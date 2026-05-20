@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Preview Sistem Topup Mahasiswa</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080b12'/%3E%3Cpath d='M16 35h32v8H16zM22 20h20v8H22z' fill='%238bb8c2'/%3E%3Cpath d='M20 43l8-23h8l8 23h-7l-1.4-5h-7.2L27 43z' fill='%23ffffff'/%3E%3C/svg%3E">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <script>
@@ -28,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260520-2">
   <style>
     body {
       background:
@@ -97,6 +98,62 @@
     .nav-btn:hover::after,
     .nav-btn.nav-active::after {
       transform: scaleX(1);
+    }
+    .poster-card .poster-content {
+      position: absolute;
+      inset: auto 0 0;
+      z-index: 10;
+      display: block;
+      padding: 1.25rem;
+      text-align: center;
+      transition: transform .28s ease, text-align .28s ease;
+    }
+    .poster-card .poster-eyebrow,
+    .poster-card .poster-title,
+    .poster-card .poster-publisher {
+      display: block;
+      letter-spacing: 0;
+    }
+    .poster-card .poster-eyebrow {
+      font-size: .68rem;
+      font-weight: 800;
+      line-height: 1;
+      color: rgba(255,255,255,.86);
+      transition: opacity .24s ease, transform .24s ease;
+    }
+    .poster-card .poster-title {
+      margin-top: .15rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-style: italic;
+      line-height: 1.05;
+      color: white;
+      transition: transform .28s ease;
+    }
+    .poster-card .poster-publisher {
+      margin-top: .35rem;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: white;
+      opacity: 0;
+      transform: translateY(.45rem);
+      transition: opacity .24s ease, transform .24s ease;
+    }
+    .poster-card:hover .poster-content {
+      transform: translateY(-.25rem);
+      text-align: left;
+    }
+    .poster-card:hover .poster-eyebrow {
+      opacity: 0;
+      transform: translateY(-.25rem);
+    }
+    .poster-card:hover .poster-title {
+      transform: translateY(-.12rem);
+    }
+    .poster-card:hover .poster-publisher {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -1015,6 +1072,6 @@
     Preview Tailwind untuk panduan sistem web topup Laravel mahasiswa.
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=20260520-2"></script>
 </body>
 </html>
