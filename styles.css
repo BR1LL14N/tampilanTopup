@@ -43,8 +43,9 @@
   content: "";
   position: absolute;
   inset: auto 0 0;
-  height: 34%;
-  background: linear-gradient(180deg, transparent, rgba(7, 47, 45, .93));
+  height: 42%;
+  background: linear-gradient(180deg, transparent, rgba(7, 47, 45, .9));
+  transition: height .28s ease, background .28s ease;
 }
 
 .poster-card:hover {
@@ -52,12 +53,79 @@
   filter: brightness(1.06);
 }
 
-.poster-card span {
+.poster-card:hover::after {
+  height: 58%;
+  background: linear-gradient(180deg, transparent, rgba(7, 24, 25, .96));
+}
+
+.poster-content {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 10;
+  padding: 1.25rem;
+  text-align: center;
+  transition: transform .28s ease, text-align .28s ease;
+}
+
+.poster-eyebrow {
+  display: block;
+  font-size: .68rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  color: rgba(255,255,255,.86);
+  transition: opacity .24s ease, transform .24s ease;
+}
+
+.poster-title {
+  display: block;
+  margin-top: .15rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.05;
+  letter-spacing: 0;
+  color: white;
   transition: transform .28s ease;
 }
 
-.poster-card:hover span {
-  transform: translateY(-4px);
+.poster-publisher {
+  display: block;
+  margin-top: .35rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: white;
+  opacity: 0;
+  transform: translateY(.45rem);
+  transition: opacity .24s ease, transform .24s ease;
+}
+
+.poster-card:hover .poster-content {
+  transform: translateY(-.25rem);
+  text-align: left;
+}
+
+.poster-card:hover .poster-eyebrow {
+  opacity: 0;
+  transform: translateY(-.25rem);
+}
+
+.poster-card:hover .poster-title {
+  transform: translateY(-.12rem);
+}
+
+.poster-card:hover .poster-publisher {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.glass {
+  transition: transform .25s ease, border-color .25s ease, background-color .25s ease;
+}
+
+.glass:hover {
+  border-color: rgba(139, 184, 194, .28);
 }
 
 .section-wrap {
@@ -154,6 +222,31 @@
   transform: translateY(-2px);
 }
 
+.interactive:active {
+  transform: translateY(0) scale(.985);
+}
+
+.poster-card.interactive:hover {
+  transform: translateY(-6px) scale(1.015);
+}
+
+.rank-card.interactive:hover {
+  transform: translateY(-4px);
+}
+
+.diagonal-card.interactive:hover {
+  transform: translateY(-4px);
+}
+
+.soft-panel {
+  transition: transform .24s ease, border-color .24s ease, background-color .24s ease;
+}
+
+.soft-panel:hover {
+  border-color: rgba(139, 184, 194, .34);
+  background: #263b3a;
+}
+
 .order-step {
   overflow: hidden;
   border-radius: .75rem;
@@ -191,6 +284,13 @@
   transform: translateY(-4px);
   border-color: rgba(139, 184, 194, .65);
   background: #315f5b;
+}
+
+.rank-card:focus,
+.poster-card:focus,
+.diagonal-card:focus {
+  outline: 2px solid rgba(139, 184, 194, .8);
+  outline-offset: 3px;
 }
 
 input, select, button {

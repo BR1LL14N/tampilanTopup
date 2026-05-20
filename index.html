@@ -53,8 +53,50 @@
     .view.active { display: block; }
     .nav-active {
       color: white;
-      background: rgba(255,255,255,.09);
-      border-color: rgba(255,255,255,.14);
+      background: rgba(139, 184, 194, .12);
+      border-color: rgba(139, 184, 194, .28);
+      box-shadow: inset 0 -2px 0 #8bb8c2;
+    }
+    .nav-btn {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      transition: color .22s ease, background-color .22s ease, border-color .22s ease, transform .22s ease;
+    }
+    .nav-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at var(--nav-x, 50%) var(--nav-y, 50%), rgba(139,184,194,.22), transparent 38%),
+        linear-gradient(90deg, rgba(139, 184, 194, .08), rgba(255, 255, 255, .08));
+      opacity: 0;
+      transition: opacity .22s ease;
+    }
+    .nav-btn::after {
+      content: "";
+      position: absolute;
+      left: .75rem;
+      right: .75rem;
+      bottom: .25rem;
+      height: 2px;
+      border-radius: 999px;
+      background: #8bb8c2;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform .24s ease;
+    }
+    .nav-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(139, 184, 194, .22);
+    }
+    .nav-btn:hover::before {
+      opacity: 1;
+    }
+    .nav-btn:hover::after,
+    .nav-btn.nav-active::after {
+      transform: scaleX(1);
     }
   </style>
 </head>
@@ -75,7 +117,6 @@
 
       <nav class="ml-auto hidden items-center gap-2 lg:flex">
         <button data-view="home" class="nav-btn nav-active rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Topup</button>
-        <button data-view="game-detail" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Detail Game</button>
         <button data-view="track" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Cek Transaksi</button>
         <button data-view="leaderboard" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Leaderboard</button>
         <button data-view="calculator" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Kalkulator</button>
@@ -95,7 +136,6 @@
     <div id="mobileNav" class="hidden border-t border-white/10 px-4 pb-4 lg:hidden">
       <div class="grid grid-cols-2 gap-2 pt-3">
         <button data-view="home" class="nav-btn nav-active rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Topup</button>
-        <button data-view="game-detail" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Detail Game</button>
         <button data-view="dashboard" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Dashboard</button>
         <button data-view="track" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Cek Transaksi</button>
         <button data-view="leaderboard" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Leaderboard</button>
@@ -333,18 +373,18 @@
           <button data-catalog-tab="live" class="rounded-lg bg-[#244341] px-5 py-3 text-sm font-extrabold text-white">Live App</button>
         </div>
         <div class="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">FREE FIRE</span></button>
-          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">MOBILE LEGENDS</span></button>
-          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">JOKI RANK</span></button>
-          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">MAGIC CHESS</span></button>
-          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">DELTA FORCE</span></button>
-          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">PUBG MOBILE</span></button>
-          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">HONOR OF KINGS</span></button>
-          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">GENSHIN</span></button>
-          <button data-view="game-detail" data-catalog-item="voucher" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">ROBLOX</span></button>
-          <button data-view="game-detail" data-catalog-item="voucher" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">STEAM WALLET</span></button>
-          <button data-view="game-detail" data-catalog-item="live" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">TIKTOK LIVE</span></button>
-          <button data-view="game-detail" data-catalog-item="live" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=500&q=80')"><span class="absolute bottom-5 z-10 block w-full px-4 text-center text-2xl font-extrabold italic">BIGO LIVE</span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">FREE FIRE</span><span class="poster-publisher">Garena</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">MOBILE LEGENDS</span><span class="poster-publisher">Moonton</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">JOKI MOBILE LEGENDS</span><span class="poster-title">JOKI RANK</span><span class="poster-publisher">KampusTopup</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">MAGIC CHESS</span><span class="poster-publisher">Moonton</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">DELTA FORCE</span><span class="poster-publisher">Level Infinite</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">PUBG MOBILE</span><span class="poster-publisher">Tencent Games</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">HONOR OF KINGS</span><span class="poster-publisher">Tencent Games</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">GENSHIN</span><span class="poster-publisher">HoYoverse</span></span></button>
+          <button data-view="game-detail" data-catalog-item="voucher" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">VOUCHER</span><span class="poster-title">ROBLOX</span><span class="poster-publisher">Roblox Corporation</span></span></button>
+          <button data-view="game-detail" data-catalog-item="voucher" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">VOUCHER</span><span class="poster-title">STEAM WALLET</span><span class="poster-publisher">Valve</span></span></button>
+          <button data-view="game-detail" data-catalog-item="live" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">LIVE APP</span><span class="poster-title">TIKTOK LIVE</span><span class="poster-publisher">TikTok</span></span></button>
+          <button data-view="game-detail" data-catalog-item="live" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">LIVE APP</span><span class="poster-title">BIGO LIVE</span><span class="poster-publisher">BIGO</span></span></button>
         </div>
       </div>
     </section>

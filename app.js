@@ -91,4 +91,12 @@ document.querySelectorAll('button, .rank-card, .poster-card').forEach((element) 
   element.classList.add('interactive');
 });
 
+document.querySelectorAll('.nav-btn').forEach((button) => {
+  button.addEventListener('pointermove', (event) => {
+    const rect = button.getBoundingClientRect();
+    button.style.setProperty('--nav-x', `${event.clientX - rect.left}px`);
+    button.style.setProperty('--nav-y', `${event.clientY - rect.top}px`);
+  });
+});
+
 lucide.createIcons();
