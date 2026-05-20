@@ -1,0 +1,207 @@
+.soft-panel {
+  background: #223433;
+  border: 1px solid rgba(160, 190, 194, .18);
+}
+
+.diagonal-card {
+  background:
+    linear-gradient(135deg, rgba(126, 163, 169, .18) 0 12%, transparent 12% 26%, rgba(126, 163, 169, .15) 26% 34%, transparent 34% 58%, rgba(126, 163, 169, .12) 58% 66%, transparent 66%),
+    #2d504d;
+  position: relative;
+  overflow: hidden;
+  transition: transform .24s ease, border-color .24s ease, filter .24s ease;
+}
+
+.diagonal-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  translate: -120% 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.13) 50%, transparent 65%);
+  transition: translate .7s ease;
+  pointer-events: none;
+}
+
+.diagonal-card:hover {
+  transform: translateY(-4px);
+  filter: brightness(1.04);
+}
+
+.diagonal-card:hover::before {
+  translate: 120% 0;
+}
+
+.poster-card {
+  min-height: 352px;
+  background-size: cover;
+  background-position: center;
+  transition: transform .28s ease, filter .28s ease;
+  will-change: transform;
+}
+
+.poster-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 34%;
+  background: linear-gradient(180deg, transparent, rgba(7, 47, 45, .93));
+}
+
+.poster-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  filter: brightness(1.06);
+}
+
+.poster-card span {
+  transition: transform .28s ease;
+}
+
+.poster-card:hover span {
+  transform: translateY(-4px);
+}
+
+.section-wrap {
+  margin-top: 2rem;
+}
+
+.tab-active {
+  background: #8bb8c2;
+  color: white;
+}
+
+.catalog-tab-active {
+  background: #8bb8c2;
+  color: #081016;
+}
+
+.hero-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: .75rem;
+  border: 1px solid rgba(160, 190, 194, .18);
+  background: #172322;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform .55s ease;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  min-height: 420px;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0) scale(1.02);
+  transition: transform .25s ease;
+}
+
+.carousel-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(8, 11, 18, .62), rgba(8, 11, 18, .08) 48%, rgba(8, 11, 18, .42));
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  display: grid;
+  height: 3.75rem;
+  width: 3.75rem;
+  transform: translateY(-50%);
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(17, 34, 34, .7);
+  color: white;
+  backdrop-filter: blur(12px);
+}
+
+.carousel-nav:hover {
+  background: rgba(45, 80, 77, .9);
+}
+
+.carousel-dot {
+  height: .55rem;
+  width: .55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .45);
+}
+
+.carousel-dot.active {
+  width: 1.8rem;
+  background: #8bb8c2;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .55s ease, transform .55s ease;
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.interactive {
+  transition: transform .2s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+}
+
+.order-step {
+  overflow: hidden;
+  border-radius: .75rem;
+  background: #223a38;
+  border: 1px solid rgba(160, 190, 194, .16);
+}
+
+.step-head {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  align-items: center;
+  background: #2b5753;
+  color: white;
+  font-weight: 800;
+}
+
+.step-number {
+  display: grid;
+  height: 50px;
+  place-items: center;
+  background: #82aeb8;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.rank-card {
+  min-height: 152px;
+  border-radius: .75rem;
+  background: #2a5652;
+  border: 1px solid rgba(160, 190, 194, .12);
+  transition: transform .22s ease, border-color .22s ease, background-color .22s ease;
+}
+
+.rank-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(139, 184, 194, .65);
+  background: #315f5b;
+}
+
+input, select, button {
+  transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
