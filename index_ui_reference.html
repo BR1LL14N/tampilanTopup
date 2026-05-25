@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Preview Sistem Topup Mahasiswa</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080b12'/%3E%3Cpath d='M16 35h32v8H16zM22 20h20v8H22z' fill='%238bb8c2'/%3E%3Cpath d='M20 43l8-23h8l8 23h-7l-1.4-5h-7.2L27 43z' fill='%23ffffff'/%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+          },
+          colors: {
+            ink: '#080b12',
+            panel: '#101522',
+            line: 'rgba(255,255,255,.11)'
+          },
+          boxShadow: {
+            neon: '0 10px 30px rgba(15,23,42,.26)'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260520-2">
+  <style>
+    body {
+      background:
+        radial-gradient(circle at 12% 0%, rgba(14,165,233,.10), transparent 26rem),
+        radial-gradient(circle at 86% 6%, rgba(148,163,184,.09), transparent 24rem),
+        linear-gradient(180deg, #080b12 0%, #0c111c 48%, #070a11 100%);
+    }
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.11);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 28px rgba(0,0,0,.18);
+      backdrop-filter: blur(20px);
+    }
+    .mesh {
+      background-image:
+        linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent);
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+    .nav-active {
+      color: white;
+      background: rgba(139, 184, 194, .12);
+      border-color: rgba(139, 184, 194, .28);
+      box-shadow: inset 0 -2px 0 #8bb8c2;
+    }
+    .nav-btn {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      transition: color .22s ease, background-color .22s ease, border-color .22s ease, transform .22s ease;
+    }
+    .nav-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at var(--nav-x, 50%) var(--nav-y, 50%), rgba(139,184,194,.22), transparent 38%),
+        linear-gradient(90deg, rgba(139, 184, 194, .08), rgba(255, 255, 255, .08));
+      opacity: 0;
+      transition: opacity .22s ease;
+    }
+    .nav-btn::after {
+      content: "";
+      position: absolute;
+      left: .75rem;
+      right: .75rem;
+      bottom: .25rem;
+      height: 2px;
+      border-radius: 999px;
+      background: #8bb8c2;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform .24s ease;
+    }
+    .nav-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(139, 184, 194, .22);
+    }
+    .nav-btn:hover::before {
+      opacity: 1;
+    }
+    .nav-btn:hover::after,
+    .nav-btn.nav-active::after {
+      transform: scaleX(1);
+    }
+    .poster-card .poster-content {
+      position: absolute;
+      inset: auto 0 0;
+      z-index: 10;
+      display: block;
+      padding: 1.25rem;
+      text-align: center;
+      transition: transform .28s ease, text-align .28s ease;
+    }
+    .poster-card .poster-eyebrow,
+    .poster-card .poster-title,
+    .poster-card .poster-publisher {
+      display: block;
+      letter-spacing: 0;
+    }
+    .poster-card .poster-eyebrow {
+      font-size: .68rem;
+      font-weight: 800;
+      line-height: 1;
+      color: rgba(255,255,255,.86);
+      transition: opacity .24s ease, transform .24s ease;
+    }
+    .poster-card .poster-title {
+      margin-top: .15rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-style: italic;
+      line-height: 1.05;
+      color: white;
+      transition: transform .28s ease;
+    }
+    .poster-card .poster-publisher {
+      margin-top: .35rem;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: white;
+      opacity: 0;
+      transform: translateY(.45rem);
+      transition: opacity .24s ease, transform .24s ease;
+    }
+    .poster-card:hover .poster-content {
+      transform: translateY(-.25rem);
+      text-align: left;
+    }
+    .poster-card:hover .poster-eyebrow {
+      opacity: 0;
+      transform: translateY(-.25rem);
+    }
+    .poster-card:hover .poster-title {
+      transform: translateY(-.12rem);
+    }
+    .poster-card:hover .poster-publisher {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 antialiased">
+  <div class="pointer-events-none fixed inset-0 mesh opacity-50"></div>
+
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-ink/80 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <button data-view="home" class="group flex items-center gap-3">
+        <span class="grid h-10 w-10 place-items-center rounded-lg bg-cyan-300 text-ink">
+          <i data-lucide="zap" class="h-5 w-5"></i>
+        </span>
+        <span>
+          <span class="block text-left text-base font-extrabold tracking-wide">KampusTopup</span>
+          <span class="block text-left text-xs text-slate-400">Laravel topup preview</span>
+        </span>
+      </button>
+
+      <nav class="ml-auto hidden items-center gap-2 lg:flex">
+        <button data-view="home" class="nav-btn nav-active rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Topup</button>
+        <button data-view="track" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Cek Transaksi</button>
+        <button data-view="leaderboard" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Leaderboard</button>
+        <button data-view="calculator" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Kalkulator</button>
+        <button data-view="dashboard" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Dashboard</button>
+        <button data-view="admin" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300 transition hover:text-white">Admin</button>
+        <button data-view="invoice" class="nav-btn rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15">Invoice</button>
+      </nav>
+
+      <button class="ml-auto rounded-lg border border-white/10 p-2 text-slate-300 lg:hidden" id="mobileToggle" aria-label="Buka menu">
+        <i data-lucide="menu" class="h-5 w-5"></i>
+      </button>
+      <button class="hidden items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-bold text-ink sm:flex">
+        <i data-lucide="user-round-plus" class="h-4 w-4"></i>
+        Daftar
+      </button>
+    </div>
+    <div id="mobileNav" class="hidden border-t border-white/10 px-4 pb-4 lg:hidden">
+      <div class="grid grid-cols-2 gap-2 pt-3">
+        <button data-view="home" class="nav-btn nav-active rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Topup</button>
+        <button data-view="dashboard" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Dashboard</button>
+        <button data-view="track" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Cek Transaksi</button>
+        <button data-view="leaderboard" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Leaderboard</button>
+        <button data-view="calculator" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Kalkulator</button>
+        <button data-view="admin" class="nav-btn rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-slate-300">Admin</button>
+        <button data-view="invoice" class="nav-btn col-span-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-sm font-semibold text-cyan-100">Invoice</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <section id="home" class="view active">
+      <div class="hero-carousel mb-10">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide" style="background-image:url('https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=1800&q=85')">
+            <div class="relative z-10 flex min-h-[420px] items-center p-7 sm:p-10 lg:p-14">
+              <div class="max-w-2xl">
+                <span class="rounded-lg bg-white/15 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-cyan-100">Promo Akun Aman</span>
+                <h2 class="mt-5 text-4xl font-extrabold uppercase leading-tight text-white sm:text-6xl">Cari akun FF dan ML?</h2>
+                <p class="mt-4 max-w-xl text-lg font-semibold text-slate-100">Topup, voucher, dan layanan game dengan proses cepat, aman, dan bergaransi.</p>
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <button data-view="game-detail" class="rounded-lg bg-cyan-200 px-5 py-3 text-sm font-extrabold text-ink">Topup Sekarang</button>
+                  <button data-view="track" class="rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white">Cek Pesanan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-slide" style="background-image:url('https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=1800&q=85')">
+            <div class="relative z-10 flex min-h-[420px] items-center p-7 sm:p-10 lg:p-14">
+              <div class="max-w-2xl">
+                <span class="rounded-lg bg-white/15 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-cyan-100">Event Mingguan</span>
+                <h2 class="mt-5 text-4xl font-extrabold uppercase leading-tight text-white sm:text-6xl">Diamond murah untuk push rank.</h2>
+                <p class="mt-4 max-w-xl text-lg font-semibold text-slate-100">Pilih nominal favorit, bayar QRIS, lalu sistem otomatis mengirim order ke provider.</p>
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <button data-view="game-detail" class="rounded-lg bg-cyan-200 px-5 py-3 text-sm font-extrabold text-ink">Lihat Produk</button>
+                  <button data-view="calculator" class="rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white">Hitung Profit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-slide" style="background-image:url('https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=1800&q=85')">
+            <div class="relative z-10 flex min-h-[420px] items-center p-7 sm:p-10 lg:p-14">
+              <div class="max-w-2xl">
+                <span class="rounded-lg bg-white/15 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-cyan-100">Voucher Digital</span>
+                <h2 class="mt-5 text-4xl font-extrabold uppercase leading-tight text-white sm:text-6xl">Roblox, Steam, dan live app.</h2>
+                <p class="mt-4 max-w-xl text-lg font-semibold text-slate-100">Katalog bisa dipisah per kategori agar user cepat menemukan produk yang mereka cari.</p>
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <button data-view="game-detail" class="rounded-lg bg-cyan-200 px-5 py-3 text-sm font-extrabold text-ink">Buka Katalog</button>
+                  <button data-view="leaderboard" class="rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white">Leaderboard</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="carousel-nav left-5" type="button" id="carouselPrev" aria-label="Slide sebelumnya">
+          <i data-lucide="chevron-left" class="h-7 w-7"></i>
+        </button>
+        <button class="carousel-nav right-5" type="button" id="carouselNext" aria-label="Slide berikutnya">
+          <i data-lucide="chevron-right" class="h-7 w-7"></i>
+        </button>
+        <div class="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+          <button class="carousel-dot active" type="button" data-carousel-dot="0" aria-label="Slide 1"></button>
+          <button class="carousel-dot" type="button" data-carousel-dot="1" aria-label="Slide 2"></button>
+          <button class="carousel-dot" type="button" data-carousel-dot="2" aria-label="Slide 3"></button>
+        </div>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-[1.12fr_.88fr]">
+        <div class="relative min-h-[520px] overflow-hidden rounded-lg border border-white/10 bg-ink">
+          <img class="absolute inset-0 h-full w-full object-cover opacity-55" src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80" alt="Setup gaming dengan lampu neon" />
+          <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/25"></div>
+          <div class="relative flex min-h-[520px] flex-col justify-between p-6 sm:p-8">
+            <div class="flex flex-wrap gap-2">
+              <span class="rounded-lg border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-bold text-emerald-200">QRIS otomatis</span>
+              <span class="rounded-lg border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-200">Webhook ready</span>
+              <span class="rounded-lg border border-slate-300/15 bg-white/10 px-3 py-1 text-xs font-bold text-slate-200">Multi provider</span>
+            </div>
+            <div class="max-w-2xl">
+              <h1 class="text-4xl font-extrabold leading-tight text-white sm:text-6xl">Topup game cepat untuk project Laravel mahasiswa.</h1>
+              <p class="mt-5 max-w-xl text-base leading-7 text-slate-300">Preview UI lengkap dari landing, pilih produk, dashboard user, admin monitoring, hingga detail invoice QRIS.</p>
+              <div class="mt-7 flex flex-wrap gap-3">
+                <button data-view="game-detail" class="rounded-lg bg-cyan-300 px-5 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-200">Mulai topup</button>
+                <button data-view="history" class="rounded-lg border border-white/15 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15">Cek transaksi</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 text-sm">
+              <div class="glass rounded-lg p-4">
+                <p class="text-2xl font-extrabold">2.1k</p>
+                <p class="mt-1 text-slate-400">Transaksi</p>
+              </div>
+              <div class="glass rounded-lg p-4">
+                <p class="text-2xl font-extrabold">99.7%</p>
+                <p class="mt-1 text-slate-400">Sukses</p>
+              </div>
+              <div class="glass rounded-lg p-4">
+                <p class="text-2xl font-extrabold">35s</p>
+                <p class="mt-1 text-slate-400">Rata-rata</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="glass rounded-lg p-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-extrabold">Checkout Topup</h2>
+              <p class="mt-1 text-sm text-slate-400">Mobile Legends dipilih otomatis</p>
+            </div>
+            <span class="rounded-lg bg-white/10 px-3 py-1 text-xs font-bold text-cyan-100">Live preview</span>
+          </div>
+
+          <div class="mt-5 overflow-hidden rounded-lg border border-white/10">
+            <img class="h-36 w-full object-cover" src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?auto=format&fit=crop&w=900&q=80" alt="Pemain game sedang memakai headset" />
+          </div>
+
+          <div class="mt-5 grid gap-3">
+            <label class="block">
+              <span class="mb-2 block text-sm font-semibold text-slate-300">ID Game</span>
+              <input value="12345678 (1234)" class="w-full rounded-lg border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none ring-cyan-300/40 focus:ring-2" />
+            </label>
+            <div>
+              <span class="mb-2 block text-sm font-semibold text-slate-300">Nominal</span>
+              <div class="grid grid-cols-2 gap-2">
+                <button class="rounded-lg border border-white/10 bg-white/10 p-3 text-left transition hover:border-cyan-300/40 hover:bg-cyan-300/10">
+                  <span class="block font-bold">86 Diamonds</span>
+                  <span class="text-sm text-cyan-200">Rp21.000</span>
+                </button>
+                <button class="rounded-lg border border-cyan-300/50 bg-cyan-300/15 p-3 text-left">
+                  <span class="block font-bold">172 Diamonds</span>
+                  <span class="text-sm text-cyan-200">Rp41.000</span>
+                </button>
+                <button class="rounded-lg border border-white/10 bg-white/10 p-3 text-left transition hover:border-cyan-300/40 hover:bg-cyan-300/10">
+                  <span class="block font-bold">257 Diamonds</span>
+                  <span class="text-sm text-cyan-200">Rp61.500</span>
+                </button>
+                <button class="rounded-lg border border-white/10 bg-white/10 p-3 text-left transition hover:border-cyan-300/40 hover:bg-cyan-300/10">
+                  <span class="block font-bold">344 Diamonds</span>
+                  <span class="text-sm text-cyan-200">Rp82.000</span>
+                </button>
+              </div>
+            </div>
+            <div>
+              <span class="mb-2 block text-sm font-semibold text-slate-300">Pembayaran</span>
+              <div class="grid grid-cols-3 gap-2">
+                <button class="rounded-lg border border-cyan-300/50 bg-cyan-300/15 px-3 py-3 text-sm font-bold">QRIS</button>
+                <button class="rounded-lg border border-white/10 bg-white/10 px-3 py-3 text-sm font-bold text-slate-300">VA</button>
+                <button class="rounded-lg border border-white/10 bg-white/10 px-3 py-3 text-sm font-bold text-slate-300">E-Wallet</button>
+              </div>
+            </div>
+            <button data-view="game-detail" class="mt-2 rounded-lg bg-white px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-100">Lihat Detail Game</button>
+          </div>
+        </aside>
+      </div>
+
+      <div class="mt-8">
+        <div class="mb-4 flex items-end justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-extrabold">Populer Sekarang</h2>
+            <p class="mt-1 text-sm text-slate-400">Katalog produk bergaya marketplace topup dengan kartu ringkas.</p>
+          </div>
+          <button class="hidden rounded-lg border border-white/10 px-4 py-2 text-sm font-bold text-slate-200 sm:block">Semua game</button>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <article data-view="game-detail" class="group cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-white/10 transition hover:-translate-y-1 hover:border-cyan-300/40">
+            <img class="h-40 w-full object-cover transition duration-500 group-hover:scale-105" src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Game action di monitor" />
+            <div class="p-4">
+              <h3 class="font-extrabold">Mobile Legends</h3>
+              <p class="mt-1 text-sm text-slate-400">Mulai Rp3.500</p>
+            </div>
+          </article>
+          <article data-view="game-detail" class="group cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-white/10 transition hover:-translate-y-1 hover:border-cyan-300/40">
+            <img class="h-40 w-full object-cover transition duration-500 group-hover:scale-105" src="https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=800&q=80" alt="Controller game" />
+            <div class="p-4">
+              <h3 class="font-extrabold">Free Fire</h3>
+              <p class="mt-1 text-sm text-slate-400">Mulai Rp1.000</p>
+            </div>
+          </article>
+          <article data-view="game-detail" class="group cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-white/10 transition hover:-translate-y-1 hover:border-cyan-300/40">
+            <img class="h-40 w-full object-cover transition duration-500 group-hover:scale-105" src="https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=800&q=80" alt="Suasana turnamen gaming" />
+            <div class="p-4">
+              <h3 class="font-extrabold">PUBG Mobile</h3>
+              <p class="mt-1 text-sm text-slate-400">Mulai Rp12.000</p>
+            </div>
+          </article>
+          <article data-view="game-detail" class="group cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-white/10 transition hover:-translate-y-1 hover:border-cyan-300/40">
+            <img class="h-40 w-full object-cover transition duration-500 group-hover:scale-105" src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=800&q=80" alt="Keyboard gaming RGB" />
+            <div class="p-4">
+              <h3 class="font-extrabold">Valorant</h3>
+              <p class="mt-1 text-sm text-slate-400">Mulai Rp52.000</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="section-wrap">
+        <div class="mb-4 flex items-center gap-3">
+          <span class="text-2xl">🔥</span>
+          <div>
+            <h2 class="text-2xl font-extrabold tracking-wide">POPULER SEKARANG!</h2>
+            <p class="mt-1 text-sm text-slate-300">Berikut adalah beberapa produk yang paling populer saat ini.</p>
+          </div>
+        </div>
+        <div class="grid gap-5 lg:grid-cols-3">
+          <button data-view="game-detail" class="diagonal-card flex min-h-28 items-center gap-4 rounded-lg p-3 text-left transition hover:-translate-y-1">
+            <img class="h-24 w-24 rounded-lg object-cover" src="https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=300&q=80" alt="Free Fire">
+            <span><strong class="block text-lg">Free Fire</strong><span class="mt-1 block text-sm text-white/80">Garena</span></span>
+          </button>
+          <button data-view="game-detail" class="diagonal-card flex min-h-28 items-center gap-4 rounded-lg p-3 text-left transition hover:-translate-y-1">
+            <img class="h-24 w-24 rounded-lg object-cover" src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80" alt="Mobile Legends">
+            <span><strong class="block text-lg">Mobile Legends</strong><span class="mt-1 block text-sm text-white/80">Moonton</span></span>
+          </button>
+          <button data-view="game-detail" class="diagonal-card flex min-h-28 items-center gap-4 rounded-lg p-3 text-left transition hover:-translate-y-1">
+            <img class="h-24 w-24 rounded-lg object-cover" src="https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=300&q=80" alt="Joki rank">
+            <span><strong class="block text-lg">Joki Rank</strong><span class="mt-1 block text-sm text-white/80">KampusTopup</span></span>
+          </button>
+          <button data-view="game-detail" class="diagonal-card flex min-h-28 items-center gap-4 rounded-lg p-3 text-left transition hover:-translate-y-1">
+            <img class="h-24 w-24 rounded-lg object-cover" src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=300&q=80" alt="Roblox Voucher">
+            <span><strong class="block text-lg">ROBLOX - Voucher</strong><span class="mt-1 block text-sm text-white/80">Roblox Corporation</span></span>
+          </button>
+          <button data-view="game-detail" class="diagonal-card flex min-h-28 items-center gap-4 rounded-lg p-3 text-left transition hover:-translate-y-1">
+            <img class="h-24 w-24 rounded-lg object-cover" src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=300&q=80" alt="Honor of Kings">
+            <span><strong class="block text-lg">Honor Of Kings</strong><span class="mt-1 block text-sm text-white/80">Tencent Games</span></span>
+          </button>
+          <button data-view="game-detail" class="diagonal-card flex min-h-28 items-center gap-4 rounded-lg p-3 text-left transition hover:-translate-y-1">
+            <img class="h-24 w-24 rounded-lg object-cover" src="https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=300&q=80" alt="Valorant">
+            <span><strong class="block text-lg">Valorant</strong><span class="mt-1 block text-sm text-white/80">Riot Games</span></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="section-wrap">
+        <div class="mb-6 flex flex-wrap gap-3">
+          <button data-catalog-tab="all" class="catalog-tab-active rounded-lg px-5 py-3 text-sm font-extrabold">Top Up</button>
+          <button data-catalog-tab="voucher" class="rounded-lg bg-[#244341] px-5 py-3 text-sm font-extrabold text-white">Voucher</button>
+          <button data-catalog-tab="live" class="rounded-lg bg-[#244341] px-5 py-3 text-sm font-extrabold text-white">Live App</button>
+        </div>
+        <div class="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">FREE FIRE</span><span class="poster-publisher">Garena</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">MOBILE LEGENDS</span><span class="poster-publisher">Moonton</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">JOKI MOBILE LEGENDS</span><span class="poster-title">JOKI RANK</span><span class="poster-publisher">KampusTopup</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">MAGIC CHESS</span><span class="poster-publisher">Moonton</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">DELTA FORCE</span><span class="poster-publisher">Level Infinite</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">PUBG MOBILE</span><span class="poster-publisher">Tencent Games</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">HONOR OF KINGS</span><span class="poster-publisher">Tencent Games</span></span></button>
+          <button data-view="game-detail" data-catalog-item="all" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">TOP UP GAME</span><span class="poster-title">GENSHIN</span><span class="poster-publisher">HoYoverse</span></span></button>
+          <button data-view="game-detail" data-catalog-item="voucher" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">VOUCHER</span><span class="poster-title">ROBLOX</span><span class="poster-publisher">Roblox Corporation</span></span></button>
+          <button data-view="game-detail" data-catalog-item="voucher" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">VOUCHER</span><span class="poster-title">STEAM WALLET</span><span class="poster-publisher">Valve</span></span></button>
+          <button data-view="game-detail" data-catalog-item="live" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">LIVE APP</span><span class="poster-title">TIKTOK LIVE</span><span class="poster-publisher">TikTok</span></span></button>
+          <button data-view="game-detail" data-catalog-item="live" class="poster-card relative overflow-hidden rounded-lg text-left" style="background-image:url('https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=500&q=80')"><span class="poster-content"><span class="poster-eyebrow">LIVE APP</span><span class="poster-title">BIGO LIVE</span><span class="poster-publisher">BIGO</span></span></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="game-detail" class="view">
+      <div class="diagonal-card mb-6 overflow-hidden rounded-lg border border-cyan-200/20">
+        <div class="grid min-h-[360px] items-end gap-6 p-6 sm:p-8 lg:grid-cols-[280px_1fr] lg:p-10">
+          <img class="h-72 w-full max-w-[260px] rounded-lg object-cover shadow-2xl" src="https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=700&q=80" alt="Poster Free Fire">
+          <div class="pb-3">
+            <p class="text-sm font-extrabold uppercase tracking-wider text-cyan-100">Top Up Game</p>
+            <h1 class="mt-2 text-4xl font-extrabold uppercase tracking-wide text-white">Joki Rank</h1>
+            <p class="mt-2 text-lg font-semibold text-slate-200">KampusTopup</p>
+            <div class="mt-8 flex flex-wrap gap-5 text-sm font-bold text-white">
+              <span class="inline-flex items-center gap-2"><i data-lucide="zap" class="h-4 w-4 text-yellow-300"></i>Proses Cepat</span>
+              <span class="inline-flex items-center gap-2"><i data-lucide="messages-square" class="h-4 w-4 text-blue-300"></i>Layanan Chat 24/7</span>
+              <span class="inline-flex items-center gap-2"><i data-lucide="badge-check" class="h-4 w-4 text-blue-300"></i>Pembayaran Aman</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid gap-6 lg:grid-cols-[1fr_380px]">
+        <div class="space-y-6">
+          <div class="flex w-fit overflow-hidden rounded-lg border border-white/10 bg-ink/50 text-sm font-extrabold">
+            <button class="tab-active px-5 py-3">Transaksi</button>
+            <button class="px-5 py-3 text-slate-300">Keterangan</button>
+          </div>
+
+          <div class="order-step">
+            <div class="step-head"><span class="step-number">1</span><span class="px-5">Masukkan Data Akun</span></div>
+            <div class="grid gap-4 p-5 sm:grid-cols-2">
+              <label><span class="mb-2 block text-sm font-bold">User ID</span><input placeholder="Masukkan User ID" class="w-full rounded-lg border border-transparent bg-[#82aeb8] px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none"></label>
+              <label><span class="mb-2 block text-sm font-bold">Server ID</span><input placeholder="Masukkan Server ID" class="w-full rounded-lg border border-transparent bg-[#82aeb8] px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none"></label>
+              <label><span class="mb-2 block text-sm font-bold">Email</span><input placeholder="Masukkan Email" class="w-full rounded-lg border border-transparent bg-[#82aeb8] px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none"></label>
+              <label><span class="mb-2 block text-sm font-bold">Pilih Login</span><select class="w-full rounded-lg border border-transparent bg-[#82aeb8] px-4 py-3 text-sm text-white outline-none"><option>Pilih Login</option><option>Moonton</option><option>Facebook</option><option>Tiktok</option><option>VK</option><option>Google</option></select></label>
+              <label><span class="mb-2 block text-sm font-bold">Request ke Penjoki</span><input placeholder="Contoh: main hero mage, jangan pakai chat all" class="w-full rounded-lg border border-transparent bg-[#82aeb8] px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none"></label>
+              <label><span class="mb-2 block text-sm font-bold">Password</span><input type="password" placeholder="Masukkan Password" class="w-full rounded-lg border border-transparent bg-[#82aeb8] px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none"></label>
+              <p class="sm:col-span-2 text-sm text-slate-300">Please make sure you fill the correct account data.</p>
+            </div>
+          </div>
+
+          <div class="order-step">
+            <div class="step-head"><span class="step-number">2</span><span class="px-5">Pilih Nominal</span></div>
+            <div class="p-5">
+              <h3 class="mb-4 font-extrabold">Joki Rank</h3>
+              <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <button class="rank-card p-4 text-left"><span class="block font-extrabold">GRAND MASTER</span><span class="mt-3 block text-xl font-extrabold text-[#82b7c2]">Rp 3.000</span><span class="mt-1 block text-sm font-bold text-pink-500 line-through">Rp 5.000</span><span class="mt-6 inline-block rounded-md bg-[#82aeb8] px-3 py-1 text-xs font-bold">Disc 40%</span></button>
+                <button class="rank-card p-4 text-left"><span class="block font-extrabold">EPIC</span><span class="mt-3 block text-xl font-extrabold text-[#82b7c2]">Rp 4.000</span><span class="mt-1 block text-sm font-bold text-pink-500 line-through">Rp 7.000</span><span class="mt-6 inline-block rounded-md bg-[#82aeb8] px-3 py-1 text-xs font-bold">Disc 43%</span></button>
+                <button class="rank-card p-4 text-left"><span class="block font-extrabold">LEGEND</span><span class="mt-3 block text-xl font-extrabold text-[#82b7c2]">Rp 4.000</span><span class="mt-1 block text-sm font-bold text-pink-500 line-through">Rp 9.000</span><span class="mt-6 inline-block rounded-md bg-[#82aeb8] px-3 py-1 text-xs font-bold">Disc 56%</span></button>
+                <button class="rank-card p-4 text-left"><span class="block font-extrabold">MYTHIC</span><span class="mt-3 block text-xl font-extrabold text-[#82b7c2]">Rp 9.000</span><span class="mt-1 block text-sm font-bold text-pink-500 line-through">Rp 22.000</span><span class="mt-6 inline-block rounded-md bg-[#82aeb8] px-3 py-1 text-xs font-bold">Disc 59%</span></button>
+                <button class="rank-card p-4 text-left"><span class="block font-extrabold">MYTHIC HONOR</span><span class="mt-3 block text-xl font-extrabold text-[#82b7c2]">Rp 10.000</span><span class="mt-1 block text-sm font-bold text-pink-500 line-through">Rp 22.000</span><span class="mt-6 inline-block rounded-md bg-[#82aeb8] px-3 py-1 text-xs font-bold">Disc 55%</span></button>
+                <button class="rank-card p-4 text-left"><span class="block font-extrabold">MYTHIC GLORY</span><span class="mt-3 block text-xl font-extrabold text-[#82b7c2]">Rp 12.000</span><span class="mt-1 block text-sm font-bold text-pink-500 line-through">Rp 22.000</span><span class="mt-6 inline-block rounded-md bg-[#82aeb8] px-3 py-1 text-xs font-bold">Disc 45%</span></button>
+                <button class="rank-card p-4 text-left"><span class="block font-extrabold">MYTHIC IMMORTAL</span><span class="mt-3 block text-xl font-extrabold text-[#82b7c2]">Rp 18.000</span><span class="mt-1 block text-sm font-bold text-pink-500 line-through">Rp 32.000</span><span class="mt-6 inline-block rounded-md bg-[#82aeb8] px-3 py-1 text-xs font-bold">Disc 44%</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="order-step">
+            <div class="step-head"><span class="step-number">3</span><span class="px-5">Masukkan Jumlah Pembelian</span></div>
+            <div class="flex gap-3 p-5">
+              <input value="1" class="min-w-0 flex-1 rounded-lg bg-[#82aeb8] px-4 py-3 text-white outline-none">
+              <button class="grid h-12 w-12 place-items-center rounded-lg bg-[#82aeb8]"><i data-lucide="plus" class="h-5 w-5"></i></button>
+              <button class="grid h-12 w-12 place-items-center rounded-lg bg-white/15"><i data-lucide="minus" class="h-5 w-5"></i></button>
+            </div>
+          </div>
+
+          <div class="order-step">
+            <div class="step-head"><span class="step-number">4</span><span class="px-5">Pilih Pembayaran</span></div>
+            <div class="grid gap-3 p-5 md:grid-cols-3">
+              <button class="rounded-lg border border-cyan-200/40 bg-[#2a5652] p-4 text-left"><strong>QRIS</strong><span class="mt-1 block text-sm text-slate-300">Otomatis</span></button>
+              <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left"><strong>Virtual Account</strong><span class="mt-1 block text-sm text-slate-300">Bank</span></button>
+              <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left"><strong>E-Wallet</strong><span class="mt-1 block text-sm text-slate-300">DANA, OVO</span></button>
+            </div>
+          </div>
+
+          <div class="order-step">
+            <div class="step-head"><span class="step-number">5</span><span class="px-5">Kode Promo</span></div>
+            <div class="grid gap-3 p-5 sm:grid-cols-[1fr_auto]">
+              <input placeholder="Masukkan kode promo" class="rounded-lg bg-[#82aeb8] px-4 py-3 text-white placeholder:text-white/55 outline-none">
+              <button class="rounded-lg bg-white px-5 py-3 font-extrabold text-ink">Gunakan</button>
+              <button class="sm:col-span-2 rounded-lg border border-dashed border-cyan-200/50 px-4 py-3 text-left font-bold text-cyan-100">Pakai Promo Yang Tersedia</button>
+            </div>
+          </div>
+
+          <div class="order-step">
+            <div class="step-head"><span class="step-number">6</span><span class="px-5">Detail Kontak</span></div>
+            <div class="p-5">
+              <label><span class="mb-2 block text-sm font-bold">No. WhatsApp</span><div class="grid grid-cols-[72px_1fr] gap-3"><span class="rounded-lg bg-[#82aeb8] px-4 py-3 font-bold">ID</span><input placeholder="81234567890" class="rounded-lg bg-[#82aeb8] px-4 py-3 text-white placeholder:text-white/55 outline-none"></div></label>
+              <p class="mt-3 text-sm text-slate-300">Nomor ini akan dihubungi jika terjadi masalah. Bukti transaksi akan kami kirim ke email/WA yang kamu isi di atas.</p>
+            </div>
+          </div>
+
+          <div class="soft-panel rounded-lg p-6">
+            <h2 class="text-xl font-extrabold">Deskripsi Joki Rank</h2>
+            <p class="mt-3 text-sm leading-7 text-slate-300">Jasa Joki Mobile Legends Auto Win Streak termurah. Cara order: input data akun, pilih paket, masukkan jumlah, pilih pembayaran, tulis No WhatsApp, klik Order Now, lalu tunggu tim memproses jokian Anda.</p>
+            <h3 class="mt-5 font-extrabold">Rule Joki</h3>
+            <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-300">
+              <li>Matikan centang verify di pengaturan ML.</li>
+              <li>Jika login 3x selama proses joki berlangsung maka dianggap selesai dan tidak bisa refund.</li>
+            </ol>
+          </div>
+        </div>
+
+        <aside class="space-y-5 lg:sticky lg:top-28 lg:self-start">
+          <div class="soft-panel rounded-lg p-5">
+            <h2 class="font-extrabold">Ulasan dan rating</h2>
+            <div class="mt-3 flex items-center gap-4">
+              <span class="text-6xl font-extrabold">5.00</span>
+              <span class="text-5xl text-yellow-300">★★★★★</span>
+            </div>
+            <p class="text-sm font-bold">Berdasarkan total 870 rating</p>
+          </div>
+          <div class="soft-panel flex items-center gap-4 rounded-lg p-5">
+            <i data-lucide="headphones" class="h-8 w-8 text-slate-200"></i>
+            <div><p class="font-extrabold">Butuh Bantuan?</p><p class="text-sm text-slate-300">Kamu bisa hubungi admin disini.</p></div>
+          </div>
+          <div class="rounded-lg border border-dashed border-cyan-200/45 bg-ink/60 p-8 text-center">
+            <p>Belum ada item produk yang dipilih.</p>
+          </div>
+          <button data-view="invoice" class="flex w-full items-center justify-center gap-3 rounded-lg bg-[#82aeb8] px-5 py-3 font-extrabold text-white"><i data-lucide="shopping-bag" class="h-5 w-5"></i>Pesan Sekarang!</button>
+        </aside>
+      </div>
+
+      <div class="hidden grid gap-6 lg:grid-cols-[360px_1fr]">
+        <aside class="space-y-4">
+          <div class="overflow-hidden rounded-lg border border-white/10 bg-panel">
+            <img class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80" alt="Mobile Legends detail produk" />
+            <div class="p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h1 class="text-2xl font-extrabold">Mobile Legends</h1>
+                  <p class="mt-1 text-sm text-slate-400">Moonton - Diamond Instan</p>
+                </div>
+                <span class="rounded-lg bg-emerald-300/10 px-3 py-1 text-xs font-bold text-emerald-200">Online</span>
+              </div>
+              <p class="mt-4 text-sm leading-6 text-slate-300">Masukkan User ID dan Server ID, pilih nominal diamond, lalu bayar menggunakan QRIS, virtual account, atau e-wallet. Sistem akan memproses topup otomatis setelah callback pembayaran diterima.</p>
+              <div class="mt-5 grid grid-cols-3 gap-2 text-center text-xs">
+                <div class="rounded-lg border border-white/10 bg-white/5 p-3">
+                  <p class="font-extrabold text-white">35s</p>
+                  <p class="mt-1 text-slate-400">Estimasi</p>
+                </div>
+                <div class="rounded-lg border border-white/10 bg-white/5 p-3">
+                  <p class="font-extrabold text-white">24 Jam</p>
+                  <p class="mt-1 text-slate-400">Layanan</p>
+                </div>
+                <div class="rounded-lg border border-white/10 bg-white/5 p-3">
+                  <p class="font-extrabold text-white">QRIS</p>
+                  <p class="mt-1 text-slate-400">Otomatis</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass rounded-lg p-5">
+            <h2 class="font-extrabold">Cara menemukan ID</h2>
+            <ol class="mt-3 space-y-3 text-sm text-slate-300">
+              <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white/10 text-xs font-bold">1</span>Buka profil Mobile Legends.</li>
+              <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white/10 text-xs font-bold">2</span>Salin User ID dan Server ID di bawah nama akun.</li>
+              <li class="flex gap-3"><span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white/10 text-xs font-bold">3</span>Pastikan format benar, contoh: 12345678 (1234).</li>
+            </ol>
+          </div>
+        </aside>
+
+        <div class="space-y-5">
+          <div class="glass rounded-lg p-5">
+            <div class="mb-4 flex items-center gap-3">
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-cyan-300 text-sm font-extrabold text-ink">1</span>
+              <div>
+                <h2 class="text-lg font-extrabold">Masukkan Data Akun</h2>
+                <p class="text-sm text-slate-400">Data ini dikirim ke provider topup.</p>
+              </div>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label>
+                <span class="mb-2 block text-sm font-semibold text-slate-300">User ID</span>
+                <input value="12345678" class="w-full rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/60" />
+              </label>
+              <label>
+                <span class="mb-2 block text-sm font-semibold text-slate-300">Server ID</span>
+                <input value="1234" class="w-full rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/60" />
+              </label>
+              <label class="sm:col-span-2">
+                <span class="mb-2 block text-sm font-semibold text-slate-300">Nickname terdeteksi</span>
+                <div class="flex items-center justify-between rounded-lg border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-sm">
+                  <span class="font-bold text-emerald-100">RakaNoLimit</span>
+                  <span class="text-emerald-200">Valid</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="glass rounded-lg p-5">
+            <div class="mb-4 flex items-center gap-3">
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-cyan-300 text-sm font-extrabold text-ink">2</span>
+              <div>
+                <h2 class="text-lg font-extrabold">Pilih Nominal</h2>
+                <p class="text-sm text-slate-400">Harga jual sudah termasuk margin dan belum termasuk fee QRIS.</p>
+              </div>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:border-cyan-300/45 hover:bg-white/10">
+                <span class="block font-extrabold">5 Diamonds</span>
+                <span class="mt-1 block text-sm text-slate-400">SKU ML5</span>
+                <span class="mt-3 block font-bold text-cyan-200">Rp1.500</span>
+              </button>
+              <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:border-cyan-300/45 hover:bg-white/10">
+                <span class="block font-extrabold">86 Diamonds</span>
+                <span class="mt-1 block text-sm text-slate-400">SKU ML86</span>
+                <span class="mt-3 block font-bold text-cyan-200">Rp21.000</span>
+              </button>
+              <button class="rounded-lg border border-cyan-300/50 bg-cyan-300/10 p-4 text-left">
+                <span class="block font-extrabold">172 Diamonds</span>
+                <span class="mt-1 block text-sm text-slate-300">SKU ML172</span>
+                <span class="mt-3 block font-bold text-cyan-100">Rp41.000</span>
+              </button>
+              <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:border-cyan-300/45 hover:bg-white/10">
+                <span class="block font-extrabold">257 Diamonds</span>
+                <span class="mt-1 block text-sm text-slate-400">SKU ML257</span>
+                <span class="mt-3 block font-bold text-cyan-200">Rp61.500</span>
+              </button>
+              <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:border-cyan-300/45 hover:bg-white/10">
+                <span class="block font-extrabold">344 Diamonds</span>
+                <span class="mt-1 block text-sm text-slate-400">SKU ML344</span>
+                <span class="mt-3 block font-bold text-cyan-200">Rp82.000</span>
+              </button>
+              <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:border-cyan-300/45 hover:bg-white/10">
+                <span class="block font-extrabold">706 Diamonds</span>
+                <span class="mt-1 block text-sm text-slate-400">SKU ML706</span>
+                <span class="mt-3 block font-bold text-cyan-200">Rp166.000</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid gap-5 xl:grid-cols-[1fr_340px]">
+            <div class="space-y-5">
+              <div class="glass rounded-lg p-5">
+                <div class="mb-4 flex items-center gap-3">
+                  <span class="grid h-8 w-8 place-items-center rounded-lg bg-cyan-300 text-sm font-extrabold text-ink">3</span>
+                  <div>
+                    <h2 class="text-lg font-extrabold">Pilih Pembayaran</h2>
+                    <p class="text-sm text-slate-400">Metode dapat dikirim ke Tripay atau Midtrans.</p>
+                  </div>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-3">
+                  <button class="rounded-lg border border-cyan-300/50 bg-cyan-300/10 p-4 text-left">
+                    <i data-lucide="qr-code" class="mb-3 h-5 w-5 text-cyan-200"></i>
+                    <span class="block font-extrabold">QRIS</span>
+                    <span class="text-sm text-slate-400">Fee Rp147</span>
+                  </button>
+                  <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10">
+                    <i data-lucide="building-2" class="mb-3 h-5 w-5 text-slate-300"></i>
+                    <span class="block font-extrabold">Virtual Account</span>
+                    <span class="text-sm text-slate-400">Bank otomatis</span>
+                  </button>
+                  <button class="rounded-lg border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10">
+                    <i data-lucide="wallet" class="mb-3 h-5 w-5 text-slate-300"></i>
+                    <span class="block font-extrabold">E-Wallet</span>
+                    <span class="text-sm text-slate-400">OVO, DANA, ShopeePay</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="glass rounded-lg p-5">
+                <div class="mb-4 flex items-center gap-3">
+                  <span class="grid h-8 w-8 place-items-center rounded-lg bg-cyan-300 text-sm font-extrabold text-ink">4</span>
+                  <div>
+                    <h2 class="text-lg font-extrabold">Kontak & Promo</h2>
+                    <p class="text-sm text-slate-400">Kontak dipakai untuk notifikasi status transaksi.</p>
+                  </div>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <input value="raka@email.test" class="rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/60" />
+                  <input value="KAMPUS10" class="rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/60" />
+                </div>
+              </div>
+            </div>
+
+            <aside class="glass h-fit rounded-lg p-5">
+              <h2 class="text-lg font-extrabold">Ringkasan Pesanan</h2>
+              <div class="mt-4 space-y-3 text-sm">
+                <div class="flex justify-between gap-4"><span class="text-slate-400">Game</span><span class="font-bold">Mobile Legends</span></div>
+                <div class="flex justify-between gap-4"><span class="text-slate-400">Produk</span><span class="font-bold">172 Diamonds</span></div>
+                <div class="flex justify-between gap-4"><span class="text-slate-400">Target</span><span class="font-bold">12345678 (1234)</span></div>
+                <div class="flex justify-between gap-4"><span class="text-slate-400">Harga</span><span class="font-bold">Rp41.000</span></div>
+                <div class="flex justify-between gap-4"><span class="text-slate-400">Fee QRIS</span><span class="font-bold">Rp147</span></div>
+                <div class="flex justify-between gap-4 text-emerald-200"><span>Voucher</span><span class="font-bold">-Rp1.000</span></div>
+                <div class="border-t border-white/10 pt-3">
+                  <div class="flex justify-between gap-4 text-base"><span class="font-extrabold">Total</span><span class="font-extrabold text-cyan-200">Rp40.147</span></div>
+                </div>
+              </div>
+              <button data-view="invoice" class="mt-5 w-full rounded-lg bg-white px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-100">Buat Invoice</button>
+              <p class="mt-3 text-center text-xs text-slate-500">Dengan melanjutkan, invoice dibuat sebagai pending lalu menunggu callback pembayaran.</p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard" class="view">
+      <div class="grid gap-6 lg:grid-cols-[260px_1fr]">
+        <aside class="glass rounded-lg p-4">
+          <div class="flex items-center gap-3 border-b border-white/10 pb-4">
+            <div class="grid h-11 w-11 place-items-center rounded-lg bg-cyan-300 text-ink font-extrabold">RA</div>
+            <div>
+              <p class="font-extrabold">Raka Aditya</p>
+              <p class="text-sm text-slate-400">Mahasiswa aktif</p>
+            </div>
+          </div>
+          <div class="mt-4 grid gap-2">
+            <button class="flex items-center gap-3 rounded-lg bg-cyan-300/10 px-3 py-3 text-left text-sm font-bold text-cyan-100"><i data-lucide="layout-dashboard" class="h-4 w-4"></i> Overview</button>
+            <button data-view="history" class="flex items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-bold text-slate-300 hover:bg-white/10"><i data-lucide="receipt-text" class="h-4 w-4"></i> Transaksi</button>
+            <button class="flex items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-bold text-slate-300 hover:bg-white/10"><i data-lucide="user-round-cog" class="h-4 w-4"></i> Profil</button>
+          </div>
+        </aside>
+        <div>
+          <div class="mb-5">
+            <h1 class="text-3xl font-extrabold">Dashboard User</h1>
+            <p class="mt-1 text-slate-400">Ringkasan saldo, transaksi, dan status topup realtime.</p>
+          </div>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div class="glass rounded-lg p-5">
+              <p class="text-sm text-slate-400">Total topup</p>
+              <p class="mt-2 text-3xl font-extrabold">Rp1.420.000</p>
+              <p class="mt-3 text-sm text-emerald-300">+18% bulan ini</p>
+            </div>
+            <div class="glass rounded-lg p-5">
+              <p class="text-sm text-slate-400">Invoice aktif</p>
+              <p class="mt-2 text-3xl font-extrabold">3</p>
+              <p class="mt-3 text-sm text-cyan-300">1 menunggu pembayaran</p>
+            </div>
+            <div class="glass rounded-lg p-5">
+              <p class="text-sm text-slate-400">Voucher</p>
+              <p class="mt-2 text-3xl font-extrabold">2</p>
+              <p class="mt-3 text-sm text-fuchsia-300">KAMPUS10 tersedia</p>
+            </div>
+          </div>
+          <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
+            <div class="glass rounded-lg p-5">
+              <div class="mb-5 flex items-center justify-between">
+                <h2 class="text-lg font-extrabold">Grafik Transaksi</h2>
+                <span class="rounded-lg bg-white/10 px-3 py-1 text-xs font-bold text-slate-300">7 hari</span>
+              </div>
+              <div class="flex h-72 items-end gap-3">
+                <div class="h-[40%] flex-1 rounded-t-lg bg-cyan-300/50"></div>
+                <div class="h-[62%] flex-1 rounded-t-lg bg-cyan-300/60"></div>
+                <div class="h-[48%] flex-1 rounded-t-lg bg-fuchsia-300/50"></div>
+                <div class="h-[75%] flex-1 rounded-t-lg bg-cyan-300/80"></div>
+                <div class="h-[58%] flex-1 rounded-t-lg bg-emerald-300/60"></div>
+                <div class="h-[86%] flex-1 rounded-t-lg bg-fuchsia-300/70"></div>
+                <div class="h-[70%] flex-1 rounded-t-lg bg-cyan-200"></div>
+              </div>
+            </div>
+            <div class="glass rounded-lg p-5">
+              <h2 class="text-lg font-extrabold">Status Terbaru</h2>
+              <div class="mt-4 space-y-3">
+                <div class="rounded-lg border border-emerald-300/20 bg-emerald-300/10 p-4">
+                  <p class="font-bold">INV-2026-0008</p>
+                  <p class="mt-1 text-sm text-slate-400">Topup berhasil dikirim</p>
+                </div>
+                <div class="rounded-lg border border-amber-300/20 bg-amber-300/10 p-4">
+                  <p class="font-bold">INV-2026-0009</p>
+                  <p class="mt-1 text-sm text-slate-400">Menunggu callback QRIS</p>
+                </div>
+                <div class="rounded-lg border border-cyan-300/20 bg-cyan-300/10 p-4">
+                  <p class="font-bold">INV-2026-0010</p>
+                  <p class="mt-1 text-sm text-slate-400">Diproses provider</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="history" class="view">
+      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="text-3xl font-extrabold">Riwayat Transaksi</h1>
+          <p class="mt-1 text-slate-400">Daftar invoice user dengan filter status dan tombol detail.</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="rounded-lg border border-white/10 px-4 py-2 text-sm font-bold text-slate-200">Semua</button>
+          <button class="rounded-lg border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-sm font-bold text-emerald-100">Sukses</button>
+          <button class="rounded-lg border border-amber-300/30 bg-amber-300/10 px-4 py-2 text-sm font-bold text-amber-100">Pending</button>
+        </div>
+      </div>
+      <div class="glass overflow-hidden rounded-lg">
+        <div class="hidden grid-cols-[1.1fr_1fr_1fr_1fr_.7fr] gap-4 border-b border-white/10 px-5 py-4 text-sm font-bold text-slate-400 md:grid">
+          <span>Invoice</span><span>Produk</span><span>Nominal</span><span>Status</span><span>Aksi</span>
+        </div>
+        <div class="divide-y divide-white/10">
+          <div class="grid gap-3 px-5 py-4 md:grid-cols-[1.1fr_1fr_1fr_1fr_.7fr] md:items-center">
+            <div><p class="font-extrabold">INV-2026-0010</p><p class="text-sm text-slate-400">20 Mei 2026, 11:20</p></div>
+            <p class="font-semibold">Mobile Legends 172</p>
+            <p class="font-semibold">Rp41.000</p>
+            <span class="w-fit rounded-lg bg-cyan-300/10 px-3 py-1 text-sm font-bold text-cyan-100">Processing</span>
+            <button data-view="invoice" class="w-fit rounded-lg bg-white px-3 py-2 text-sm font-extrabold text-ink">Detail</button>
+          </div>
+          <div class="grid gap-3 px-5 py-4 md:grid-cols-[1.1fr_1fr_1fr_1fr_.7fr] md:items-center">
+            <div><p class="font-extrabold">INV-2026-0009</p><p class="text-sm text-slate-400">20 Mei 2026, 10:48</p></div>
+            <p class="font-semibold">Free Fire 140</p>
+            <p class="font-semibold">Rp19.500</p>
+            <span class="w-fit rounded-lg bg-amber-300/10 px-3 py-1 text-sm font-bold text-amber-100">Pending</span>
+            <button data-view="invoice" class="w-fit rounded-lg border border-white/10 px-3 py-2 text-sm font-bold text-slate-200">Detail</button>
+          </div>
+          <div class="grid gap-3 px-5 py-4 md:grid-cols-[1.1fr_1fr_1fr_1fr_.7fr] md:items-center">
+            <div><p class="font-extrabold">INV-2026-0008</p><p class="text-sm text-slate-400">19 Mei 2026, 22:15</p></div>
+            <p class="font-semibold">PUBG UC 325</p>
+            <p class="font-semibold">Rp72.000</p>
+            <span class="w-fit rounded-lg bg-emerald-300/10 px-3 py-1 text-sm font-bold text-emerald-100">Success</span>
+            <button data-view="invoice" class="w-fit rounded-lg border border-white/10 px-3 py-2 text-sm font-bold text-slate-200">Detail</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="track" class="view">
+      <div class="mx-auto max-w-4xl">
+        <div class="mb-6">
+          <h1 class="text-3xl font-extrabold">Cek Transaksi</h1>
+          <p class="mt-2 text-slate-400">Masukkan nomor invoice atau email untuk melihat status pembayaran dan proses topup.</p>
+        </div>
+        <div class="glass rounded-lg p-5">
+          <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <input value="INV-2026-0010" class="rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/60" />
+            <button data-view="invoice" class="rounded-lg bg-cyan-300 px-5 py-3 text-sm font-extrabold text-ink">Cari Transaksi</button>
+          </div>
+          <div class="mt-5 rounded-lg border border-cyan-300/20 bg-cyan-300/10 p-4">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="font-extrabold">INV-2026-0010</p>
+                <p class="mt-1 text-sm text-slate-300">Mobile Legends - 172 Diamonds</p>
+              </div>
+              <span class="w-fit rounded-lg bg-amber-300/15 px-3 py-1 text-sm font-bold text-amber-100">Menunggu Pembayaran</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 grid gap-4 md:grid-cols-3">
+          <div class="soft-panel rounded-lg p-5"><i data-lucide="receipt-text" class="h-6 w-6 text-cyan-200"></i><h2 class="mt-3 font-extrabold">Invoice</h2><p class="mt-1 text-sm text-slate-300">Nomor invoice dibuat otomatis saat checkout.</p></div>
+          <div class="soft-panel rounded-lg p-5"><i data-lucide="shield-check" class="h-6 w-6 text-cyan-200"></i><h2 class="mt-3 font-extrabold">Pembayaran</h2><p class="mt-1 text-sm text-slate-300">Status berubah setelah callback payment gateway valid.</p></div>
+          <div class="soft-panel rounded-lg p-5"><i data-lucide="send" class="h-6 w-6 text-cyan-200"></i><h2 class="mt-3 font-extrabold">Topup</h2><p class="mt-1 text-sm text-slate-300">Queue akan mengirim SKU ke provider topup.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="leaderboard" class="view">
+      <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="text-3xl font-extrabold">Leaderboard</h1>
+          <p class="mt-2 text-slate-400">Ranking pelanggan berdasarkan total transaksi bulan ini.</p>
+        </div>
+        <button class="rounded-lg border border-white/10 px-4 py-2 text-sm font-bold text-slate-200">Mei 2026</button>
+      </div>
+      <div class="grid gap-5 lg:grid-cols-3">
+        <div class="diagonal-card rounded-lg p-5 lg:col-span-1">
+          <p class="text-sm font-bold text-cyan-100">Peringkat #1</p>
+          <h2 class="mt-2 text-3xl font-extrabold">RakaNoLimit</h2>
+          <p class="mt-2 text-slate-200">87 transaksi - Rp4.250.000</p>
+        </div>
+        <div class="glass overflow-hidden rounded-lg lg:col-span-2">
+          <div class="grid grid-cols-[70px_1fr_1fr] border-b border-white/10 px-5 py-3 text-sm font-bold text-slate-400">
+            <span>Rank</span><span>Nama</span><span>Total</span>
+          </div>
+          <div class="divide-y divide-white/10">
+            <div class="grid grid-cols-[70px_1fr_1fr] px-5 py-4"><strong>#1</strong><span>RakaNoLimit</span><span>Rp4.250.000</span></div>
+            <div class="grid grid-cols-[70px_1fr_1fr] px-5 py-4"><strong>#2</strong><span>MiyaMain</span><span>Rp3.810.000</span></div>
+            <div class="grid grid-cols-[70px_1fr_1fr] px-5 py-4"><strong>#3</strong><span>CampusHero</span><span>Rp2.945.000</span></div>
+            <div class="grid grid-cols-[70px_1fr_1fr] px-5 py-4"><strong>#4</strong><span>RobuxHunter</span><span>Rp2.120.000</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="calculator" class="view">
+      <div class="mx-auto max-w-5xl">
+        <div class="mb-6">
+          <h1 class="text-3xl font-extrabold">Kalkulator Harga</h1>
+          <p class="mt-2 text-slate-400">Simulasi sederhana untuk menentukan harga jual, fee QRIS, dan profit bersih.</p>
+        </div>
+        <div class="grid gap-5 lg:grid-cols-[1fr_360px]">
+          <div class="glass rounded-lg p-5">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <label><span class="mb-2 block text-sm font-semibold text-slate-300">Harga API</span><input value="18500" class="w-full rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white"></label>
+              <label><span class="mb-2 block text-sm font-semibold text-slate-300">Harga Jual</span><input value="21000" class="w-full rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white"></label>
+              <label><span class="mb-2 block text-sm font-semibold text-slate-300">Fee QRIS</span><input value="147" class="w-full rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white"></label>
+              <label><span class="mb-2 block text-sm font-semibold text-slate-300">Voucher</span><input value="0" class="w-full rounded-lg border border-white/10 bg-ink/70 px-4 py-3 text-sm text-white"></label>
+            </div>
+          </div>
+          <aside class="diagonal-card rounded-lg p-5">
+            <p class="text-sm font-bold text-cyan-100">Estimasi Profit</p>
+            <p class="mt-2 text-4xl font-extrabold">Rp2.353</p>
+            <div class="mt-5 space-y-2 text-sm text-slate-200">
+              <div class="flex justify-between"><span>Harga jual</span><strong>Rp21.000</strong></div>
+              <div class="flex justify-between"><span>Harga API</span><strong>Rp18.500</strong></div>
+              <div class="flex justify-between"><span>Fee QRIS</span><strong>Rp147</strong></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="admin" class="view">
+      <div class="mb-5">
+        <h1 class="text-3xl font-extrabold">Admin Monitoring</h1>
+        <p class="mt-1 text-slate-400">Preview statistik, CRUD produk, dan antrian transaksi provider.</p>
+      </div>
+      <div class="grid gap-4 md:grid-cols-4">
+        <div class="glass rounded-lg p-5"><p class="text-sm text-slate-400">Omzet hari ini</p><p class="mt-2 text-2xl font-extrabold">Rp8.740.000</p></div>
+        <div class="glass rounded-lg p-5"><p class="text-sm text-slate-400">Profit bersih</p><p class="mt-2 text-2xl font-extrabold">Rp725.300</p></div>
+        <div class="glass rounded-lg p-5"><p class="text-sm text-slate-400">Order gagal</p><p class="mt-2 text-2xl font-extrabold">4</p></div>
+        <div class="glass rounded-lg p-5"><p class="text-sm text-slate-400">Provider aktif</p><p class="mt-2 text-2xl font-extrabold">3</p></div>
+      </div>
+      <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_370px]">
+        <div class="glass overflow-hidden rounded-lg">
+          <div class="flex items-center justify-between border-b border-white/10 p-5">
+            <h2 class="text-lg font-extrabold">Transaksi Masuk</h2>
+            <button class="rounded-lg bg-cyan-300 px-4 py-2 text-sm font-extrabold text-ink">Export</button>
+          </div>
+          <div class="divide-y divide-white/10">
+            <div class="grid gap-3 p-5 md:grid-cols-[1fr_1fr_1fr_.8fr] md:items-center">
+              <p class="font-bold">INV-2026-0010</p><p class="text-slate-300">Digiflazz / ML172</p><p class="text-slate-300">Queue topup</p><span class="rounded-lg bg-cyan-300/10 px-3 py-1 text-sm font-bold text-cyan-100">Running</span>
+            </div>
+            <div class="grid gap-3 p-5 md:grid-cols-[1fr_1fr_1fr_.8fr] md:items-center">
+              <p class="font-bold">INV-2026-0009</p><p class="text-slate-300">Tripay / QRIS</p><p class="text-slate-300">Payment callback</p><span class="rounded-lg bg-amber-300/10 px-3 py-1 text-sm font-bold text-amber-100">Waiting</span>
+            </div>
+            <div class="grid gap-3 p-5 md:grid-cols-[1fr_1fr_1fr_.8fr] md:items-center">
+              <p class="font-bold">INV-2026-0007</p><p class="text-slate-300">Tokovoucher / RBX</p><p class="text-slate-300">Manual review</p><span class="rounded-lg bg-fuchsia-300/10 px-3 py-1 text-sm font-bold text-fuchsia-100">Hybrid</span>
+            </div>
+          </div>
+        </div>
+        <div class="glass rounded-lg p-5">
+          <h2 class="text-lg font-extrabold">Produk Cepat</h2>
+          <div class="mt-4 space-y-3">
+            <div class="rounded-lg border border-white/10 p-4">
+              <div class="flex justify-between gap-3"><p class="font-bold">ML86</p><p class="text-cyan-200">Rp21.000</p></div>
+              <p class="mt-1 text-sm text-slate-400">Harga API Rp18.500, profit Rp2.353</p>
+            </div>
+            <div class="rounded-lg border border-white/10 p-4">
+              <div class="flex justify-between gap-3"><p class="font-bold">FF140</p><p class="text-cyan-200">Rp19.500</p></div>
+              <p class="mt-1 text-sm text-slate-400">Provider VIP-Reseller aktif</p>
+            </div>
+            <button class="w-full rounded-lg border border-white/10 bg-white/10 px-4 py-3 text-sm font-bold text-white">Tambah produk</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="invoice" class="view">
+      <div class="mb-5">
+        <h1 class="text-3xl font-extrabold">Detail Invoice</h1>
+        <p class="mt-1 text-slate-400">Halaman pembayaran QRIS, status webhook, dan progres topup.</p>
+      </div>
+      <div class="grid gap-6 lg:grid-cols-[1fr_390px]">
+        <div class="glass rounded-lg p-5 sm:p-6">
+          <div class="flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p class="text-sm font-bold text-cyan-200">INV-2026-0010</p>
+              <h2 class="mt-1 text-2xl font-extrabold">Mobile Legends - 172 Diamonds</h2>
+              <p class="mt-2 text-slate-400">Target ID: 12345678 (1234)</p>
+            </div>
+            <span class="w-fit rounded-lg border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-sm font-extrabold text-amber-100">Menunggu Pembayaran</span>
+          </div>
+
+          <div class="mt-6 grid gap-4 md:grid-cols-3">
+            <div class="rounded-lg border border-white/10 bg-white/10 p-4">
+              <p class="text-sm text-slate-400">Total Bayar</p>
+              <p class="mt-1 text-2xl font-extrabold">Rp41.147</p>
+            </div>
+            <div class="rounded-lg border border-white/10 bg-white/10 p-4">
+              <p class="text-sm text-slate-400">Metode</p>
+              <p class="mt-1 text-2xl font-extrabold">QRIS</p>
+            </div>
+            <div class="rounded-lg border border-white/10 bg-white/10 p-4">
+              <p class="text-sm text-slate-400">Kadaluarsa</p>
+              <p class="mt-1 text-2xl font-extrabold">14:59</p>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-lg border border-white/10 bg-ink/50 p-5">
+            <h3 class="text-lg font-extrabold">Timeline Transaksi</h3>
+            <div class="mt-5 space-y-5">
+              <div class="flex gap-4">
+                <div class="mt-1 h-3 w-3 rounded-full bg-emerald-300"></div>
+                <div><p class="font-bold">Invoice dibuat</p><p class="text-sm text-slate-400">Laravel membuat invoice dan menyimpan transaksi pending.</p></div>
+              </div>
+              <div class="flex gap-4">
+                <div class="mt-1 h-3 w-3 rounded-full bg-emerald-300"></div>
+                <div><p class="font-bold">QRIS berhasil dibuat</p><p class="text-sm text-slate-400">Payment gateway mengembalikan QR code, nominal, dan expiry time.</p></div>
+              </div>
+              <div class="flex gap-4">
+                <div class="mt-1 h-3 w-3 rounded-full bg-amber-300"></div>
+                <div><p class="font-bold">Menunggu callback webhook</p><p class="text-sm text-slate-400">Setelah pembayaran sukses, status menjadi paid lalu queue topup berjalan.</p></div>
+              </div>
+              <div class="flex gap-4 opacity-55">
+                <div class="mt-1 h-3 w-3 rounded-full bg-slate-500"></div>
+                <div><p class="font-bold">Topup dikirim provider</p><p class="text-sm text-slate-400">Digiflazz/VIP-Reseller memproses SKU ML172 ke target ID.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="glass rounded-lg p-5">
+          <h2 class="text-lg font-extrabold">Scan QRIS</h2>
+          <p class="mt-1 text-sm text-slate-400">Gunakan e-wallet atau mobile banking.</p>
+          <div class="mt-5 rounded-lg bg-white p-5">
+            <div class="grid aspect-square w-full grid-cols-7 gap-1">
+              <div class="col-span-2 row-span-2 bg-ink"></div><div class="bg-ink"></div><div></div><div class="bg-ink"></div><div></div><div class="col-span-2 row-span-2 bg-ink"></div>
+              <div class="bg-ink"></div><div></div><div class="bg-ink"></div><div class="bg-ink"></div><div></div>
+              <div></div><div class="bg-ink"></div><div></div><div class="bg-ink"></div><div></div><div class="bg-ink"></div><div></div>
+              <div class="bg-ink"></div><div></div><div class="bg-ink"></div><div></div><div class="bg-ink"></div><div></div><div class="bg-ink"></div>
+              <div></div><div class="bg-ink"></div><div></div><div class="bg-ink"></div><div class="bg-ink"></div><div class="bg-ink"></div><div></div>
+              <div class="col-span-2 row-span-2 bg-ink"></div><div></div><div class="bg-ink"></div><div></div><div></div><div class="bg-ink"></div>
+              <div></div><div class="bg-ink"></div><div></div><div class="bg-ink"></div><div class="bg-ink"></div>
+            </div>
+          </div>
+          <div class="mt-5 rounded-lg border border-white/10 bg-white/10 p-4">
+            <div class="flex justify-between gap-3 text-sm"><span class="text-slate-400">Harga produk</span><span class="font-bold">Rp41.000</span></div>
+            <div class="mt-2 flex justify-between gap-3 text-sm"><span class="text-slate-400">Fee QRIS</span><span class="font-bold">Rp147</span></div>
+            <div class="mt-3 border-t border-white/10 pt-3 flex justify-between gap-3"><span class="font-extrabold">Total</span><span class="font-extrabold text-cyan-200">Rp41.147</span></div>
+          </div>
+          <button class="mt-4 w-full rounded-lg bg-cyan-300 px-4 py-3 text-sm font-extrabold text-ink">Cek Status Pembayaran</button>
+          <button data-view="history" class="mt-2 w-full rounded-lg border border-white/10 px-4 py-3 text-sm font-bold text-slate-200">Kembali ke Riwayat</button>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="relative mt-10 border-t border-white/10 px-4 py-8 text-center text-sm text-slate-500">
+    Preview Tailwind untuk panduan sistem web topup Laravel mahasiswa.
+  </footer>
+
+  <script src="app.js?v=20260520-2"></script>
+</body>
+</html>
