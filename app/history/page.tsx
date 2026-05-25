@@ -1,14 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { TransactionCard } from "@/components/transaction/transaction-card"
 import { Search, Filter, Loader2 } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
 // Mock transactions
 const mockTransactions = [
@@ -55,12 +56,63 @@ const mockTransactions = [
 
 export default function HistoryPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [transactions, setTransactions] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filteredTransactions = mockTransactions.filter(
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (user) {
+          const { data: txs } = await supabase
+            .from("transaction_details")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+
+          if (txs && txs.length > 0) {
+            const mapped = txs.map((tx: any) => ({
+              id: tx.invoice,
+              invoice: tx.invoice,
+              target_id: tx.target_id,
+              amount: tx.amount,
+              payment_status: tx.payment_status,
+              topup_status: tx.topup_status,
+              created_at: tx.created_at,
+              product: {
+                name: tx.product_name,
+                game: {
+                  name: tx.game_name,
+                  icon: "🎮",
+                }
+              }
+            }))
+            setTransactions(mapped)
+            return
+          }
+        }
+        
+        // Fallback to mock data if not logged in or no transactions
+        setTransactions(mockTransactions)
+      } catch (err) {
+        console.error("Failed to load transactions:", err)
+        setTransactions(mockTransactions)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchTransactions()
+  }, [])
+
+  const filteredTransactions = transactions.filter(
     (tx) =>
       tx.invoice.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.target_id.includes(searchQuery)
+      tx.target_id.includes(searchQuery) ||
+      (tx.product?.name && tx.product.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (tx.product?.game?.name && tx.product.game.name.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   return (

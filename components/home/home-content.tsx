@@ -12,6 +12,7 @@ import {
   ShoppingBag,
   Headphones,
   Flame,
+  Award,
 } from "lucide-react"
 
 interface HomeContentProps {
@@ -52,7 +53,7 @@ const slides = [
 const diagonalCards = [
   { name: "Free Fire", publisher: "Garena", image: "https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=300&q=80", slug: "free-fire" },
   { name: "Mobile Legends", publisher: "Moonton", image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80", slug: "mobile-legends" },
-  { name: "Joki Rank", publisher: "KampusTopup", image: "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=300&q=80", slug: "mobile-legends" },
+  { name: "Joki Rank", publisher: "Mitsuru", image: "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=300&q=80", slug: "mobile-legends" },
   { name: "ROBLOX - Voucher", publisher: "Roblox Corporation", image: "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=300&q=80", slug: "roblox" },
   { name: "Honor Of Kings", publisher: "Tencent Games", image: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=300&q=80", slug: "honor-of-kings" },
   { name: "Valorant", publisher: "Riot Games", image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=300&q=80", slug: "valorant" },
@@ -61,7 +62,7 @@ const diagonalCards = [
 const catalogItems = [
   { title: "FREE FIRE", eyebrow: "TOP UP GAME", publisher: "Garena", bg: "https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "free-fire" },
   { title: "MOBILE LEGENDS", eyebrow: "TOP UP GAME", publisher: "Moonton", bg: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "mobile-legends" },
-  { title: "JOKI RANK", eyebrow: "JOKI MOBILE LEGENDS", publisher: "KampusTopup", bg: "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "mobile-legends" },
+  { title: "JOKI RANK", eyebrow: "JOKI MOBILE LEGENDS", publisher: "Mitsuru", bg: "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "mobile-legends" },
   { title: "MAGIC CHESS", eyebrow: "TOP UP GAME", publisher: "Moonton", bg: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "mobile-legends" },
   { title: "DELTA FORCE", eyebrow: "TOP UP GAME", publisher: "Level Infinite", bg: "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "pubg-mobile" },
   { title: "PUBG MOBILE", eyebrow: "TOP UP GAME", publisher: "Tencent Games", bg: "https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "pubg-mobile" },
@@ -76,6 +77,23 @@ const catalogItems = [
 export function HomeContent({ user }: HomeContentProps) {
   const router = useRouter()
   
+  const handleSliderClick = (action: string) => {
+    if (action === "Topup Sekarang" || action === "Lihat Produk" || action === "Buka Katalog") {
+      const catalogEl = document.getElementById("catalog")
+      if (catalogEl) {
+        catalogEl.scrollIntoView({ behavior: "smooth" })
+      } else {
+        router.push("/games")
+      }
+    } else if (action === "Cek Pesanan") {
+      router.push("/check")
+    } else if (action === "Hitung Profit") {
+      router.push("/calculator")
+    } else if (action === "Leaderboard") {
+      router.push("/leaderboard")
+    }
+  }
+
   // Carousel State
   const [activeSlide, setActiveSlide] = useState(0)
   const carouselInterval = useRef<NodeJS.Timeout | null>(null)
@@ -83,11 +101,25 @@ export function HomeContent({ user }: HomeContentProps) {
   // Catalog Tab State
   const [activeTab, setActiveTab] = useState("all")
 
-  // Quick Checkout State
-  const [gameId, setGameId] = useState("12345678")
-  const [serverId, setServerId] = useState("1234")
-  const [selectedNominal, setSelectedNominal] = useState("172 Diamonds")
-  const [selectedPayment, setSelectedPayment] = useState("QRIS")
+  // Flash Sale Timer State
+  const [timeLeft, setTimeLeft] = useState({ hours: 2, minutes: 14, seconds: 35 })
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 }
+        } else if (prev.minutes > 0) {
+          return { ...prev, minutes: prev.minutes - 1, seconds: 59 }
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59, seconds: 59 }
+        } else {
+          return { hours: 2, minutes: 14, seconds: 35 } // Reset
+        }
+      })
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     startCarousel()
@@ -125,29 +157,30 @@ export function HomeContent({ user }: HomeContentProps) {
     startCarousel()
   }
 
-  const handleQuickCheckout = () => {
-    // Redirect to dynamic checkout or invoice based on selections
-    const skuMap: Record<string, string> = {
-      "86 Diamonds": "ML86",
-      "172 Diamonds": "ML172",
-      "257 Diamonds": "ML257",
-      "344 Diamonds": "ML344",
-    }
-    const sku = skuMap[selectedNominal] || "ML172"
-    router.push(`/checkout/${sku}?target=${gameId}&serverId=${serverId}&payment=${selectedPayment.toLowerCase()}`)
+  // Clip path styles for hexagonal game UI cuts
+  const bevelStyle = {
+    clipPath: "polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px)"
+  }
+
+  const inputBevelStyle = {
+    clipPath: "polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px)"
+  }
+
+  const tabBevelStyle = {
+    clipPath: "polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% 100%, 0% 100%)"
   }
 
   return (
     <div className="min-h-screen text-slate-100 antialiased relative">
       {/* Mesh Background */}
-      <div className="pointer-events-none fixed inset-0 mesh opacity-50 z-0"></div>
+      <div className="pointer-events-none fixed inset-0 mesh opacity-45 z-0"></div>
 
       <Header user={user} />
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         
         {/* Hero Carousel */}
-        <div className="hero-carousel mb-10 overflow-hidden relative rounded-lg border border-white/10">
+        <div className="hero-carousel mb-10 overflow-hidden relative rounded-2xl border border-white/10 shadow-neon-cyan/20">
           <div 
             className="carousel-track flex transition-transform duration-500"
             style={{ transform: `translateX(-${activeSlide * 100}%)` }}
@@ -155,37 +188,49 @@ export function HomeContent({ user }: HomeContentProps) {
             {slides.map((slide, idx) => (
               <div 
                 key={idx}
-                className="carousel-slide min-h-[420px] bg-cover bg-center flex items-center relative w-full shrink-0"
+                className="carousel-slide min-h-[440px] bg-cover bg-center flex items-center relative w-full shrink-0 auto-shimmer-bg"
                 style={{ backgroundImage: `url('${slide.bg}')` }}
               >
                 {/* Dark overlay for readability */}
-                <div className="absolute inset-0 bg-black/50 z-0"></div>
+                <div className="absolute inset-0 bg-black/60 z-0"></div>
                 
-                <div className="relative z-10 flex min-h-[420px] items-center p-7 sm:p-10 lg:p-14">
+                <div className="relative z-10 flex min-h-[440px] items-center p-7 sm:p-10 lg:p-16">
                   <div className="max-w-2xl">
-                    <span className="rounded-lg bg-white/15 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-cyan-100">
+                    <span className="rounded bg-cyan-300/10 border border-cyan-300/30 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-cyan-300">
                       {slide.tag}
                     </span>
-                    <h2 className="mt-5 text-4xl font-extrabold uppercase leading-tight text-white sm:text-6xl">
+                    <h2 className="mt-5 text-4xl font-black uppercase leading-none text-white sm:text-6xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-slate-400">
                       {slide.title}
                     </h2>
-                    <p className="mt-4 max-w-xl text-lg font-semibold text-slate-100">
+                    <p className="mt-4 max-w-xl text-base font-semibold text-slate-300">
                       {slide.desc}
                     </p>
-                    <div className="mt-8 flex flex-wrap gap-3">
-                      <button 
-                        onClick={() => router.push("/games/mobile-legends")}
-                        className="rounded-lg bg-cyan-200 px-5 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-300 hover:scale-[1.02] active:scale-[0.98] shimmer-hover"
-                      >
-                        {slide.btn1}
-                      </button>
-                      <button 
-                        onClick={() => router.push("/check")}
-                        className="rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] shimmer-hover"
-                      >
-                        {slide.btn2}
-                      </button>
+                    
+                    {/* Beveled Slide Action Buttons */}
+                    <div className="mt-8 flex flex-wrap gap-4">
+                      {/* Primary button: solid cyan with glow default, custom hover */}
+                      <div className="relative p-[1px] bg-gradient-to-r from-cyan-300 to-blue-500 rounded-lg shadow-[0_0_15px_rgba(34,211,238,0.25)] hover:shadow-[0_0_25px_rgba(34,211,238,0.55)] transition-all duration-300 hover:scale-105 active:scale-95" style={inputBevelStyle}>
+                        <button 
+                          onClick={() => handleSliderClick(slide.btn1)}
+                          className="bg-cyan-300 text-slate-950 hover:bg-slate-950 hover:text-cyan-300 font-black px-6 py-3 text-xs tracking-widest uppercase transition-all duration-300 shimmer-hover"
+                          style={inputBevelStyle}
+                        >
+                          {slide.btn1}
+                        </button>
+                      </div>
+                      
+                      {/* Secondary button: outline cyan default, solid cyan fill hover */}
+                      <div className="relative p-[1px] bg-cyan-400/50 hover:bg-cyan-300 rounded-lg shadow-[0_0_10px_rgba(34,211,238,0.1)] hover:shadow-[0_0_20px_rgba(34,211,238,0.45)] transition-all duration-300 hover:scale-105 active:scale-95" style={inputBevelStyle}>
+                        <button 
+                          onClick={() => handleSliderClick(slide.btn2)}
+                          className="bg-slate-950/90 text-cyan-300 hover:bg-cyan-300 hover:text-slate-950 font-black px-6 py-3 text-xs tracking-widest uppercase transition-all duration-300 shimmer-hover"
+                          style={inputBevelStyle}
+                        >
+                          {slide.btn2}
+                        </button>
+                      </div>
                     </div>
+
                   </div>
                 </div>
               </div>
@@ -194,26 +239,26 @@ export function HomeContent({ user }: HomeContentProps) {
 
           <button 
             onClick={handlePrevSlide}
-            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-white/10 border border-white/20 text-white transition hover:bg-white/20 z-20" 
+            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 text-white transition-all hover:scale-105 active:scale-95 z-20" 
             type="button" 
             aria-label="Slide sebelumnya"
           >
-            <ChevronLeft className="h-7 w-7" />
+            <ChevronLeft className="h-6 w-6 text-cyan-300" />
           </button>
           <button 
             onClick={handleNextSlide}
-            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-white/10 border border-white/20 text-white transition hover:bg-white/20 z-20" 
+            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 text-white transition-all hover:scale-105 active:scale-95 z-20" 
             type="button" 
             aria-label="Slide berikutnya"
           >
-            <ChevronRight className="h-7 w-7" />
+            <ChevronRight className="h-6 w-6 text-cyan-300" />
           </button>
-          <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+          <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2.5">
             {slides.map((_, idx) => (
               <button 
                 key={idx}
                 onClick={() => handleDotClick(idx)}
-                className={`carousel-dot ${activeSlide === idx ? "active" : ""}`} 
+                className={`carousel-dot h-1.5 transition-all duration-300 rounded-full ${activeSlide === idx ? "w-8 bg-cyan-300" : "w-2 bg-white/20 hover:bg-white/40"}`} 
                 type="button" 
                 aria-label={`Slide ${idx + 1}`}
               ></button>
@@ -221,253 +266,236 @@ export function HomeContent({ user }: HomeContentProps) {
           </div>
         </div>
 
-        {/* Main Grid */}
-        <div className="grid gap-6 lg:grid-cols-[1.12fr_.88fr]">
+        {/* Flash Sale Section - Blending Cyan Theme with Orange Urgency Accent */}
+        <div className="section-wrap mb-12 bg-gradient-to-r from-cyan-950/15 via-slate-900/10 to-transparent border border-cyan-300/20 rounded-2xl p-6 md:p-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-300/5 rounded-full blur-3xl pointer-events-none" />
           
-          {/* Left Hero Card */}
-          <div className="relative min-h-[520px] overflow-hidden rounded-lg border border-white/10 bg-ink">
-            <img 
-              className="absolute inset-0 h-full w-full object-cover opacity-55" 
-              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80" 
-              alt="Setup gaming dengan lampu neon" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/25"></div>
-            
-            <div className="relative flex min-h-[520px] flex-col justify-between p-6 sm:p-8">
-              <div className="flex flex-wrap gap-2">
-                <span className="rounded-lg border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-bold text-emerald-200">
-                  QRIS otomatis
-                </span>
-                <span className="rounded-lg border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-200">
-                  Webhook ready
-                </span>
-                <span className="rounded-lg border border-slate-300/15 bg-white/10 px-3 py-1 text-xs font-bold text-slate-200">
-                  Multi provider
-                </span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 relative z-10">
+            <div className="flex items-center gap-3.5">
+              <span className="flex h-12 w-12 place-items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 animate-pulse shadow-lg shadow-cyan-300/10">
+                <Zap className="h-6 w-6 fill-cyan-500/20" />
+              </span>
+              <div>
+                <h2 className="text-2xl font-black tracking-wide text-white uppercase">FLASH SALE HARI INI</h2>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Promo terbatas dengan harga miring untuk game favoritmu.</p>
               </div>
-              <div className="max-w-2xl my-6">
-                <h1 className="text-4xl font-extrabold leading-tight text-white sm:text-6xl">
-                  Topup game cepat untuk proyek Laravel mahasiswa.
-                </h1>
-                <p className="mt-5 max-w-xl text-base leading-7 text-slate-300">
-                  Preview UI lengkap dari landing, pilih produk, dashboard user, admin monitoring, hingga detail invoice QRIS.
-                </p>
-                <div className="mt-7 flex flex-wrap gap-3">
-                  <button 
-                    onClick={() => router.push("/games/mobile-legends")}
-                    className="rounded-lg bg-cyan-300 px-5 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-200"
-                  >
-                    Mulai topup
-                  </button>
-                  <button 
-                    onClick={() => router.push("/check")}
-                    className="rounded-lg border border-white/15 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15"
-                  >
-                    Cek transaksi
-                  </button>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 text-sm">
-                <div className="glass rounded-lg p-4">
-                  <p className="text-2xl font-extrabold">2.1k</p>
-                  <p className="mt-1 text-slate-400">Transaksi</p>
-                </div>
-                <div className="glass rounded-lg p-4">
-                  <p className="text-2xl font-extrabold">99.7%</p>
-                  <p className="mt-1 text-slate-400">Sukses</p>
-                </div>
-                <div className="glass rounded-lg p-4">
-                  <p className="text-2xl font-extrabold">35s</p>
-                  <p className="mt-1 text-slate-400">Rata-rata</p>
-                </div>
+            </div>
+            {/* Timer */}
+            <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-4 py-2.5">
+              <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest mr-2">Berakhir dalam</span>
+              <div className="flex gap-1.5">
+                {[
+                  { value: timeLeft.hours, label: "H" },
+                  { value: timeLeft.minutes, label: "M" },
+                  { value: timeLeft.seconds, label: "S" }
+                ].map((t, idx) => (
+                  <div key={idx} className="flex items-center">
+                    <span className="bg-orange-600 text-white font-black px-2.5 py-1 rounded text-sm min-w-[32px] text-center shadow-lg shadow-orange-500/25 font-mono">
+                      {String(t.value).padStart(2, '0')}
+                    </span>
+                    {idx < 2 && <span className="font-black text-orange-400 mx-1">:</span>}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Right Checkout Panel */}
-          <aside className="glass rounded-lg p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-extrabold">Checkout Topup</h2>
-                <p className="mt-1 text-sm text-slate-400">Mobile Legends dipilih otomatis</p>
-              </div>
-              <span className="rounded-lg bg-white/10 px-3 py-1 text-xs font-bold text-cyan-100">Live preview</span>
-            </div>
+          {/* Flash Sale Cards with Small Game Cover Thumbnails (Vertical Card Layout) */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 relative z-10">
+            {[
+              { game: "Mobile Legends", name: "86 Diamonds", oriPrice: 25000, salePrice: 19800, discount: 20, sold: 82, slug: "mobile-legends" },
+              { game: "Free Fire", name: "140 Diamonds", oriPrice: 34000, salePrice: 27500, discount: 19, sold: 64, slug: "free-fire" },
+              { game: "PUBG Mobile", name: "325 UC", oriPrice: 105000, salePrice: 88000, discount: 16, sold: 91, slug: "pubg-mobile" },
+              { game: "Valorant", name: "1000 VP", oriPrice: 85000, salePrice: 73200, discount: 14, sold: 45, slug: "valorant" }
+            ].map((item, idx) => {
+              const flashSaleThumbnails: Record<string, string> = {
+                "mobile-legends": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=100&q=80",
+                "free-fire": "https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=100&q=80",
+                "pubg-mobile": "https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=100&q=80",
+                "valorant": "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=100&q=80",
+              }
+              return (
+                <div key={idx} className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 hover:from-cyan-300/40 hover:to-cyan-300/20 transition-all duration-300 shadow-md" style={bevelStyle}>
+                  <button 
+                    onClick={() => router.push(`/games/${item.slug}`)}
+                    className="w-full relative overflow-hidden bg-slate-950 p-4 text-left group flex flex-col justify-between h-full min-h-[160px] shimmer-hover"
+                    style={bevelStyle}
+                    type="button"
+                  >
+                    {/* Discount Badge */}
+                    <span className="absolute top-3 right-3 rounded bg-orange-600 px-2 py-0.5 text-[9px] font-black text-white z-10 shadow-sm leading-none">
+                      -{item.discount}%
+                    </span>
 
-            <div className="mt-5 overflow-hidden rounded-lg border border-white/10">
-              <img 
-                className="h-36 w-full object-cover" 
-                src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?auto=format&fit=crop&w=900&q=80" 
-                alt="Pemain game sedang memakai headset" 
-              />
-            </div>
+                    <div className="flex gap-3 items-center w-full">
+                      {/* Small Game Cover Thumbnail */}
+                      <div className="h-12 w-12 rounded-lg overflow-hidden shrink-0 border border-white/10 group-hover:border-cyan-300/30 transition-colors" style={inputBevelStyle}>
+                        <img 
+                          src={flashSaleThumbnails[item.slug]} 
+                          alt={item.name} 
+                          className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider truncate">{item.game}</p>
+                        <h4 className="mt-0.5 font-black text-white text-xs group-hover:text-cyan-300 transition-colors uppercase tracking-tight truncate pr-6">{item.name}</h4>
+                      </div>
+                    </div>
 
-            <div className="mt-5 grid gap-3">
-              <div className="grid grid-cols-2 gap-2">
-                <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-slate-300">ID Game</span>
-                  <input 
-                    value={gameId} 
-                    onChange={(e) => setGameId(e.target.value)}
-                    className="w-full rounded-lg border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/40" 
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-slate-300">Server ID</span>
-                  <input 
-                    value={serverId} 
-                    onChange={(e) => setServerId(e.target.value)}
-                    className="w-full rounded-lg border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-300/40" 
-                  />
-                </label>
-              </div>
+                    <div className="mt-4 w-full">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-sm font-black text-cyan-300 font-mono">Rp {item.salePrice.toLocaleString("id-ID")}</span>
+                        <span className="text-[10px] text-slate-500 line-through font-mono">Rp {item.oriPrice.toLocaleString("id-ID")}</span>
+                      </div>
 
-              <div>
-                <span className="mb-2 block text-sm font-semibold text-slate-300">Nominal</span>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { name: "86 Diamonds", price: "Rp21.000" },
-                    { name: "172 Diamonds", price: "Rp41.000" },
-                    { name: "257 Diamonds", price: "Rp61.500" },
-                    { name: "344 Diamonds", price: "Rp82.000" },
-                  ].map((nom) => (
-                    <button 
-                      key={nom.name}
-                      onClick={() => setSelectedNominal(nom.name)}
-                      className={`rounded-lg border p-3 text-left transition ${selectedNominal === nom.name ? "border-cyan-300/50 bg-cyan-300/15" : "border-white/10 bg-white/10 hover:border-cyan-300/40 hover:bg-cyan-300/10"}`}
-                    >
-                      <span className="block font-bold">{nom.name}</span>
-                      <span className="text-sm text-cyan-200">{nom.price}</span>
-                    </button>
-                  ))}
+                      {/* Progress Bar with labels above it */}
+                      <div className="mt-4">
+                        <div className="flex justify-between text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          <span>Tersisa <span className="text-cyan-400 font-mono">{100 - item.sold}</span></span>
+                          <span>Terjual <span className="text-cyan-400 font-mono">{item.sold}</span></span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                          <div className="h-full bg-cyan-400 rounded-full animate-pulse" style={{ width: `${item.sold}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
                 </div>
-              </div>
-
-              <div>
-                <span className="mb-2 block text-sm font-semibold text-slate-300">Pembayaran</span>
-                <div className="grid grid-cols-3 gap-2">
-                  {["QRIS", "VA", "E-Wallet"].map((pay) => (
-                    <button 
-                      key={pay}
-                      onClick={() => setSelectedPayment(pay)}
-                      className={`rounded-lg border px-3 py-3 text-sm font-bold text-center transition ${selectedPayment === pay ? "border-cyan-300/50 bg-cyan-300/15 text-white" : "border-white/10 bg-white/10 text-slate-300 hover:border-cyan-300/40"}`}
-                    >
-                      {pay}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-2 mt-2">
-                <button 
-                  onClick={() => router.push("/games/mobile-legends")}
-                  className="flex-1 rounded-lg bg-white/10 border border-white/10 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-white/20"
-                >
-                  Lihat Detail Game
-                </button>
-                <button 
-                  onClick={handleQuickCheckout}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-200 hover:scale-[1.02] active:scale-[0.98] shimmer-hover"
-                >
-                  <ShoppingBag className="h-4 w-4" />
-                  Order Sekarang
-                </button>
-              </div>
-            </div>
-          </aside>
+              )
+            })}
+          </div>
         </div>
 
-        {/* Section: Populer Sekarang (Diagonal Cards) */}
-        <div className="section-wrap">
-          <div className="mb-4 flex items-center gap-3">
-            <Flame className="h-7 w-7 text-cyan-300" />
+        {/* Section: Populer Sekarang (Diagonal Cards with Glowing Beveled Outlines) */}
+        <div className="section-wrap mb-12">
+          <div className="mb-6 flex items-center gap-3">
+            <Flame className="h-8 w-8 text-cyan-300 animate-pulse" />
             <div>
-              <h2 className="text-2xl font-extrabold tracking-wide">POPULER SEKARANG!</h2>
-              <p className="mt-1 text-sm text-slate-300">Berikut adalah beberapa produk yang paling populer saat ini.</p>
+              <h2 className="text-2xl font-black tracking-wide text-white uppercase">POPULER SEKARANG!</h2>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Berikut adalah beberapa produk yang paling populer saat ini.</p>
             </div>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {diagonalCards.map((card, idx) => (
-              <button 
-                key={idx}
-                onClick={() => router.push(`/games/${card.slug}`)}
-                className="diagonal-card flex min-h-28 items-center gap-4 rounded-lg p-3 text-left transition hover:-translate-y-1 hover:border-cyan-300/20"
-              >
-                <img className="h-24 w-24 rounded-lg object-cover" src={card.image} alt={card.name} />
-                <span>
-                  <strong className="block text-lg">{card.name}</strong>
-                  <span className="mt-1 block text-sm text-white/80">{card.publisher}</span>
-                </span>
-              </button>
+              <div key={idx} className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 hover:from-cyan-300/40 hover:to-cyan-300/20 transition-all duration-300 shadow-md" style={bevelStyle}>
+                <button 
+                  onClick={() => router.push(`/games/${card.slug}`)}
+                  className="w-full flex min-h-28 items-center gap-5 bg-slate-950 p-4 text-left group shimmer-hover"
+                  style={bevelStyle}
+                >
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden" style={inputBevelStyle}>
+                    <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />
+                  </div>
+                  <span>
+                    <strong className="block text-lg font-black text-white group-hover:text-cyan-300 transition-colors uppercase tracking-tight">{card.name}</strong>
+                    <span className="mt-1 block text-xs font-bold text-slate-500 uppercase tracking-wider">{card.publisher}</span>
+                  </span>
+                </button>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Section: Catalog Tabs */}
-        <div className="section-wrap">
-          <div className="mb-6 flex flex-wrap gap-3">
+        {/* Section: Catalog Tabs & Grid */}
+        <div id="catalog" className="section-wrap">
+          <div className="mb-8 flex flex-wrap gap-2">
             <button 
               onClick={() => setActiveTab("all")}
-              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shimmer-hover ${activeTab === "all" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
+              className={`px-6 py-3 text-xs font-black uppercase tracking-wider transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
+                activeTab === "all" 
+                  ? "bg-cyan-300 text-ink shadow-lg shadow-cyan-300/10" 
+                  : "bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5"
+              }`}
+              style={tabBevelStyle}
             >
-              Top Up
+              Top Up Game
             </button>
             <button 
               onClick={() => setActiveTab("voucher")}
-              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shimmer-hover ${activeTab === "voucher" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
+              className={`px-6 py-3 text-xs font-black uppercase tracking-wider transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
+                activeTab === "voucher" 
+                  ? "bg-cyan-300 text-ink shadow-lg shadow-cyan-300/10" 
+                  : "bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5"
+              }`}
+              style={tabBevelStyle}
             >
-              Voucher
+              Voucher Digital
             </button>
             <button 
               onClick={() => setActiveTab("live")}
-              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shimmer-hover ${activeTab === "live" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
+              className={`px-6 py-3 text-xs font-black uppercase tracking-wider transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
+                activeTab === "live" 
+                  ? "bg-cyan-300 text-ink shadow-lg shadow-cyan-300/10" 
+                  : "bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5"
+              }`}
+              style={tabBevelStyle}
             >
-              Live App
+              Live App Coins
             </button>
           </div>
           
-          <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {catalogItems
               .filter((item) => activeTab === "all" ? item.tab === "all" : item.tab === activeTab)
               .map((item, idx) => (
                 <button 
                   key={idx}
                   onClick={() => router.push(`/games/${item.slug}`)}
-                  className="poster-card relative overflow-hidden rounded-lg text-left h-72 group transition duration-300 hover:-translate-y-1 hover:border-cyan-300/40"
-                  style={{ backgroundImage: `url('${item.bg}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                  className="poster-card relative overflow-hidden text-left h-72 group transition duration-300 hover:-translate-y-1 shadow-md"
+                  style={{ 
+                    backgroundImage: `url('${item.bg}')`, 
+                    backgroundSize: 'cover', 
+                    backgroundPosition: 'center',
+                    clipPath: "polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px)"
+                  }}
                 >
-                  {/* Overlay for hover scale */}
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300"></div>
+                  {/* Glass dark overlays */}
+                  <div className="absolute inset-0 bg-black/50 group-hover:bg-cyan-950/20 transition-colors duration-300" />
                   
-                  <span className="poster-content z-10">
-                    <span className="poster-eyebrow">{item.eyebrow}</span>
-                    <span className="poster-title">{item.title}</span>
-                    <span className="poster-publisher">{item.publisher}</span>
+                  {/* Subtle diagonal highlight line */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-cyan-300/10 via-transparent to-transparent pointer-events-none" />
+
+                  <span className="poster-content z-10 p-5">
+                    <span className="poster-eyebrow text-[9px] font-black uppercase text-cyan-300 tracking-widest">{item.eyebrow}</span>
+                    <span className="poster-title font-black uppercase italic tracking-tight text-white mt-1 group-hover:text-cyan-200 transition-colors">{item.title}</span>
+                    <span className="poster-publisher text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">{item.publisher}</span>
                   </span>
                 </button>
               ))}
           </div>
         </div>
 
-        {/* Floating Support Info */}
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <div className="soft-panel rounded-lg p-5 flex items-center gap-4">
-            <span className="text-4xl font-extrabold">5.00</span>
-            <div>
-              <span className="text-2xl text-yellow-300 block">★★★★★</span>
-              <p className="text-sm font-bold text-slate-300">Berdasarkan total 870 rating pengguna</p>
+        {/* Dynamic Trust and Support Panels with game borders */}
+        <div className="mt-16 grid gap-6 md:grid-cols-2">
+          
+          <div className="relative p-[1px] bg-white/10" style={bevelStyle}>
+            <div className="bg-slate-950/90 p-6 flex items-center gap-5 h-full" style={bevelStyle}>
+              <span className="grid h-12 w-12 place-items-center rounded bg-cyan-300 text-ink shadow font-mono font-black text-lg">
+                5.0
+              </span>
+              <div>
+                <div className="text-yellow-400 text-lg leading-none mb-1">★★★★★</div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Berdasarkan total 870 rating pengguna terverifikasi</p>
+              </div>
             </div>
           </div>
-          <div 
-            onClick={() => router.push("https://wa.me/6281234567890")}
-            className="soft-panel flex items-center gap-4 rounded-lg p-5 cursor-pointer transition hover:border-cyan-300/30"
-          >
-            <Headphones className="h-8 w-8 text-[#8bb8c2]" />
-            <div>
-              <p className="font-extrabold">Butuh Bantuan?</p>
-              <p className="text-sm text-slate-300">Hubungi layanan Customer Service 24/7 kami.</p>
+
+          <div className="relative p-[1px] bg-white/10 hover:bg-cyan-300/30 transition-all duration-300" style={bevelStyle}>
+            <div 
+              onClick={() => router.push("https://wa.me/6281234567890")}
+              className="bg-slate-950/90 flex items-center gap-5 p-6 cursor-pointer group h-full"
+              style={bevelStyle}
+            >
+              <span className="grid h-12 w-12 place-items-center rounded bg-cyan-300/10 text-cyan-300 group-hover:bg-cyan-300 group-hover:text-ink transition-all duration-300">
+                <Headphones className="h-6 w-6" />
+              </span>
+              <div>
+                <p className="font-black text-white uppercase group-hover:text-cyan-300 transition-colors">Butuh Bantuan?</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Hubungi layanan Customer Service 24/7 kami.</p>
+              </div>
             </div>
           </div>
+
         </div>
 
       </main>

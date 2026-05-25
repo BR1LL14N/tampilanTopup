@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,63 +35,90 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  Loader2,
 } from "lucide-react"
-
-// Mock data
-const transactions = [
-  {
-    id: "1",
-    invoice: "INV-20260525-0001",
-    user: "john@example.com",
-    product: "86 Diamonds",
-    game: "Mobile Legends",
-    icon: "🎮",
-    target_id: "12345678",
-    amount: 25000,
-    payment_status: "paid",
-    topup_status: "success",
-    created_at: "2026-05-25T10:30:00Z",
-  },
-  {
-    id: "2",
-    invoice: "INV-20260524-0001",
-    user: "jane@example.com",
-    product: "70 Diamonds + 10 Bonus",
-    game: "Free Fire",
-    icon: "🔥",
-    target_id: "98765432",
-    amount: 18000,
-    payment_status: "paid",
-    topup_status: "success",
-    created_at: "2026-05-24T15:45:00Z",
-  },
-  {
-    id: "3",
-    invoice: "INV-20260523-0001",
-    user: "bob@example.com",
-    product: "60 UC",
-    game: "PUBG Mobile",
-    icon: "🎯",
-    target_id: "55556666",
-    amount: 22000,
-    payment_status: "paid",
-    topup_status: "processing",
-    created_at: "2026-05-23T08:20:00Z",
-  },
-]
-
-const stats = [
-  { label: "Total Transaksi", value: "156", icon: TrendingUp, color: "text-primary" },
-  { label: "Hari Ini", value: "12", icon: Clock, color: "text-secondary" },
-  { label: "Pending", value: "3", icon: Clock, color: "text-yellow-500" },
-  { label: "Gagal", value: "2", icon: XCircle, color: "text-red-500" },
-]
+import { createClient } from "@/lib/supabase/client"
 
 export default function AdminTransactionsPage() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [transactionsList, setTransactionsList] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
-  const filteredTransactions = transactions.filter((tx) => {
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        
+        if (!authUser) {
+          router.push("/auth/login")
+          return
+        }
+
+        // Fetch profile and check role
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("name, email, role")
+          .eq("id", authUser.id)
+          .single()
+
+        if (!profile || profile.role !== "admin") {
+          router.push("/dashboard")
+          return
+        }
+
+        setCurrentUser({
+          name: profile.name || authUser.user_metadata?.name || authUser.email || "Admin",
+          email: authUser.email || "",
+          role: profile.role
+        })
+
+        // Fetch transactions from view
+        const { data: dbTransactions } = await supabase
+          .from("transaction_details")
+          .select("*")
+          .order("created_at", { ascending: false })
+
+        if (dbTransactions) {
+          setTransactionsList(dbTransactions.map((tx: any) => ({
+            id: tx.id,
+            invoice: tx.invoice,
+            user: tx.user_email || "Guest",
+            product: tx.product_name,
+            game: tx.game_name || "Game",
+            target_id: tx.target_id,
+            amount: tx.amount,
+            topup_status: tx.topup_status,
+            created_at: tx.created_at,
+          })))
+        } else {
+          setTransactionsList([])
+        }
+      } catch (err) {
+        console.error("Failed to load admin transactions:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAdminData()
+  }, [router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+      </div>
+    )
+  }
+
+  const filteredTransactions = transactionsList.filter((tx) => {
     const matchesSearch =
       tx.invoice.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tx.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -100,9 +128,32 @@ export default function AdminTransactionsPage() {
     return matchesSearch && matchesStatus;
   })
 
+  // Calculate dynamic stats
+  const totalTransactions = transactionsList.length.toString()
+  
+  const todayStr = new Date().toISOString().split('T')[0]
+  const todayTransactions = transactionsList.filter((tx) => 
+    tx.created_at && tx.created_at.startsWith(todayStr)
+  ).length.toString()
+
+  const pendingTransactions = transactionsList.filter((tx) => 
+    tx.topup_status === "pending" || tx.topup_status === "processing"
+  ).length.toString()
+
+  const failedTransactions = transactionsList.filter((tx) => 
+    tx.topup_status === "failed"
+  ).length.toString()
+
+  const stats = [
+    { label: "Total Transaksi", value: totalTransactions, icon: TrendingUp, color: "text-primary" },
+    { label: "Hari Ini", value: todayTransactions, icon: Clock, color: "text-secondary" },
+    { label: "Pending", value: pendingTransactions, icon: Clock, color: "text-yellow-500" },
+    { label: "Gagal", value: failedTransactions, icon: XCircle, color: "text-red-500" },
+  ]
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header user={{ name: "Admin", email: "admin@gametopup.com", role: "admin" }} />
+      <Header user={currentUser} />
 
       <main className="flex-1 py-8">
         <div className="container">

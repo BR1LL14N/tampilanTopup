@@ -6,6 +6,22 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number): string {
+  let currency = "IDR";
+  if (typeof window !== "undefined") {
+    currency = window.localStorage.getItem("topup_currency") || "IDR";
+  }
+
+  if (currency === "USD") {
+    // Convert IDR to USD with approximate rate (1 USD = 15,000 IDR)
+    const usdAmount = amount / 15000;
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(usdAmount);
+  }
+
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",

@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,52 +31,104 @@ import {
   Trash2,
   Eye,
   Gamepad2,
+  Loader2,
 } from "lucide-react"
-
-// Mock data
-const games = [
-  {
-    id: "1",
-    name: "Mobile Legends",
-    slug: "mobile-legends",
-    icon: "🎮",
-    category: "MOBA",
-    image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&h=300&fit=crop",
-    status: true,
-    products_count: 12,
-  },
-  {
-    id: "2",
-    name: "Free Fire",
-    slug: "free-fire",
-    icon: "🔥",
-    category: "Battle Royale",
-    image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=400&h=300&fit=crop",
-    status: true,
-    products_count: 8,
-  },
-  {
-    id: "3",
-    name: "PUBG Mobile",
-    slug: "pubg-mobile",
-    icon: "🎯",
-    category: "Battle Royale",
-    image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400&h=300&fit=crop",
-    status: true,
-    products_count: 10,
-  },
-]
+import { createClient } from "@/lib/supabase/client"
 
 export default function AdminGamesPage() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [gamesList, setGamesList] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredGames = games.filter((game) =>
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        
+        if (!authUser) {
+          router.push("/auth/login")
+          return
+        }
+
+        // Fetch profile and check role
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("name, email, role")
+          .eq("id", authUser.id)
+          .single()
+
+        if (!profile || profile.role !== "admin") {
+          router.push("/dashboard")
+          return
+        }
+
+        setCurrentUser({
+          name: profile.name || authUser.user_metadata?.name || authUser.email || "Admin",
+          email: authUser.email || "",
+          role: profile.role
+        })
+
+        // Fetch games list
+        const { data: dbGames } = await supabase
+          .from("games")
+          .select("*")
+          .order("sort_order", { ascending: true })
+
+        if (dbGames && dbGames.length > 0) {
+          const gamesWithCount = await Promise.all(
+            dbGames.map(async (game: any) => {
+              const { count } = await supabase
+                .from("products")
+                .select("*", { count: "exact", head: true })
+                .eq("game_id", game.id)
+              
+              return {
+                id: game.id,
+                name: game.name,
+                slug: game.slug,
+                icon: game.icon || "🎮",
+                category: game.category || "Game",
+                image: game.image || "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&h=300&fit=crop",
+                status: game.status,
+                products_count: count || 0
+              }
+            })
+          )
+          setGamesList(gamesWithCount)
+        } else {
+          setGamesList([])
+        }
+      } catch (err) {
+        console.error("Failed to load admin games data:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAdminData()
+  }, [router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+      </div>
+    )
+  }
+
+  const filteredGames = gamesList.filter((game) =>
     game.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header user={{ name: "Admin", email: "admin@gametopup.com", role: "admin" }} />
+      <Header user={currentUser} />
 
       <main className="flex-1 py-8">
         <div className="container">

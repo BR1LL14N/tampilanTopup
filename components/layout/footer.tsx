@@ -28,12 +28,12 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-cyan-300 text-ink">
-                <Gamepad2 className="h-6 w-6" />
-              </span>
+            <Link href="/" className="flex items-center gap-3 mb-4 group">
+              <div className="h-10 w-10 rounded overflow-hidden bg-slate-950 border border-white/10 shadow-lg shadow-cyan-300/5 group-hover:border-cyan-300/30 transition-all duration-300">
+                <img src="/mitsuru.png" alt="Mitsuru Logo" className="h-full w-full object-cover" />
+              </div>
               <span>
-                <span className="block text-left text-base font-extrabold tracking-wide">KampusTopup</span>
+                <span className="block text-left text-base font-extrabold tracking-wide text-white group-hover:text-cyan-300 transition-colors">Mitsuru</span>
               </span>
             </Link>
             <p className="text-sm text-slate-400 mb-4">
@@ -115,7 +115,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-white/10 text-center">
           <p className="text-sm text-slate-500">
-            &copy; {currentYear} KampusTopup. All rights reserved.
+            &copy; {currentYear} Mitsuru. All rights reserved.
           </p>
         </div>
       </div>

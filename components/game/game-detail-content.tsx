@@ -13,6 +13,9 @@ import {
   ShoppingBag,
   Headphones,
   Star,
+  User,
+  Shield,
+  FileText
 } from "lucide-react"
 
 interface Product {
@@ -40,6 +43,33 @@ interface GameDetailContentProps {
     email: string
     role: string
   } | null
+}
+
+const gameWallpapers: Record<string, string> = {
+  "mobile-legends": "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=1200&q=80",
+  "free-fire": "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1200&q=80",
+  "pubg-mobile": "https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=1200&q=80",
+  "valorant": "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?auto=format&fit=crop&w=1200&q=80",
+  "genshin-impact": "https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=1200&q=80",
+  "roblox": "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=1200&q=80",
+  "honor-of-kings": "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=80",
+}
+const defaultWallpaper = "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80"
+
+const getPublisher = (slug: string) => {
+  const map: Record<string, string> = {
+    "mobile-legends": "Moonton",
+    "free-fire": "Garena",
+    "pubg-mobile": "Tencent Games",
+    "valorant": "Riot Games",
+    "genshin-impact": "HoYoverse",
+    "roblox": "Roblox Corporation",
+    "honor-of-kings": "Tencent Games",
+    "steam": "Valve",
+    "tiktok": "TikTok",
+    "bigo": "BIGO",
+  }
+  return map[slug] || "Game Publisher"
 }
 
 export function GameDetailContent({ game, user }: GameDetailContentProps) {
@@ -80,39 +110,94 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     )
   }
 
+  // Hexagonal game cuts
+  const bevelStyle = {
+    clipPath: "polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px)"
+  }
+  
+  const cardBevelStyle = {
+    clipPath: "polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px)"
+  }
+
+  const inputBevelStyle = {
+    clipPath: "polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px)"
+  }
+
+  const tagBevelStyle = {
+    clipPath: "polygon(4px 0%, calc(100% - 4px) 0%, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0% calc(100% - 4px), 0% 4px)"
+  }
+
+  const tabBevelStyle = {
+    clipPath: "polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% 100%, 0% 100%)"
+  }
+
+  const bannerBg = gameWallpapers[game.slug] || defaultWallpaper
+  const publisher = getPublisher(game.slug)
+
   return (
     <div className="min-h-screen text-slate-100 antialiased relative">
       {/* Mesh Background */}
-      <div className="pointer-events-none fixed inset-0 mesh opacity-50 z-0"></div>
+      <div className="pointer-events-none fixed inset-0 mesh opacity-45 z-0"></div>
 
       <Header user={user} />
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         
-        {/* Game Header Banner */}
-        <div className="diagonal-card mb-6 overflow-hidden rounded-lg border border-cyan-200/20">
-          <div className="grid min-h-[360px] items-end gap-6 p-6 sm:p-8 lg:grid-cols-[280px_1fr] lg:p-10">
-            <img 
-              className="h-72 w-full max-w-[260px] rounded-lg object-cover shadow-2xl" 
-              src={game.image} 
-              alt={game.name} 
+        {/* Game Header Banner Redesign */}
+        <div className="relative mb-10 rounded-2xl border border-white/10 overflow-hidden bg-slate-950/60 shadow-lg shadow-cyan-300/5">
+          
+          {/* Banner background visual on the right */}
+          <div className="absolute inset-0 z-0">
+            <div 
+              className="absolute inset-0 md:inset-y-0 md:left-1/3 md:right-0 bg-cover bg-center"
+              style={{ backgroundImage: `url('${bannerBg}')` }}
             />
-            <div className="pb-3">
-              <p className="text-sm font-extrabold uppercase tracking-wider text-cyan-100">Top Up Game</p>
-              <h1 className="mt-2 text-4xl font-extrabold uppercase tracking-wide text-white">{game.name}</h1>
-              <p className="mt-2 text-lg font-semibold text-slate-200">{game.category}</p>
-              <div className="mt-8 flex flex-wrap gap-5 text-sm font-bold text-white">
-                <span className="inline-flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-yellow-300" />
+            {/* Dark gradient overlay from left to right */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
+          </div>
+
+          {/* Banner Content Grid */}
+          <div className="relative z-20 grid md:grid-cols-[240px_1fr] gap-8 p-6 md:p-8 pt-16 md:pt-20 items-end">
+            
+            {/* Beveled Tilted Cover Image */}
+            <div className="relative p-[1px] bg-gradient-to-tr from-cyan-300/40 to-blue-500/40 shadow-neon-cyan/20 w-44 md:w-52 mx-auto md:mx-0" style={bevelStyle}>
+              <div className="overflow-hidden w-full h-60 md:h-64" style={bevelStyle}>
+                <img 
+                  className="h-full w-full object-cover transition-transform duration-750 hover:scale-110" 
+                  src={game.image} 
+                  alt={game.name} 
+                />
+              </div>
+            </div>
+
+            {/* Title & Info Panel */}
+            <div className="space-y-4 text-center md:text-left">
+              <div>
+                <span className="text-[10px] font-black uppercase text-cyan-300 bg-cyan-300/10 border border-cyan-300/20 px-2.5 py-1 rounded" style={tagBevelStyle}>
+                  Penyedia Resmi
+                </span>
+                <h1 className="text-3xl md:text-5xl font-black uppercase text-white mt-3 tracking-tight">
+                  {game.name}
+                </h1>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                  Publisher: <span className="text-white">{publisher}</span> • Kategori: <span className="text-cyan-300">{game.category}</span>
+                </p>
+              </div>
+
+              {/* Sub-badges layout */}
+              <div className="flex flex-wrap justify-center md:justify-start gap-3.5 pt-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[10px] font-black uppercase tracking-wider">
+                  <Zap className="h-3.5 w-3.5 fill-yellow-400/20" />
                   Proses Cepat
                 </span>
-                <span className="inline-flex items-center gap-2">
-                  <MessagesSquare className="h-4 w-4 text-blue-300" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black uppercase tracking-wider">
+                  <MessagesSquare className="h-3.5 w-3.5 fill-cyan-400/20" />
                   Layanan Chat 24/7
                 </span>
-                <span className="inline-flex items-center gap-2">
-                  <BadgeCheck className="h-4 w-4 text-emerald-300" />
-                  Pembayaran Aman
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
+                  <BadgeCheck className="h-3.5 w-3.5 fill-emerald-400/20" />
+                  Pembayaran Aman!
                 </span>
               </div>
             </div>
@@ -120,170 +205,210 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
         </div>
 
         {/* Dynamic content grid */}
-        <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
           
           {/* Left Column Form */}
           <div className="space-y-6">
             
-            {/* View tabs */}
-            <div className="flex w-fit overflow-hidden rounded-lg border border-white/10 bg-ink/50 text-sm font-extrabold">
+            {/* Folder style tabs selector */}
+            <div className="flex overflow-hidden border-b border-white/10 text-xs font-black uppercase tracking-wider gap-1">
               <button 
                 onClick={() => setActiveTab("transaksi")}
-                className={`px-5 py-3 ${activeTab === "transaksi" ? "tab-active" : "text-slate-300"}`}
+                className={`px-6 py-2.5 transition-all duration-300 ${
+                  activeTab === "transaksi" 
+                    ? "bg-cyan-300 text-ink shadow-lg shadow-cyan-300/10" 
+                    : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+                }`}
+                style={tabBevelStyle}
               >
-                Transaksi
+                Form Transaksi
               </button>
               <button 
                 onClick={() => setActiveTab("keterangan")}
-                className={`px-5 py-3 ${activeTab === "keterangan" ? "tab-active" : "text-slate-300"}`}
+                className={`px-6 py-2.5 transition-all duration-300 ${
+                  activeTab === "keterangan" 
+                    ? "bg-cyan-300 text-ink shadow-lg shadow-cyan-300/10" 
+                    : "bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+                }`}
+                style={tabBevelStyle}
               >
-                Keterangan
+                Informasi Game
               </button>
             </div>
 
             {activeTab === "transaksi" ? (
               <>
                 {/* Step 1: Input Akun */}
-                <div className="order-step">
-                  <div className="step-head">
-                    <span className="step-number">1</span>
-                    <span className="px-5 font-bold">Masukkan Data Akun</span>
+                <div className="relative p-[1px] bg-white/10 rounded-2xl overflow-hidden shadow-md">
+                  <div className="p-4 bg-slate-950/80 border-b border-white/5 flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center bg-cyan-300 text-ink font-black text-xs" style={tagBevelStyle}>1</span>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-white">Masukkan Data Akun</h3>
                   </div>
-                  <div className="grid gap-4 p-5 sm:grid-cols-2">
-                    <label>
-                      <span className="mb-2 block text-sm font-bold">User ID</span>
-                      <input 
-                        value={gameId}
-                        onChange={(e) => setGameId(e.target.value)}
-                        placeholder="Masukkan User ID" 
-                        className="w-full rounded-lg border border-transparent bg-[#82aeb8]/30 px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none focus:bg-[#82aeb8]/40" 
-                      />
-                    </label>
+                  
+                  <div className="grid gap-5 p-6 sm:grid-cols-2 bg-slate-950/40">
+                    <div className="space-y-2">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-slate-300">User ID <span className="text-cyan-300">*</span></span>
+                      <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
+                        <input 
+                          value={gameId}
+                          onChange={(e) => setGameId(e.target.value)}
+                          placeholder="Masukkan User ID" 
+                          className="w-full bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 outline-none" 
+                          style={inputBevelStyle}
+                          required
+                        />
+                      </div>
+                    </div>
                     
                     {/* Conditionally show Server ID for Mobile Legends */}
                     {game.slug === "mobile-legends" && (
-                      <label>
-                        <span className="mb-2 block text-sm font-bold">Server ID</span>
-                        <input 
-                          value={serverId}
-                          onChange={(e) => setServerId(e.target.value)}
-                          placeholder="Masukkan Server ID" 
-                          className="w-full rounded-lg border border-transparent bg-[#82aeb8]/30 px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none focus:bg-[#82aeb8]/40" 
-                        />
-                      </label>
+                      <div className="space-y-2">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-slate-300">Server ID <span className="text-cyan-300">*</span></span>
+                        <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
+                          <input 
+                            value={serverId}
+                            onChange={(e) => setServerId(e.target.value)}
+                            placeholder="Masukkan Server ID" 
+                            className="w-full bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 outline-none" 
+                            style={inputBevelStyle}
+                            required
+                          />
+                        </div>
+                      </div>
                     )}
 
-                    {/* Additional simulated fields for Joki/Vouchers if needed */}
-                    <label>
-                      <span className="mb-2 block text-sm font-bold">Email (Opsional)</span>
-                      <input 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Masukkan Email" 
-                        className="w-full rounded-lg border border-transparent bg-[#82aeb8]/30 px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none focus:bg-[#82aeb8]/40" 
-                      />
-                    </label>
+                    <div className="space-y-2">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-slate-300">Email (Opsional)</span>
+                      <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
+                        <input 
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="name@email.com" 
+                          className="w-full bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 outline-none" 
+                          style={inputBevelStyle}
+                        />
+                      </div>
+                    </div>
                     
-                    <label>
-                      <span className="mb-2 block text-sm font-bold">Pilih Login</span>
-                      <select 
-                        value={loginMethod}
-                        onChange={(e) => setLoginMethod(e.target.value)}
-                        className="w-full rounded-lg border border-transparent bg-[#82aeb8]/30 px-4 py-3 text-sm text-white outline-none focus:bg-[#82aeb8]/40"
-                      >
-                        <option value="Pilih Login">Pilih Login</option>
-                        <option value="Moonton">Moonton</option>
-                        <option value="Facebook">Facebook</option>
-                        <option value="Tiktok">Tiktok</option>
-                        <option value="VK">VK</option>
-                        <option value="Google">Google</option>
-                      </select>
-                    </label>
+                    <div className="space-y-2">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-slate-300">Metode Login</span>
+                      <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
+                        <select 
+                          value={loginMethod}
+                          onChange={(e) => setLoginMethod(e.target.value)}
+                          className="w-full bg-slate-950 px-4 py-2.5 text-sm text-white outline-none"
+                          style={inputBevelStyle}
+                        >
+                          <option value="Pilih Login" className="bg-slate-950">Pilih Login</option>
+                          <option value="Moonton" className="bg-slate-950">Moonton</option>
+                          <option value="Facebook" className="bg-slate-950">Facebook</option>
+                          <option value="Tiktok" className="bg-slate-950">Tiktok</option>
+                          <option value="VK" className="bg-slate-950">VK</option>
+                          <option value="Google" className="bg-slate-950">Google</option>
+                        </select>
+                      </div>
+                    </div>
 
-                    <label className="sm:col-span-2">
-                      <span className="mb-2 block text-sm font-bold">Password (Hanya untuk Joki)</span>
-                      <input 
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Masukkan Password" 
-                        className="w-full rounded-lg border border-transparent bg-[#82aeb8]/30 px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none focus:bg-[#82aeb8]/40" 
-                      />
-                    </label>
+                    <div className="sm:col-span-2 space-y-2">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-slate-300">Password (Khusus Joki Rank)</span>
+                      <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
+                        <input 
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Masukkan password akun game Anda jika memesan Joki" 
+                          className="w-full bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 outline-none" 
+                          style={inputBevelStyle}
+                        />
+                      </div>
+                    </div>
 
-                    <label className="sm:col-span-2">
-                      <span className="mb-2 block text-sm font-bold">Request ke Admin/Penjoki</span>
-                      <input 
-                        value={requestNotes}
-                        onChange={(e) => setRequestNotes(e.target.value)}
-                        placeholder="Contoh: Main hero mage, jangan pakai chat all" 
-                        className="w-full rounded-lg border border-transparent bg-[#82aeb8]/30 px-4 py-3 text-sm text-white placeholder:text-white/55 outline-none focus:bg-[#82aeb8]/40" 
-                      />
-                    </label>
-                    
-                    <p className="sm:col-span-2 text-xs text-slate-300">
-                      *Pastikan data akun yang Anda isi sudah benar sebelum melanjutkan ke pembayaran.
-                    </p>
+                    <div className="sm:col-span-2 space-y-2">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-slate-300">Catatan Khusus untuk Admin</span>
+                      <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
+                        <input 
+                          value={requestNotes}
+                          onChange={(e) => setRequestNotes(e.target.value)}
+                          placeholder="Contoh: Tolong matikan verifikasi 2 langkah, push di jam malam saja" 
+                          className="w-full bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 outline-none" 
+                          style={inputBevelStyle}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Step 2: Pilih Nominal */}
-                <div className="order-step">
-                  <div className="step-head">
-                    <span className="step-number">2</span>
-                    <span className="px-5 font-bold">Pilih Nominal</span>
+                <div className="relative p-[1px] bg-white/10 rounded-2xl overflow-hidden shadow-md">
+                  <div className="p-4 bg-slate-950/80 border-b border-white/5 flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center bg-cyan-300 text-ink font-black text-xs" style={tagBevelStyle}>2</span>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-white">Pilih Nominal Top Up</h3>
                   </div>
-                  <div className="p-5">
+                  
+                  <div className="p-6 bg-slate-950/40">
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                       {game.products.map((prod) => {
                         const originalPrice = Math.round(prod.sell_price * 1.25)
                         const discount = 20
                         const isSelected = selectedProduct?.id === prod.id
                         return (
-                          <button 
-                            key={prod.id}
-                            onClick={() => setSelectedProduct(prod)}
-                            className={`rank-card p-4 text-left transition duration-300 hover:scale-[1.02] ${isSelected ? "border-cyan-300/50 bg-cyan-300/10 ring-2 ring-cyan-300/30" : "border-white/10 bg-white/5"}`}
-                          >
-                            <span className="block font-extrabold text-sm">{prod.name}</span>
-                            <span className="mt-3 block text-xl font-extrabold text-[#82b7c2]">
-                              Rp {prod.sell_price.toLocaleString("id-ID")}
-                            </span>
-                            <span className="mt-1 block text-xs font-bold text-pink-500 line-through">
-                              Rp {originalPrice.toLocaleString("id-ID")}
-                            </span>
-                            <span className="mt-4 inline-block rounded bg-[#82aeb8] px-2 py-0.5 text-[10px] font-bold text-ink">
-                              Disc {discount}%
-                            </span>
-                          </button>
+                          <div key={prod.id} className={`relative p-[1px] transition-all duration-300 ${isSelected ? "bg-gradient-to-r from-cyan-300 to-blue-500 shadow-neon-cyan/20 scale-[1.02]" : "bg-white/5 hover:bg-white/10"}`} style={cardBevelStyle}>
+                            <button 
+                              onClick={() => setSelectedProduct(prod)}
+                              className="w-full bg-slate-950 p-4 text-left group shimmer-hover"
+                              style={cardBevelStyle}
+                              type="button"
+                            >
+                              <span className="block font-black text-xs uppercase tracking-wide text-white group-hover:text-cyan-300 transition-colors">{prod.name}</span>
+                              <div className="mt-3 flex items-baseline justify-between">
+                                <span className="text-base font-black text-cyan-300 font-mono">
+                                  Rp {prod.sell_price.toLocaleString("id-ID")}
+                                </span>
+                                <span className="text-[10px] text-pink-500 line-through font-mono">
+                                  Rp {originalPrice.toLocaleString("id-ID")}
+                                </span>
+                              </div>
+                              <span className={`inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider mt-3 ${
+                                isSelected ? "bg-cyan-300 text-ink" : "bg-pink-500/20 text-pink-400"
+                              }`} style={tagBevelStyle}>
+                                HEMAT {discount}%
+                              </span>
+                            </button>
+                          </div>
                         )
                       })}
                     </div>
                   </div>
                 </div>
 
-                {/* Step 3: Masukkan Jumlah Pembelian */}
-                <div className="order-step">
-                  <div className="step-head">
-                    <span className="step-number">3</span>
-                    <span className="px-5 font-bold">Masukkan Jumlah Pembelian</span>
+                {/* Step 3: Jumlah Pembelian */}
+                <div className="relative p-[1px] bg-white/10 rounded-2xl overflow-hidden shadow-md">
+                  <div className="p-4 bg-slate-950/80 border-b border-white/5 flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center bg-cyan-300 text-ink font-black text-xs" style={tagBevelStyle}>3</span>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-white">Tentukan Jumlah Pembelian</h3>
                   </div>
-                  <div className="flex gap-3 p-5 items-center">
-                    <input 
-                      type="number"
-                      value={quantity}
-                      onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="min-w-0 max-w-[80px] rounded-lg bg-[#82aeb8]/30 px-4 py-3 text-center text-white outline-none focus:ring-2 focus:ring-cyan-300/40" 
-                    />
+                  
+                  <div className="flex gap-3.5 p-6 bg-slate-950/40 items-center">
+                    <div className="relative p-[1px] bg-white/10" style={inputBevelStyle}>
+                      <input 
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                        className="w-16 bg-slate-950 py-3 text-center text-sm font-bold text-white outline-none" 
+                        style={inputBevelStyle}
+                      />
+                    </div>
                     <button 
                       onClick={() => setQuantity((q) => q + 1)}
-                      className="grid h-12 w-12 place-items-center rounded-lg bg-[#82aeb8]/20 transition hover:bg-[#82aeb8]/30 text-white"
+                      className="grid h-11 w-11 place-items-center rounded bg-cyan-300/10 hover:bg-cyan-300 text-cyan-300 hover:text-ink border border-cyan-300/20 transition-all hover:scale-105 active:scale-95"
+                      type="button"
                     >
                       <Plus className="h-5 w-5" />
                     </button>
                     <button 
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="grid h-12 w-12 place-items-center rounded-lg bg-white/15 transition hover:bg-white/20 text-white"
+                      className="grid h-11 w-11 place-items-center rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-all hover:scale-105 active:scale-95"
+                      type="button"
                     >
                       <Minus className="h-5 w-5" />
                     </button>
@@ -291,169 +416,203 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                 </div>
 
                 {/* Step 4: Pilih Pembayaran */}
-                <div className="order-step">
-                  <div className="step-head">
-                    <span className="step-number">4</span>
-                    <span className="px-5 font-bold">Pilih Pembayaran</span>
+                <div className="relative p-[1px] bg-white/10 rounded-2xl overflow-hidden shadow-md">
+                  <div className="p-4 bg-slate-950/80 border-b border-white/5 flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center bg-cyan-300 text-ink font-black text-xs" style={tagBevelStyle}>4</span>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-white">Pilih Jalur Pembayaran</h3>
                   </div>
-                  <div className="grid gap-3 p-5 md:grid-cols-3">
+                  
+                  <div className="grid gap-4 p-6 md:grid-cols-3 bg-slate-950/40">
                     {[
-                      { id: "QRIS", desc: "Instan & Otomatis" },
-                      { id: "VA", desc: "Transfer Bank" },
-                      { id: "E-Wallet", desc: "DANA, OVO, ShopeePay" },
+                      { id: "QRIS", desc: "Verifikasi Otomatis (Instan)" },
+                      { id: "VA", desc: "Transfer Bank Virtual Account" },
+                      { id: "E-Wallet", desc: "DANA, OVO, LinkAja, ShopeePay" },
                     ].map((pm) => {
                       const isSelected = paymentMethod === pm.id
                       return (
-                        <button 
-                          key={pm.id}
-                          onClick={() => setPaymentMethod(pm.id)}
-                          className={`rounded-lg border p-4 text-left transition duration-300 ${isSelected ? "border-cyan-200/40 bg-[#2a5652]" : "border-white/10 bg-white/5 hover:border-cyan-200/25"}`}
-                        >
-                          <strong>{pm.id}</strong>
-                          <span className="mt-1 block text-xs text-slate-300">{pm.desc}</span>
-                        </button>
+                        <div key={pm.id} className={`relative p-[1px] transition-all duration-300 ${isSelected ? "bg-gradient-to-r from-cyan-300 to-blue-500 shadow-neon-cyan/10" : "bg-white/5 hover:bg-white/10"}`} style={cardBevelStyle}>
+                          <button 
+                            onClick={() => setPaymentMethod(pm.id)}
+                            className="w-full bg-slate-950 p-4 text-left group shimmer-hover h-full flex flex-col justify-between"
+                            style={cardBevelStyle}
+                            type="button"
+                          >
+                            <strong className="block text-xs font-black uppercase tracking-wide text-white group-hover:text-cyan-300 transition-colors">{pm.id}</strong>
+                            <span className="mt-2 block text-[10px] text-slate-500 font-semibold uppercase leading-normal">{pm.desc}</span>
+                          </button>
+                        </div>
                       )
                     })}
                   </div>
                 </div>
 
                 {/* Step 5: Kode Promo */}
-                <div className="order-step">
-                  <div className="step-head">
-                    <span className="step-number">5</span>
-                    <span className="px-5 font-bold">Kode Promo</span>
+                <div className="relative p-[1px] bg-white/10 rounded-2xl overflow-hidden shadow-md">
+                  <div className="p-4 bg-slate-950/80 border-b border-white/5 flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center bg-cyan-300 text-ink font-black text-xs" style={tagBevelStyle}>5</span>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-white">Gunakan Kode Promo</h3>
                   </div>
-                  <div className="grid gap-3 p-5 sm:grid-cols-[1fr_auto]">
-                    <input 
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
-                      placeholder="Masukkan kode promo" 
-                      className="rounded-lg bg-[#82aeb8]/30 px-4 py-3 text-white placeholder:text-white/55 outline-none focus:ring-2 focus:ring-cyan-300/40" 
-                    />
-                    <button className="rounded-lg bg-white px-5 py-3 font-extrabold text-ink transition hover:bg-cyan-100">
-                      Gunakan
-                    </button>
+                  
+                  <div className="grid gap-4 p-6 sm:grid-cols-[1fr_auto] bg-slate-950/40">
+                    <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
+                      <input 
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value)}
+                        placeholder="Masukkan kode promo jika ada" 
+                        className="w-full bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none" 
+                        style={inputBevelStyle}
+                      />
+                    </div>
+                    <div className="relative p-[1px] bg-white/10 hover:bg-cyan-300/30 transition-all duration-300" style={inputBevelStyle}>
+                      <button className="bg-slate-950 px-6 py-3 text-xs font-black uppercase tracking-wider text-slate-300 hover:text-white transition-colors" style={inputBevelStyle} type="button">
+                        Pakai
+                      </button>
+                    </div>
                     <button 
                       onClick={() => setPromoCode("PROMO-MHS")}
-                      className="sm:col-span-2 rounded-lg border border-dashed border-cyan-200/50 px-4 py-3 text-left font-bold text-cyan-100 transition hover:bg-cyan-300/10"
+                      className="sm:col-span-2 rounded-lg border border-dashed border-cyan-300/20 hover:border-cyan-300/40 bg-cyan-300/[0.02] hover:bg-cyan-300/[0.05] p-3 text-left text-xs font-black text-cyan-300 uppercase tracking-widest transition-all duration-300"
+                      type="button"
                     >
-                      Pakai Promo Yang Tersedia: PROMO-MHS (Diskon 5%)
+                      Dapatkan Diskon Tambahan 5%: PROMO-MHS
                     </button>
                   </div>
                 </div>
 
                 {/* Step 6: Detail Kontak */}
-                <div className="order-step">
-                  <div className="step-head">
-                    <span className="step-number">6</span>
-                    <span className="px-5 font-bold">Detail Kontak</span>
+                <div className="relative p-[1px] bg-white/10 rounded-2xl overflow-hidden shadow-md">
+                  <div className="p-4 bg-slate-950/80 border-b border-white/5 flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center bg-cyan-300 text-ink font-black text-xs" style={tagBevelStyle}>6</span>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-white">Detail Kontak WhatsApp</h3>
                   </div>
-                  <div className="p-5">
-                    <label>
-                      <span className="mb-2 block text-sm font-bold">No. WhatsApp</span>
-                      <div className="grid grid-cols-[72px_1fr] gap-3">
-                        <span className="rounded-lg bg-[#82aeb8]/30 flex items-center justify-center font-bold">ID (+62)</span>
-                        <input 
-                          value={whatsapp}
-                          onChange={(e) => setWhatsapp(e.target.value)}
-                          placeholder="81234567890" 
-                          className="rounded-lg bg-[#82aeb8]/30 px-4 py-3 text-white placeholder:text-white/55 outline-none focus:ring-2 focus:ring-cyan-300/40" 
-                        />
+                  
+                  <div className="p-6 space-y-4 bg-slate-950/40">
+                    <div className="space-y-2">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-slate-300">No. WhatsApp Aktif <span className="text-cyan-300">*</span></span>
+                      <div className="grid grid-cols-[80px_1fr] gap-3">
+                        <span className="rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center font-bold text-slate-400 text-xs">ID (+62)</span>
+                        <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
+                          <input 
+                            value={whatsapp}
+                            onChange={(e) => setWhatsapp(e.target.value)}
+                            placeholder="81234567890" 
+                            className="w-full bg-slate-950 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none" 
+                            style={inputBevelStyle}
+                            required
+                          />
+                        </div>
                       </div>
-                    </label>
-                    <p className="mt-3 text-xs text-slate-300">
-                      Nomor ini akan dihubungi jika terjadi masalah. Bukti transaksi akan kami kirim ke WhatsApp Anda.
+                    </div>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">
+                      *Bukti status pengiriman dan kwitansi invoice akan dikirimkan otomatis ke WhatsApp Anda.
                     </p>
                   </div>
                 </div>
               </>
             ) : (
               /* Description & Rules Tab */
-              <div className="soft-panel rounded-lg p-6">
-                <h2 className="text-xl font-extrabold">Deskripsi {game.name}</h2>
-                <p className="mt-3 text-sm leading-7 text-slate-300">
+              <div className="glass p-6 md:p-8 rounded-2xl border-white/10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-300/5 rounded-full blur-2xl pointer-events-none" />
+                <h2 className="text-lg font-black uppercase tracking-wide text-white border-b border-white/5 pb-3 flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-cyan-300" />
+                  Keterangan Game {game.name}
+                </h2>
+                <p className="mt-4 text-xs font-medium leading-relaxed text-slate-300">
                   {game.description}
                 </p>
-                <h3 className="mt-5 font-extrabold">Ketentuan & Aturan Topup:</h3>
-                <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-slate-300">
-                  <li>Pastikan User ID dan Server ID diisi dengan benar. Kesalahan penginputan di luar tanggung jawab kami.</li>
-                  <li>Proses transaksi umumnya memakan waktu 10-60 detik setelah pembayaran diverifikasi.</li>
-                  <li>Untuk joki rank, harap matikan verifikasi perangkat baru di pengaturan game dan jangan login selama proses joki berlangsung.</li>
+                
+                <h3 className="mt-8 font-black uppercase tracking-widest text-xs text-white flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-cyan-300" />
+                  Syarat &amp; Ketentuan Pengisian
+                </h3>
+                <ol className="mt-4 list-decimal space-y-3 pl-5 text-xs text-slate-400 font-medium">
+                  <li>Harap teliti kembali nominal produk dan target ID akun Anda. Transaksi yang salah diinput di luar tanggung jawab pihak Mitsuru.</li>
+                  <li>Proses distribusi top up diselesaikan secara otomatis dalam 10-60 detik segera setelah dana masuk.</li>
+                  <li>Untuk transaksi Joki Rank ML, mohon jangan membuka akun game selama proses pengerjaan oleh penjoki untuk menghindari kegagalan pengerjaan.</li>
                 </ol>
               </div>
             )}
           </div>
 
           {/* Right Column Sidebar */}
-          <aside className="space-y-5 lg:sticky lg:top-28 lg:self-start">
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
             
-            {/* Review Card */}
-            <div className="soft-panel rounded-lg p-5">
-              <h2 className="font-extrabold text-base">Ulasan dan rating</h2>
-              <div className="mt-3 flex items-center gap-4">
-                <span className="text-5xl font-extrabold">5.00</span>
-                <div className="flex flex-col">
-                  <span className="text-3xl text-yellow-300">★★★★★</span>
-                  <p className="text-xs font-bold text-slate-400">Berdasarkan 870 rating</p>
+            {/* Reviews Card */}
+            <div className="glass p-5 rounded-2xl border-white/10 relative overflow-hidden">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Ulasan Pengguna</h2>
+              <div className="flex items-center gap-4 bg-slate-950/45 p-3 rounded-xl border border-white/5">
+                <span className="text-4xl font-black text-cyan-300 font-mono leading-none">4.99</span>
+                <div>
+                  <span className="text-yellow-400 text-base leading-none block">★★★★★</span>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">Berdasarkan 870 rating terverifikasi</p>
                 </div>
               </div>
             </div>
 
-            {/* Help Card */}
-            <div className="soft-panel flex items-center gap-4 rounded-lg p-5">
-              <Headphones className="h-8 w-8 text-slate-200" />
+            {/* CS Support Card */}
+            <div 
+              onClick={() => router.push("https://wa.me/6281234567890")}
+              className="glass p-5 rounded-2xl border-white/10 flex items-center gap-4 hover:border-cyan-300/30 cursor-pointer transition-all duration-300 group"
+            >
+              <span className="grid h-11 w-11 place-items-center rounded bg-cyan-300/10 text-cyan-300 group-hover:bg-cyan-300 group-hover:text-ink transition-colors">
+                <Headphones className="h-5 w-5" />
+              </span>
               <div>
-                <p className="font-extrabold text-sm">Butuh Bantuan?</p>
-                <p className="text-xs text-slate-300">Hubungi kami jika terjadi kendala pembayaran.</p>
+                <p className="font-black text-white text-xs uppercase group-hover:text-cyan-300 transition-colors">Customer Service</p>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Siap melayani keluhan 24/7 jam</p>
               </div>
             </div>
 
-            {/* Selected Product Review */}
-            <div className="soft-panel rounded-lg p-5 border border-white/10">
-              <h3 className="font-bold border-b border-white/10 pb-3">Ringkasan Pembelian</h3>
+            {/* Selected Product Summary */}
+            <div className="glass p-6 rounded-2xl border border-white/10 relative overflow-hidden">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-white border-b border-white/5 pb-3">Ringkasan Invoice</h3>
+              
               {selectedProduct ? (
-                <div className="mt-4 space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Nominal:</span>
-                    <span className="font-bold">{selectedProduct.name}</span>
+                <div className="mt-4 space-y-3.5 text-xs font-semibold">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 uppercase text-[10px] tracking-wider">Item Produk</span>
+                    <span className="font-bold text-white">{selectedProduct.name}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Jumlah:</span>
-                    <span className="font-bold">{quantity}x</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 uppercase text-[10px] tracking-wider">Jumlah</span>
+                    <span className="font-mono text-cyan-300 font-bold bg-white/5 px-2 py-0.5 rounded">x{quantity}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Metode:</span>
-                    <span className="font-bold text-cyan-300">{paymentMethod}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 uppercase text-[10px] tracking-wider">Jalur Bayar</span>
+                    <span className="font-bold text-white uppercase">{paymentMethod}</span>
                   </div>
                   {gameId && (
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Target ID:</span>
-                      <span className="font-bold">{gameId} {serverId && `(${serverId})`}</span>
+                    <div className="flex justify-between items-center border-t border-white/5 pt-3">
+                      <span className="text-slate-500 uppercase text-[10px] tracking-wider">ID Akun</span>
+                      <span className="font-mono text-white font-bold">{gameId} {serverId && `(${serverId})`}</span>
                     </div>
                   )}
-                  <div className="flex justify-between border-t border-white/10 pt-3 text-base">
-                    <span className="text-white font-bold">Total:</span>
-                    <span className="font-extrabold text-cyan-200">
+                  <div className="flex justify-between items-center border-t border-white/10 pt-4">
+                    <span className="text-white font-black uppercase text-xs">Total Tagihan</span>
+                    <span className="text-lg font-black text-cyan-300 font-mono">
                       Rp {(selectedProduct.sell_price * quantity).toLocaleString("id-ID")}
                     </span>
                   </div>
                 </div>
               ) : (
-                <p className="mt-4 text-sm text-slate-400 text-center py-4">
-                  Belum ada item produk yang dipilih.
+                <p className="mt-4 text-xs text-slate-500 text-center py-4 font-bold uppercase tracking-widest">
+                  Silakan pilih nominal produk
                 </p>
               )}
             </div>
 
-            {/* Submit Button */}
-            <button 
-              onClick={handleOrder}
-              disabled={!selectedProduct}
-              className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#82aeb8] hover:bg-[#82aeb8]/85 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-5 py-3 font-extrabold text-white shadow-neon-cyan shimmer-hover"
-            >
-              <ShoppingBag className="h-5 w-5" />
-              Pesan Sekarang!
-            </button>
+            {/* Submit Button with Shimmer */}
+            <div className="relative p-[1px] bg-gradient-to-r from-cyan-300/40 to-blue-500/40 hover:from-cyan-300 hover:to-blue-500 transition-all duration-300 shadow-lg shadow-cyan-300/5 hover:shadow-cyan-300/20" style={bevelStyle}>
+              <button 
+                onClick={handleOrder}
+                disabled={!selectedProduct}
+                className="w-full bg-slate-950/90 py-3.5 text-xs font-black uppercase tracking-widest text-cyan-300 hover:text-white transition-colors flex items-center justify-center gap-2.5 shimmer-hover"
+                style={bevelStyle}
+              >
+                <ShoppingBag className="h-4.5 w-4.5" />
+                Pesan &amp; Kirim Instan!
+              </button>
+            </div>
+
           </aside>
         </div>
 

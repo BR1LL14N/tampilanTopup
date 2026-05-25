@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,61 +32,91 @@ import {
   Trash2,
   Eye,
   TrendingUp,
+  Loader2,
 } from "lucide-react"
-
-// Mock data
-const products = [
-  {
-    id: "1",
-    name: "86 Diamonds",
-    game: "Mobile Legends",
-    icon: "🎮",
-    provider_sku: "ML86",
-    price: 21000,
-    sell_price: 25000,
-    status: true,
-    transactions: 156,
-  },
-  {
-    id: "2",
-    name: "172 Diamonds",
-    game: "Mobile Legends",
-    icon: "🎮",
-    provider_sku: "ML172",
-    price: 42000,
-    sell_price: 49000,
-    status: true,
-    transactions: 98,
-  },
-  {
-    id: "3",
-    name: "50 Diamonds",
-    game: "Free Fire",
-    icon: "🔥",
-    provider_sku: "FF50",
-    price: 12000,
-    sell_price: 15000,
-    status: true,
-    transactions: 234,
-  },
-  {
-    id: "4",
-    name: "60 UC",
-    game: "PUBG Mobile",
-    icon: "🎯",
-    provider_sku: "PUBG60",
-    price: 18000,
-    sell_price: 22000,
-    status: false,
-    transactions: 0,
-  },
-]
+import { createClient } from "@/lib/supabase/client"
 
 export default function AdminProductsPage() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [productsList, setProductsList] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
 
-  const filteredProducts = products.filter((product) => {
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        
+        if (!authUser) {
+          router.push("/auth/login")
+          return
+        }
+
+        // Fetch profile and check role
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("name, email, role")
+          .eq("id", authUser.id)
+          .single()
+
+        if (!profile || profile.role !== "admin") {
+          router.push("/dashboard")
+          return
+        }
+
+        setCurrentUser({
+          name: profile.name || authUser.user_metadata?.name || authUser.email || "Admin",
+          email: authUser.email || "",
+          role: profile.role
+        })
+
+        // Fetch products list from view public.product_details
+        const { data: dbProducts } = await supabase
+          .from("product_details")
+          .select("*")
+          .order("sort_order", { ascending: true })
+
+        if (dbProducts && dbProducts.length > 0) {
+          setProductsList(dbProducts.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            game: p.game_name,
+            slug: p.game_slug,
+            icon: p.game_icon || "🎮",
+            provider_sku: p.provider_sku,
+            price: p.price,
+            sell_price: p.sell_price,
+            status: p.status,
+            transactions: 0
+          })))
+        } else {
+          setProductsList([])
+        }
+      } catch (err) {
+        console.error("Failed to load admin products data:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAdminData()
+  }, [router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+      </div>
+    )
+  }
+
+  const filteredProducts = productsList.filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -98,7 +129,7 @@ export default function AdminProductsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header user={{ name: "Admin", email: "admin@gametopup.com", role: "admin" }} />
+      <Header user={currentUser} />
 
       <main className="flex-1 py-8">
         <div className="container">
@@ -121,14 +152,14 @@ export default function AdminProductsPage() {
             <Card>
               <CardContent className="p-6">
                 <p className="text-muted-foreground text-sm">Total Produk</p>
-                <p className="text-2xl font-bold">{products.length}</p>
+                <p className="text-2xl font-bold">{productsList.length}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <p className="text-muted-foreground text-sm">Aktif</p>
                 <p className="text-2xl font-bold text-green-500">
-                  {products.filter((p) => p.status).length}
+                  {productsList.filter((p) => p.status).length}
                 </p>
               </CardContent>
             </Card>
@@ -137,7 +168,7 @@ export default function AdminProductsPage() {
                 <p className="text-muted-foreground text-sm">Total Profit</p>
                 <p className="text-2xl font-bold text-primary">
                   {formatCurrency(
-                    products.reduce(
+                    productsList.reduce(
                       (sum, p) =>
                         sum + (p.sell_price - p.price) * p.transactions,
                       0

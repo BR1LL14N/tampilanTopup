@@ -45,12 +45,17 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
 
         {transaction.product && (
           <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg mb-3">
-            <GameIcon slug={transaction.product.game?.name.toLowerCase().replace(/ /g, "-") || "gamepad-2"} className="h-6 w-6 text-muted-foreground" />
+            <GameIcon slug={transaction.product.game?.name?.toLowerCase().replace(/ /g, "-") || "gamepad-2"} className="h-6 w-6 text-muted-foreground" />
             <div>
-              <p className="font-medium">
+              {transaction.product.game && (
+                <p className="text-[10px] font-black text-cyan-300 uppercase tracking-wider leading-none">
+                  {transaction.product.game.name}
+                </p>
+              )}
+              <p className="font-bold text-white text-sm mt-1">
                 {transaction.product.name}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-slate-400 mt-0.5 font-medium">
                 ID: {transaction.target_id}
               </p>
             </div>
