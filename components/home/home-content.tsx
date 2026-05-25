@@ -175,13 +175,13 @@ export function HomeContent({ user }: HomeContentProps) {
                     <div className="mt-8 flex flex-wrap gap-3">
                       <button 
                         onClick={() => router.push("/games/mobile-legends")}
-                        className="rounded-lg bg-cyan-200 px-5 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-300"
+                        className="rounded-lg bg-cyan-200 px-5 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-300 hover:scale-[1.02] active:scale-[0.98] shimmer-hover"
                       >
                         {slide.btn1}
                       </button>
                       <button 
                         onClick={() => router.push("/check")}
-                        className="rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+                        className="rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] shimmer-hover"
                       >
                         {slide.btn2}
                       </button>
@@ -367,7 +367,7 @@ export function HomeContent({ user }: HomeContentProps) {
                 </button>
                 <button 
                   onClick={handleQuickCheckout}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-200"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-4 py-3 text-sm font-extrabold text-ink transition hover:bg-cyan-200 hover:scale-[1.02] active:scale-[0.98] shimmer-hover"
                 >
                   <ShoppingBag className="h-4 w-4" />
                   Order Sekarang
@@ -408,19 +408,19 @@ export function HomeContent({ user }: HomeContentProps) {
           <div className="mb-6 flex flex-wrap gap-3">
             <button 
               onClick={() => setActiveTab("all")}
-              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition ${activeTab === "all" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
+              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shimmer-hover ${activeTab === "all" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
             >
               Top Up
             </button>
             <button 
               onClick={() => setActiveTab("voucher")}
-              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition ${activeTab === "voucher" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
+              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shimmer-hover ${activeTab === "voucher" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
             >
               Voucher
             </button>
             <button 
               onClick={() => setActiveTab("live")}
-              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition ${activeTab === "live" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
+              className={`rounded-lg px-5 py-3 text-sm font-extrabold transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shimmer-hover ${activeTab === "live" ? "catalog-tab-active" : "bg-[#244341] text-white hover:bg-[#2e5250]"}`}
             >
               Live App
             </button>

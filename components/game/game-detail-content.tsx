@@ -449,7 +449,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
             <button 
               onClick={handleOrder}
               disabled={!selectedProduct}
-              className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#82aeb8] hover:bg-[#82aeb8]/80 disabled:opacity-50 px-5 py-3 font-extrabold text-white transition duration-300 shadow-neon-cyan"
+              className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#82aeb8] hover:bg-[#82aeb8]/85 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 px-5 py-3 font-extrabold text-white shadow-neon-cyan shimmer-hover"
             >
               <ShoppingBag className="h-5 w-5" />
               Pesan Sekarang!
