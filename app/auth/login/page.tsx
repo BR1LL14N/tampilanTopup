@@ -5,13 +5,14 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { gameAssets } from "@/lib/assets"
 
 // Beautiful gaming wallpapers for rotating backgrounds
 const wallpapers = [
-  "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?auto=format&fit=crop&w=1920&q=80"
+  gameAssets["mobile-legends"].banner,
+  gameAssets["free-fire"].banner,
+  gameAssets.valorant.banner,
+  gameAssets["pubg-mobile"].banner,
 ]
 
 export default function LoginPage() {

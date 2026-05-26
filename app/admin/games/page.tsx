@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Header } from "@/components/layout/header"
 import { formatCurrency, formatDate, getStatusBgColor } from "@/lib/utils"
-import { GameIcon } from "@/components/game/game-icon"
+import { gameAssets, getGameAsset } from "@/lib/assets"
 import {
   Plus,
   Search,
@@ -91,7 +91,7 @@ export default function AdminGamesPage() {
                 slug: game.slug,
                 icon: game.icon || "🎮",
                 category: game.category || "Game",
-                image: game.image || "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&h=300&fit=crop",
+                image: getGameAsset(game.slug)?.banner || game.image || gameAssets["mobile-legends"].banner,
                 status: game.status,
                 products_count: count || 0
               }
@@ -186,7 +186,7 @@ export default function AdminGamesPage() {
                           </div>
                           <div>
                             <p className="font-medium flex items-center gap-1.5">
-                              <GameIcon slug={game.slug} className="h-4 w-4 text-muted-foreground" />
+                              <img src={getGameAsset(game.slug)?.icon} alt="" className="h-4 w-4 rounded object-cover" />
                               {game.name}
                             </p>
                             <p className="text-sm text-muted-foreground">

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { GameDetailContent } from "@/components/game/game-detail-content"
+import { gameAssets } from "@/lib/assets"
 
 // Game data mapping
 const gameData = {
@@ -8,7 +9,7 @@ const gameData = {
     name: "Mobile Legends",
     icon: "🎮",
     slug: "mobile-legends",
-    image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&h=400&fit=crop",
+    image: gameAssets["mobile-legends"].poster,
     description: "Top up diamond Mobile Legends Bang Bang dengan harga terbaik dan proses instant. Diamond langsung masuk ke akun Anda.",
     category: "MOBA",
     products: [
@@ -24,7 +25,7 @@ const gameData = {
     name: "Free Fire",
     icon: "🔥",
     slug: "free-fire",
-    image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=800&h=400&fit=crop",
+    image: gameAssets["free-fire"].poster,
     description: "Top up diamond Free Fire MAX dan Free Fire dengan proses cepat dan harga murah.",
     category: "Battle Royale",
     products: [
@@ -39,7 +40,7 @@ const gameData = {
     name: "PUBG Mobile",
     icon: "🎯",
     slug: "pubg-mobile",
-    image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=800&h=400&fit=crop",
+    image: gameAssets["pubg-mobile"].poster,
     description: "Top up UC PUBG Mobile dengan harga terbaik. UC langsung masuk dalam hitungan menit.",
     category: "Battle Royale",
     products: [
@@ -53,7 +54,7 @@ const gameData = {
     name: "Valorant",
     icon: "💜",
     slug: "valorant",
-    image: "https://images.unsplash.com/photo-1614680096145-8c4c4c2dddbb?w=800&h=400&fit=crop",
+    image: gameAssets.valorant.poster,
     description: "Top up Valorant Points (VP) untuk membeli senjata, skin, dan konten lainnya.",
     category: "FPS",
     products: [
@@ -67,7 +68,7 @@ const gameData = {
     name: "Genshin Impact",
     icon: "✨",
     slug: "genshin-impact",
-    image: "https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?w=800&h=400&fit=crop",
+    image: gameAssets["genshin-impact"].poster,
     description: "Top up Genesis Crystals untuk Genshin Impact secara instan dan aman.",
     category: "RPG",
     products: [
@@ -82,7 +83,7 @@ const gameData = {
     name: "Honor of Kings",
     icon: "👑",
     slug: "honor-of-kings",
-    image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=400&fit=crop",
+    image: gameAssets["honor-of-kings"].poster,
     description: "Top up Honor of Kings Tokens dengan proses instan 24 jam.",
     category: "MOBA",
     products: [
@@ -97,7 +98,7 @@ const gameData = {
     name: "Roblox",
     icon: "🧱",
     slug: "roblox",
-    image: "https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=800&h=400&fit=crop",
+    image: gameAssets.roblox.poster,
     description: "Top up Robux atau beli Roblox Gift Card untuk mengakses item eksklusif.",
     category: "Voucher",
     products: [
@@ -112,7 +113,7 @@ const gameData = {
     name: "Steam Wallet",
     icon: "🎮",
     slug: "steam",
-    image: "https://images.unsplash.com/photo-1511882150382-421056c89033?w=800&h=400&fit=crop",
+    image: gameAssets.steam.poster,
     description: "Top up saldo Steam Wallet USD/IDR untuk membeli game favorit Anda di Steam.",
     category: "Voucher",
     products: [
@@ -126,7 +127,7 @@ const gameData = {
     name: "TikTok Live",
     icon: "📱",
     slug: "tiktok",
-    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&h=400&fit=crop",
+    image: gameAssets.tiktok.poster,
     description: "Top up Koin TikTok Live untuk memberikan gift kepada kreator favorit Anda.",
     category: "Live App",
     products: [
@@ -141,7 +142,7 @@ const gameData = {
     name: "Bigo Live",
     icon: "🎙️",
     slug: "bigo",
-    image: "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=800&h=400&fit=crop",
+    image: gameAssets.bigo.poster,
     description: "Top up Diamond Bigo Live instan untuk mendukung broadcaster favorit Anda.",
     category: "Live App",
     products: [

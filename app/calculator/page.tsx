@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { createClient } from "@/lib/supabase/client"
+import { getItemAssetForProduct } from "@/lib/assets"
 import { Loader2, Calculator, Info, Zap, ChevronRight, Award, Flame, RefreshCw, ShoppingCart } from "lucide-react"
 
 export default function CalculatorPage() {
@@ -72,6 +73,7 @@ export default function CalculatorPage() {
 
     // Filter products for this game
     const gameProducts = products.filter(p => p.game_id === selectedGameId)
+    const activeGame = games.find(g => g.id === selectedGameId)
     
     // Parse quantity of currency from name
     // Examples: "86 Diamonds" -> 86, "70 Diamonds + 10 Bonus" -> 80
@@ -88,6 +90,8 @@ export default function CalculatorPage() {
         id: p.id,
         name: p.name,
         slug: p.sku || p.id,
+        sku: p.provider_sku,
+        gameName: activeGame?.name,
         qty: qty,
         price: p.sell_price,
       }
@@ -364,13 +368,22 @@ export default function CalculatorPage() {
                       
                       {optimizationResult.items.map((item: any, idx: number) => (
                         <div key={idx} className="flex justify-between items-center bg-slate-950/50 p-4 rounded-xl border border-white/5 hover:border-cyan-300/20 transition-all duration-300 group">
-                          <div>
-                            <span className="text-[10px] font-bold text-cyan-300 bg-cyan-300/10 px-2 py-0.5 rounded">
-                              {item.qty} Qty per Item
+                          <div className="flex items-center gap-3">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+                              <img
+                                src={getItemAssetForProduct(item.name, item.sku, item.gameName)}
+                                alt=""
+                                className="max-h-full max-w-full object-contain"
+                              />
                             </span>
-                            <p className="font-extrabold text-white mt-1 group-hover:text-cyan-300 transition-colors">
-                              {item.name}
-                            </p>
+                            <div>
+                              <span className="text-[10px] font-bold text-cyan-300 bg-cyan-300/10 px-2 py-0.5 rounded">
+                                {item.qty} Qty per Item
+                              </span>
+                              <p className="font-extrabold text-white mt-1 group-hover:text-cyan-300 transition-colors">
+                                {item.name}
+                              </p>
+                            </div>
                           </div>
                           <div className="text-right">
                             <span className="font-mono text-cyan-300 font-bold text-sm bg-white/5 px-2.5 py-1 rounded mr-3">

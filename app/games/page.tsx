@@ -6,14 +6,14 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { createClient } from "@/lib/supabase/server"
 import { ArrowRight } from "lucide-react"
-import { GameIcon } from "@/components/game/game-icon"
+import { gameAssets, getGameAsset } from "@/lib/assets"
 
 const games = [
   {
     name: "Mobile Legends",
     icon: "🎮",
     slug: "mobile-legends",
-    image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&h=400&fit=crop",
+    image: gameAssets["mobile-legends"].banner,
     description: "Top up diamond Mobile Legends dengan harga terbaik",
     category: "MOBA",
     products: 12,
@@ -22,7 +22,7 @@ const games = [
     name: "Free Fire",
     icon: "🔥",
     slug: "free-fire",
-    image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=600&h=400&fit=crop",
+    image: gameAssets["free-fire"].banner,
     description: "Diamond Free Fire langsung masuk ke akun",
     category: "Battle Royale",
     products: 8,
@@ -31,7 +31,7 @@ const games = [
     name: "PUBG Mobile",
     icon: "🎯",
     slug: "pubg-mobile",
-    image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=600&h=400&fit=crop",
+    image: gameAssets["pubg-mobile"].banner,
     description: "UC PUBG Mobile dengan proses instant",
     category: "Battle Royale",
     products: 10,
@@ -40,7 +40,7 @@ const games = [
     name: "Valorant",
     icon: "💜",
     slug: "valorant",
-    image: "https://images.unsplash.com/photo-1614680096145-8c4c4c2dddbb?w=600&h=400&fit=crop",
+    image: gameAssets.valorant.banner,
     description: "VP Valorant untuk pengalaman gaming terbaik",
     category: "FPS",
     products: 6,
@@ -49,7 +49,7 @@ const games = [
     name: "Genshin Impact",
     icon: "✨",
     slug: "genshin-impact",
-    image: "https://images.unsplash.com/photo-1535567464580-5f6d4f7e2b1e?w=600&h=400&fit=crop",
+    image: gameAssets["genshin-impact"].banner,
     description: "Genesis Crystal Genshin Impact termurah",
     category: "RPG",
     products: 15,
@@ -58,7 +58,7 @@ const games = [
     name: "Honor of Kings",
     icon: "👑",
     slug: "honor-of-kings",
-    image: "https://images.unsplash.com/photo-1606588271854-e09e8e9c0b3a?w=600&h=400&fit=crop",
+    image: gameAssets["honor-of-kings"].banner,
     description: "Top up荣耀Token dengan proses cepat",
     category: "MOBA",
     products: 8,
@@ -100,7 +100,7 @@ export default async function GamesPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                     <div className="absolute top-4 left-4">
                       <span className="px-3 py-1.5 text-xs font-medium bg-primary/20 text-primary backdrop-blur-sm rounded-full">
-                        <GameIcon slug={game.slug} className="inline-block h-3.5 w-3.5 mr-1.5 align-text-bottom text-primary" /> {game.category}
+                        <img src={getGameAsset(game.slug)?.icon} alt="" className="mr-1.5 inline-block h-3.5 w-3.5 rounded object-cover align-text-bottom" /> {game.category}
                       </span>
                     </div>
                   </div>

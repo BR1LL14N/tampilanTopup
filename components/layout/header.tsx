@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
+import { gameAssets } from "@/lib/assets"
 
 const IndonesiaFlag = ({ className = "h-3.5 w-5" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2" className={cn("rounded-sm object-cover shadow-sm inline-block border border-white/10 shrink-0", className)}>
@@ -58,16 +59,16 @@ interface HeaderProps {
 }
 
 const staticGames = [
-  { name: "Free Fire", publisher: "Garena", image: "https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=300&q=80", slug: "free-fire" },
-  { name: "Mobile Legends", publisher: "Moonton", image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80", slug: "mobile-legends" },
-  { name: "ROBLOX - Voucher", publisher: "Roblox Corporation", image: "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=300&q=80", slug: "roblox" },
-  { name: "Honor Of Kings", publisher: "Tencent Games", image: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=300&q=80", slug: "honor-of-kings" },
-  { name: "Valorant", publisher: "Riot Games", image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=300&q=80", slug: "valorant" },
-  { name: "PUBG Mobile", publisher: "Tencent Games", image: "https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=300&q=80", slug: "pubg-mobile" },
-  { name: "Genshin Impact", publisher: "HoYoverse", image: "https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=300&q=80", slug: "genshin-impact" },
-  { name: "Steam Wallet", publisher: "Valve", image: "https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=300&q=80", slug: "steam" },
-  { name: "TikTok Live", publisher: "TikTok", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=300&q=80", slug: "tiktok" },
-  { name: "Bigo Live", publisher: "BIGO", image: "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=300&q=80", slug: "bigo" }
+  { name: "Free Fire", publisher: "Garena", image: gameAssets["free-fire"].icon, slug: "free-fire" },
+  { name: "Mobile Legends", publisher: "Moonton", image: gameAssets["mobile-legends"].icon, slug: "mobile-legends" },
+  { name: "ROBLOX - Voucher", publisher: "Roblox Corporation", image: gameAssets.roblox.icon, slug: "roblox" },
+  { name: "Honor Of Kings", publisher: "Tencent Games", image: gameAssets["honor-of-kings"].icon, slug: "honor-of-kings" },
+  { name: "Valorant", publisher: "Riot Games", image: gameAssets.valorant.icon, slug: "valorant" },
+  { name: "PUBG Mobile", publisher: "Tencent Games", image: gameAssets["pubg-mobile"].icon, slug: "pubg-mobile" },
+  { name: "Genshin Impact", publisher: "HoYoverse", image: gameAssets["genshin-impact"].icon, slug: "genshin-impact" },
+  { name: "Steam Wallet", publisher: "Valve", image: gameAssets.steam.icon, slug: "steam" },
+  { name: "TikTok Live", publisher: "TikTok", image: gameAssets.tiktok.icon, slug: "tiktok" },
+  { name: "Bigo Live", publisher: "BIGO", image: gameAssets.bigo.icon, slug: "bigo" }
 ]
 
 export function Header({ user }: HeaderProps) {

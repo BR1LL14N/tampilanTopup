@@ -12,7 +12,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { createClient } from "@/lib/supabase/client"
 import { formatCurrency, generateInvoice } from "@/lib/utils"
-import { GameIcon } from "@/components/game/game-icon"
+import { gameAssets, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
 import {
   ArrowLeft,
   QrCode,
@@ -31,15 +31,15 @@ const mockProduct = {
   game: {
     name: "Mobile Legends",
     icon: "🎮",
-    image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&h=300&fit=crop",
+    image: gameAssets["mobile-legends"].poster,
   },
 }
 
 const paymentMethods = [
-  { id: "qris", name: "QRIS", icon: QrCode, description: "Scan dengan aplikasi apapun" },
-  { id: "gopay", name: "GoPay", icon: Smartphone, description: "Bayar dengan GoPay" },
-  { id: "shopeepay", name: "ShopeePay", icon: CreditCard, description: "Bayar dengan ShopeePay" },
-  { id: "ovo", name: "OVO", icon: CreditCard, description: "Bayar dengan OVO" },
+  { id: "qris", name: "QRIS", icon: QrCode, logo: paymentAssets.qris, description: "Scan dengan aplikasi apapun" },
+  { id: "gopay", name: "GoPay", icon: Smartphone, logo: paymentAssets.gopay, description: "Bayar dengan GoPay" },
+  { id: "shopeepay", name: "ShopeePay", icon: CreditCard, logo: paymentAssets.shopeepay, description: "Bayar dengan ShopeePay" },
+  { id: "ovo", name: "OVO", icon: CreditCard, logo: paymentAssets.ovo, description: "Bayar dengan OVO" },
 ]
 
 export default function CheckoutPage() {
@@ -171,7 +171,13 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div>
-                      <GameIcon slug={mockProduct.game.name.toLowerCase().replace(/ /g, "-")} className="h-6 w-6 text-muted-foreground align-text-bottom mb-1" />
+                      <span className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1.5">
+                        <img
+                          src={getItemAssetForProduct(mockProduct.name, mockProduct.provider_sku, mockProduct.game.name)}
+                          alt=""
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </span>
                       <p className="font-semibold">{mockProduct.game.name}</p>
                       <p className="text-sm text-muted-foreground">
                         {mockProduct.name}
@@ -258,7 +264,9 @@ export default function CheckoutPage() {
                         }`}
                       >
                         <div className="flex items-center gap-4">
-                          <method.icon className="h-6 w-6 text-primary" />
+                          <span className="flex h-9 w-14 items-center justify-center rounded bg-white p-1.5">
+                            <img src={method.logo} alt={method.name} className="max-h-full max-w-full object-contain" />
+                          </span>
                           <div className="text-left flex-1">
                             <p className="font-medium">{method.name}</p>
                             <p className="text-sm text-muted-foreground">

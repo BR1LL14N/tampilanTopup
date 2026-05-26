@@ -17,6 +17,7 @@ import {
   Shield,
   FileText
 } from "lucide-react"
+import { gameAssets, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
 
 interface Product {
   id: string
@@ -46,15 +47,18 @@ interface GameDetailContentProps {
 }
 
 const gameWallpapers: Record<string, string> = {
-  "mobile-legends": "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=1200&q=80",
-  "free-fire": "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1200&q=80",
-  "pubg-mobile": "https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=1200&q=80",
-  "valorant": "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?auto=format&fit=crop&w=1200&q=80",
-  "genshin-impact": "https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=1200&q=80",
-  "roblox": "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=1200&q=80",
-  "honor-of-kings": "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=80",
+  "mobile-legends": gameAssets["mobile-legends"].banner,
+  "free-fire": gameAssets["free-fire"].banner,
+  "pubg-mobile": gameAssets["pubg-mobile"].banner,
+  "valorant": gameAssets.valorant.banner,
+  "genshin-impact": gameAssets["genshin-impact"].banner,
+  "roblox": gameAssets.roblox.banner,
+  "honor-of-kings": gameAssets["honor-of-kings"].banner,
+  "steam": gameAssets.steam.banner,
+  "tiktok": gameAssets.tiktok.banner,
+  "bigo": gameAssets.bigo.banner,
 }
-const defaultWallpaper = "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80"
+const defaultWallpaper = gameAssets["mobile-legends"].banner
 
 const getPublisher = (slug: string) => {
   const map: Record<string, string> = {
@@ -359,6 +363,13 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                               style={cardBevelStyle}
                               type="button"
                             >
+                              <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1.5">
+                                <img
+                                  src={getItemAssetForProduct(prod.name, prod.provider_sku, game.name)}
+                                  alt=""
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              </span>
                               <span className="block font-black text-xs uppercase tracking-wide text-white group-hover:text-cyan-300 transition-colors">{prod.name}</span>
                               <div className="mt-3 flex items-baseline justify-between">
                                 <span className="text-base font-black text-cyan-300 font-mono">
@@ -424,9 +435,9 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                   
                   <div className="grid gap-4 p-6 md:grid-cols-3 bg-slate-950/40">
                     {[
-                      { id: "QRIS", desc: "Verifikasi Otomatis (Instan)" },
-                      { id: "VA", desc: "Transfer Bank Virtual Account" },
-                      { id: "E-Wallet", desc: "DANA, OVO, LinkAja, ShopeePay" },
+                      { id: "QRIS", desc: "Verifikasi Otomatis (Instan)", logo: paymentAssets.qris },
+                      { id: "VA", desc: "Transfer Bank Virtual Account", logo: paymentAssets.dana },
+                      { id: "E-Wallet", desc: "DANA, OVO, LinkAja, ShopeePay", logo: paymentAssets.gopay },
                     ].map((pm) => {
                       const isSelected = paymentMethod === pm.id
                       return (
@@ -437,6 +448,9 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                             style={cardBevelStyle}
                             type="button"
                           >
+                            <span className="mb-3 flex h-9 w-16 items-center justify-center rounded bg-white p-1.5">
+                              <img src={pm.logo} alt={pm.id} className="max-h-full max-w-full object-contain" />
+                            </span>
                             <strong className="block text-xs font-black uppercase tracking-wide text-white group-hover:text-cyan-300 transition-colors">{pm.id}</strong>
                             <span className="mt-2 block text-[10px] text-slate-500 font-semibold uppercase leading-normal">{pm.desc}</span>
                           </button>
@@ -570,7 +584,16 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                 <div className="mt-4 space-y-3.5 text-xs font-semibold">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-500 uppercase text-[10px] tracking-wider">Item Produk</span>
-                    <span className="font-bold text-white">{selectedProduct.name}</span>
+                    <span className="flex items-center gap-2 font-bold text-white">
+                      <span className="flex h-7 w-7 items-center justify-center rounded bg-white p-1">
+                        <img
+                          src={getItemAssetForProduct(selectedProduct.name, selectedProduct.provider_sku, game.name)}
+                          alt=""
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </span>
+                      {selectedProduct.name}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-500 uppercase text-[10px] tracking-wider">Jumlah</span>

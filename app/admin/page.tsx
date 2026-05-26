@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { formatCurrency } from "@/lib/utils"
+import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
   TrendingUp,
   ShoppingBag,
@@ -119,6 +120,7 @@ export default function AdminDashboardPage() {
             .map((p: any) => ({
               name: p.name,
               game: p.game_name,
+              sku: p.provider_sku,
               sold: Math.floor(Math.random() * 30) + 5, // Mocked sold count for dashboard display
               revenue: p.sell_price * (Math.floor(Math.random() * 10) + 1),
             }))
@@ -281,8 +283,14 @@ export default function AdminDashboardPage() {
                         className="flex items-center justify-between p-4 bg-slate-950/60 border border-white/5 hover:border-cyan-300/20 rounded-xl transition-all duration-300 group"
                       >
                         <div>
-                          <p className="font-bold text-white group-hover:text-cyan-300 transition-colors text-sm uppercase tracking-tight">{tx.product}</p>
-                          <p className="text-[10px] font-semibold text-slate-500 uppercase mt-0.5 tracking-wider">
+                          <p className="flex items-center gap-2 font-bold text-white group-hover:text-cyan-300 transition-colors text-sm uppercase tracking-tight">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1">
+                              <img src={getItemAssetForProduct(tx.product, undefined, tx.game)} alt="" className="max-h-full max-w-full object-contain" />
+                            </span>
+                            {tx.product}
+                          </p>
+                          <p className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                            <img src={getGameAssetByName(tx.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
                             {tx.game} • <span className="font-mono">{tx.invoice}</span>
                           </p>
                         </div>
@@ -327,11 +335,17 @@ export default function AdminDashboardPage() {
               <div className="p-6 space-y-4">
                 {topProducts.map((p, idx) => (
                   <div key={idx} className="flex justify-between items-center bg-slate-950/60 p-4 rounded-xl border border-white/5 hover:border-cyan-300/10 transition-all duration-300">
-                    <div>
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+                        <img src={getItemAssetForProduct(p.name, p.sku, p.game)} alt="" className="max-h-full max-w-full object-contain" />
+                      </span>
+                      <div>
                       <p className="font-extrabold text-white text-xs uppercase tracking-tight">{p.name}</p>
-                      <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">
+                      <p className="mt-0.5 flex items-center gap-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+                        <img src={getGameAssetByName(p.game)?.icon} alt="" className="h-3 w-3 rounded object-cover" />
                         {p.game} • {p.sold} terjual
                       </p>
+                      </div>
                     </div>
                     <span className="text-xs font-black text-green-400 font-mono">
                       Rp {p.revenue.toLocaleString("id-ID")}

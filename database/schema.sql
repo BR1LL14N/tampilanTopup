@@ -293,12 +293,12 @@ CREATE TRIGGER update_settings_updated_at
 
 -- Insert Games
 INSERT INTO public.games (name, slug, image, icon, category, description) VALUES
-('Mobile Legends', 'mobile-legends', 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&h=400&fit=crop', '🎮', 'MOBA', 'Top up diamond Mobile Legends Bang Bang dengan harga terbaik dan proses instant.'),
-('Free Fire', 'free-fire', 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=600&h=400&fit=crop', '🔥', 'Battle Royale', 'Top up diamond Free Fire MAX dan Free Fire dengan proses cepat dan harga murah.'),
-('PUBG Mobile', 'pubg-mobile', 'https://images.unsplash.com/photo-1542751110-97427bbecf20?w=600&h=400&fit=crop', '🎯', 'Battle Royale', 'Top up UC PUBG Mobile dengan harga terbaik. UC langsung masuk dalam hitungan menit.'),
-('Valorant', 'valorant', 'https://images.unsplash.com/photo-1614680096145-8c4c4c2dddbb?w=600&h=400&fit=crop', '💜', 'FPS', 'Top up Valorant Points (VP) untuk membeli senjata, skin, dan konten lainnya.'),
-('Genshin Impact', 'genshin-impact', 'https://images.unsplash.com/photo-1535567464580-5f6d4f7e2b1e?w=600&h=400&fit=crop', '✨', 'RPG', 'Genesis Crystal Genshin Impact termurah dengan proses instant.'),
-('Honor of Kings', 'honor-of-kings', 'https://images.unsplash.com/photo-1606588271854-e09e8e9c0b3a?w=600&h=400&fit=crop', '👑', 'MOBA', 'Top up荣耀Token dengan proses cepat dan harga terbaik.')
+('Mobile Legends', 'mobile-legends', '/assets/games/mobile-legends/banner.png', '🎮', 'MOBA', 'Top up diamond Mobile Legends Bang Bang dengan harga terbaik dan proses instant.'),
+('Free Fire', 'free-fire', '/assets/games/free-fire/banner.png', '🔥', 'Battle Royale', 'Top up diamond Free Fire MAX dan Free Fire dengan proses cepat dan harga murah.'),
+('PUBG Mobile', 'pubg-mobile', '/assets/games/pubg-mobile/banner.png', '🎯', 'Battle Royale', 'Top up UC PUBG Mobile dengan harga terbaik. UC langsung masuk dalam hitungan menit.'),
+('Valorant', 'valorant', '/assets/games/valorant/banner.png', '💜', 'FPS', 'Top up Valorant Points (VP) untuk membeli senjata, skin, dan konten lainnya.'),
+('Genshin Impact', 'genshin-impact', '/assets/games/genshin-impact/banner.png', '✨', 'RPG', 'Genesis Crystal Genshin Impact termurah dengan proses instant.'),
+('Honor of Kings', 'honor-of-kings', '/assets/games/honor-of-kings/banner.png', '👑', 'MOBA', 'Top up荣耀Token dengan proses cepat dan harga terbaik.')
 ON CONFLICT (slug) DO NOTHING;
 
 -- Insert Products

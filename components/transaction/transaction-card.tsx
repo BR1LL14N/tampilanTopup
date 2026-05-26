@@ -9,7 +9,7 @@ import {
   ArrowRight,
 } from "lucide-react"
 import Link from "next/link"
-import { GameIcon } from "@/components/game/game-icon"
+import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 
 interface TransactionCardProps {
   transaction: Transaction
@@ -45,10 +45,25 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
 
         {transaction.product && (
           <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg mb-3">
-            <GameIcon slug={transaction.product.game?.name?.toLowerCase().replace(/ /g, "-") || "gamepad-2"} className="h-6 w-6 text-muted-foreground" />
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+              <img
+                src={getItemAssetForProduct(
+                  transaction.product.name,
+                  transaction.product.provider_sku,
+                  transaction.product.game?.name
+                )}
+                alt=""
+                className="max-h-full max-w-full object-contain"
+              />
+            </span>
             <div>
               {transaction.product.game && (
-                <p className="text-[10px] font-black text-cyan-300 uppercase tracking-wider leading-none">
+                <p className="flex items-center gap-1.5 text-[10px] font-black text-cyan-300 uppercase tracking-wider leading-none">
+                  <img
+                    src={getGameAssetByName(transaction.product.game.name)?.icon}
+                    alt=""
+                    className="h-3.5 w-3.5 rounded object-cover"
+                  />
                   {transaction.product.game.name}
                 </p>
               )}
@@ -116,7 +131,18 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                 <span className="font-mono text-sm">{tx.invoice}</span>
               </td>
               <td className="py-3 px-4">
-                {tx.product?.name || "N/A"}
+                <div className="flex items-center gap-2">
+                  {tx.product && (
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1">
+                      <img
+                        src={getItemAssetForProduct(tx.product.name, tx.product.provider_sku, tx.product.game?.name)}
+                        alt=""
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </span>
+                  )}
+                  {tx.product?.name || "N/A"}
+                </div>
               </td>
               <td className="py-3 px-4">{tx.target_id}</td>
               <td className="py-3 px-4 font-semibold">

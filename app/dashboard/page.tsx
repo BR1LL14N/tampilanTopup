@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { formatCurrency, formatDate } from "@/lib/utils"
-import { GameIcon } from "@/components/game/game-icon"
+import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
   Wallet,
   Clock,
@@ -242,11 +242,12 @@ export default function DashboardPage() {
                       >
                         <div className="flex items-center gap-4">
                           <span className="grid h-10 w-10 place-items-center bg-cyan-300/5 text-cyan-300 border border-cyan-300/10 rounded-lg group-hover:bg-cyan-300/10 group-hover:border-cyan-300/30 transition-colors">
-                            <GameIcon slug={tx.game.toLowerCase().replace(/ /g, "-")} className="h-5 w-5" />
+                            <img src={getItemAssetForProduct(tx.product, undefined, tx.game)} alt="" className="max-h-7 max-w-7 object-contain" />
                           </span>
                           <div>
                             <p className="font-bold text-white group-hover:text-cyan-300 transition-colors text-sm uppercase tracking-tight">{tx.product}</p>
-                            <p className="text-[10px] font-semibold text-slate-500 uppercase mt-0.5 tracking-wider">
+                            <p className="mt-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                              <img src={getGameAssetByName(tx.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
                               {tx.game} • <span className="font-mono">{tx.invoice}</span>
                             </p>
                           </div>

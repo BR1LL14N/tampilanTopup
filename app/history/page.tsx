@@ -10,6 +10,7 @@ import { Footer } from "@/components/layout/footer"
 import { TransactionCard } from "@/components/transaction/transaction-card"
 import { Search, Filter, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { getGameAssetByName } from "@/lib/assets"
 
 // Mock transactions
 const mockTransactions = [
@@ -23,7 +24,7 @@ const mockTransactions = [
     created_at: "2026-05-25T10:30:00Z",
     product: {
       name: "86 Diamonds",
-      game: { icon: "🎮", name: "Mobile Legends" },
+      game: { icon: getGameAssetByName("Mobile Legends")?.icon, name: "Mobile Legends" },
     },
   },
   {
@@ -36,7 +37,7 @@ const mockTransactions = [
     created_at: "2026-05-24T15:45:00Z",
     product: {
       name: "70 Diamonds + 10 Bonus",
-      game: { icon: "🔥", name: "Free Fire" },
+      game: { icon: getGameAssetByName("Free Fire")?.icon, name: "Free Fire" },
     },
   },
   {
@@ -49,7 +50,7 @@ const mockTransactions = [
     created_at: "2026-05-23T08:20:00Z",
     product: {
       name: "60 UC",
-      game: { icon: "🎯", name: "PUBG Mobile" },
+      game: { icon: getGameAssetByName("PUBG Mobile")?.icon, name: "PUBG Mobile" },
     },
   },
 ]
@@ -85,7 +86,7 @@ export default function HistoryPage() {
                 name: tx.product_name,
                 game: {
                   name: tx.game_name,
-                  icon: "🎮",
+                  icon: getGameAssetByName(tx.game_name)?.icon,
                 }
               }
             }))

@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/footer"
 import { createClient } from "@/lib/supabase/client"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { cn } from "@/lib/utils"
+import { getGameAssetByName, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
 import { 
   Loader2, 
   CheckCircle2, 
@@ -222,11 +223,27 @@ export default function InvoiceDetailPage() {
                   </div>
                   <div className="flex justify-between items-center border-b border-white/5 pb-2">
                     <span className="text-slate-400 font-medium">Game</span>
-                    <span className="font-bold text-white uppercase">{result.game}</span>
+                    <span className="flex items-center gap-2 font-bold text-white uppercase">
+                      <img
+                        src={getGameAssetByName(result.game)?.icon}
+                        alt=""
+                        className="h-5 w-5 rounded object-cover"
+                      />
+                      {result.game}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/5 pb-2">
                     <span className="text-slate-400 font-medium">Item Produk</span>
-                    <span className="font-bold text-white">{result.product}</span>
+                    <span className="flex items-center gap-2 font-bold text-white">
+                      <span className="flex h-7 w-7 items-center justify-center rounded bg-white p-1">
+                        <img
+                          src={getItemAssetForProduct(result.product, undefined, result.game)}
+                          alt=""
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </span>
+                      {result.product}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/5 pb-2">
                     <span className="text-slate-400 font-medium">User ID Tujuan</span>
@@ -234,7 +251,14 @@ export default function InvoiceDetailPage() {
                   </div>
                   <div className="flex justify-between items-center border-b border-white/5 pb-2">
                     <span className="text-slate-400 font-medium">Metode Pembayaran</span>
-                    <span className="font-bold text-white uppercase">{result.payment_method || "-"}</span>
+                    <span className="flex items-center gap-2 font-bold text-white uppercase">
+                      {String(result.payment_method || "").toLowerCase().includes("qris") && (
+                        <span className="flex h-6 w-10 items-center justify-center rounded bg-white p-1">
+                          <img src={paymentAssets.qris} alt="" className="max-h-full max-w-full object-contain" />
+                        </span>
+                      )}
+                      {result.payment_method || "-"}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/5 pb-2">
                     <span className="text-slate-400 font-medium">Status Pembayaran</span>

@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Header } from "@/components/layout/header"
 import { formatCurrency, getStatusBgColor } from "@/lib/utils"
-import { GameIcon } from "@/components/game/game-icon"
+import { getGameAsset, getItemAssetForProduct } from "@/lib/assets"
 import {
   Plus,
   Search,
@@ -220,10 +220,21 @@ export default function AdminProductsPage() {
                     <TableRow key={product.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <GameIcon slug={product.game.toLowerCase().replace(/ /g, "-")} className="h-5 w-5 text-muted-foreground" />
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+                            <img
+                              src={getItemAssetForProduct(product.name, product.provider_sku, product.game)}
+                              alt=""
+                              className="max-h-full max-w-full object-contain"
+                            />
+                          </span>
                           <div>
                             <p className="font-medium">{product.name}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                              <img
+                                src={getGameAsset(product.slug)?.icon}
+                                alt=""
+                                className="h-4 w-4 rounded object-cover"
+                              />
                               {product.game}
                             </p>
                           </div>

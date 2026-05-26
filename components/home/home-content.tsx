@@ -14,6 +14,7 @@ import {
   Flame,
   Award,
 } from "lucide-react"
+import { gameAssets } from "@/lib/assets"
 
 interface HomeContentProps {
   user?: {
@@ -28,7 +29,7 @@ const slides = [
     tag: "Promo Akun Aman",
     title: "Cari akun FF dan ML?",
     desc: "Topup, voucher, dan layanan game dengan proses cepat, aman, dan bergaransi.",
-    bg: "https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=1800&q=85",
+    bg: gameAssets["free-fire"].banner,
     btn1: "Topup Sekarang",
     btn2: "Cek Pesanan",
   },
@@ -36,7 +37,7 @@ const slides = [
     tag: "Event Mingguan",
     title: "Diamond murah untuk push rank.",
     desc: "Pilih nominal favorit, bayar QRIS, lalu sistem otomatis mengirim order to provider.",
-    bg: "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=1800&q=85",
+    bg: gameAssets["mobile-legends"].banner,
     btn1: "Lihat Produk",
     btn2: "Hitung Profit",
   },
@@ -44,34 +45,34 @@ const slides = [
     tag: "Voucher Digital",
     title: "Roblox, Steam, dan live app.",
     desc: "Katalog bisa dipisah per kategori agar user cepat menemukan produk yang mereka cari.",
-    bg: "https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=1800&q=85",
+    bg: gameAssets.roblox.banner,
     btn1: "Buka Katalog",
     btn2: "Leaderboard",
   },
 ]
 
 const diagonalCards = [
-  { name: "Free Fire", publisher: "Garena", image: "https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=300&q=80", slug: "free-fire" },
-  { name: "Mobile Legends", publisher: "Moonton", image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80", slug: "mobile-legends" },
-  { name: "Joki Rank", publisher: "Mitsuru", image: "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=300&q=80", slug: "mobile-legends" },
-  { name: "ROBLOX - Voucher", publisher: "Roblox Corporation", image: "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=300&q=80", slug: "roblox" },
-  { name: "Honor Of Kings", publisher: "Tencent Games", image: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=300&q=80", slug: "honor-of-kings" },
-  { name: "Valorant", publisher: "Riot Games", image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=300&q=80", slug: "valorant" },
+  { name: "Free Fire", publisher: "Garena", image: gameAssets["free-fire"].icon, slug: "free-fire" },
+  { name: "Mobile Legends", publisher: "Moonton", image: gameAssets["mobile-legends"].icon, slug: "mobile-legends" },
+  { name: "Joki Rank", publisher: "Mitsuru", image: gameAssets["mobile-legends"].poster, slug: "mobile-legends" },
+  { name: "ROBLOX - Voucher", publisher: "Roblox Corporation", image: gameAssets.roblox.icon, slug: "roblox" },
+  { name: "Honor Of Kings", publisher: "Tencent Games", image: gameAssets["honor-of-kings"].icon, slug: "honor-of-kings" },
+  { name: "Valorant", publisher: "Riot Games", image: gameAssets.valorant.icon, slug: "valorant" },
 ]
 
 const catalogItems = [
-  { title: "FREE FIRE", eyebrow: "TOP UP GAME", publisher: "Garena", bg: "https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "free-fire" },
-  { title: "MOBILE LEGENDS", eyebrow: "TOP UP GAME", publisher: "Moonton", bg: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "mobile-legends" },
-  { title: "JOKI RANK", eyebrow: "JOKI MOBILE LEGENDS", publisher: "Mitsuru", bg: "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "mobile-legends" },
-  { title: "MAGIC CHESS", eyebrow: "TOP UP GAME", publisher: "Moonton", bg: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "mobile-legends" },
-  { title: "DELTA FORCE", eyebrow: "TOP UP GAME", publisher: "Level Infinite", bg: "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "pubg-mobile" },
-  { title: "PUBG MOBILE", eyebrow: "TOP UP GAME", publisher: "Tencent Games", bg: "https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "pubg-mobile" },
-  { title: "HONOR OF KINGS", eyebrow: "TOP UP GAME", publisher: "Tencent Games", bg: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "honor-of-kings" },
-  { title: "GENSHIN", eyebrow: "TOP UP GAME", publisher: "HoYoverse", bg: "https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?auto=format&fit=crop&w=500&q=80", tab: "all", slug: "genshin-impact" },
-  { title: "ROBLOX", eyebrow: "VOUCHER", publisher: "Roblox Corporation", bg: "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&w=500&q=80", tab: "voucher", slug: "roblox" },
-  { title: "STEAM WALLET", eyebrow: "VOUCHER", publisher: "Valve", bg: "https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=500&q=80", tab: "voucher", slug: "steam" },
-  { title: "TIKTOK LIVE", eyebrow: "LIVE APP", publisher: "TikTok", bg: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80", tab: "live", slug: "tiktok" },
-  { title: "BIGO LIVE", eyebrow: "LIVE APP", publisher: "BIGO", bg: "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=500&q=80", tab: "live", slug: "bigo" },
+  { title: "FREE FIRE", eyebrow: "TOP UP GAME", publisher: "Garena", bg: gameAssets["free-fire"].poster, tab: "all", slug: "free-fire" },
+  { title: "MOBILE LEGENDS", eyebrow: "TOP UP GAME", publisher: "Moonton", bg: gameAssets["mobile-legends"].poster, tab: "all", slug: "mobile-legends" },
+  { title: "JOKI RANK", eyebrow: "JOKI MOBILE LEGENDS", publisher: "Mitsuru", bg: gameAssets["mobile-legends"].poster, tab: "all", slug: "mobile-legends" },
+  { title: "MAGIC CHESS", eyebrow: "TOP UP GAME", publisher: "Moonton", bg: gameAssets["mobile-legends"].poster, tab: "all", slug: "mobile-legends" },
+  { title: "DELTA FORCE", eyebrow: "TOP UP GAME", publisher: "Level Infinite", bg: gameAssets["pubg-mobile"].poster, tab: "all", slug: "pubg-mobile" },
+  { title: "PUBG MOBILE", eyebrow: "TOP UP GAME", publisher: "Tencent Games", bg: gameAssets["pubg-mobile"].poster, tab: "all", slug: "pubg-mobile" },
+  { title: "HONOR OF KINGS", eyebrow: "TOP UP GAME", publisher: "Tencent Games", bg: gameAssets["honor-of-kings"].poster, tab: "all", slug: "honor-of-kings" },
+  { title: "GENSHIN", eyebrow: "TOP UP GAME", publisher: "HoYoverse", bg: gameAssets["genshin-impact"].poster, tab: "all", slug: "genshin-impact" },
+  { title: "ROBLOX", eyebrow: "VOUCHER", publisher: "Roblox Corporation", bg: gameAssets.roblox.poster, tab: "voucher", slug: "roblox" },
+  { title: "STEAM WALLET", eyebrow: "VOUCHER", publisher: "Valve", bg: gameAssets.steam.poster, tab: "voucher", slug: "steam" },
+  { title: "TIKTOK LIVE", eyebrow: "LIVE APP", publisher: "TikTok", bg: gameAssets.tiktok.poster, tab: "live", slug: "tiktok" },
+  { title: "BIGO LIVE", eyebrow: "LIVE APP", publisher: "BIGO", bg: gameAssets.bigo.poster, tab: "live", slug: "bigo" },
 ]
 
 export function HomeContent({ user }: HomeContentProps) {
@@ -309,10 +310,10 @@ export function HomeContent({ user }: HomeContentProps) {
               { game: "Valorant", name: "1000 VP", oriPrice: 85000, salePrice: 73200, discount: 14, sold: 45, slug: "valorant" }
             ].map((item, idx) => {
               const flashSaleThumbnails: Record<string, string> = {
-                "mobile-legends": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=100&q=80",
-                "free-fire": "https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=100&q=80",
-                "pubg-mobile": "https://images.unsplash.com/photo-1614680376739-414d95ff43df?auto=format&fit=crop&w=100&q=80",
-                "valorant": "https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=100&q=80",
+                "mobile-legends": gameAssets["mobile-legends"].icon,
+                "free-fire": gameAssets["free-fire"].icon,
+                "pubg-mobile": gameAssets["pubg-mobile"].icon,
+                "valorant": gameAssets.valorant.icon,
               }
               return (
                 <div key={idx} className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 hover:from-cyan-300/40 hover:to-cyan-300/20 transition-all duration-300 shadow-md" style={bevelStyle}>
