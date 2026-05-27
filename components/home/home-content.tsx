@@ -5,10 +5,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { FlipCard } from "@/components/ui/flip-card"
 import { FloatingElement } from "@/components/ui/floating-element"
 import { ParallaxSection } from "@/components/ui/parallax-section"
-import { MagneticButton } from "@/components/ui/magnetic-button"
 import {
   Zap,
   ChevronLeft,
@@ -242,20 +240,18 @@ export function HomeContent({ user }: HomeContentProps) {
             ))}
           </div>
 
-          <MagneticButton 
+          <button 
             onClick={handlePrevSlide}
-            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 text-white transition-all active:scale-95 z-20" 
-            strength={0.4}
+            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 hover:bg-black/60 hover:scale-110 text-white transition-all active:scale-95 z-20" 
           >
             <ChevronLeft className="h-6 w-6 text-cyan-300" />
-          </MagneticButton>
-          <MagneticButton 
+          </button>
+          <button 
             onClick={handleNextSlide}
-            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 text-white transition-all active:scale-95 z-20" 
-            strength={0.4}
+            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 hover:bg-black/60 hover:scale-110 text-white transition-all active:scale-95 z-20" 
           >
             <ChevronRight className="h-6 w-6 text-cyan-300" />
-          </MagneticButton>
+          </button>
           <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2.5">
             {slides.map((_, idx) => (
               <button 
@@ -385,10 +381,9 @@ export function HomeContent({ user }: HomeContentProps) {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {diagonalCards.map((card, idx) => (
               <div key={idx} className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 hover:from-cyan-300/40 hover:to-cyan-300/20 transition-all duration-300 shadow-md interactive-card group" style={bevelStyle}>
-                <MagneticButton 
+                <button 
                   onClick={() => router.push(`/games/${card.slug}`)}
-                  className="w-full flex min-h-28 items-center gap-5 bg-slate-950 p-4 text-left shimmer-hover"
-                  strength={0.25}
+                  className="w-full flex min-h-28 items-center gap-5 bg-slate-950 p-4 text-left shimmer-hover hover:scale-105 transition-transform duration-300"
                 >
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden transform-gpu" style={inputBevelStyle}>
                     <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />
@@ -397,7 +392,7 @@ export function HomeContent({ user }: HomeContentProps) {
                     <strong className="block text-lg font-black text-white group-hover:text-cyan-300 transition-colors uppercase tracking-tight">{card.name}</strong>
                     <span className="mt-1 block text-xs font-bold text-slate-500 uppercase tracking-wider">{card.publisher}</span>
                   </span>
-                </MagneticButton>
+                </button>
               </div>
             ))}
           </div>
