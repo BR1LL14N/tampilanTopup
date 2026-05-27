@@ -5,6 +5,10 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { FlipCard } from "@/components/ui/flip-card"
+import { FloatingElement } from "@/components/ui/floating-element"
+import { ParallaxSection } from "@/components/ui/parallax-section"
+import { MagneticButton } from "@/components/ui/magnetic-button"
 import {
   Zap,
   ChevronLeft,
@@ -238,22 +242,20 @@ export function HomeContent({ user }: HomeContentProps) {
             ))}
           </div>
 
-          <button 
+          <MagneticButton 
             onClick={handlePrevSlide}
-            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 text-white transition-all hover:scale-105 active:scale-95 z-20" 
-            type="button" 
-            aria-label="Slide sebelumnya"
+            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 text-white transition-all active:scale-95 z-20" 
+            strength={0.4}
           >
             <ChevronLeft className="h-6 w-6 text-cyan-300" />
-          </button>
-          <button 
+          </MagneticButton>
+          <MagneticButton 
             onClick={handleNextSlide}
-            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 text-white transition-all hover:scale-105 active:scale-95 z-20" 
-            type="button" 
-            aria-label="Slide berikutnya"
+            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-black/40 border border-white/10 hover:border-cyan-300/30 text-white transition-all active:scale-95 z-20" 
+            strength={0.4}
           >
             <ChevronRight className="h-6 w-6 text-cyan-300" />
-          </button>
+          </MagneticButton>
           <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2.5">
             {slides.map((_, idx) => (
               <button 
@@ -268,14 +270,16 @@ export function HomeContent({ user }: HomeContentProps) {
         </div>
 
         {/* Flash Sale Section - Blending Cyan Theme with Orange Urgency Accent */}
-        <div className="section-wrap mb-12 bg-gradient-to-r from-cyan-950/15 via-slate-900/10 to-transparent border border-cyan-300/20 rounded-2xl p-6 md:p-8 relative overflow-hidden">
+        <ParallaxSection className="section-wrap mb-12 bg-gradient-to-r from-cyan-950/15 via-slate-900/10 to-transparent border border-cyan-300/20 rounded-2xl p-6 md:p-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-300/5 rounded-full blur-3xl pointer-events-none" />
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 relative z-10">
             <div className="flex items-center gap-3.5">
-              <span className="flex h-12 w-12 place-items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 animate-pulse shadow-lg shadow-cyan-300/10">
-                <Zap className="h-6 w-6 fill-cyan-500/20" />
-              </span>
+              <FloatingElement delay={0.2} duration={4}>
+                <span className="flex h-12 w-12 place-items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shadow-lg shadow-cyan-300/10">
+                  <Zap className="h-6 w-6 fill-cyan-500/20" />
+                </span>
+              </FloatingElement>
               <div>
                 <h2 className="text-2xl font-black tracking-wide text-white uppercase">FLASH SALE HARI INI</h2>
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Promo terbatas dengan harga miring untuk game favoritmu.</p>
@@ -365,12 +369,14 @@ export function HomeContent({ user }: HomeContentProps) {
               )
             })}
           </div>
-        </div>
+        </ParallaxSection>
 
         {/* Section: Populer Sekarang (Diagonal Cards with Glowing Beveled Outlines) */}
-        <div className="section-wrap mb-12">
+        <ParallaxSection className="section-wrap mb-12">
           <div className="mb-6 flex items-center gap-3">
-            <Flame className="h-8 w-8 text-cyan-300 animate-pulse" />
+            <FloatingElement delay={0} duration={3}>
+              <Flame className="h-8 w-8 text-cyan-300" />
+            </FloatingElement>
             <div>
               <h2 className="text-2xl font-black tracking-wide text-white uppercase">POPULER SEKARANG!</h2>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Berikut adalah beberapa produk yang paling populer saat ini.</p>
@@ -378,24 +384,24 @@ export function HomeContent({ user }: HomeContentProps) {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {diagonalCards.map((card, idx) => (
-              <div key={idx} className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 hover:from-cyan-300/40 hover:to-cyan-300/20 transition-all duration-300 shadow-md" style={bevelStyle}>
-                <button 
+              <div key={idx} className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 hover:from-cyan-300/40 hover:to-cyan-300/20 transition-all duration-300 shadow-md interactive-card group" style={bevelStyle}>
+                <MagneticButton 
                   onClick={() => router.push(`/games/${card.slug}`)}
-                  className="w-full flex min-h-28 items-center gap-5 bg-slate-950 p-4 text-left group shimmer-hover"
-                  style={bevelStyle}
+                  className="w-full flex min-h-28 items-center gap-5 bg-slate-950 p-4 text-left shimmer-hover"
+                  strength={0.25}
                 >
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden" style={inputBevelStyle}>
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden transform-gpu" style={inputBevelStyle}>
                     <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />
                   </div>
                   <span>
                     <strong className="block text-lg font-black text-white group-hover:text-cyan-300 transition-colors uppercase tracking-tight">{card.name}</strong>
                     <span className="mt-1 block text-xs font-bold text-slate-500 uppercase tracking-wider">{card.publisher}</span>
                   </span>
-                </button>
+                </MagneticButton>
               </div>
             ))}
           </div>
-        </div>
+        </ParallaxSection>
 
         {/* Section: Catalog Tabs & Grid */}
         <div id="catalog" className="section-wrap">
