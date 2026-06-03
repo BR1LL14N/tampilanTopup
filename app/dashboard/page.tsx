@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -133,19 +134,21 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-ink relative overflow-hidden">
+      <div className="min-h-screen flex flex-col bg-ink relative overflow-x-clip">
         <div className="pointer-events-none absolute inset-0 mesh opacity-25 z-0" />
         <Header />
-        <main className="flex-1 flex items-center justify-center relative z-10">
-          <Loader2 className="h-8 w-8 animate-spin text-cyan-300" />
-        </main>
-        <Footer />
+        <SidebarContentWrapper isAuthenticated={!!currentUser}>
+          <main className="flex-1 flex items-center justify-center relative z-10">
+            <Loader2 className="h-8 w-8 animate-spin text-cyan-300" />
+          </main>
+          <Footer />
+        </SidebarContentWrapper>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-ink relative overflow-hidden text-slate-100">
+    <div className="min-h-screen flex flex-col bg-ink relative overflow-x-clip text-slate-100">
       
       {/* Background elements */}
       <div className="pointer-events-none fixed inset-0 mesh opacity-45 z-0" />
@@ -154,9 +157,11 @@ export default function DashboardPage() {
 
       <Header user={currentUser} />
 
-      <main className="flex-1 py-10 px-4 sm:px-6 lg:px-8 relative z-10 max-w-7xl mx-auto w-full">
-        
-        {/* Welcome HUD Header */}
+      <SidebarContentWrapper isAuthenticated={!!currentUser}>
+        <main className="flex-1 py-10 relative z-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          
+          {/* Welcome HUD Header */}
         <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-950/40 p-6 md:p-8 rounded-2xl border border-white/5 relative overflow-hidden">
           {/* Subtle glow border at bottom */}
           <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-300/20 to-transparent" />
@@ -342,10 +347,12 @@ export default function DashboardPage() {
           </div>
 
         </div>
+        </div>
 
-      </main>
+        </main>
 
-      <Footer />
+        <Footer />
+      </SidebarContentWrapper>
     </div>
   )
 }

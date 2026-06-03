@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Header } from "@/components/layout/header"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -198,7 +199,7 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
+    <div className="min-h-screen flex flex-col relative overflow-x-clip">
       {/* Background Mesh and Decorative Glows (Matching Home layout exactly) */}
       <div className="pointer-events-none fixed inset-0 mesh opacity-45 z-0" />
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -206,7 +207,8 @@ export default function LeaderboardPage() {
 
       <Header user={currentUser} />
 
-      <main className="flex-1 py-8 relative z-10">
+      <SidebarContentWrapper isAuthenticated={!!currentUser}>
+        <main className="flex-1 py-8 relative z-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
           {/* Header Title Section */}
@@ -531,14 +533,15 @@ export default function LeaderboardPage() {
             </CardContent>
           </Card>
         </div>
-      </main>
+        </main>
 
-      {/* Footer copyright matches other pages */}
-      <footer className="border-t border-white/10 bg-ink py-6 mt-12 relative z-10">
-        <div className="mx-auto max-w-7xl px-4 text-center text-xs text-slate-500 sm:px-6 lg:px-8">
-          © 2026 Mitsuru. All rights reserved.
-        </div>
-      </footer>
+        {/* Footer copyright matches other pages */}
+        <footer className="border-t border-white/10 bg-ink py-6 mt-12 relative z-10">
+          <div className="mx-auto max-w-7xl px-4 text-center text-xs text-slate-500 sm:px-6 lg:px-8">
+            © 2026 Mitsuru. All rights reserved.
+          </div>
+        </footer>
+      </SidebarContentWrapper>
     </div>
   )
 }
