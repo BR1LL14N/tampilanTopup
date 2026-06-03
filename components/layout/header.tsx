@@ -237,11 +237,11 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <>
-      {/* Global CSS Injector to pad main content when sidebar is active on desktop */}
+      {/* Global CSS Injector to pad layout components when sidebar is active on desktop */}
       {currentUser && (
         <style dangerouslySetInnerHTML={{ __html: `
           @media (min-width: 1024px) {
-            main {
+            header, main, footer {
               padding-left: 16rem !important;
               transition: padding-left 0.3s ease;
             }
