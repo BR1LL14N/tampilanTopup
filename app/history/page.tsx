@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { TransactionCard } from "@/components/transaction/transaction-card"
 import { Search, Filter, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
@@ -120,7 +121,8 @@ export default function HistoryPage() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="flex-1 py-8">
+      <SidebarContentWrapper>
+        <main className="flex-1 py-8">
         <div className="container">
           {/* Header */}
           <div className="mb-8">
@@ -182,9 +184,10 @@ export default function HistoryPage() {
             </Card>
           )}
         </div>
-      </main>
+        </main>
 
-      <Footer />
+        <Footer />
+      </SidebarContentWrapper>
     </div>
   )
 }

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { createClient } from "@/lib/supabase/client"
 import { formatCurrency, generateInvoice } from "@/lib/utils"
 import { gameAssets, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
@@ -114,7 +115,8 @@ export default function CheckoutPage() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="flex-1 py-8">
+      <SidebarContentWrapper>
+        <main className="flex-1 py-8">
         <div className="container max-w-4xl">
           {/* Back Button */}
           <Link
@@ -399,9 +401,10 @@ export default function CheckoutPage() {
             </div>
           )}
         </div>
-      </main>
+        </main>
 
-      <Footer />
+        <Footer />
+      </SidebarContentWrapper>
     </div>
   )
 }

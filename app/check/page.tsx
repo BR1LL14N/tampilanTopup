@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { createClient } from "@/lib/supabase/client"
 import { Loader2, Search, CheckCircle2, AlertTriangle, Clock, ArrowLeft, ShieldAlert } from "lucide-react"
 
@@ -64,14 +65,15 @@ export default function CheckTransactionPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden text-slate-100">
+    <div className="min-h-screen flex flex-col relative overflow-x-clip text-slate-100">
       
       {/* Mesh Background Grid */}
       <div className="pointer-events-none fixed inset-0 mesh opacity-45 z-0" />
 
       <Header />
 
-      <main className="flex-1 py-16 px-4 relative z-20 flex items-center justify-center">
+      <SidebarContentWrapper>
+        <main className="flex-1 py-16 px-4 relative z-20 flex items-center justify-center">
         <div className="w-full max-w-xl">
           
           {/* Section Title */}
@@ -228,9 +230,10 @@ export default function CheckTransactionPage() {
 
           </div>
         </div>
-      </main>
+        </main>
 
-      <Footer />
+        <Footer />
+      </SidebarContentWrapper>
     </div>
   )
 }

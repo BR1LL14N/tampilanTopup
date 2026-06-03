@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Header } from "@/components/layout/header"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { formatCurrency, formatDate, getStatusBgColor } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -155,7 +156,8 @@ export default function AdminTransactionsPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header user={currentUser} />
 
-      <main className="flex-1 py-8">
+      <SidebarContentWrapper isAuthenticated={!!currentUser}>
+        <main className="flex-1 py-8">
         <div className="container">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
@@ -299,7 +301,8 @@ export default function AdminTransactionsPage() {
             </CardContent>
           </Card>
         </div>
-      </main>
+        </main>
+      </SidebarContentWrapper>
     </div>
   )
 }

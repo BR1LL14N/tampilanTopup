@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import {
   Zap,
   ChevronLeft,
@@ -178,7 +179,9 @@ export function HomeContent({ user }: HomeContentProps) {
 
       <Header user={user} />
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <SidebarContentWrapper isAuthenticated={!!user}>
+        <main className="relative z-10 py-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Hero Carousel */}
         <div className="hero-carousel mb-10 overflow-hidden relative rounded-2xl border border-white/10 shadow-neon-cyan/20">
@@ -499,9 +502,11 @@ export function HomeContent({ user }: HomeContentProps) {
 
         </div>
 
+        </div>
       </main>
 
       <Footer />
-    </div>
-  )
+    </SidebarContentWrapper>
+  </div>
+)
 }
