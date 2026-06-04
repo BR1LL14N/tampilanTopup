@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useParams, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -12,8 +12,8 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { createClient } from "@/lib/supabase/client"
-import { formatCurrency, generateInvoice } from "@/lib/utils"
-import { gameAssets, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
+import { formatCurrency } from "@/lib/utils"
+import { gameAssets, getItemAssetForProduct, paymentAssets, getGameAsset } from "@/lib/assets"
 import {
   ArrowLeft,
   QrCode,
@@ -22,19 +22,6 @@ import {
   CheckCircle,
   Loader2,
 } from "lucide-react"
-
-// Mock product data
-const mockProduct = {
-  id: "1",
-  name: "86 Diamonds",
-  sell_price: 25000,
-  provider_sku: "ML86",
-  game: {
-    name: "Mobile Legends",
-    icon: "🎮",
-    image: gameAssets["mobile-legends"].poster,
-  },
-}
 
 const paymentMethods = [
   { id: "qris", name: "QRIS", icon: QrCode, logo: paymentAssets.qris, description: "Scan dengan aplikasi apapun" },
@@ -45,7 +32,14 @@ const paymentMethods = [
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const { id } = useParams() // id = provider_sku
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  const targetFromUrl = searchParams.get("target") || ""
+  const qtyFromUrl = parseInt(searchParams.get("qty") || "1", 10)
+  const paymentFromUrl = searchParams.get("payment") || ""
+
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedPayment, setSelectedPayment] = useState("")
@@ -59,6 +53,61 @@ export default function CheckoutPage() {
     qr_string?: string
   } | null>(null)
 
+  const [product, setProduct] = useState<any>(null)
+  const [loadingProduct, setLoadingProduct] = useState(true)
+
+  // Fetch product from Supabase based on provider_sku
+  useEffect(() => {
+    if (!id) return
+
+    const fetchProduct = async () => {
+      setLoadingProduct(true)
+      try {
+        const skuStr = String(id)
+        const { data, error } = await supabase
+          .from("product_details")
+          .select("*")
+          .eq("provider_sku", skuStr)
+          .single()
+
+        if (error || !data) {
+          console.error("Failed to load product details:", error)
+        } else {
+          setProduct({
+            id: data.id,
+            name: data.name,
+            sell_price: data.sell_price,
+            provider_sku: data.provider_sku,
+            game: {
+              name: data.game_name,
+              icon: data.game_icon || "🎮",
+              image: getGameAsset(data.game_slug)?.poster || data.game_icon || gameAssets["mobile-legends"].poster,
+            },
+          })
+        }
+      } catch (err) {
+        console.error("Error fetching product:", err)
+      } finally {
+        setLoadingProduct(false)
+      }
+    }
+
+    fetchProduct()
+  }, [id])
+
+  // Populate data from URL params
+  useEffect(() => {
+    if (targetFromUrl) {
+      setFormData((prev) => ({ ...prev, target_id: targetFromUrl }))
+    }
+  }, [targetFromUrl])
+
+  useEffect(() => {
+    if (paymentFromUrl) {
+      setSelectedPayment(paymentFromUrl.toLowerCase())
+    }
+  }, [paymentFromUrl])
+
   const handleSubmitTarget = async (e: React.FormEvent) => {
     e.preventDefault()
     setStep(2)
@@ -69,46 +118,86 @@ export default function CheckoutPage() {
   }
 
   const handleCreatePayment = async () => {
-    if (!selectedPayment) return
+    if (!selectedPayment || !product) return
 
     setIsLoading(true)
     try {
-      // Generate invoice
-      const invoice = generateInvoice()
+      const response = await fetch("/api/transactions/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          product_id: product.id,
+          target_id: formData.target_id,
+          target_name: formData.target_name || null,
+          payment_method: selectedPayment,
+          quantity: qtyFromUrl,
+        }),
+      })
 
-      // Create transaction in Supabase (mock for now)
-      // In production, this would call your backend API
+      const resJson = await response.json()
+      if (resJson.error) {
+        throw new Error(resJson.error)
+      }
 
-      // Simulate payment creation
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
+      const tx = resJson.data
       setTransactionData({
-        invoice,
-        amount: mockProduct.sell_price,
-        qr_string: "00020101021226620009com.bri.ccho.id010911000000000001020326303003000000000000000052040000000000000000052069000016000000000000000000103015802091573303710501000008000005820333待定00000000000000000000000000",
+        invoice: tx.invoice,
+        amount: tx.amount,
+        qr_string: tx.qr_string,
       })
 
       setStep(3)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment creation failed:", error)
+      alert(`Gagal membuat pembayaran: ${error.message}`)
     } finally {
       setIsLoading(false)
     }
   }
 
   const handlePaymentComplete = async () => {
+    if (!transactionData) return
+
     setIsLoading(true)
     try {
-      // Simulate payment verification
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const response = await fetch("/api/transactions/pay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          invoice: transactionData.invoice,
+        }),
+      })
+
+      const resJson = await response.json()
+      if (resJson.error) {
+        throw new Error(resJson.error)
+      }
 
       // Redirect to success page
-      router.push(`/history/${transactionData?.invoice}`)
-    } catch (error) {
+      router.push(`/history/${transactionData.invoice}`)
+    } catch (error: any) {
       console.error("Payment verification failed:", error)
+      alert(`Verifikasi pembayaran gagal: ${error.message}`)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (loadingProduct || !product) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-white">
+        <Header />
+        <main className="flex-1 flex flex-col items-center justify-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Memuat Rincian Produk...</p>
+        </main>
+        <Footer />
+      </div>
+    )
   }
 
   return (
@@ -166,8 +255,8 @@ export default function CheckoutPage() {
                   <div className="flex gap-4 mb-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden">
                       <Image
-                        src={mockProduct.game.image}
-                        alt={mockProduct.game.name}
+                        src={product.game.image}
+                        alt={product.game.name}
                         fill
                         className="object-cover"
                       />
@@ -175,26 +264,26 @@ export default function CheckoutPage() {
                     <div>
                       <span className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1.5">
                         <img
-                          src={getItemAssetForProduct(mockProduct.name, mockProduct.provider_sku, mockProduct.game.name)}
+                          src={getItemAssetForProduct(product.name, product.provider_sku, product.game.name)}
                           alt=""
                           className="max-h-full max-w-full object-contain"
                         />
                       </span>
-                      <p className="font-semibold">{mockProduct.game.name}</p>
+                      <p className="font-semibold">{product.game.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {mockProduct.name}
+                        {product.name}
                       </p>
                     </div>
                   </div>
                   <div className="border-t border-white/10 pt-4">
                     <div className="flex justify-between mb-2">
                       <span className="text-muted-foreground">Harga</span>
-                      <span>{formatCurrency(mockProduct.sell_price)}</span>
+                      <span>{formatCurrency(product.sell_price)}</span>
                     </div>
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span>
                       <span className="text-primary">
-                        {formatCurrency(mockProduct.sell_price)}
+                        {formatCurrency(product.sell_price * qtyFromUrl)}
                       </span>
                     </div>
                   </div>
@@ -309,7 +398,7 @@ export default function CheckoutPage() {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Produk</span>
-                      <span>{mockProduct.name}</span>
+                      <span>{product.name} (x{qtyFromUrl})</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Target</span>
@@ -318,7 +407,7 @@ export default function CheckoutPage() {
                     <div className="border-t border-white/10 pt-4 flex justify-between font-semibold text-lg">
                       <span>Total</span>
                       <span className="text-primary">
-                        {formatCurrency(mockProduct.sell_price)}
+                        {formatCurrency(product.sell_price * qtyFromUrl)}
                       </span>
                     </div>
                   </div>
@@ -362,7 +451,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Produk</span>
-                      <span>{mockProduct.name}</span>
+                      <span>{product.name} (x{qtyFromUrl})</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Target</span>
