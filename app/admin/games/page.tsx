@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Header } from "@/components/layout/header"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { formatCurrency, formatDate, getStatusBgColor } from "@/lib/utils"
 import { gameAssets, getGameAsset } from "@/lib/assets"
 import {
@@ -130,113 +131,115 @@ export default function AdminGamesPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header user={currentUser} />
 
-      <main className="flex-1 py-8">
-        <div className="container">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Kelola Game</h1>
-              <p className="text-muted-foreground">
-                Kelola daftar game yang tersedia
-              </p>
+      <SidebarContentWrapper isAuthenticated={!!currentUser}>
+        <main className="flex-1 py-8">
+          <div className="container">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">Kelola Game</h1>
+                <p className="text-muted-foreground">
+                  Kelola daftar game yang tersedia
+                </p>
+              </div>
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Tambah Game
+              </Button>
             </div>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Tambah Game
-            </Button>
-          </div>
 
-          {/* Search */}
-          <div className="mb-6">
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Cari game..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+            {/* Search */}
+            <div className="mb-6">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Cari game..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Games Table */}
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Game</TableHead>
-                    <TableHead>Kategori</TableHead>
-                    <TableHead>Produk</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredGames.map((game) => (
-                    <TableRow key={game.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5">
-                            <img
-                              src={game.image}
-                              alt={game.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <p className="font-medium flex items-center gap-1.5">
-                              <img src={getGameAsset(game.slug)?.icon} alt="" className="h-4 w-4 rounded object-cover" />
-                              {game.name}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              /{game.slug}
-                            </p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{game.category}</TableCell>
-                      <TableCell>{game.products_count}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
-                            game.status ? "success" : "failed"
-                          )}`}
-                        >
-                          {game.status ? "Aktif" : "Nonaktif"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Eye className="h-4 w-4 mr-2" />
-                              Lihat
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-500">
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Hapus
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+            {/* Games Table */}
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Game</TableHead>
+                      <TableHead>Kategori</TableHead>
+                      <TableHead>Produk</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Aksi</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredGames.map((game) => (
+                      <TableRow key={game.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5">
+                              <img
+                                src={game.image}
+                                alt={game.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div>
+                              <p className="font-medium flex items-center gap-1.5">
+                                <img src={getGameAsset(game.slug)?.icon} alt="" className="h-4 w-4 rounded object-cover" />
+                                {game.name}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                /{game.slug}
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{game.category}</TableCell>
+                        <TableCell>{game.products_count}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
+                              game.status ? "success" : "failed"
+                            )}`}
+                          >
+                            {game.status ? "Aktif" : "Nonaktif"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>
+                                <Eye className="h-4 w-4 mr-2" />
+                                Lihat
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-500">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Hapus
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </SidebarContentWrapper>
     </div>
   )
 }

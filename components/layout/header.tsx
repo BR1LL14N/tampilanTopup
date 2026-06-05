@@ -20,7 +20,11 @@ import {
   Shield,
   HelpCircle,
   Sun,
-  Moon
+  Moon,
+  ChevronLeft,
+  ChevronRight,
+  Gamepad2,
+  ShoppingBag
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -95,6 +99,29 @@ export function Header({ user }: HeaderProps) {
 
   // Theme state
   const [theme, setTheme] = useState("dark")
+
+  // Sidebar collapse state
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Initialize collapse state from localStorage on client-side
+  useEffect(() => {
+    setMounted(true)
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("topup_sidebar_collapsed")
+      setIsSidebarCollapsed(stored === "true")
+    }
+  }, [])
+
+  const toggleSidebar = () => {
+    const nextState = !isSidebarCollapsed
+    setIsSidebarCollapsed(nextState)
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("topup_sidebar_collapsed", String(nextState))
+      // Notify SidebarContentWrapper instances on same tab
+      window.dispatchEvent(new Event("sidebar-toggle"))
+    }
+  }
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -238,18 +265,6 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <>
-      {/* Global CSS Injector to pad layout components when sidebar is active on desktop */}
-      {currentUser && (
-        <style dangerouslySetInnerHTML={{ __html: `
-          @media (min-width: 1024px) {
-            header, main, footer {
-              padding-left: 16rem !important;
-              transition: padding-left 0.3s ease;
-            }
-          }
-        ` }} />
-      )}
-
       {/* Top Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-ink/85 backdrop-blur-xl shadow-sm dark:shadow-none">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
@@ -538,33 +553,61 @@ export function Header({ user }: HeaderProps) {
 
       {/* Persistent Left Sidebar Navigation for Logged-In User on Desktop */}
       {currentUser && (
-        <aside className="fixed top-[65px] left-0 bottom-0 w-64 bg-slate-900 dark:bg-slate-950/70 border-r border-slate-700/50 dark:border-white/10 z-40 p-5 flex flex-col justify-between hidden lg:flex backdrop-blur-md">
+        <aside className={cn(
+          "fixed top-[65px] left-0 bottom-0 bg-slate-900 dark:bg-slate-950/70 border-r border-slate-700/50 dark:border-white/10 z-40 p-4 flex flex-col justify-between hidden lg:flex backdrop-blur-md transition-all duration-300 ease-in-out",
+          isSidebarCollapsed ? "w-20" : "w-64"
+        )}>
           <div className="space-y-6">
             
+            {/* Collapse Toggle Button */}
+            <div className={cn("flex items-center", isSidebarCollapsed ? "justify-center" : "justify-between px-1")}>
+              {!isSidebarCollapsed && (
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest animate-fadeIn">Pusat Navigasi</span>
+              )}
+              <button
+                onClick={toggleSidebar}
+                className="p-1.5 rounded-lg border border-slate-200/10 dark:border-white/10 hover:border-cyan-300/30 text-slate-400 hover:text-cyan-300 hover:bg-slate-950 transition-all"
+                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+              >
+                {isSidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              </button>
+            </div>
+            
             {/* User Profile Info Card inside Sidebar */}
-            <div className="p-4 bg-slate-900/50 border border-white/5 rounded-xl flex items-center gap-3">
+            <div className={cn(
+              "p-3 bg-slate-950/40 border border-white/5 rounded-xl flex items-center transition-all duration-300",
+              isSidebarCollapsed ? "justify-center" : "gap-3"
+            )}>
               <span className="grid h-9 w-9 place-items-center rounded-full bg-cyan-300/10 text-cyan-300 border border-cyan-300/20 shrink-0">
                 <User className="h-4.5 w-4.5" />
               </span>
-              <div className="overflow-hidden">
-                <p className="text-xs font-extrabold text-white uppercase tracking-tight truncate">{currentUser.name}</p>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{currentUser.role === 'admin' ? 'Administrator' : 'Gamer Member'}</p>
-              </div>
+              {!isSidebarCollapsed && (
+                <div className="overflow-hidden animate-fadeIn">
+                  <p className="text-xs font-extrabold text-white uppercase tracking-tight truncate">{currentUser.name}</p>
+                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{currentUser.role === 'admin' ? 'Administrator' : 'Gamer Member'}</p>
+                </div>
+              )}
             </div>
 
             {/* Sidebar Navigation Links */}
             <div className="space-y-1">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-3 mb-2">Menu Utama</p>
+              {!isSidebarCollapsed ? (
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-3 mb-2 animate-fadeIn">Menu Utama</p>
+              ) : (
+                <div className="h-2" />
+              )}
               
               <Link 
                 href="/dashboard"
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                  "flex items-center rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                  isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                   pathname === "/dashboard" && "bg-cyan-300/10 text-cyan-300 hover:text-cyan-300 hover:bg-cyan-300/10 border-cyan-300/10"
                 )}
+                title={isSidebarCollapsed ? "Dashboard" : undefined}
               >
                 <LayoutDashboard className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-                Dashboard
+                {!isSidebarCollapsed && <span className="animate-fadeIn">Dashboard</span>}
               </Link>
 
               {navLinks.map((link) => (
@@ -572,71 +615,90 @@ export function Header({ user }: HeaderProps) {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     isActive(link.href) && "bg-cyan-300/10 text-cyan-300 hover:text-cyan-300 hover:bg-cyan-300/10 border-cyan-300/10"
                   )}
+                  title={isSidebarCollapsed ? link.label : undefined}
                 >
                   <link.icon className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-                  {link.label}
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">{link.label}</span>}
                 </Link>
               ))}
 
               <Link 
                 href="/history"
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                  "flex items-center rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                  isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                   pathname === "/history" && "bg-cyan-300/10 text-cyan-300 hover:text-cyan-300 hover:bg-cyan-300/10 border-cyan-300/10"
                 )}
+                title={isSidebarCollapsed ? t.history : undefined}
               >
                 <History className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-                {t.history}
+                {!isSidebarCollapsed && <span className="animate-fadeIn">{t.history}</span>}
               </Link>
             </div>
 
             {/* Admin Specific Links */}
             {currentUser.role === "admin" && (
               <div className="space-y-1 border-t border-white/5 pt-4">
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-3 mb-2">Admin Panel</p>
+                {!isSidebarCollapsed ? (
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-3 mb-2 animate-fadeIn">Admin Panel</p>
+                ) : (
+                  <div className="h-2" />
+                )}
                 
                 <Link 
                   href="/admin"
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin" && "bg-cyan-300/10 text-cyan-300 hover:text-cyan-300 hover:bg-cyan-300/10 border-cyan-300/10"
                   )}
+                  title={isSidebarCollapsed ? "Admin Room" : undefined}
                 >
                   <Shield className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
-                  Admin Room
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Admin Room</span>}
                 </Link>
 
                 <Link 
                   href="/admin/games"
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/games" && "bg-cyan-300/10 text-cyan-300 hover:text-cyan-300 hover:bg-cyan-300/10 border-cyan-300/10"
                   )}
+                  title={isSidebarCollapsed ? "Kelola Game" : undefined}
                 >
-                  Kelola Game
+                  <Gamepad2 className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Kelola Game</span>}
                 </Link>
 
                 <Link 
                   href="/admin/products"
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/products" && "bg-cyan-300/10 text-cyan-300 hover:text-cyan-300 hover:bg-cyan-300/10 border-cyan-300/10"
                   )}
+                  title={isSidebarCollapsed ? "Kelola Produk" : undefined}
                 >
-                  Kelola Produk
+                  <ShoppingBag className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Kelola Produk</span>}
                 </Link>
 
                 <Link 
                   href="/admin/transactions"
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/transactions" && "bg-cyan-300/10 text-cyan-300 hover:text-cyan-300 hover:bg-cyan-300/10 border-cyan-300/10"
                   )}
+                  title={isSidebarCollapsed ? "Transaksi Masuk" : undefined}
                 >
-                  Transaksi Masuk
+                  <History className="h-4.5 w-4.5 group-hover:scale-105 transition-transform" />
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Transaksi Masuk</span>}
                 </Link>
               </div>
             )}
@@ -647,10 +709,14 @@ export function Header({ user }: HeaderProps) {
           <div className="border-t border-white/5 pt-4">
             <button
               onClick={() => setShowLogoutConfirm(true)}
-              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all border border-transparent"
+              className={cn(
+                "flex items-center w-full rounded-lg text-xs font-black uppercase tracking-wider text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all border border-transparent",
+                isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
+              )}
+              title={isSidebarCollapsed ? t.logout : undefined}
             >
               <LogOut className="h-4.5 w-4.5" />
-              {t.logout}
+              {!isSidebarCollapsed && <span className="animate-fadeIn">{t.logout}</span>}
             </button>
           </div>
         </aside>
