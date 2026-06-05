@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/luthf/dev/claude-code/projects/MRF-topup-app/**)",
+      "Bash(dir /b C:\\\\laragon\\\\www\\\\freelance-top-up-app\\\\app)"
+    ]
+  }
+}

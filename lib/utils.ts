@@ -77,14 +77,14 @@ export function getStatusColor(status: string): string {
 
 export function getStatusBgColor(status: string): string {
   const colors: Record<string, string> = {
-    pending: "bg-yellow-500/10 text-yellow-500",
-    processing: "bg-blue-500/10 text-blue-500",
-    success: "bg-green-500/10 text-green-500",
-    failed: "bg-red-500/10 text-red-500",
-    paid: "bg-green-500/10 text-green-500",
-    expired: "bg-gray-500/10 text-gray-500",
+    pending: "bg-amber-50 text-amber-500",
+    processing: "bg-blue-50 text-blue-500",
+    success: "bg-emerald-50 text-emerald-500",
+    failed: "bg-red-50 text-red-500",
+    paid: "bg-emerald-50 text-emerald-500",
+    expired: "bg-gray-100 text-gray-500",
   };
-  return colors[status.toLowerCase()] || "bg-gray-500/10 text-gray-500";
+  return colors[status.toLowerCase()] || "bg-gray-100 text-gray-500";
 }
 
 export function truncateText(text: string, length: number): string {

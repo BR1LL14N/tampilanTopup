@@ -53,7 +53,7 @@ export default function AdminTransactionsPage() {
       try {
         const supabase = createClient()
         const { data: { user: authUser } } = await supabase.auth.getUser()
-        
+
         if (!authUser) {
           router.push("/auth/login")
           return
@@ -131,17 +131,17 @@ export default function AdminTransactionsPage() {
 
   // Calculate dynamic stats
   const totalTransactions = transactionsList.length.toString()
-  
+
   const todayStr = new Date().toISOString().split('T')[0]
-  const todayTransactions = transactionsList.filter((tx) => 
+  const todayTransactions = transactionsList.filter((tx) =>
     tx.created_at && tx.created_at.startsWith(todayStr)
   ).length.toString()
 
-  const pendingTransactions = transactionsList.filter((tx) => 
+  const pendingTransactions = transactionsList.filter((tx) =>
     tx.topup_status === "pending" || tx.topup_status === "processing"
   ).length.toString()
 
-  const failedTransactions = transactionsList.filter((tx) => 
+  const failedTransactions = transactionsList.filter((tx) =>
     tx.topup_status === "failed"
   ).length.toString()
 
@@ -202,7 +202,7 @@ export default function AdminTransactionsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-sm"
+              className="px-4 py-2 rounded-lg border border-sky-border bg-white text-sm"
             >
               <option value="all">Semua Status</option>
               <option value="success">Berhasil</option>
@@ -237,7 +237,7 @@ export default function AdminTransactionsPage() {
                       <TableCell>{tx.user}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ice p-1.5">
                             <img
                               src={getItemAssetForProduct(tx.product, undefined, tx.game)}
                               alt=""

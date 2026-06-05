@@ -5,22 +5,22 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-extrabold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-extrabold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-cyan-300 text-ink hover:bg-cyan-200 hover:scale-105",
+          "bg-sky text-white hover:bg-diamond hover:scale-105 active:scale-95",
         destructive:
-          "bg-red-500 text-white hover:bg-red-600 hover:scale-105",
+          "bg-red-500 text-white hover:bg-red-600 hover:scale-105 active:scale-95",
         outline:
-          "border border-white/10 bg-white/10 text-white hover:bg-white/15 hover:border-cyan-300/40 hover:scale-105",
+          "border-2 border-sky text-sky bg-white hover:bg-sky/5 hover:scale-105 active:scale-95",
         secondary:
-          "bg-white/10 text-white hover:bg-white/15 border border-white/10",
-        ghost: "hover:bg-white/10 hover:text-white",
-        link: "text-cyan-200 underline-offset-4 hover:underline",
+          "bg-mist text-text-primary hover:bg-ice border border-sky-border hover:scale-105 active:scale-95",
+        ghost: "hover:bg-ice text-text-secondary hover:text-text-primary",
+        link: "text-sky underline-offset-4 hover:underline",
         accent:
-          "border border-cyan-300/50 bg-cyan-300/15 text-cyan-100 hover:bg-cyan-300/25",
+          "border border-sky/50 bg-sky/10 text-diamond hover:bg-sky/20 hover:scale-105 active:scale-95",
       },
       size: {
         default: "h-11 px-5 py-2",

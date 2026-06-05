@@ -50,7 +50,7 @@ export default function AdminProductsPage() {
       try {
         const supabase = createClient()
         const { data: { user: authUser } } = await supabase.auth.getUser()
-        
+
         if (!authUser) {
           router.push("/auth/login")
           return
@@ -222,7 +222,7 @@ export default function AdminProductsPage() {
                     <TableRow key={product.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ice p-1.5">
                             <img
                               src={getItemAssetForProduct(product.name, product.provider_sku, product.game)}
                               alt=""

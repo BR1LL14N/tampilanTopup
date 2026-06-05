@@ -10,13 +10,13 @@ import { createClient } from "@/lib/supabase/client"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
-import { 
-  Loader2, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Clock, 
-  ArrowLeft, 
-  ShieldAlert, 
+import {
+  Loader2,
+  CheckCircle2,
+  AlertTriangle,
+  Clock,
+  ArrowLeft,
+  ShieldAlert,
   Receipt,
   FileText
 } from "lucide-react"
@@ -135,45 +135,43 @@ export default function InvoiceDetailPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip text-slate-100">
-      {/* Mesh Background Grid */}
-      <div className="pointer-events-none fixed inset-0 mesh opacity-45 z-0" />
+    <div className="min-h-screen flex flex-col relative overflow-x-clip text-text-primary">
 
       <Header />
 
       <SidebarContentWrapper>
         <main className="flex-1 py-16 px-4 relative z-20 flex items-center justify-center">
           <div className="w-full max-w-xl">
-            
+
             {/* Section Title */}
             <div className="text-center mb-8">
-              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-white mb-2 flex items-center justify-center gap-2">
-                <Receipt className="h-6 w-6 text-cyan-300" />
+              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-text-primary mb-2 flex items-center justify-center gap-2">
+                <Receipt className="h-6 w-6 text-sky" />
                 Detail Transaksi
               </h1>
-              <p className="text-xs font-semibold tracking-wider text-cyan-300 uppercase">
+              <p className="text-xs font-semibold tracking-wider text-sky uppercase">
                 Nomor Invoice: {invoiceId}
               </p>
             </div>
 
             {/* Glass Card Container */}
-            <div className="w-full glass rounded-2xl shadow-neon-cyan border-white/10 backdrop-blur-md p-6 md:p-8 relative">
-              <div className="absolute top-0 left-0 w-20 h-20 bg-cyan-300/10 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute bottom-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="w-full glass-sky rounded-2xl shadow-sky-glow border-sky-border backdrop-blur-md p-6 md:p-8 relative bg-white/80">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-sky/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-20 h-20 bg-diamond/10 rounded-full blur-2xl pointer-events-none" />
 
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <Loader2 className="h-8 w-8 animate-spin text-cyan-300" />
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Memuat Detail Invoice...</p>
+                  <Loader2 className="h-8 w-8 animate-spin text-sky" />
+                  <p className="text-xs font-bold uppercase tracking-widest text-text-secondary">Memuat Detail Invoice...</p>
                 </div>
               ) : error ? (
                 <div className="space-y-6">
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-3 animate-fadeIn">
+                  <div className="p-4 rounded-xl bg-red-50 border border-red-500/20 text-red-500 text-xs font-semibold flex items-center gap-3 animate-fadeIn">
                     <ShieldAlert className="h-5 w-5 text-red-500 shrink-0" />
                     <span>{error}</span>
                   </div>
                   <div className="flex justify-center">
-                    <Link href="/history" className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-cyan-300 transition duration-300 uppercase tracking-widest">
+                    <Link href="/history" className="inline-flex items-center gap-2 text-xs font-bold text-text-secondary hover:text-sky transition duration-300 uppercase tracking-widest">
                       <ArrowLeft className="h-4 w-4" />
                       Kembali ke Riwayat
                     </Link>
@@ -181,51 +179,51 @@ export default function InvoiceDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-6 animate-fadeIn">
-                  
+
                   {/* Visual Status Header bar */}
-                  <div className={`p-4 rounded-xl flex items-center justify-between border border-white/5 ${
-                    result.status === 'success' ? 'bg-green-500/10 border-green-500/20' :
-                    result.status === 'processing' ? 'bg-yellow-500/10 border-yellow-500/20' :
-                    result.status === 'pending' ? 'bg-blue-500/10 border-blue-500/20' :
-                    'bg-red-500/10 border-red-500/20'
+                  <div className={`p-4 rounded-xl flex items-center justify-between border ${
+                    result.status === 'success' ? 'bg-emerald-50 border-emerald-500/20' :
+                    result.status === 'processing' ? 'bg-amber-50 border-amber-500/20' :
+                    result.status === 'pending' ? 'bg-blue-50 border-blue-500/20' :
+                    'bg-red-50 border-red-500/20'
                   }`}>
                     <div className="flex items-center gap-2">
                       {result.status === 'success' ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-400" />
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                       ) : result.status === 'processing' || result.status === 'pending' ? (
-                        <Clock className="h-5 w-5 text-yellow-400 animate-spin" />
+                        <Clock className="h-5 w-5 text-amber-500 animate-spin" />
                       ) : (
-                        <AlertTriangle className="h-5 w-5 text-red-400" />
+                        <AlertTriangle className="h-5 w-5 text-red-500" />
                       )}
-                      <span className="text-xs font-bold uppercase tracking-wider">
+                      <span className="text-xs font-bold uppercase tracking-wider text-text-primary">
                         Status Topup
                       </span>
                     </div>
                     <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider ${
-                      result.status === 'success' ? 'bg-green-500 text-ink' :
-                      result.status === 'processing' ? 'bg-yellow-500 text-ink' :
+                      result.status === 'success' ? 'bg-emerald-500 text-white' :
+                      result.status === 'processing' ? 'bg-amber-500 text-white' :
                       result.status === 'pending' ? 'bg-blue-500 text-white' :
                       'bg-red-500 text-white'
                     }`} style={tagBevelStyle}>
                       {result.status === 'success' ? 'Berhasil' :
-                       result.status === 'processing' ? 'Diproses' : 
+                       result.status === 'processing' ? 'Diproses' :
                        result.status === 'pending' ? 'Tertunda' : 'Gagal'}
                     </span>
                   </div>
 
                   {/* Details Table */}
-                  <div className="border border-white/10 rounded-xl bg-slate-950/60 p-5 space-y-4 text-xs">
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <span className="text-slate-400 font-medium">Nomor Invoice</span>
-                      <span className="font-mono text-cyan-300 font-bold">{result.invoice}</span>
+                  <div className="border border-sky-border rounded-xl bg-ice p-5 space-y-4 text-xs">
+                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                      <span className="text-text-secondary font-medium">Nomor Invoice</span>
+                      <span className="font-mono text-sky font-bold">{result.invoice}</span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <span className="text-slate-400 font-medium">Tanggal Transaksi</span>
-                      <span className="text-white font-semibold">{formatDate(result.date)}</span>
+                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                      <span className="text-text-secondary font-medium">Tanggal Transaksi</span>
+                      <span className="text-text-primary font-semibold">{formatDate(result.date)}</span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <span className="text-slate-400 font-medium">Game</span>
-                      <span className="flex items-center gap-2 font-bold text-white uppercase">
+                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                      <span className="text-text-secondary font-medium">Game</span>
+                      <span className="flex items-center gap-2 font-bold text-text-primary uppercase">
                         <img
                           src={getGameAssetByName(result.game)?.icon}
                           alt=""
@@ -234,10 +232,10 @@ export default function InvoiceDetailPage() {
                         {result.game}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <span className="text-slate-400 font-medium">Item Produk</span>
-                      <span className="flex items-center gap-2 font-bold text-white">
-                        <span className="flex h-7 w-7 items-center justify-center rounded bg-white p-1">
+                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                      <span className="text-text-secondary font-medium">Item Produk</span>
+                      <span className="flex items-center gap-2 font-bold text-text-primary">
+                        <span className="flex h-7 w-7 items-center justify-center rounded bg-white p-1 border border-sky-border/30">
                           <img
                             src={getItemAssetForProduct(result.product, undefined, result.game)}
                             alt=""
@@ -247,39 +245,39 @@ export default function InvoiceDetailPage() {
                         {result.product}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <span className="text-slate-400 font-medium">User ID Tujuan</span>
-                      <span className="font-mono bg-white/5 px-2.5 py-1 rounded text-cyan-100 font-semibold">{result.target_id}</span>
+                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                      <span className="text-text-secondary font-medium">User ID Tujuan</span>
+                      <span className="font-mono bg-ice px-2.5 py-1 rounded text-text-primary font-semibold border border-sky-border/30">{result.target_id}</span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <span className="text-slate-400 font-medium">Metode Pembayaran</span>
-                      <span className="flex items-center gap-2 font-bold text-white uppercase">
+                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                      <span className="text-text-secondary font-medium">Metode Pembayaran</span>
+                      <span className="flex items-center gap-2 font-bold text-text-primary uppercase">
                         {String(result.payment_method || "").toLowerCase().includes("qris") && (
-                          <span className="flex h-6 w-10 items-center justify-center rounded bg-white p-1">
+                          <span className="flex h-6 w-10 items-center justify-center rounded bg-white p-1 border border-sky-border/30">
                             <img src={paymentAssets.qris} alt="" className="max-h-full max-w-full object-contain" />
                           </span>
                         )}
                         {result.payment_method || "-"}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <span className="text-slate-400 font-medium">Status Pembayaran</span>
+                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                      <span className="text-text-secondary font-medium">Status Pembayaran</span>
                       <span className={`font-semibold capitalize ${
-                        result.payment_status === 'paid' ? 'text-green-400' :
-                        result.payment_status === 'failed' ? 'text-red-400' :
-                        'text-yellow-400'
+                        result.payment_status === 'paid' ? 'text-emerald-500' :
+                        result.payment_status === 'failed' ? 'text-red-500' :
+                        'text-amber-500'
                       }`}>{result.payment_status || "Pending"}</span>
                     </div>
                     <div className="flex justify-between items-center pt-1">
-                      <span className="text-slate-400 font-medium">Total Pembayaran</span>
-                      <span className="text-lg font-black text-cyan-300">{formatCurrency(result.amount)}</span>
+                      <span className="text-text-secondary font-medium">Total Pembayaran</span>
+                      <span className="text-lg font-black text-sky">{formatCurrency(result.amount)}</span>
                     </div>
                   </div>
 
                   {/* Back Link */}
                   <div className="flex justify-center pt-4">
-                    <Link href="/history" className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-cyan-300 transition duration-300 uppercase tracking-widest hover:translate-x-[-2px]">
-                      <ArrowLeft className="h-4 w-4 text-cyan-300" />
+                    <Link href="/history" className="inline-flex items-center gap-2 text-xs font-bold text-text-secondary hover:text-sky transition duration-300 uppercase tracking-widest hover:translate-x-[-2px]">
+                      <ArrowLeft className="h-4 w-4 text-sky" />
                       Kembali ke Riwayat
                     </Link>
                   </div>

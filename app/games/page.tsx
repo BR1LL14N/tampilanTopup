@@ -99,7 +99,7 @@ export default async function GamesPage() {
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-text-primary/80 via-text-primary/30 to-transparent" />
                       <div className="absolute top-4 left-4">
                         <span className="px-3 py-1.5 text-xs font-medium bg-primary/20 text-primary backdrop-blur-sm rounded-full">
                           <img src={getGameAsset(game.slug)?.icon} alt="" className="mr-1.5 inline-block h-3.5 w-3.5 rounded object-cover align-text-bottom" /> {game.category}

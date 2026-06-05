@@ -95,7 +95,7 @@ export default function HistoryPage() {
             return
           }
         }
-        
+
         // Fallback to mock data if not logged in or no transactions
         setTransactions(mockTransactions)
       } catch (err) {
@@ -126,7 +126,7 @@ export default function HistoryPage() {
         <div className="container">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-text-primary">
               Riwayat Transaksi
             </h1>
             <p className="text-muted-foreground">
@@ -166,19 +166,19 @@ export default function HistoryPage() {
               ))}
             </div>
           ) : (
-            <Card className="p-12 text-center">
+            <Card className="p-12 text-center bg-white rounded-[20px] border border-sky-border shadow-sky-soft">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-ice flex items-center justify-center">
                   <Search className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="font-semibold mb-2">Tidak ada transaksi</h3>
+                <h3 className="font-semibold mb-2 text-text-primary">Tidak ada transaksi</h3>
                 <p className="text-muted-foreground mb-6">
                   {searchQuery
                     ? "Transaksi tidak ditemukan"
                     : "Kamu belum memiliki transaksi"}
                 </p>
                 <Link href="/games">
-                  <Button>Mulai Top Up</Button>
+                  <Button className="bg-sky hover:bg-diamond text-white">Mulai Top Up</Button>
                 </Link>
               </CardContent>
             </Card>
