@@ -23,38 +23,44 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative mt-10 border-t border-white/10 py-8">
+    <footer className="relative mt-10 border-t border-sky-border bg-mist py-8">
+      {/* Cloud decoration */}
+      <div className="absolute bottom-0 left-0 w-full h-16 opacity-20 pointer-events-none overflow-hidden">
+        <div className="absolute bottom-0 left-1/4 w-32 h-16 bg-white rounded-full blur-xl" />
+        <div className="absolute bottom-0 right-1/3 w-24 h-12 bg-white rounded-full blur-lg" />
+      </div>
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-4 group">
-              <div className="h-10 w-10 rounded overflow-hidden bg-slate-950 border border-white/10 shadow-lg shadow-cyan-300/5 group-hover:border-cyan-300/30 transition-all duration-300">
+              <div className="h-10 w-10 rounded-lg overflow-hidden bg-white border border-sky-border shadow-sky-soft group-hover:border-sky/50 group-hover:shadow-sky-medium transition-all duration-300">
                 <img src="/mitsuru.png" alt="Mitsuru Logo" className="h-full w-full object-cover" />
               </div>
               <span>
-                <span className="block text-left text-base font-extrabold tracking-wide text-white group-hover:text-cyan-300 transition-colors">Mitsuru</span>
+                <span className="block text-left text-base font-extrabold tracking-wide text-text-primary group-hover:text-sky transition-colors">Mitsuru</span>
               </span>
             </Link>
-            <p className="text-sm text-slate-400 mb-4">
+            <p className="text-sm text-text-secondary mb-4">
               Top up game favorite kamu dengan harga terbaik dan proses otomatis 24/7.
             </p>
             <div className="flex gap-3">
               <a
                 href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 hover:bg-cyan-300/20 transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white border border-sky-border hover:bg-sky/5 hover:border-sky/30 transition-colors text-text-secondary hover:text-sky"
               >
                 <Twitter className="h-4 w-4" />
               </a>
               <a
                 href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 hover:bg-cyan-300/20 transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white border border-sky-border hover:bg-sky/5 hover:border-sky/30 transition-colors text-text-secondary hover:text-sky"
               >
                 <Instagram className="h-4 w-4" />
               </a>
               <a
                 href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 hover:bg-cyan-300/20 transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white border border-sky-border hover:bg-sky/5 hover:border-sky/30 transition-colors text-text-secondary hover:text-sky"
               >
                 <Github className="h-4 w-4" />
               </a>
@@ -63,13 +69,13 @@ export function Footer() {
 
           {/* Product */}
           <div>
-            <h4 className="font-extrabold mb-4">Produk</h4>
+            <h4 className="font-extrabold mb-4 text-text-primary">Produk</h4>
             <ul className="space-y-2">
               {footerLinks.product.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-400 hover:text-cyan-200 transition-colors"
+                    className="text-sm text-text-secondary hover:text-sky transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -80,13 +86,13 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="font-extrabold mb-4">Bantuan</h4>
+            <h4 className="font-extrabold mb-4 text-text-primary">Bantuan</h4>
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-400 hover:text-cyan-200 transition-colors"
+                    className="text-sm text-text-secondary hover:text-sky transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -97,13 +103,13 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="font-extrabold mb-4">Legal</h4>
+            <h4 className="font-extrabold mb-4 text-text-primary">Legal</h4>
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-400 hover:text-cyan-200 transition-colors"
+                    className="text-sm text-text-secondary hover:text-sky transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -113,8 +119,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-white/10 text-center">
-          <p className="text-sm text-slate-500">
+        <div className="mt-12 pt-8 border-t border-sky-border text-center">
+          <p className="text-sm text-text-muted">
             &copy; {currentYear} Mitsuru. All rights reserved.
           </p>
         </div>

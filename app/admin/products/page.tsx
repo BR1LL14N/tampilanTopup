@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Header } from "@/components/layout/header"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
+import { getCachedUser } from "@/lib/auth-cache"
 import { formatCurrency, getStatusBgColor } from "@/lib/utils"
 import { getGameAsset, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -46,11 +48,17 @@ export default function AdminProductsPage() {
   const [activeTab, setActiveTab] = useState("all")
 
   useEffect(() => {
+    // Read cache on mount
+    const cached = getCachedUser()
+    if (cached) {
+      setCurrentUser(cached)
+    }
+
     const fetchAdminData = async () => {
       try {
         const supabase = createClient()
         const { data: { user: authUser } } = await supabase.auth.getUser()
-        
+
         if (!authUser) {
           router.push("/auth/login")
           return
@@ -109,10 +117,55 @@ export default function AdminProductsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
+        <Header user={currentUser} />
+        <SidebarContentWrapper isAuthenticated={!!currentUser}>
+          <main className="flex-1 py-8">
+            <div className="container space-y-8">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-44 rounded-lg bg-sky/10" />
+                  <Skeleton className="h-4 w-64 rounded-md bg-sky/10" />
+                </div>
+                <Skeleton className="h-10 w-36 rounded-xl bg-sky/10" />
+              </div>
+
+              {/* Tabs */}
+              <div className="flex gap-2">
+                <Skeleton className="h-9 w-20 rounded-lg bg-sky/10" />
+                <Skeleton className="h-9 w-24 rounded-lg bg-sky/10" />
+                <Skeleton className="h-9 w-24 rounded-lg bg-sky/10" />
+              </div>
+
+              {/* Table Card */}
+              <div className="bg-white rounded-[20px] border border-sky-border shadow-sky-soft p-6 space-y-6">
+                <Skeleton className="h-10 w-80 rounded-xl bg-sky/10" />
+                <div className="space-y-3">
+                  {/* Header row */}
+                  <div className="grid grid-cols-6 gap-4 py-2 border-b border-sky-border/50">
+                    <Skeleton className="h-4 w-24 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-16 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-20 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-16 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-12 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-8 justify-self-end rounded bg-sky/10" />
+                  </div>
+                  {/* Data rows */}
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="grid grid-cols-6 gap-4 py-4 items-center border-b border-sky-border/30">
+                      <Skeleton className="h-4 w-32 rounded-md bg-sky/10" />
+                      <Skeleton className="h-4 w-24 rounded-md bg-sky/10" />
+                      <Skeleton className="h-4.5 w-16 rounded-md font-mono bg-sky/10" />
+                      <Skeleton className="h-4 w-16 rounded-md bg-sky/10" />
+                      <Skeleton className="h-6 w-16 rounded-full bg-sky/10" />
+                      <Skeleton className="h-8 w-8 justify-self-end rounded-md bg-sky/10" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </main>
+        </SidebarContentWrapper>
       </div>
     )
   }
@@ -222,7 +275,7 @@ export default function AdminProductsPage() {
                     <TableRow key={product.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ice p-1.5">
                             <img
                               src={getItemAssetForProduct(product.name, product.provider_sku, product.game)}
                               alt=""

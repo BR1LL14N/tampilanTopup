@@ -19,14 +19,14 @@ export function GameCard({ game }: GameCardProps) {
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-text-primary/80 via-text-primary/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full">
+              <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium bg-sky/10 text-sky rounded-full">
             <img src={getGameAsset(game.slug)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" /> {game.category}
               </span>
             </div>
-            <h3 className="text-lg font-bold text-white">{game.name}</h3>
+            <h3 className="text-lg font-bold text-text-primary">{game.name}</h3>
           </div>
         </div>
       </Card>
@@ -58,7 +58,7 @@ export function ProductCard({ product, game, onSelect }: ProductCardProps) {
                 className="max-h-full max-w-full object-contain"
               />
             </span>
-            <h4 className="font-semibold">{product.name}</h4>
+            <h4 className="font-semibold text-text-primary">{product.name}</h4>
           </div>
           {game && (
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
@@ -73,11 +73,11 @@ export function ProductCard({ product, game, onSelect }: ProductCardProps) {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs text-muted-foreground">Harga</p>
-          <p className="text-xl font-bold text-primary">
+          <p className="text-xl font-bold text-sky">
             Rp {product.sell_price.toLocaleString("id-ID")}
           </p>
         </div>
-        <span className="px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary rounded-lg">
+        <span className="px-3 py-1.5 text-xs font-medium bg-sky/10 text-sky rounded-lg">
           Pilih
         </span>
       </div>

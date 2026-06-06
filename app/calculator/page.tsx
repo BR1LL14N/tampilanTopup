@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { getItemAssetForProduct } from "@/lib/assets"
 import { Loader2, Calculator, Info, Zap, ChevronRight, Award, Flame, RefreshCw, ShoppingCart } from "lucide-react"
@@ -17,7 +18,7 @@ export default function CalculatorPage() {
   const [selectedGameId, setSelectedGameId] = useState("")
   const [targetQty, setTargetQty] = useState<number>(300)
   const [paymentMethod, setPaymentMethod] = useState("qris")
-  
+
   // Results
   const [optimizationResult, setOptimizationResult] = useState<any>(null)
   const [gameCurrencyName, setGameCurrencyName] = useState("Diamonds")
@@ -27,10 +28,10 @@ export default function CalculatorPage() {
       try {
         const { data: dbGames } = await supabase.from("games").select("*")
         const { data: dbProducts } = await supabase.from("products").select("*")
-        
+
         if (dbGames) setGames(dbGames)
         if (dbProducts) setProducts(dbProducts)
-        
+
         if (dbGames && dbGames.length > 0) {
           setSelectedGameId(dbGames[0].id)
         }
@@ -75,7 +76,7 @@ export default function CalculatorPage() {
     // Filter products for this game
     const gameProducts = products.filter(p => p.game_id === selectedGameId)
     const activeGame = games.find(g => g.id === selectedGameId)
-    
+
     // Parse quantity of currency from name
     // Examples: "86 Diamonds" -> 86, "70 Diamonds + 10 Bonus" -> 80
     const parsedPackages = gameProducts.map(p => {
@@ -83,7 +84,7 @@ export default function CalculatorPage() {
       let qty = 0
       if (numbers) {
         qty = numbers.reduce((acc: number, curr: string) => acc + parseInt(curr), 0)
-        // If it was addition (like 70 + 10), it is correct. 
+        // If it was addition (like 70 + 10), it is correct.
         // If the name is "86 Diamonds", numbers matches ["86"], qty = 86.
         // Let's make sure it handles Roblox like "Robux 800" or UC "60 UC"
       }
@@ -106,11 +107,11 @@ export default function CalculatorPage() {
     }
 
     const optimal = solveOptimalCombination(targetQty, parsedPackages)
-    
+
     if (optimal) {
       // Calculate Loyalty Points (e.g. 1 point for every Rp 1000 spent)
       const points = Math.floor(optimal.totalPrice / 1000)
-      
+
       // Calculate payment method processing fee & discount
       let fee = 0
       let discount = 0
@@ -144,7 +145,7 @@ export default function CalculatorPage() {
 
     const maxQty = Math.max(...pkgs.map(p => p.qty))
     // We limit target + maxQty to keep DP array size small and search bounded
-    const limit = Math.min(target + maxQty, 20000) 
+    const limit = Math.min(target + maxQty, 20000)
 
     const dp = new Array(limit + 1).fill(Infinity)
     const parent = new Array(limit + 1).fill(-1)
@@ -213,125 +214,133 @@ export default function CalculatorPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip text-slate-100">
-      
-      {/* Mesh grid & glowing spots */}
-      <div className="pointer-events-none fixed inset-0 mesh opacity-45 z-0" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-300/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen flex flex-col relative overflow-x-clip text-text-primary">
+
+      {/* Background decorative elements */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-diamond/5 rounded-full blur-3xl pointer-events-none" />
 
       <Header />
 
       <SidebarContentWrapper>
         <main className="flex-1 py-12 relative z-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
+
         {/* Title HUD */}
         <div className="mb-10 text-center">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-300 text-ink mb-4 shadow-lg shadow-cyan-300/20">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-sky text-white mb-4 shadow-lg shadow-sky/20">
             <Calculator className="h-6 w-6" />
           </div>
-          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white mb-2">
+          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-text-primary mb-2">
             Topup Optimizer
           </h1>
-          <p className="text-xs font-semibold tracking-widest text-cyan-300 uppercase">
+          <p className="text-xs font-semibold tracking-widest text-sky uppercase">
             Kalkulator Belanja & Kombinasi Paket Hemat Game
           </p>
         </div>
 
         {isLoading ? (
-          <div className="min-h-[300px] flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-cyan-300" />
+          <div className="grid md:grid-cols-12 gap-8 items-start">
+            <div className="md:col-span-5 bg-white/60 p-6 md:p-8 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+              <Skeleton className="h-6 w-40 rounded-lg bg-sky/10" />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-28 rounded bg-sky/10" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-36 rounded bg-sky/10" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-28 rounded bg-sky/10" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                </div>
+              </div>
+              <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+            </div>
+            <div className="md:col-span-7 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+              <Skeleton className="h-6 w-32 rounded-lg bg-sky/10" />
+              <div className="flex flex-col items-center justify-center py-12 space-y-3">
+                <Skeleton className="h-12 w-12 rounded-xl bg-sky/10" />
+                <Skeleton className="h-4 w-48 rounded bg-sky/10" />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid md:grid-cols-12 gap-8 items-start">
-            
+
             {/* Left Column: Form Input */}
-            <div className="md:col-span-5 glass p-6 md:p-8 rounded-2xl border-white/10 shadow-xl relative overflow-hidden">
-              <h2 className="text-lg font-black uppercase tracking-wide text-white mb-6 border-b border-white/5 pb-2 flex items-center gap-2">
-                <Flame className="h-4 w-4 text-cyan-300 animate-pulse" />
+            <div className="md:col-span-5 glass-sky p-6 md:p-8 rounded-2xl border-sky-border shadow-sky-soft relative overflow-hidden">
+              <h2 className="text-lg font-black uppercase tracking-wide text-text-primary mb-6 border-b border-sky-border/50 pb-2 flex items-center gap-2">
+                <Flame className="h-4 w-4 text-sky animate-pulse" />
                 Parameter Optimasi
               </h2>
 
               <form onSubmit={handleOptimize} className="space-y-6">
-                
+
                 {/* Select Game */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                  <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
                     Pilih Game Favorit
                   </label>
-                  <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
-                    <select
-                      value={selectedGameId}
-                      onChange={(e) => setSelectedGameId(e.target.value)}
-                      className="w-full bg-slate-950 px-4 py-3 outline-none text-sm text-white"
-                      style={inputBevelStyle}
-                    >
-                      {games.map((g) => (
-                        <option key={g.id} value={g.id} className="bg-slate-950 text-white">
-                          {g.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <select
+                    value={selectedGameId}
+                    onChange={(e) => setSelectedGameId(e.target.value)}
+                    className="w-full bg-white border border-sky-border rounded-xl px-4 py-3 outline-none text-sm text-text-primary hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
+                  >
+                    {games.map((g) => (
+                      <option key={g.id} value={g.id} className="bg-white text-text-primary">
+                        {g.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Target Currency Input */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                  <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
                     Target Jumlah {gameCurrencyName}
                   </label>
-                  <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
-                    <input
-                      type="number"
-                      min="1"
-                      max="15000"
-                      value={targetQty}
-                      onChange={(e) => setTargetQty(parseInt(e.target.value) || 0)}
-                      className="w-full bg-slate-950 px-4 py-3 outline-none text-sm text-white font-mono"
-                      style={inputBevelStyle}
-                      required
-                    />
-                  </div>
-                  <span className="text-[10px] text-slate-400 block">
+                  <input
+                    type="number"
+                    min="1"
+                    max="15000"
+                    value={targetQty}
+                    onChange={(e) => setTargetQty(parseInt(e.target.value) || 0)}
+                    className="w-full bg-white border border-sky-border rounded-xl px-4 py-3 outline-none text-sm text-text-primary font-mono hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
+                    required
+                  />
+                  <span className="text-[10px] text-text-muted block">
                     Masukkan nominal yang Anda butuhkan (contoh: 250 atau 1000).
                   </span>
                 </div>
 
                 {/* Payment Method */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
+                  <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
                     Metode Pembayaran
                   </label>
-                  <div className="relative p-[1px] bg-white/10 focus-within:bg-cyan-300 transition-colors" style={inputBevelStyle}>
-                    <select
-                      value={paymentMethod}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-full bg-slate-950 px-4 py-3 outline-none text-sm text-white"
-                      style={inputBevelStyle}
-                    >
-                      <option value="qris" className="bg-slate-950 text-white">QRIS (Potongan 2%)</option>
-                      <option value="gopay" className="bg-slate-950 text-white">GoPay (Biaya Rp 500)</option>
-                      <option value="shopeepay" className="bg-slate-950 text-white">ShopeePay (Biaya Rp 500)</option>
-                      <option value="bca" className="bg-slate-950 text-white">BCA Virtual Account (Biaya Rp 1.000)</option>
-                    </select>
-                  </div>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full bg-white border border-sky-border rounded-xl px-4 py-3 outline-none text-sm text-text-primary hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
+                  >
+                    <option value="qris" className="bg-white text-text-primary">QRIS (Potongan 2%)</option>
+                    <option value="gopay" className="bg-white text-text-primary">GoPay (Biaya Rp 500)</option>
+                    <option value="shopeepay" className="bg-white text-text-primary">ShopeePay (Biaya Rp 500)</option>
+                    <option value="bca" className="bg-white text-text-primary">BCA Virtual Account (Biaya Rp 1.000)</option>
+                  </select>
                 </div>
 
                 {/* Submit Button */}
-                <div
-                  className="relative p-[1px] bg-gradient-to-r from-cyan-300/40 to-blue-500/40 hover:from-cyan-300 hover:to-blue-500 transition-all duration-300"
-                  style={bevelStyle}
+                <button
+                  type="submit"
+                  className="w-full bg-sky hover:bg-diamond py-3 text-xs font-bold uppercase tracking-widest text-white transition rounded-xl flex items-center justify-center gap-2 shadow-sky-soft hover:shadow-sky-glow shimmer-hover"
                 >
-                  <button
-                    type="submit"
-                    className="w-full bg-slate-950 py-3 text-xs font-bold uppercase tracking-widest text-cyan-300 hover:text-white transition flex items-center justify-center gap-2 shimmer-hover"
-                    style={bevelStyle}
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Kalkulasikan Kombinasi Hemat
-                  </button>
-                </div>
+                  <RefreshCw className="h-4 w-4" />
+                  Kalkulasikan Kombinasi Hemat
+                </button>
 
               </form>
             </div>
@@ -340,26 +349,26 @@ export default function CalculatorPage() {
             <div className="md:col-span-7 space-y-6">
               {optimizationResult ? (
                 optimizationResult.error ? (
-                  <div className="glass p-6 rounded-2xl border-red-500/20 bg-red-950/10 text-red-400 text-sm font-semibold flex items-center gap-3">
+                  <div className="glass-sky p-6 rounded-2xl border-red-500/20 bg-red-50 text-red-500 text-sm font-semibold flex items-center gap-3">
                     <Info className="h-5 w-5 text-red-500" />
                     {optimizationResult.error}
                   </div>
                 ) : (
-                  <div className="glass p-6 md:p-8 rounded-2xl border-white/10 shadow-neon-cyan relative overflow-hidden animate-fadeIn">
-                    
+                  <div className="glass-sky p-6 md:p-8 rounded-2xl border-sky-border shadow-sky-glow relative overflow-hidden animate-fadeIn bg-white/80">
+
                     {/* Header Summary */}
-                    <div className="flex justify-between items-start border-b border-white/10 pb-4 mb-6">
+                    <div className="flex justify-between items-start border-b border-sky-border pb-4 mb-6">
                       <div>
-                        <span className="text-[10px] font-black uppercase tracking-wider text-cyan-300 bg-cyan-300/10 px-2.5 py-1 rounded" style={inputBevelStyle}>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-sky bg-sky/10 px-2.5 py-1 rounded-full border border-sky/20">
                           Optimasi Berhasil
                         </span>
-                        <h3 className="text-xl font-extrabold uppercase mt-2 text-white">
+                        <h3 className="text-xl font-extrabold uppercase mt-2 text-text-primary">
                           Rekomendasi Paket
                         </h3>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Estimasi Biaya</span>
-                        <span className="text-2xl font-black text-cyan-300">
+                        <span className="text-[10px] text-text-secondary font-bold uppercase block">Estimasi Biaya</span>
+                        <span className="text-2xl font-black text-sky">
                           Rp {optimizationResult.finalPrice.toLocaleString("id-ID")}
                         </span>
                       </div>
@@ -367,12 +376,12 @@ export default function CalculatorPage() {
 
                     {/* Combinations List */}
                     <div className="space-y-3 mb-6">
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Item yang Harus Dibeli:</p>
-                      
+                      <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Item yang Harus Dibeli:</p>
+
                       {optimizationResult.items.map((item: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center bg-slate-950/50 p-4 rounded-xl border border-white/5 hover:border-cyan-300/20 transition-all duration-300 group">
+                        <div key={idx} className="flex justify-between items-center bg-ice p-4 rounded-xl border border-sky-border/50 hover:border-sky/20 transition-all duration-300 group">
                           <div className="flex items-center gap-3">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5 border border-sky-border/30">
                               <img
                                 src={getItemAssetForProduct(item.name, item.sku, item.gameName)}
                                 alt=""
@@ -380,19 +389,19 @@ export default function CalculatorPage() {
                               />
                             </span>
                             <div>
-                              <span className="text-[10px] font-bold text-cyan-300 bg-cyan-300/10 px-2 py-0.5 rounded">
+                              <span className="text-[10px] font-bold text-sky bg-sky/10 px-2 py-0.5 rounded">
                                 {item.qty} Qty per Item
                               </span>
-                              <p className="font-extrabold text-white mt-1 group-hover:text-cyan-300 transition-colors">
+                              <p className="font-extrabold text-text-primary mt-1 group-hover:text-sky transition-colors">
                                 {item.name}
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <span className="font-mono text-cyan-300 font-bold text-sm bg-white/5 px-2.5 py-1 rounded mr-3">
+                            <span className="font-mono text-sky font-bold text-sm bg-sky/10 px-2.5 py-1 rounded mr-3">
                               x{item.count} Paket
                             </span>
-                            <span className="font-extrabold text-white text-sm">
+                            <span className="font-extrabold text-text-primary text-sm">
                               Rp {(item.price * item.count).toLocaleString("id-ID")}
                             </span>
                           </div>
@@ -401,46 +410,46 @@ export default function CalculatorPage() {
                     </div>
 
                     {/* Optimization Specs */}
-                    <div className="grid grid-cols-2 gap-4 bg-slate-950/80 p-5 rounded-xl border border-white/5 mb-6 text-xs">
+                    <div className="grid grid-cols-2 gap-4 bg-ice p-5 rounded-xl border border-sky-border/50 mb-6 text-xs">
                       <div>
-                        <span className="text-slate-400 block font-medium mb-0.5">Mata Uang Target</span>
-                        <span className="text-white font-bold">{targetQty} {gameCurrencyName}</span>
+                        <span className="text-text-secondary block font-medium mb-0.5">Mata Uang Target</span>
+                        <span className="text-text-primary font-bold">{targetQty} {gameCurrencyName}</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 block font-medium mb-0.5">Dihasilkan Paket</span>
-                        <span className="text-green-400 font-bold flex items-center gap-1">
+                        <span className="text-text-secondary block font-medium mb-0.5">Dihasilkan Paket</span>
+                        <span className="text-emerald-500 font-bold flex items-center gap-1">
                           {optimizationResult.totalQty} {gameCurrencyName}
                           {optimizationResult.totalQty > targetQty && (
-                            <span className="text-[10px] bg-green-500/15 text-green-300 px-1.5 py-0.5 rounded-full font-extrabold">
+                            <span className="text-[10px] bg-emerald-50 text-emerald-500 px-1.5 py-0.5 rounded-full font-extrabold">
                               +{optimizationResult.totalQty - targetQty} Bonus
                             </span>
                           )}
                         </span>
                       </div>
-                      <div className="border-t border-white/5 pt-2 mt-2">
-                        <span className="text-slate-400 block font-medium mb-0.5">Subtotal Belanja</span>
-                        <span className="text-white font-bold">Rp {optimizationResult.totalPrice.toLocaleString("id-ID")}</span>
+                      <div className="border-t border-sky-border/50 pt-2 mt-2">
+                        <span className="text-text-secondary block font-medium mb-0.5">Subtotal Belanja</span>
+                        <span className="text-text-primary font-bold">Rp {optimizationResult.totalPrice.toLocaleString("id-ID")}</span>
                       </div>
-                      <div className="border-t border-white/5 pt-2 mt-2">
-                        <span className="text-slate-400 block font-medium mb-0.5">Potongan Promo QRIS</span>
-                        <span className="text-green-400 font-bold">
+                      <div className="border-t border-sky-border/50 pt-2 mt-2">
+                        <span className="text-text-secondary block font-medium mb-0.5">Potongan Promo QRIS</span>
+                        <span className="text-emerald-500 font-bold">
                           {optimizationResult.discount > 0 ? `-Rp ${optimizationResult.discount.toLocaleString("id-ID")}` : "Rp 0"}
                         </span>
                       </div>
                     </div>
 
                     {/* Loyalty Points HUD panel */}
-                    <div className="bg-gradient-to-r from-cyan-300/10 via-blue-500/5 to-transparent p-4 rounded-xl border border-cyan-300/20 flex items-center justify-between mb-6">
+                    <div className="bg-gradient-to-r from-sky/10 via-diamond/5 to-transparent p-4 rounded-xl border border-sky/20 flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                        <span className="grid h-8 w-8 place-items-center rounded bg-cyan-300 text-ink shadow">
+                        <span className="grid h-8 w-8 place-items-center rounded bg-sky text-white shadow">
                           <Award className="h-4.5 w-4.5" />
                         </span>
                         <div>
-                          <p className="font-extrabold text-sm text-white">Loyalty Reward Points</p>
-                          <p className="text-[10px] text-slate-400 font-semibold">Bisa ditukarkan dengan diskon topup berikutnya</p>
+                          <p className="font-extrabold text-sm text-text-primary">Loyalty Reward Points</p>
+                          <p className="text-[10px] text-text-secondary font-semibold">Bisa ditukarkan dengan diskon topup berikutnya</p>
                         </div>
                       </div>
-                      <span className="text-lg font-black text-cyan-300 font-mono">
+                      <span className="text-lg font-black text-sky font-mono">
                         +{optimizationResult.points} Poin
                       </span>
                     </div>
@@ -448,29 +457,23 @@ export default function CalculatorPage() {
                     {/* Dynamic Action Button */}
                     <div className="flex justify-end">
                       <Link href={`/games/${games.find(g => g.id === selectedGameId)?.slug || "mobile-legends"}`} className="w-full">
-                        <div
-                          className="relative p-[1px] bg-gradient-to-r from-cyan-300/60 to-blue-500/60 hover:from-cyan-300 hover:to-blue-500 transition-all duration-300"
-                          style={bevelStyle}
+                        <button
+                          className="w-full bg-sky hover:bg-diamond text-white py-3.5 text-xs font-black uppercase tracking-widest transition flex items-center justify-center gap-2 shadow-sky-soft hover:shadow-sky-glow shimmer-hover rounded-xl"
                         >
-                          <button
-                            className="w-full bg-slate-950 py-3.5 text-xs font-black uppercase tracking-widest text-cyan-300 hover:text-white transition flex items-center justify-center gap-2 shimmer-hover"
-                            style={bevelStyle}
-                          >
-                            <ShoppingCart className="h-4 w-4 text-cyan-300" />
-                            Beli Langsung ke Halaman Produk
-                            <ChevronRight className="h-4 w-4" />
-                          </button>
-                        </div>
+                          <ShoppingCart className="h-4 w-4 text-white animate-pulse" />
+                          Beli Langsung ke Halaman Produk
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
                       </Link>
                     </div>
 
                   </div>
                 )
               ) : (
-                <div className="glass p-8 rounded-2xl border-white/10 text-center flex flex-col items-center justify-center min-h-[350px]">
-                  <Calculator className="h-12 w-12 text-slate-500 mb-4 animate-pulse" />
-                  <h3 className="text-base font-extrabold uppercase text-white mb-2">Optimalisasi Belanja</h3>
-                  <p className="text-xs text-slate-400 max-w-sm">
+                <div className="glass-sky p-8 rounded-2xl border-sky-border text-center flex flex-col items-center justify-center min-h-[350px] bg-white/80">
+                  <Calculator className="h-12 w-12 text-text-muted mb-4 animate-pulse" />
+                  <h3 className="text-base font-extrabold uppercase text-text-primary mb-2">Optimalisasi Belanja</h3>
+                  <p className="text-xs text-text-secondary max-w-sm">
                     Isi target nominal mata uang game yang Anda butuhkan di sebelah kiri, kemudian klik tombol kalkulasi untuk melihat kombinasi paket harga paling hemat.
                   </p>
                 </div>

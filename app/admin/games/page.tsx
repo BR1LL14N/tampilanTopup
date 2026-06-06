@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Header } from "@/components/layout/header"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
+import { getCachedUser } from "@/lib/auth-cache"
 import { formatCurrency, formatDate, getStatusBgColor } from "@/lib/utils"
 import { gameAssets, getGameAsset } from "@/lib/assets"
 import {
@@ -44,11 +46,17 @@ export default function AdminGamesPage() {
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
+    // Read cache on mount
+    const cached = getCachedUser()
+    if (cached) {
+      setCurrentUser(cached)
+    }
+
     const fetchAdminData = async () => {
       try {
         const supabase = createClient()
         const { data: { user: authUser } } = await supabase.auth.getUser()
-        
+
         if (!authUser) {
           router.push("/auth/login")
           return
@@ -85,7 +93,7 @@ export default function AdminGamesPage() {
                 .from("products")
                 .select("*", { count: "exact", head: true })
                 .eq("game_id", game.id)
-              
+
               return {
                 id: game.id,
                 name: game.name,
@@ -115,10 +123,49 @@ export default function AdminGamesPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
+        <Header user={currentUser} />
+        <SidebarContentWrapper isAuthenticated={!!currentUser}>
+          <main className="flex-1 py-8">
+            <div className="container space-y-8">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-40 rounded-lg bg-sky/10" />
+                  <Skeleton className="h-4 w-60 rounded-md bg-sky/10" />
+                </div>
+                <Skeleton className="h-10 w-32 rounded-xl bg-sky/10" />
+              </div>
+
+              {/* Table Card */}
+              <div className="bg-white rounded-[20px] border border-sky-border shadow-sky-soft p-6 space-y-6">
+                <Skeleton className="h-10 w-72 rounded-xl bg-sky/10" />
+                <div className="space-y-3">
+                  {/* Header row */}
+                  <div className="grid grid-cols-5 gap-4 py-2 border-b border-sky-border/50">
+                    <Skeleton className="h-4 w-20 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-16 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-24 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-12 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-8 justify-self-end rounded bg-sky/10" />
+                  </div>
+                  {/* Data rows */}
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="grid grid-cols-5 gap-4 py-4 items-center border-b border-sky-border/30">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-8 w-8 rounded-lg shrink-0 bg-sky/10" />
+                        <Skeleton className="h-4 w-28 rounded-md bg-sky/10" />
+                      </div>
+                      <Skeleton className="h-4 w-20 rounded-md bg-sky/10" />
+                      <Skeleton className="h-4 w-10 rounded-md bg-sky/10" />
+                      <Skeleton className="h-6 w-16 rounded-full bg-sky/10" />
+                      <Skeleton className="h-8 w-8 justify-self-end rounded-md bg-sky/10" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </main>
+        </SidebarContentWrapper>
       </div>
     )
   }
@@ -179,7 +226,7 @@ export default function AdminGamesPage() {
                       <TableRow key={game.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5">
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-ice">
                               <img
                                 src={game.image}
                                 alt={game.name}

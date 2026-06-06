@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
 import { TransactionCard } from "@/components/transaction/transaction-card"
 import { Search, Filter, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
@@ -95,7 +96,7 @@ export default function HistoryPage() {
             return
           }
         }
-        
+
         // Fallback to mock data if not logged in or no transactions
         setTransactions(mockTransactions)
       } catch (err) {
@@ -126,7 +127,7 @@ export default function HistoryPage() {
         <div className="container">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-text-primary">
               Riwayat Transaksi
             </h1>
             <p className="text-muted-foreground">
@@ -153,8 +154,28 @@ export default function HistoryPage() {
 
           {/* Transactions */}
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="bg-white p-5 rounded-[20px] border border-sky-border shadow-sky-soft space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-lg bg-sky/10" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-24 rounded bg-sky/10" />
+                      <Skeleton className="h-3.5 w-32 rounded bg-sky/10" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 pt-3 border-t border-sky-border/50">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-3.5 w-16 rounded bg-sky/10" />
+                      <Skeleton className="h-3.5 w-24 rounded bg-sky/10" />
+                    </div>
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-20 rounded bg-sky/10" />
+                      <Skeleton className="h-4 w-12 rounded bg-sky/10" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredTransactions.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -166,19 +187,19 @@ export default function HistoryPage() {
               ))}
             </div>
           ) : (
-            <Card className="p-12 text-center">
+            <Card className="p-12 text-center bg-white rounded-[20px] border border-sky-border shadow-sky-soft">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-ice flex items-center justify-center">
                   <Search className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="font-semibold mb-2">Tidak ada transaksi</h3>
+                <h3 className="font-semibold mb-2 text-text-primary">Tidak ada transaksi</h3>
                 <p className="text-muted-foreground mb-6">
                   {searchQuery
                     ? "Transaksi tidak ditemukan"
                     : "Kamu belum memiliki transaksi"}
                 </p>
                 <Link href="/games">
-                  <Button>Mulai Top Up</Button>
+                  <Button className="bg-sky hover:bg-diamond text-white">Mulai Top Up</Button>
                 </Link>
               </CardContent>
             </Card>

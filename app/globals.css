@@ -2,55 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    /* LIGHT MODE - Premium Slate-Blue Gaming Theme */
-    --background: 220 25% 93%;   /* Cool slate-blue tinted light bg */
-    --foreground: 222 47% 11%;   /* Deep slate for text */
-    --card: 220 20% 98%;         /* Almost white with slight blue tint */
-    --card-foreground: 222 47% 11%;
-    --popover: 220 20% 98%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 187 75% 38%;      /* Darker cyan for light bg */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 215 25% 88%;    /* Muted blue-gray */
-    --secondary-foreground: 222 47% 11%;
-    --muted: 215 20% 90%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 330 81% 60%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 215 25% 84%;       /* Visible border */
-    --input: 215 20% 90%;
-    --ring: 187 75% 38%;
-    --radius: 0.75rem;
-    /* Custom light theme tokens */
-    --sidebar-bg: 222 35% 16%;   /* Dark sidebar even in light mode */
-    --sidebar-border: 222 30% 22%;
+/* Custom Sky Fantasy utilities for @apply compatibility */
+@layer utilities {
+  /* Shadows */
+  .shadow-sky-soft {
+    box-shadow: 0 8px 20px rgba(92, 184, 255, 0.12);
+  }
+  .shadow-sky-medium {
+    box-shadow: 0 12px 30px rgba(92, 184, 255, 0.18);
+  }
+  .shadow-sky-glow {
+    box-shadow: 0 0 25px rgba(92, 184, 255, 0.35);
   }
 
-  .dark {
-    /* DARK MODE COLORS */
-    --background: 225 30% 4%;  /* #080b12 - ink */
-    --foreground: 210 20% 95%; /* #f1f5f9 - slate-100 */
-    --card: 225 25% 7%;        /* #101522 - panel */
-    --card-foreground: 210 20% 95%;
-    --popover: 225 25% 7%;
-    --popover-foreground: 210 20% 95%;
-    --primary: 187 92% 44%;     /* #08b4c8 - cyan-300 */
-    --primary-foreground: 225 30% 4%; /* ink */
-    --secondary: 187 92% 44%;
-    --secondary-foreground: 225 30% 4%;
-    --muted: 215 20% 15%;
-    --muted-foreground: 215 12% 65%;
-    --accent: 330 81% 65%;
-    --accent-foreground: 225 30% 4%;
-    --destructive: 0 84% 60%;
+  /* Text colors */
+  .text-text-primary { color: hsl(210 40% 18%); }
+  .text-text-secondary { color: hsl(210 30% 40%); }
+  .text-text-muted { color: hsl(210 25% 55%); }
+  .text-sky { color: hsl(207 100% 62%); }
+  .text-diamond { color: hsl(207 100% 56%); }
+
+  /* Background colors */
+  .bg-ice { background-color: hsl(206 100% 95%); }
+  .bg-mist { background-color: hsl(210 40% 98%); }
+  .bg-sky { background-color: hsl(207 100% 62%); }
+  .bg-sky\/5 { background-color: rgba(92, 184, 255, 0.05); }
+  .bg-sky\/10 { background-color: rgba(92, 184, 255, 0.1); }
+  .bg-sky\/20 { background-color: rgba(92, 184, 255, 0.2); }
+  .bg-sky\/30 { background-color: rgba(92, 184, 255, 0.3); }
+
+  /* Border colors */
+  .border-sky-border { border-color: hsl(207 60% 90%); }
+  .border-card-border { border-color: hsl(207 60% 87%); }
+  .border-sky { border-color: hsl(207 100% 62%); }
+  .border-sky\/20 { border-color: rgba(92, 184, 255, 0.2); }
+  .border-sky\/30 { border-color: rgba(92, 184, 255, 0.3); }
+  .border-sky\/40 { border-color: rgba(92, 184, 255, 0.4); }
+  .border-sky-border\/50 { border-color: rgba(207, 96, 144, 0.5); }
+
+  /* Ring colors */
+  .ring-sky\/20 { --tw-ring-color: rgba(92, 184, 255, 0.2); }
+
+  /* Focus states */
+  .focus\:border-sky:focus { border-color: hsl(207 100% 62%); }
+  .focus\:ring-sky\/20:focus { --tw-ring-color: rgba(92, 184, 255, 0.2); }
+  .focus\:ring-sky\/20:focus-visible { --tw-ring-color: rgba(92, 184, 255, 0.2); }
+
+  /* Hover states */
+  .hover\:bg-sky\/5:hover { background-color: rgba(92, 184, 255, 0.05); }
+  .hover\:bg-sky\/10:hover { background-color: rgba(92, 184, 255, 0.1); }
+  .hover\:border-sky\/30:hover { border-color: rgba(92, 184, 255, 0.3); }
+  .hover\:text-sky:hover { color: hsl(207 100% 62%); }
+}
+
+@layer base {
+  :root {
+    /* ===== SKY FANTASY THEME - Light Mode ===== */
+    /* Background */
+    --background: 210 40% 98%;    /* #F7FBFF - Mist White */
+    --foreground: 210 40% 18%;     /* #1B3A57 - Text Primary */
+    /* Card */
+    --card: 0 0% 100%;            /* #FFFFFF - Cloud White */
+    --card-foreground: 210 40% 18%; /* #1B3A57 */
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 40% 18%;
+    /* Primary - Sky Blue */
+    --primary: 207 100% 62%;      /* #5CB8FF - Sky Blue */
+    --primary-foreground: 0 0% 100%; /* White */
+    /* Secondary - Ice Blue */
+    --secondary: 206 100% 95%;     /* #EEF8FF - Ice Blue */
+    --secondary-foreground: 210 40% 18%; /* #1B3A57 */
+    /* Muted */
+    --muted: 210 20% 94%;         /* Light muted */
+    --muted-foreground: 210 30% 46%; /* #53718E - Text Secondary */
+    /* Accent - Diamond Blue */
+    --accent: 207 100% 56%;       /* #39AFFF - Diamond Blue */
+    --accent-foreground: 0 0% 100%;
+    /* Destructive */
+    --destructive: 0 84.2% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;  /* rgba(255,255,255,.11) */
-    --input: 215 20% 15%;
-    --ring: 187 92% 44%;
+    /* Border */
+    --border: 207 60% 90%;        /* #CFEFFF - Sky Border */
+    --input: 207 60% 90%;
+    --ring: 207 100% 62%;          /* #5CB8FF - Sky Blue ring */
+    --radius: 0.75rem;
+    /* Sidebar */
+    --sidebar-bg: 210 40% 98%;
+    --sidebar-border: 207 60% 90%;
+    /* Custom Sky Fantasy tokens */
+    --sky: 207 100% 62%;          /* #5CB8FF */
+    --sky-soft: 207 100% 76%;     /* #8DD3FF */
+    --sky-light: 207 100% 90%;    /* #D9F1FF */
+    --diamond: 207 100% 56%;      /* #39AFFF */
+    --fantasy: 207 100% 71%;      /* #63CFFF */
+    --glow: 207 100% 78%;        /* #7FD7FF */
+    --mist: 210 40% 98%;          /* #F7FBFF */
+    --ice: 206 100% 95%;          /* #EEF8FF */
+    --text-secondary: 210 30% 40%; /* #53718E */
+    --text-muted: 210 25% 55%;    /* #7F99B0 */
+    --sky-border: 207 60% 90%;    /* #CFEFFF */
+    --card-border: 207 60% 87%;   /* #D8EEFF */
   }
 }
 
@@ -58,62 +110,114 @@
   * {
     @apply border-border;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-poppins), 'Poppins', ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Light mode body */
-    color: hsl(222, 47%, 11%);
+    color: hsl(210 40% 18%); /* #1B3A57 */
+    /* Sky Fantasy background: wallpaper + gradient overlay */
     background:
-      radial-gradient(circle at 12% 0%, rgba(6,182,212,.08), transparent 28rem),
-      radial-gradient(circle at 88% 8%, rgba(99,102,241,.06), transparent 26rem),
-      linear-gradient(160deg, #dde4f0 0%, #e8eef8 30%, #dfe7f3 65%, #d8e2ef 100%);
+      url('/assets/app/wallpaper-bg.webp') center/cover no-repeat fixed,
+      linear-gradient(180deg, #F7FBFF 0%, #EAF7FF 40%, #DFF2FF 100%);
+    min-height: 100vh;
   }
-  .dark body,
-  .dark {
-    color: #f1f5f9;
+
+  /* Headings use Montserrat */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-montserrat), 'Montserrat', ui-sans-serif, sans-serif;
+    font-weight: 800;
+    color: hsl(207 45% 28%); /* #2E5F85 - heading color */
   }
-  .dark body {
-    background:
-      radial-gradient(circle at 12% 0%, rgba(14,165,233,.10), transparent 26rem),
-      radial-gradient(circle at 86% 6%, rgba(148,163,184,.09), transparent 24rem),
-      linear-gradient(180deg, #080b12 0%, #0c111c 48%, #070a11 100%) !important;
+
+  /* Custom selection color */
+  ::selection {
+    background-color: hsl(207 100% 62% / 0.2);
+    color: hsl(207 100% 30%);
   }
 }
 
-/* Mesh Background Effect - LIGHT MODE: clearly visible slate-blue tinted grid */
+/* =============================================
+   SKY FANTASY BACKGROUND SYSTEM
+   ============================================= */
+
+/* Mesh/Topography Background Pattern */
 .mesh {
   background-image:
-    linear-gradient(rgba(99,120,180,.13) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99,120,180,.13) 1px, transparent 1px);
+    linear-gradient(rgba(92, 184, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(92, 184, 255, 0.06) 1px, transparent 1px);
   background-size: 44px 44px;
-  mask-image: linear-gradient(to bottom, black 0%, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
 }
 
-/* Dark mode: white subtle lines */
-.dark .mesh {
+/* Cloud Decorations */
+.cloud-decor {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: blur(1px);
+}
+
+/* Sparkle Decorative Elements */
+.sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #7FD7FF 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(2px);
+  pointer-events: none;
+  animation: sparkle-pulse 3s ease-in-out infinite;
+}
+
+@keyframes sparkle-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* Checkerboard Corner Pattern */
+.checker-corner {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  opacity: 0.1;
+  pointer-events: none;
   background-image:
-    linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(to bottom, black, transparent);
+    linear-gradient(45deg, hsl(207 100% 62%) 25%, transparent 25%),
+    linear-gradient(-45deg, hsl(207 100% 62%) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, hsl(207 100% 62%) 75%),
+    linear-gradient(-45deg, transparent 75%, hsl(207 100% 62%) 75%);
+  background-size: 12px 12px;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
 }
 
-/* Glass Effect - LIGHT MODE: clean frosted white panel */
+/* =============================================
+   SKY FANTASY GLASSMORPHISM (LIGHT)
+   ============================================= */
+
+/* Light Glass Effect - Primary glass used throughout */
 .glass {
-  background: linear-gradient(145deg, rgba(255,255,255,.82), rgba(240,246,255,.65));
-  border: 1px solid rgba(99,120,180,.18);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 8px 24px rgba(60,80,140,.08);
+  background: linear-gradient(145deg, rgba(255,255,255,0.88), rgba(247,251,255,0.75));
+  border: 1px solid rgba(207, 96, 144, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 24px rgba(92,184,255,0.08);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
-/* Dark mode glass */
-.dark .glass {
-  background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.04));
-  border: 1px solid rgba(255,255,255,.11);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 28px rgba(0,0,0,.18);
-  backdrop-filter: blur(20px);
+/* Sky Fantasy Glass Variant */
+.glass-sky {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid hsl(207 60% 90% / 0.6);
+  box-shadow: 0 8px 24px rgba(92,184,255,0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
+/* Dark glass (kept for admin/settings if needed) */
 .glass-dark {
   background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.04));
   border: 1px solid rgba(255,255,255,.11);
@@ -123,155 +227,55 @@
 
 /* Soft Panel */
 .soft-panel {
-  @apply glass rounded-lg p-6 transition-all duration-300;
+  @apply bg-white rounded-xl p-6 border border-card-border transition-all duration-300;
+  box-shadow: 0 8px 20px rgba(92,184,255,.12);
 }
 
 .soft-panel:hover {
-  border-color: rgba(139, 184, 194, 0.25);
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.3);
+  border-color: hsl(207 100% 62% / 0.3);
+  box-shadow: 0 8px 24px rgba(92,184,255,0.15);
+}
+
+/* =============================================
+   SKY FANTASY CARD STYLES
+   ============================================= */
+
+/* Standard Sky Fantasy Card */
+.card-sky {
+  @apply bg-white rounded-[20px] border border-card-border transition-all duration-300;
+  box-shadow: 0 8px 20px rgba(92,184,255,.12);
+}
+
+.card-sky:hover {
+  box-shadow: 0 0 25px rgba(92,184,255,0.25);
 }
 
 /* Diagonal Card */
 .diagonal-card {
-  @apply glass rounded-lg p-5 transition-all duration-300;
-  background: linear-gradient(135deg, rgba(139, 184, 194, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+  @apply rounded-[20px] p-5 transition-all duration-300;
+  background: linear-gradient(135deg, rgba(92,184,255,0.08) 0%, rgba(255,255,255,0.9) 100%);
+  border: 1px solid hsl(207 60% 87% / 0.5);
 }
 
 .diagonal-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(139, 184, 194, 0.35);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.4), 0 0 15px rgba(139, 184, 194, 0.12);
+  border-color: hsl(207 100% 62% / 0.35);
+  box-shadow: 0 12px 28px -6px rgba(92,184,255,0.15), 0 0 15px rgba(92,184,255,0.1);
 }
 
-/* Shimmer Hover Sweep Effect */
-.diagonal-card,
-.poster-card,
-.shimmer-hover {
-  position: relative;
-  overflow: hidden;
-}
-
-.diagonal-card::before,
-.poster-card::before,
-.shimmer-hover::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -150%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.16) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  transform: skewX(-25deg);
-  pointer-events: none;
-}
-
-.diagonal-card:hover::before,
-.poster-card:hover::before,
-.shimmer-hover:hover::before {
-  left: 150%;
-  transition: left 0.85s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Neon Effects */
-.neon-cyan {
-  box-shadow: 0 0 20px rgba(139, 184, 194, 0.4), 0 0 40px rgba(139, 184, 194, 0.2);
-}
-
-/* Gradient Text */
-.gradient-text {
-  @apply bg-clip-text text-transparent;
-  background-image: linear-gradient(135deg, #8bb8c2 0%, #82b7c2 50%, #8bb8c2 100%);
-}
-
-/* Gradient Background */
-.gradient-bg {
-  background: linear-gradient(135deg, rgba(139, 184, 194, 0.1) 0%, rgba(6, 182, 212, 0.1) 50%, rgba(139, 184, 194, 0.1) 100%);
-}
-
-/* Glow Hover Effect */
-.glow-hover {
-  @apply transition-all duration-300;
-}
-
-.glow-hover:hover {
-  @apply scale-105;
-  box-shadow: 0 0 30px rgba(139, 184, 194, 0.5);
-}
-
-/* Navigation Button Styles */
-.nav-btn {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  transition: color .22s ease, background-color .22s ease, border-color .22s ease, transform .22s ease;
-}
-
-.nav-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(circle at var(--nav-x, 50%) var(--nav-y, 50%), rgba(139,184,194,.22), transparent 38%),
-    linear-gradient(90deg, rgba(139, 184, 194, .08), rgba(255, 255, 255, .08));
-  opacity: 0;
-  transition: opacity .22s ease;
-}
-
-.nav-btn::after {
-  content: "";
-  position: absolute;
-  left: .75rem;
-  right: .75rem;
-  bottom: .25rem;
-  height: 2px;
-  border-radius: 999px;
-  background: #8bb8c2;
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform .24s ease;
-}
-
-.nav-btn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(139, 184, 194, .22);
-  color: white;
-}
-
-.nav-btn:hover::before {
-  opacity: 1;
-}
-
-.nav-btn:hover::after,
-.nav-btn.nav-active::after {
-  transform: scaleX(1);
-}
-
-.nav-active {
-  color: white !important;
-  background: rgba(139, 184, 194, .12) !important;
-  border-color: rgba(139, 184, 194, .28) !important;
-  box-shadow: inset 0 -2px 0 #8bb8c2;
-}
-
-/* Poster Card Styles */
+/* Poster Card - Sky Fantasy Version */
 .poster-card {
   position: relative;
   overflow: hidden;
-  border-radius: 0.75rem;
+  border-radius: 20px;
   transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1), border-color .3s ease, box-shadow .3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid hsl(207 60% 87% / 0.4);
 }
 
 .poster-card:hover {
   transform: translateY(-6px) scale(1.02);
-  border-color: rgba(139, 184, 194, 0.4);
-  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.55), 0 0 20px rgba(139, 184, 194, 0.18);
+  border-color: hsl(207 100% 62% / 0.5);
+  box-shadow: 0 15px 30px -10px rgba(92,184,255,0.2), 0 0 20px rgba(92,184,255,0.12);
 }
 
 .poster-card .poster-content {
@@ -295,7 +299,7 @@
   font-size: .68rem;
   font-weight: 800;
   line-height: 1;
-  color: rgba(255,255,255,.86);
+  color: hsl(207 100% 56%);
   transition: opacity .24s ease, transform .24s ease;
 }
 
@@ -305,7 +309,7 @@
   font-weight: 800;
   font-style: italic;
   line-height: 1.05;
-  color: white;
+  color: #ffffff;
   transition: transform .28s ease;
 }
 
@@ -314,7 +318,7 @@
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.35;
-  color: white;
+  color: rgba(255, 255, 255, 0.8);
   opacity: 0;
   transform: translateY(.45rem);
   transition: opacity .24s ease, transform .24s ease;
@@ -339,9 +343,147 @@
   transform: translateY(0);
 }
 
-/* Order Step Styles */
+/* =============================================
+   SKY FANTASY SHIMMER (Light Theme)
+   ============================================= */
+
+/* Shimmer Hover Sweep Effect - Light Theme Version */
+.diagonal-card,
+.poster-card,
+.shimmer-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.diagonal-card::before,
+.poster-card::before,
+.shimmer-hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+}
+
+.diagonal-card:hover::before,
+.poster-card:hover::before,
+.shimmer-hover:hover::before {
+  left: 150%;
+  transition: left 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =============================================
+   SKY FANTASY NEON / GLOW EFFECTS
+   ============================================= */
+
+/* Neon Cyan (kept for compatibility, adapted to sky blue) */
+.neon-cyan {
+  box-shadow: 0 0 20px rgba(92, 184, 255, 0.4), 0 0 40px rgba(92, 184, 255, 0.2);
+}
+
+/* Sky Glow */
+.glow-sky {
+  box-shadow: 0 0 25px rgba(92, 184, 255, 0.35);
+}
+
+/* Gradient Text */
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #5CB8FF 0%, #39AFFF 50%, #5CB8FF 100%);
+}
+
+/* Gradient Background */
+.gradient-bg {
+  background: linear-gradient(135deg, rgba(92,184,255,0.1) 0%, rgba(57,175,255,0.1) 50%, rgba(92,184,255,0.1) 100%);
+}
+
+/* Glow Hover Effect */
+.glow-hover {
+  @apply transition-all duration-300;
+}
+
+.glow-hover:hover {
+  @apply scale-105;
+  box-shadow: 0 0 30px rgba(92, 184, 255, 0.4);
+}
+
+/* =============================================
+   SKY FANTASY NAVIGATION BUTTONS
+   ============================================= */
+
+.nav-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: color .22s ease, background-color .22s ease, border-color .22s ease, transform .22s ease;
+}
+
+.nav-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at var(--nav-x, 50%) var(--nav-y, 50%), rgba(92,184,255,0.15), transparent 38%),
+    linear-gradient(90deg, rgba(92,184,255,.05), rgba(255,255,255,.05));
+  opacity: 0;
+  transition: opacity .22s ease;
+}
+
+.nav-btn::after {
+  content: "";
+  position: absolute;
+  left: .75rem;
+  right: .75rem;
+  bottom: .25rem;
+  height: 2px;
+  border-radius: 999px;
+  background: #5CB8FF;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .24s ease;
+}
+
+.nav-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(92, 184, 255, 0.3);
+  color: hsl(207 100% 40%);
+}
+
+.nav-btn:hover::before {
+  opacity: 1;
+}
+
+.nav-btn:hover::after,
+.nav-btn.nav-active::after {
+  transform: scaleX(1);
+}
+
+.nav-active {
+  color: hsl(207 100% 40%) !important;
+  background: rgba(92,184,255,0.08) !important;
+  border-color: rgba(92,184,255,0.28) !important;
+  box-shadow: inset 0 -2px 0 #5CB8FF;
+}
+
+/* =============================================
+   ORDER STEPS & RANK CARDS
+   ============================================= */
+
 .order-step {
-  @apply glass rounded-lg p-5;
+  @apply rounded-[20px] p-5;
+  background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(247,251,255,0.8));
+  border: 1px solid hsl(207 60% 90% / 0.6);
+  box-shadow: 0 4px 16px rgba(92,184,255,0.08);
 }
 
 .step-head {
@@ -349,23 +491,35 @@
 }
 
 .step-number {
-  @apply grid h-8 w-8 place-items-center rounded-lg bg-cyan-300 text-sm font-extrabold text-ink;
+  @apply grid h-8 w-8 place-items-center rounded-lg;
+  background: hsl(207 100% 62%);
+  color: white;
+  font-weight: 800;
+  font-size: 0.875rem;
 }
 
-/* Rank Card */
 .rank-card {
-  @apply glass rounded-lg p-4 cursor-pointer transition-all duration-300;
-  border: 1px solid rgba(255,255,255,.1);
+  @apply rounded-[20px] p-4 cursor-pointer transition-all duration-300;
+  background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(247,251,255,0.8));
+  border: 1px solid hsl(207 60% 90% / 0.6);
+  box-shadow: 0 4px 16px rgba(92,184,255,0.08);
 }
 
 .rank-card:hover {
-  @apply border-cyan-300/40 bg-white/10;
+  border-color: hsl(207 100% 62% / 0.4);
+  background: linear-gradient(145deg, rgba(255,255,255,1), rgba(247,251,255,0.9));
   transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(92,184,255,0.12);
 }
 
-/* Carousel Styles */
+/* =============================================
+   CAROUSEL STYLES
+   ============================================= */
+
 .hero-carousel {
-  @apply relative overflow-hidden rounded-lg;
+  @apply relative overflow-hidden rounded-[24px];
+  border: 1px solid hsl(207 60% 90%);
+  box-shadow: 0 12px 30px rgba(92,184,255,0.12);
 }
 
 .carousel-track {
@@ -377,89 +531,62 @@
 }
 
 .carousel-nav {
-  @apply absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-lg bg-white/10 border border-white/20 text-white;
+  @apply absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-xl;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid hsl(207 60% 90%);
+  box-shadow: 0 4px 16px rgba(92,184,255,0.1);
+  transition: all 0.3s ease;
+}
+
+.carousel-nav:hover {
+  background: hsl(207 100% 62%);
+  border-color: hsl(207 100% 62%);
+  transform: translate-y(-50%) scale(1.05);
+}
+
+.carousel-nav:hover svg {
+  color: white;
 }
 
 .carousel-dot {
-  @apply h-3 w-3 rounded-full bg-white/30 transition-all;
+  @apply h-1.5 rounded-full transition-all;
+  background: rgba(92,184,255,0.2);
 }
 
 .carousel-dot.active {
-  @apply bg-cyan-300 w-6;
+  background: hsl(207 100% 62%);
+  width: 32px;
 }
 
-/* Catalog Tab */
+/* =============================================
+   TAB & CATALOG STYLES
+   ============================================= */
+
 .catalog-tab-active {
-  @apply bg-white/15 border border-cyan-300/30 text-white;
+  @apply bg-sky text-white;
+  box-shadow: 0 8px 20px rgba(92,184,255,.12);
 }
 
-/* View Toggle */
-.view {
-  display: none;
+.tab-active {
+  @apply bg-sky/10 text-sky font-semibold;
 }
 
-.view.active {
-  display: block;
-}
+/* =============================================
+   SECTION WRAP
+   ============================================= */
 
-/* Section Wrap */
 .section-wrap {
   @apply mt-8;
 }
 
-/* Reveal Animation */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
+/* =============================================
+   ANIMATIONS
+   ============================================= */
 
-.reveal.in-view {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Interactive Elements */
-.interactive {
-  @apply transition-all duration-300;
-}
-
-/* Scrollbar Hide */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-ink;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-cyan-300/30 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-cyan-300/50;
-}
-
-/* Animations */
+/* Shimmer Animation - Light Theme */
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 @keyframes float {
@@ -468,17 +595,30 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(139, 184, 194, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(139, 184, 194, 0.6);
-  }
+  0%, 100% { box-shadow: 0 0 20px rgba(92, 184, 255, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(92, 184, 255, 0.6); }
+}
+
+@keyframes auto-shimmer {
+  0% { left: -150%; }
+  35% { left: 150%; }
+  100% { left: 150%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sparkle-float {
+  0% { opacity: 0.3; transform: translateY(0) rotate(0deg); }
+  50% { opacity: 1; transform: translateY(-8px) rotate(180deg); }
+  100% { opacity: 0.3; transform: translateY(0) rotate(360deg); }
 }
 
 .animate-shimmer {
   animation: shimmer 2s infinite;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   background-size: 200% 100%;
 }
 
@@ -490,41 +630,15 @@
   animation: glow-pulse 2s ease-in-out infinite;
 }
 
-/* Tab Active */
-.tab-active {
-  @apply bg-cyan-300/15 text-white;
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
 }
 
-/* Input Focus Ring */
-input:focus,
-select:focus {
-  @apply ring-2 ring-cyan-300/40 border-cyan-300/60 outline-none;
+.animate-sparkle {
+  animation: sparkle-float 4s ease-in-out infinite;
 }
 
-/* Badge Styles */
-.badge-success {
-  @apply bg-emerald-300/10 text-emerald-200 border border-emerald-300/20;
-}
-
-.badge-warning {
-  @apply bg-amber-300/10 text-amber-200 border border-amber-300/20;
-}
-
-.badge-info {
-  @apply bg-cyan-300/10 text-cyan-200 border border-cyan-300/20;
-}
-
-.badge-error {
-  @apply bg-red-500/10 text-red-500 border border-red-500/20;
-}
-
-/* Automatic slider background shimmer sweep */
-@keyframes auto-shimmer {
-  0% { left: -150%; }
-  35% { left: 150%; }
-  100% { left: 150%; }
-}
-
+/* Automatic slider background shimmer sweep - Sky Fantasy */
 .auto-shimmer-bg {
   position: relative;
   overflow: hidden;
@@ -539,9 +653,9 @@ select:focus {
   height: 100%;
   background: linear-gradient(
     to right,
-    rgba(34, 211, 238, 0) 0%,
-    rgba(34, 211, 238, 0.16) 50%,
-    rgba(34, 211, 238, 0) 100%
+    rgba(92,184,255,0) 0%,
+    rgba(92,184,255,0.15) 50%,
+    rgba(92,184,255,0) 100%
   );
   transform: skewX(-25deg);
   pointer-events: none;
@@ -549,17 +663,120 @@ select:focus {
   animation: auto-shimmer 6s infinite ease-in-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(2px);
+/* Reveal Animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =============================================
+   SCROLLBAR STYLES
+   ============================================= */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(207 60% 95%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(207 100% 62% / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(207 100% 62% / 0.5);
+}
+
+/* =============================================
+   INPUT FOCUS RING
+   ============================================= */
+
+input:focus,
+select:focus {
+  @apply ring-2 ring-sky/20 border-sky outline-none;
+}
+
+/* =============================================
+   BADGE STYLES (Sky Fantasy)
+   ============================================= */
+
+.badge-success {
+  @apply bg-emerald-50 text-emerald-600 border border-emerald-200;
+}
+
+.badge-warning {
+  @apply bg-amber-50 text-amber-600 border border-amber-200;
+}
+
+.badge-info {
+  @apply bg-sky/10 text-sky border border-sky/20;
+}
+
+.badge-error {
+  @apply bg-red-50 text-red-600 border border-red-200;
+}
+
+/* =============================================
+   UTILITY CLASSES
+   ============================================= */
+
+/* View Toggle */
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* Interactive Elements */
+.interactive {
+  @apply transition-all duration-300;
+}
+
+/* Text colors */
+.text-sky-primary {
+  color: hsl(210 40% 18%);
+}
+
+.text-sky-secondary {
+  color: hsl(210 30% 40%);
+}
+
+.text-sky-muted {
+  color: hsl(210 25% 55%);
+}
+
+/* Sidebar Layout Pre-hydration support */
+@media (min-width: 1024px) {
+  html.has-user.sidebar-expanded .sidebar-content-wrapper {
+    margin-left: 16rem !important; /* 256px */
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  html.has-user.sidebar-collapsed .sidebar-content-wrapper {
+    margin-left: 5rem !important; /* 80px */
+  }
+  html.no-user .sidebar-content-wrapper {
+    margin-left: 0 !important;
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
-}
