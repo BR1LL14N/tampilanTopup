@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Header } from "@/components/layout/header"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
+import { getCachedUser } from "@/lib/auth-cache"
 import { formatCurrency, formatDate, getStatusBgColor } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -49,6 +51,12 @@ export default function AdminTransactionsPage() {
   const [statusFilter, setStatusFilter] = useState("all")
 
   useEffect(() => {
+    // Read cache on mount
+    const cached = getCachedUser()
+    if (cached) {
+      setCurrentUser(cached)
+    }
+
     const fetchAdminData = async () => {
       try {
         const supabase = createClient()
@@ -111,10 +119,62 @@ export default function AdminTransactionsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
+        <Header user={currentUser} />
+        <SidebarContentWrapper isAuthenticated={!!currentUser}>
+          <main className="flex-1 py-8">
+            <div className="container space-y-8">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-36 rounded-lg bg-sky/10" />
+                  <Skeleton className="h-4 w-56 rounded-md bg-sky/10" />
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="bg-white p-4 rounded-xl border border-sky-border shadow-sky-soft space-y-2">
+                    <Skeleton className="h-3.5 w-24 rounded bg-sky/10" />
+                    <Skeleton className="h-7 w-16 rounded-md bg-sky/10" />
+                  </div>
+                ))}
+              </div>
+
+              {/* Table Card */}
+              <div className="bg-white rounded-[20px] border border-sky-border shadow-sky-soft p-6 space-y-6">
+                <div className="flex gap-4 flex-wrap">
+                  <Skeleton className="h-10 w-72 rounded-xl bg-sky/10" />
+                  <Skeleton className="h-10 w-36 rounded-xl bg-sky/10" />
+                </div>
+                <div className="space-y-3">
+                  {/* Header row */}
+                  <div className="grid grid-cols-7 gap-4 py-2 border-b border-sky-border/50">
+                    <Skeleton className="h-4 w-16 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-20 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-24 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-16 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-16 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-12 rounded bg-sky/10" />
+                    <Skeleton className="h-4 w-8 justify-self-end rounded bg-sky/10" />
+                  </div>
+                  {/* Data rows */}
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="grid grid-cols-7 gap-4 py-4 items-center border-b border-sky-border/30">
+                      <Skeleton className="h-4 w-20 rounded-md font-mono bg-sky/10" />
+                      <Skeleton className="h-4 w-28 rounded-md bg-sky/10" />
+                      <Skeleton className="h-4 w-32 rounded-md bg-sky/10" />
+                      <Skeleton className="h-4 w-20 rounded-md bg-sky/10" />
+                      <Skeleton className="h-5 w-16 rounded-md bg-sky/10" />
+                      <Skeleton className="h-6 w-16 rounded-full bg-sky/10" />
+                      <Skeleton className="h-8 w-8 justify-self-end rounded-md bg-sky/10" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </main>
+        </SidebarContentWrapper>
       </div>
     )
   }

@@ -309,7 +309,7 @@
   font-weight: 800;
   font-style: italic;
   line-height: 1.05;
-  color: hsl(207 45% 28%);
+  color: #ffffff;
   transition: transform .28s ease;
 }
 
@@ -318,7 +318,7 @@
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.35;
-  color: hsl(210 30% 46%);
+  color: rgba(255, 255, 255, 0.8);
   opacity: 0;
   transform: translateY(.45rem);
   transition: opacity .24s ease, transform .24s ease;
@@ -766,3 +766,17 @@ select:focus {
 .text-sky-muted {
   color: hsl(210 25% 55%);
 }
+
+/* Sidebar Layout Pre-hydration support */
+@media (min-width: 1024px) {
+  html.has-user.sidebar-expanded .sidebar-content-wrapper {
+    margin-left: 16rem !important; /* 256px */
+  }
+  html.has-user.sidebar-collapsed .sidebar-content-wrapper {
+    margin-left: 5rem !important; /* 80px */
+  }
+  html.no-user .sidebar-content-wrapper {
+    margin-left: 0 !important;
+  }
+}
+

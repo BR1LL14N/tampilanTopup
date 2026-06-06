@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { formatCurrency } from "@/lib/utils"
 import { gameAssets, getItemAssetForProduct, paymentAssets, getGameAsset } from "@/lib/assets"
@@ -189,13 +190,73 @@ export default function CheckoutPage() {
 
   if (loadingProduct || !product) {
     return (
-      <div className="min-h-screen flex flex-col bg-background text-white">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
-        <main className="flex-1 flex flex-col items-center justify-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Memuat Rincian Produk...</p>
-        </main>
-        <Footer />
+        <SidebarContentWrapper>
+          <main className="flex-1 py-8">
+            <div className="container max-w-4xl space-y-8">
+              {/* Back link */}
+              <Skeleton className="h-4 w-20 rounded bg-sky/10" />
+
+              {/* Progress Steps */}
+              <div className="flex items-center justify-center gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-8 rounded-full bg-sky/10" />
+                    <Skeleton className="hidden sm:block h-4 w-16 rounded bg-sky/10" />
+                    {i < 3 && <Skeleton className="h-0.5 w-12 rounded bg-sky/10" />}
+                  </div>
+                ))}
+              </div>
+
+              {/* Main Grid */}
+              <div className="grid md:grid-cols-12 gap-8 items-start">
+                {/* Left Column: Form Placeholder */}
+                <div className="md:col-span-7 bg-white/60 p-6 md:p-8 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+                  <Skeleton className="h-6 w-48 rounded-lg bg-sky/10" />
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4.5 w-28 rounded bg-sky/10" />
+                      <Skeleton className="h-11 w-full rounded-xl bg-sky/10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-4.5 w-28 rounded bg-sky/10" />
+                      <Skeleton className="h-11 w-full rounded-xl bg-sky/10" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-11 w-full rounded-xl mt-6 bg-sky/10" />
+                </div>
+
+                {/* Right Column: Order Details */}
+                <div className="md:col-span-5 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+                  <Skeleton className="h-6 w-36 rounded-lg bg-sky/10" />
+                  <div className="flex items-center gap-4 p-4 border border-sky-border/30 rounded-xl">
+                    <Skeleton className="h-12 w-12 rounded-xl shrink-0 bg-sky/10" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4.5 w-20 rounded bg-sky/10" />
+                      <Skeleton className="h-3.5 w-32 rounded bg-sky/10" />
+                    </div>
+                  </div>
+                  <div className="space-y-3 pt-4 border-t border-sky-border">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-20 rounded bg-sky/10" />
+                      <Skeleton className="h-4 w-16 rounded bg-sky/10" />
+                    </div>
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-24 rounded bg-sky/10" />
+                      <Skeleton className="h-4 w-20 rounded bg-sky/10" />
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-sky-border/50">
+                      <Skeleton className="h-5 w-24 rounded bg-sky/10" />
+                      <Skeleton className="h-5 w-28 rounded bg-sky/10" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+          <Footer />
+        </SidebarContentWrapper>
       </div>
     )
   }

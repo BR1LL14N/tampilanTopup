@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { getItemAssetForProduct } from "@/lib/assets"
 import { Loader2, Calculator, Info, Zap, ChevronRight, Award, Flame, RefreshCw, ShoppingCart } from "lucide-react"
@@ -239,8 +240,32 @@ export default function CalculatorPage() {
         </div>
 
         {isLoading ? (
-          <div className="min-h-[300px] flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-sky" />
+          <div className="grid md:grid-cols-12 gap-8 items-start">
+            <div className="md:col-span-5 bg-white/60 p-6 md:p-8 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+              <Skeleton className="h-6 w-40 rounded-lg bg-sky/10" />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-28 rounded bg-sky/10" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-36 rounded bg-sky/10" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-28 rounded bg-sky/10" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                </div>
+              </div>
+              <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+            </div>
+            <div className="md:col-span-7 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+              <Skeleton className="h-6 w-32 rounded-lg bg-sky/10" />
+              <div className="flex flex-col items-center justify-center py-12 space-y-3">
+                <Skeleton className="h-12 w-12 rounded-xl bg-sky/10" />
+                <Skeleton className="h-4 w-48 rounded bg-sky/10" />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid md:grid-cols-12 gap-8 items-start">

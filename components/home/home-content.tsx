@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import {
   Zap,
   ChevronLeft,
@@ -175,7 +176,8 @@ export function HomeContent({ user }: HomeContentProps) {
     <div className="min-h-screen text-text-primary antialiased relative">
       <Header user={user} />
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <SidebarContentWrapper isAuthenticated={!!user}>
+        <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
         {/* Hero Carousel - Sky Fantasy */}
         <div className="hero-carousel mb-10 overflow-hidden relative rounded-[24px] border border-sky-border shadow-sky-medium">
@@ -370,7 +372,7 @@ export function HomeContent({ user }: HomeContentProps) {
               <button
                 key={idx}
                 onClick={() => router.push(`/games/${card.slug}`)}
-                className="w-full flex min-h-28 items-center gap-5 bg-white border border-sky-border hover:border-sky/40 p-4 text-left group shimmer-hover rounded-[20px] shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 hover:-translate-y-1"
+                className="w-full flex min-h-28 items-center gap-5 bg-white/60 backdrop-blur-md border border-sky-border hover:border-sky/40 p-4 text-left group shimmer-hover rounded-[20px] shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 hover:bg-white hover:-translate-y-1"
               >
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-sky-border group-hover:border-sky/30 transition-colors">
                   <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />
@@ -392,7 +394,7 @@ export function HomeContent({ user }: HomeContentProps) {
               className={`px-6 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
                 activeTab === "all"
                   ? "bg-sky text-white shadow-sky-soft"
-                  : "bg-white hover:bg-ice text-text-secondary hover:text-text-primary border border-sky-border"
+                  : "bg-white/60 hover:bg-white text-text-secondary hover:text-text-primary border border-sky-border/80"
               }`}
             >
               Top Up Game
@@ -402,7 +404,7 @@ export function HomeContent({ user }: HomeContentProps) {
               className={`px-6 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
                 activeTab === "voucher"
                   ? "bg-sky text-white shadow-sky-soft"
-                  : "bg-white hover:bg-ice text-text-secondary hover:text-text-primary border border-sky-border"
+                  : "bg-white/60 hover:bg-white text-text-secondary hover:text-text-primary border border-sky-border/80"
               }`}
             >
               Voucher Digital
@@ -412,7 +414,7 @@ export function HomeContent({ user }: HomeContentProps) {
               className={`px-6 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
                 activeTab === "live"
                   ? "bg-sky text-white shadow-sky-soft"
-                  : "bg-white hover:bg-ice text-text-secondary hover:text-text-primary border border-sky-border"
+                  : "bg-white/60 hover:bg-white text-text-secondary hover:text-text-primary border border-sky-border/80"
               }`}
             >
               Live App Coins
@@ -433,16 +435,16 @@ export function HomeContent({ user }: HomeContentProps) {
                     backgroundPosition: 'center',
                   }}
                 >
-                  {/* Light overlay for Sky Fantasy */}
-                  <div className="absolute inset-0 bg-white/50 group-hover:bg-sky/5 transition-colors duration-300" />
+                  {/* Transparent black overlay that fades out on hover */}
+                  <div className="absolute inset-0 bg-black/50 group-hover:opacity-0 transition-opacity duration-300 z-0" />
 
                   {/* Subtle highlight */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-sky/10 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-sky/15 via-transparent to-transparent pointer-events-none z-0" />
 
                   <span className="poster-content z-10 p-5">
                     <span className="poster-eyebrow text-[9px] font-black uppercase text-sky tracking-widest">{item.eyebrow}</span>
-                    <span className="poster-title font-black uppercase italic tracking-tight text-text-primary mt-1 group-hover:text-sky transition-colors">{item.title}</span>
-                    <span className="poster-publisher text-xs font-bold text-text-secondary uppercase tracking-wider mt-1">{item.publisher}</span>
+                    <span className="poster-title font-black uppercase italic tracking-tight text-white mt-1 group-hover:text-sky transition-colors">{item.title}</span>
+                    <span className="poster-publisher text-xs font-bold text-white/80 uppercase tracking-wider mt-1">{item.publisher}</span>
                   </span>
                 </button>
               ))}
@@ -477,9 +479,10 @@ export function HomeContent({ user }: HomeContentProps) {
 
         </div>
 
-      </main>
+        </main>
 
-      <Footer />
+        <Footer />
+      </SidebarContentWrapper>
     </div>
   )
 }

@@ -37,6 +37,31 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var userStored = sessionStorage.getItem('topup_cached_user');
+                  if (userStored) {
+                    document.documentElement.classList.add('has-user');
+                    var sidebarCollapsed = localStorage.getItem('topup_sidebar_collapsed');
+                    if (sidebarCollapsed === 'true') {
+                      document.documentElement.classList.add('sidebar-collapsed');
+                      document.documentElement.classList.remove('sidebar-expanded');
+                    } else {
+                      document.documentElement.classList.add('sidebar-expanded');
+                      document.documentElement.classList.remove('sidebar-collapsed');
+                    }
+                  } else {
+                    document.documentElement.classList.add('no-user');
+                    document.documentElement.classList.remove('has-user', 'sidebar-collapsed', 'sidebar-expanded');
+                  }
+                } catch (e) {}
+              })();
+            `
+          }}
+        />
       </head>
       <body className={`${montserrat.variable} ${poppins.variable} min-h-screen antialiased font-body`}>
         <div className="relative min-h-screen flex flex-col">

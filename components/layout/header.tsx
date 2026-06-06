@@ -27,6 +27,7 @@ import {
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { gameAssets } from "@/lib/assets"
+import { getCachedUser } from "@/lib/auth-cache"
 
 const IndonesiaFlag = ({ className = "h-3.5 w-5" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2" className={cn("rounded-sm object-cover shadow-sm inline-block border border-sky-border shrink-0", className)}>
@@ -79,7 +80,9 @@ export function Header({ user }: HeaderProps) {
 
   // Base states
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(user || null)
+  const [currentUser, setCurrentUser] = useState<any>(() => {
+    return user || null
+  })
 
   // Search states
   const [searchQuery, setSearchQuery] = useState("")
@@ -117,35 +120,99 @@ export function Header({ user }: HeaderProps) {
   }
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const htmlEl = document.documentElement
+      const isAuth = !!currentUser
+      if (isAuth) {
+        htmlEl.classList.add("has-user")
+        htmlEl.classList.remove("no-user")
+        if (isSidebarCollapsed) {
+          htmlEl.classList.add("sidebar-collapsed")
+          htmlEl.classList.remove("sidebar-expanded")
+        } else {
+          htmlEl.classList.add("sidebar-expanded")
+          htmlEl.classList.remove("sidebar-collapsed")
+        }
+      } else {
+        htmlEl.classList.add("no-user")
+        htmlEl.classList.remove("has-user", "sidebar-collapsed", "sidebar-expanded")
+      }
+    }
+  }, [currentUser, isSidebarCollapsed])
+
+  useEffect(() => {
     if (user !== undefined) {
-      setCurrentUser(user)
+      const cached = getCachedUser()
+      if (!user && cached) {
+        setCurrentUser(cached)
+      } else {
+        setCurrentUser(user)
+      }
       return
     }
+
+    // Read initial cached user immediately on mount
+    const cached = getCachedUser()
+    if (cached !== undefined) {
+      setCurrentUser(cached)
+    }
+
     const fetchUser = async () => {
       try {
         const { createClient } = await import("@/lib/supabase/client")
         const supabase = createClient()
-        const { data } = await supabase.auth.getUser()
-        if (data?.user) {
+        
+        // Use getSession for instant render from local storage cache
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user) {
+          const user = session.user
+          const userObj = {
+            name: user.user_metadata?.name || user.email || '',
+            email: user.email || '',
+            role: user.user_metadata?.role || 'user'
+          }
+          setCurrentUser(userObj)
+          
+          // Save to cache
+          const { setCachedUser } = await import("@/lib/auth-cache")
+          setCachedUser(userObj)
+
+          // Fetch detailed profile asynchronously to confirm custom role/name
           const { data: profile } = await supabase
             .from("user_profiles")
             .select("role, name")
-            .eq("id", data.user.id)
+            .eq("id", user.id)
             .single()
 
-          setCurrentUser({
-            name: profile?.name || data.user.user_metadata?.name || data.user.email || '',
-            email: data.user.email || '',
-            role: profile?.role || data.user.user_metadata?.role || 'user'
-          })
+          if (profile) {
+            const updatedUser = {
+              name: profile.name || user.user_metadata?.name || user.email || '',
+              email: user.email || '',
+              role: profile.role || user.user_metadata?.role || 'user'
+            }
+            setCurrentUser(updatedUser)
+            setCachedUser(updatedUser)
+          }
         } else {
           setCurrentUser(null)
+          const { setCachedUser } = await import("@/lib/auth-cache")
+          setCachedUser(null)
         }
       } catch (e) {
         // Fallback if supabase client is not ready
       }
     }
     fetchUser()
+
+    // Listen to global auth state changes
+    const handleAuthChange = () => {
+      const cached = getCachedUser()
+      setCurrentUser(cached || null)
+    }
+    window.addEventListener("auth-state-change", handleAuthChange)
+    return () => {
+      window.removeEventListener("auth-state-change", handleAuthChange)
+    }
   }, [user])
 
   useEffect(() => {
@@ -180,7 +247,9 @@ export function Header({ user }: HeaderProps) {
 
   const handleLogout = async () => {
     const { createClient } = await import("@/lib/supabase/client")
+    const { setCachedUser } = await import("@/lib/auth-cache")
     const supabase = createClient()
+    setCachedUser(null)
     await supabase.auth.signOut()
     window.location.href = "/"
   }
@@ -492,7 +561,7 @@ export function Header({ user }: HeaderProps) {
       </header>
 
       {/* Persistent Left Sidebar Navigation for Logged-In User on Desktop - Sky Fantasy */}
-      {currentUser && (
+      {mounted && currentUser && (
         <aside className={cn(
           "fixed top-[65px] left-0 bottom-0 bg-white/90 border-r border-sky-border z-40 p-4 flex flex-col justify-between hidden lg:flex backdrop-blur-md transition-all duration-300 ease-in-out shadow-sky-soft",
           isSidebarCollapsed ? "w-20" : "w-64"

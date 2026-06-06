@@ -149,17 +149,22 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
           {/* Game Header Banner Redesign */}
-          <div className="relative mb-10 rounded-2xl border border-sky-border overflow-hidden bg-white shadow-lg shadow-sky-soft">
+          <div className="relative mb-10 rounded-2xl border border-sky-border overflow-hidden bg-white shadow-lg shadow-sky-soft group transition-all duration-300">
 
-            {/* Banner background visual on the right */}
+            {/* Banner background visual spanning the entire card */}
             <div className="absolute inset-0 z-0">
               <div
-                className="absolute inset-0 md:inset-y-0 md:left-1/3 md:right-0 bg-cover bg-center"
+                className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: `url('${bannerBg}')` }}
               />
               {/* Light gradient overlay from left to right */}
-              <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent z-10" />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/45 to-transparent z-10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent z-10" />
+            </div>
+
+            {/* Shimmer overlay sweep on hover */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-[15]">
+              <div className="absolute top-0 left-[-150%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-25deg] transition-all duration-1000 ease-out group-hover:left-[150%]" />
             </div>
 
             {/* Banner Content Grid */}
@@ -175,30 +180,30 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
               </div>
 
               {/* Title & Info Panel */}
-              <div className="space-y-4 text-center md:text-left">
+              <div className="space-y-4 text-center md:text-left relative z-20">
                 <div>
-                  <span className="text-[10px] font-black uppercase text-sky bg-sky/10 border border-sky/20 px-2.5 py-1 rounded">
+                  <span className="text-[10px] font-black uppercase text-white bg-sky px-2.5 py-1 rounded shadow-sm shadow-sky/20">
                     Penyedia Resmi
                   </span>
                   <h1 className="text-3xl md:text-5xl font-black uppercase text-text-primary mt-3 tracking-tight">
                     {game.name}
                   </h1>
                   <p className="text-xs font-bold text-text-secondary uppercase tracking-widest mt-1">
-                    Publisher: <span className="text-text-primary">{publisher}</span> • Kategori: <span className="text-sky">{game.category}</span>
+                    Publisher: <span className="text-text-primary">{publisher}</span> • Kategori: <span className="text-sky-600 font-extrabold">{game.category}</span>
                   </p>
                 </div>
 
                 {/* Sub-badges layout */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-3.5 pt-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-amber-500/20 text-amber-600 text-[10px] font-black uppercase tracking-wider shadow-sm">
                     <Zap className="h-3.5 w-3.5 fill-amber-500/20" />
                     Proses Cepat
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky/10 border border-sky/20 text-sky text-[10px] font-black uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-sky-border/40 text-text-primary text-[10px] font-black uppercase tracking-wider shadow-sm">
                     <MessagesSquare className="h-3.5 w-3.5 fill-sky/20" />
                     Layanan Chat 24/7
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase tracking-wider shadow-sm">
                     <BadgeCheck className="h-3.5 w-3.5 fill-emerald-500/20" />
                     Pembayaran Aman!
                   </span>

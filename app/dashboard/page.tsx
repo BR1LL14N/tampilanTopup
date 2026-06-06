@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
+import { getCachedUser } from "@/lib/auth-cache"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -39,6 +41,12 @@ export default function DashboardPage() {
   const [totalSpent, setTotalSpent] = useState(0)
 
   useEffect(() => {
+    // Read cache on mount
+    const cached = getCachedUser()
+    if (cached) {
+      setCurrentUser(cached)
+    }
+
     const fetchDashboardData = async () => {
       try {
         const supabase = createClient()
@@ -137,8 +145,68 @@ export default function DashboardPage() {
       <div className="min-h-screen flex flex-col relative overflow-x-clip">
         <Header />
         <SidebarContentWrapper isAuthenticated={!!currentUser}>
-          <main className="flex-1 flex items-center justify-center relative z-10">
-            <Loader2 className="h-8 w-8 animate-spin text-sky" />
+          <main className="flex-1 relative z-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+              {/* Welcome HUD Header Skeleton */}
+              <div className="h-44 w-full bg-white/60 p-6 md:p-8 rounded-2xl border border-sky-border shadow-sky-soft flex flex-col justify-between">
+                <div className="space-y-3">
+                  <Skeleton className="h-8 w-1/3 rounded-xl bg-sky/10" />
+                  <Skeleton className="h-4 w-1/2 rounded-lg bg-sky/10" />
+                </div>
+                <Skeleton className="h-10 w-44 rounded-xl bg-sky/10" />
+              </div>
+
+              {/* Stats Cards Skeleton */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-3">
+                    <div className="flex justify-between items-center">
+                      <Skeleton className="h-4 w-20 rounded-md bg-sky/10" />
+                      <Skeleton className="h-8 w-8 rounded-xl bg-sky/10" />
+                    </div>
+                    <Skeleton className="h-8 w-16 rounded-lg bg-sky/10" />
+                  </div>
+                ))}
+              </div>
+
+              {/* Grid Columns Skeleton */}
+              <div className="grid md:grid-cols-12 gap-8">
+                {/* Left Column: Profil & Keamanan */}
+                <div className="md:col-span-4 space-y-8">
+                  {/* Profile Card */}
+                  <div className="bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+                    <div className="flex flex-col items-center text-center space-y-3">
+                      <Skeleton className="h-20 w-20 rounded-full bg-sky/10" />
+                      <Skeleton className="h-5 w-32 rounded-lg bg-sky/10" />
+                      <Skeleton className="h-4 w-24 rounded-md bg-sky/10" />
+                    </div>
+                    <div className="space-y-3 pt-4 border-t border-sky-border">
+                      <Skeleton className="h-4 w-full rounded-md bg-sky/10" />
+                      <Skeleton className="h-4 w-3/4 rounded-md bg-sky/10" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Transactions */}
+                <div className="md:col-span-8 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="h-6 w-48 rounded-lg bg-sky/10" />
+                    <Skeleton className="h-4 w-20 rounded-md bg-sky/10" />
+                  </div>
+                  <div className="space-y-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="flex justify-between items-center p-4 border border-sky-border/50 rounded-xl">
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-32 rounded-md bg-sky/10" />
+                          <Skeleton className="h-3 w-24 rounded-sm bg-sky/10" />
+                        </div>
+                        <Skeleton className="h-6 w-20 rounded-lg bg-sky/10" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </main>
           <Footer />
         </SidebarContentWrapper>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { getCachedUser } from "@/lib/auth-cache"
 
 interface SidebarContentWrapperProps {
   children: React.ReactNode
@@ -12,7 +13,7 @@ interface SidebarContentWrapperProps {
  *
  * Wraps all content below the sticky navbar (<main> + <Footer>).
  * When a user is logged in, a sidebar occupies the left 256px (expanded) or
- * 80px (collapsed) on lg+ screens.  This component reads the sidebar state
+ * 80px (collapsed) on lg+ screens. This component reads the sidebar state
  * from localStorage and applies a matching `margin-left` so content never
  * hides behind the sidebar – and transitions smoothly when the sidebar
  * is toggled.
@@ -25,12 +26,22 @@ export function SidebarContentWrapper({
 }: SidebarContentWrapperProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [isAuth, setIsAuth] = useState(isAuthenticated ?? false)
+  const [isAuth, setIsAuth] = useState(() => {
+    if (isAuthenticated !== undefined) return isAuthenticated
+    return false
+  })
+  const [isTransitionReady, setIsTransitionReady] = useState(false)
 
   useEffect(() => {
     setMounted(true)
     const stored = localStorage.getItem("topup_sidebar_collapsed")
     setCollapsed(stored === "true")
+
+    // Retrieve cached user on mount to update client-side auth state
+    if (isAuthenticated === undefined) {
+      const cached = getCachedUser()
+      setIsAuth(!!cached)
+    }
 
     // Listen for sidebar toggle events dispatched by the Header component
     const handleStorage = (e: StorageEvent) => {
@@ -45,27 +56,78 @@ export function SidebarContentWrapper({
       setCollapsed(stored === "true")
     }
 
+    // Listen to global auth state changes
+    const handleAuthChange = () => {
+      const cached = getCachedUser()
+      setIsAuth(!!cached)
+    }
+
     window.addEventListener("storage", handleStorage)
     window.addEventListener("sidebar-toggle", handleCustom)
+    window.addEventListener("auth-state-change", handleAuthChange)
+
+    // Delay enabling transitions to avoid layout jump animation on initial mount
+    const timer = setTimeout(() => {
+      setIsTransitionReady(true)
+    }, 50)
+
     return () => {
       window.removeEventListener("storage", handleStorage)
       window.removeEventListener("sidebar-toggle", handleCustom)
+      window.removeEventListener("auth-state-change", handleAuthChange)
+      clearTimeout(timer)
     }
-  }, [])
+  }, [isAuthenticated])
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const htmlEl = document.documentElement
+      if (isAuth) {
+        htmlEl.classList.add("has-user")
+        htmlEl.classList.remove("no-user")
+        if (collapsed) {
+          htmlEl.classList.add("sidebar-collapsed")
+          htmlEl.classList.remove("sidebar-expanded")
+        } else {
+          htmlEl.classList.add("sidebar-expanded")
+          htmlEl.classList.remove("sidebar-collapsed")
+        }
+      } else {
+        htmlEl.classList.add("no-user")
+        htmlEl.classList.remove("has-user", "sidebar-collapsed", "sidebar-expanded")
+      }
+    }
+  }, [isAuth, collapsed])
+
+  useEffect(() => {
+    // If explicitly authenticated via prop, set it immediately
     if (isAuthenticated !== undefined) {
       setIsAuth(isAuthenticated)
       return
     }
 
-    // Auto-detect auth client-side if not explicitly provided
+    // Otherwise, perform background check to keep state in sync
     const checkAuth = async () => {
       try {
         const { createClient } = await import("@/lib/supabase/client")
         const supabase = createClient()
-        const { data } = await supabase.auth.getUser()
-        setIsAuth(!!data?.user)
+        const { data } = await supabase.auth.getSession()
+        const hasSession = !!data?.session
+        setIsAuth(hasSession)
+        
+        // Update the cache if mismatch is found
+        const currentCache = getCachedUser()
+        if (hasSession && !currentCache) {
+          const { setCachedUser } = await import("@/lib/auth-cache")
+          setCachedUser({
+            name: data.session?.user.user_metadata?.name || data.session?.user.email || '',
+            email: data.session?.user.email || '',
+            role: data.session?.user.user_metadata?.role || 'user'
+          })
+        } else if (!hasSession && currentCache) {
+          const { setCachedUser } = await import("@/lib/auth-cache")
+          setCachedUser(null)
+        }
       } catch (e) {
         setIsAuth(false)
       }
@@ -73,35 +135,18 @@ export function SidebarContentWrapper({
     checkAuth()
   }, [isAuthenticated])
 
-  if (!isAuth) {
-    return <>{children}</>
-  }
-
   return (
     <div
-      className="transition-all duration-300 ease-in-out"
-      style={
-        mounted
-          ? {
-              // On lg+ screens shift content to clear the sidebar
-              // On smaller screens sidebar is hidden so no shift needed
-              marginLeft: `var(--sidebar-width, 0px)`,
-            }
-          : undefined
-      }
+      className={`sidebar-content-wrapper ${
+        isTransitionReady ? "transition-all duration-300 ease-in-out" : ""
+      } ${
+        isAuth
+          ? mounted && collapsed
+            ? "lg:ml-20"
+            : "lg:ml-64"
+          : "lg:ml-0"
+      }`}
     >
-      <style>{`
-        @media (min-width: 1024px) {
-          :root {
-            --sidebar-width: ${mounted ? (collapsed ? "5rem" : "16rem") : "16rem"};
-          }
-        }
-        @media (max-width: 1023px) {
-          :root {
-            --sidebar-width: 0px;
-          }
-        }
-      `}</style>
       {children}
     </div>
   )

@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { cn } from "@/lib/utils"
@@ -160,9 +161,30 @@ export default function InvoiceDetailPage() {
               <div className="absolute bottom-0 right-0 w-20 h-20 bg-diamond/10 rounded-full blur-2xl pointer-events-none" />
 
               {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <Loader2 className="h-8 w-8 animate-spin text-sky" />
-                  <p className="text-xs font-bold uppercase tracking-widest text-text-secondary">Memuat Detail Invoice...</p>
+                <div className="space-y-6">
+                  {/* Visual Status Header bar Skeleton */}
+                  <div className="p-4 rounded-xl flex items-center justify-between border bg-slate-50/50 border-sky-border/50">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-5 w-5 rounded-full bg-sky/10" />
+                      <Skeleton className="h-4 w-28 rounded bg-sky/10" />
+                    </div>
+                    <Skeleton className="h-6 w-20 rounded bg-sky/10" />
+                  </div>
+
+                  {/* Details Table Skeleton */}
+                  <div className="border border-sky-border rounded-xl bg-ice/40 p-5 space-y-4">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div key={i} className="flex justify-between items-center border-b border-sky-border/30 pb-2">
+                        <Skeleton className="h-4 w-24 rounded bg-sky/10" />
+                        <Skeleton className="h-4 w-32 rounded bg-sky/10" />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer button Skeleton */}
+                  <div className="flex justify-center pt-2">
+                    <Skeleton className="h-10 w-48 rounded-xl bg-sky/10" />
+                  </div>
                 </div>
               ) : error ? (
                 <div className="space-y-6">

@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
+import { Skeleton } from "@/components/ui/skeleton"
+import { getCachedUser } from "@/lib/auth-cache"
 import { formatCurrency } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -31,6 +33,12 @@ export default function AdminDashboardPage() {
   const [topProducts, setTopProducts] = useState<any[]>([])
 
   useEffect(() => {
+    // Read cache on mount
+    const cached = getCachedUser()
+    if (cached?.role === "admin") {
+      setIsAdmin(true)
+    }
+
     async function verifyAdminAndFetchData() {
       try {
         const { data: { user: authUser } } = await supabase.auth.getUser()
@@ -166,8 +174,63 @@ export default function AdminDashboardPage() {
       <div className="min-h-screen flex flex-col relative overflow-x-clip">
         <Header />
         <SidebarContentWrapper isAuthenticated={isAdmin}>
-          <main className="flex-1 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <main className="flex-1 py-10 relative z-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+              {/* Title */}
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-48 rounded-lg bg-sky/10" />
+                <Skeleton className="h-4 w-72 rounded-md bg-sky/10" />
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-3">
+                    <div className="flex justify-between items-center">
+                      <Skeleton className="h-4 w-24 rounded-md bg-sky/10" />
+                      <Skeleton className="h-8 w-8 rounded-xl bg-sky/10" />
+                    </div>
+                    <Skeleton className="h-8 w-28 rounded-lg bg-sky/10" />
+                  </div>
+                ))}
+              </div>
+
+              {/* Two columns */}
+              <div className="grid lg:grid-cols-12 gap-8">
+                {/* Left Column: Transaksi Terbaru */}
+                <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+                  <Skeleton className="h-6 w-40 rounded-lg bg-sky/10" />
+                  <div className="space-y-4">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="flex justify-between items-center p-4 border border-sky-border/50 rounded-xl">
+                        <div className="space-y-2 flex-1 mr-4">
+                          <Skeleton className="h-4 w-28 rounded-md bg-sky/10" />
+                          <Skeleton className="h-3 w-40 rounded-sm bg-sky/10" />
+                        </div>
+                        <Skeleton className="h-6 w-16 rounded-md bg-sky/10" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right Column: Produk Terlaris */}
+                <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+                  <Skeleton className="h-6 w-40 rounded-lg bg-sky/10" />
+                  <div className="space-y-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="flex items-center gap-4 p-3 border border-sky-border/30 rounded-xl">
+                        <Skeleton className="h-10 w-10 rounded-lg shrink-0 bg-sky/10" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-24 rounded-md bg-sky/10" />
+                          <Skeleton className="h-3 w-16 rounded-sm bg-sky/10" />
+                        </div>
+                        <Skeleton className="h-5 w-10 rounded-md bg-sky/10" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </main>
           <Footer />
         </SidebarContentWrapper>
