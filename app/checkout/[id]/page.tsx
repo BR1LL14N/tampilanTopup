@@ -210,7 +210,7 @@ export default function CheckoutPage() {
           {/* Back Button */}
           <Link
             href="/games/mobile-legends"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-white mb-6"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-text-primary mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
             Kembali
@@ -226,7 +226,7 @@ export default function CheckoutPage() {
                       ? "bg-green-500 text-white"
                       : step === index + 1
                       ? "bg-primary text-white"
-                      : "bg-white/10 text-muted-foreground"
+                      : "bg-ice text-muted-foreground"
                   }`}
                 >
                   {step > index + 1 ? (
@@ -237,7 +237,7 @@ export default function CheckoutPage() {
                 </div>
                 <span className="text-sm hidden sm:inline">{label}</span>
                 {index < 2 && (
-                  <div className="w-12 h-0.5 bg-white/10 hidden sm:block" />
+                  <div className="w-12 h-0.5 bg-sky-border hidden sm:block" />
                 )}
               </div>
             ))}
@@ -262,7 +262,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div>
-                      <span className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1.5">
+                      <span className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-ice p-1.5">
                         <img
                           src={getItemAssetForProduct(product.name, product.provider_sku, product.game.name)}
                           alt=""
@@ -275,7 +275,7 @@ export default function CheckoutPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="border-t border-white/10 pt-4">
+                  <div className="border-t border-sky-border pt-4">
                     <div className="flex justify-between mb-2">
                       <span className="text-muted-foreground">Harga</span>
                       <span>{formatCurrency(product.sell_price)}</span>
@@ -351,7 +351,7 @@ export default function CheckoutPage() {
                         className={`w-full p-4 rounded-xl border transition-all ${
                           selectedPayment === method.id
                             ? "border-primary bg-primary/10"
-                            : "border-white/10 hover:border-white/20"
+                            : "border-sky-border hover:border-sky-border/80"
                         }`}
                       >
                         <div className="flex items-center gap-4">
@@ -404,7 +404,7 @@ export default function CheckoutPage() {
                       <span className="text-muted-foreground">Target</span>
                       <span>{formData.target_id}</span>
                     </div>
-                    <div className="border-t border-white/10 pt-4 flex justify-between font-semibold text-lg">
+                    <div className="border-t border-sky-border pt-4 flex justify-between font-semibold text-lg">
                       <span>Total</span>
                       <span className="text-primary">
                         {formatCurrency(product.sell_price * qtyFromUrl)}
@@ -457,7 +457,7 @@ export default function CheckoutPage() {
                       <span className="text-muted-foreground">Target</span>
                       <span>{formData.target_id}</span>
                     </div>
-                    <div className="border-t border-white/10 pt-4 flex justify-between font-semibold text-lg">
+                    <div className="border-t border-sky-border pt-4 flex justify-between font-semibold text-lg">
                       <span>Total</span>
                       <span className="text-primary">
                         {formatCurrency(transactionData.amount)}

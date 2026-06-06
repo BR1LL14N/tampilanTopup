@@ -1,19 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
-import { gameAssets } from "@/lib/assets"
-
-// Beautiful gaming wallpapers for rotating backgrounds
-const wallpapers = [
-  gameAssets["mobile-legends"].banner,
-  gameAssets["free-fire"].banner,
-  gameAssets.valorant.banner,
-  gameAssets["pubg-mobile"].banner,
-]
 
 export default function LoginPage() {
   const router = useRouter()
@@ -25,16 +16,6 @@ export default function LoginPage() {
     email: "",
     password: "",
   })
-  
-  // Background rotating state
-  const [bgIndex, setBgIndex] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBgIndex((prev) => (prev + 1) % wallpapers.length)
-    }, 6000)
-    return () => clearInterval(interval)
-  }, [])
 
   const supabase = createClient()
 
@@ -92,67 +73,61 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-ink">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
-      {/* Background Rotating Images with smooth cross-fade (Midpoint visibility) */}
+      {/* Light gradient overlay on wallpaper background */}
       <div className="absolute inset-0 z-0">
-        {wallpapers.map((url, index) => (
-          <div
-            key={url}
-            className="absolute inset-0 bg-cover bg-center transition-opacity duration-1500 ease-in-out"
-            style={{
-              backgroundImage: `url(${url})`,
-              opacity: bgIndex === index ? 0.45 : 0,
-            }}
-          />
-        ))}
-        {/* Dark overlay & grid lines to match theme (Midpoint overlay darkness to reveal details without being too bright) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/85 via-ink/55 to-ink/90 z-10" />
-        <div className="pointer-events-none absolute inset-0 mesh opacity-40 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/40 to-white/60 z-10" />
       </div>
 
       {/* Main Glass login card */}
-      <div className="w-full max-w-4xl glass relative z-20 overflow-hidden rounded-2xl shadow-neon-cyan border-white/10 backdrop-blur-md flex flex-col md:flex-row">
-        
+      <div className="w-full max-w-4xl glass-sky relative z-20 overflow-hidden rounded-2xl shadow-sky-glow border-sky-border backdrop-blur-md flex flex-col md:flex-row">
+
         {/* Decorative corner glows */}
-        <div className="absolute top-0 left-0 w-24 h-24 bg-cyan-300/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 left-0 w-24 h-24 bg-sky/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-24 h-24 bg-diamond/10 rounded-full blur-2xl pointer-events-none" />
 
         {/* Tab switchers at the top absolute container */}
         <div className="absolute top-0 left-6 flex z-30 items-center">
-          <button
-            className="px-6 py-2.5 bg-cyan-300 text-ink font-bold text-sm tracking-wide shadow-lg shadow-cyan-300/10 shimmer-hover"
-            style={tabBevelStyle}
-          >
-            Sign in
-          </button>
-          <Link href="/auth/register">
+          <div className="p-[1.5px] bg-sky" style={tabBevelStyle}>
             <button
-              className="px-6 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-bold text-sm tracking-wide transition border-r border-white/5 shimmer-hover"
+              className="px-6 py-2 bg-sky text-white font-black text-xs uppercase tracking-wider shimmer-hover"
               style={tabBevelStyle}
             >
-              Register
+              Sign in
             </button>
+          </div>
+          <Link href="/auth/register">
+            <div className="p-[1.5px] bg-sky hover:bg-diamond ml-[-1px] transition-colors duration-300" style={tabBevelStyle}>
+              <button
+                className="px-6 py-2 bg-white text-text-secondary hover:text-sky font-black text-xs uppercase tracking-wider transition duration-300 shimmer-hover"
+                style={tabBevelStyle}
+              >
+                Register
+              </button>
+            </div>
           </Link>
           <Link href="/">
-            <button
-              className="px-5 py-2 ml-2 bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-cyan-300 font-bold text-xs tracking-wide transition border border-white/10 hover:border-cyan-300/20 flex items-center gap-1.5 shadow-md shimmer-hover"
-              style={tabBevelStyle}
-              title="Kembali ke Beranda"
-            >
-              <ArrowLeft className="h-3.5 w-3.5 text-cyan-400" />
-              Kembali
-            </button>
+            <div className="p-[1.5px] bg-sky hover:bg-diamond ml-2 transition-colors duration-300" style={tabBevelStyle}>
+              <button
+                className="px-4 py-2 bg-white text-sky font-black text-xs uppercase tracking-wider transition hover:bg-sky hover:text-white flex items-center gap-1.5 transition duration-300 shimmer-hover"
+                style={tabBevelStyle}
+                title="Kembali ke Beranda"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Kembali
+              </button>
+            </div>
           </Link>
         </div>
 
         {/* Left Column: Form Content */}
         <div className="flex-1 p-8 md:p-12 pt-16 md:pt-20">
           <div className="mb-8">
-            <h2 className="text-3xl font-black tracking-tight text-white mb-2 uppercase bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+            <h2 className="text-3xl font-black tracking-tight text-text-primary mb-2 uppercase bg-clip-text text-transparent bg-gradient-to-r from-text-primary to-text-secondary">
               Welcome Back!
             </h2>
-            <p className="text-xs tracking-wider text-cyan-300 font-semibold uppercase">
+            <p className="text-xs tracking-wider text-sky font-semibold uppercase">
               Ready to top up your favorite games?
             </p>
           </div>
@@ -166,20 +141,17 @@ export default function LoginPage() {
 
             {/* Email field */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
-                Your email <span className="text-cyan-300">*</span>
+              <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
+                Your email <span className="text-sky">*</span>
               </label>
-              <div
-                className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 focus-within:from-cyan-300 focus-within:to-cyan-400 transition-all duration-300"
-                style={inputBevelStyle}
-              >
+              <div className="relative p-[1.5px] bg-sky focus-within:bg-diamond transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="email"
                   type="email"
                   placeholder="name@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-slate-950/80 px-4 py-2.5 text-white placeholder-slate-500 outline-none border-none text-sm transition-colors duration-200"
+                  className="w-full bg-white px-4 py-2.5 text-text-primary placeholder-text-muted outline-none border-none text-sm"
                   style={inputBevelStyle}
                   required
                 />
@@ -188,13 +160,10 @@ export default function LoginPage() {
 
             {/* Password field */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
-                Your password <span className="text-cyan-300">*</span>
+              <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
+                Your password <span className="text-sky">*</span>
               </label>
-              <div
-                className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 focus-within:from-cyan-300 focus-within:to-cyan-400 transition-all duration-300"
-                style={inputBevelStyle}
-              >
+              <div className="relative p-[1.5px] bg-sky focus-within:bg-diamond transition-colors duration-200" style={inputBevelStyle}>
                 <div className="relative">
                   <input
                     id="password"
@@ -202,14 +171,14 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full bg-slate-950/80 pl-4 pr-12 py-2.5 text-white placeholder-slate-500 outline-none border-none text-sm transition-colors duration-200"
+                    className="w-full bg-white pl-4 pr-12 py-2.5 text-text-primary placeholder-text-muted outline-none border-none text-sm"
                     style={inputBevelStyle}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -219,27 +188,24 @@ export default function LoginPage() {
 
             {/* Remember & Forgot options */}
             <div className="flex items-center justify-between text-xs font-semibold">
-              <label className="flex items-center gap-2 text-slate-400 cursor-pointer select-none hover:text-white transition">
+              <label className="flex items-center gap-2 text-text-secondary cursor-pointer select-none hover:text-text-primary transition">
                 <input
                   type="checkbox"
-                  className="rounded border-white/10 bg-slate-950 text-cyan-300 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                  className="rounded border-sky-border bg-white text-sky focus:ring-0 focus:ring-offset-0 cursor-pointer"
                 />
                 Remember me
               </label>
-              <Link href="/auth/forgot-password" className="text-cyan-300 hover:text-cyan-200 transition">
+              <Link href="/auth/forgot-password" className="text-sky hover:text-diamond transition">
                 I forgot my password
               </Link>
             </div>
 
             {/* Submit Button */}
-            <div
-              className="relative p-[1px] bg-gradient-to-r from-cyan-300/40 to-blue-500/40 hover:from-cyan-300 hover:to-blue-500 transition-all duration-300 shadow-lg shadow-cyan-300/5 hover:shadow-cyan-300/20"
-              style={bevelStyle}
-            >
+            <div className="relative p-[1.5px] bg-sky hover:bg-diamond transition-colors duration-300 shadow-sky-soft" style={bevelStyle}>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-slate-950/90 py-3 text-sm font-bold uppercase tracking-wider text-cyan-300 hover:text-white transition flex items-center justify-center gap-2 shimmer-hover"
+                className="w-full bg-white hover:bg-sky hover:text-white py-3 text-sm font-bold uppercase tracking-wider text-sky transition flex items-center justify-center gap-2 shimmer-hover"
                 style={bevelStyle}
               >
                 {isLoading ? (
@@ -257,34 +223,31 @@ export default function LoginPage() {
 
         {/* Center Divider: "Or" vertical line */}
         <div className="flex items-center justify-center md:flex-col py-4 md:py-0 px-8 md:px-0">
-          <div className="h-[1px] md:h-24 w-full md:w-[1px] bg-white/10" />
-          <span className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-500 bg-transparent select-none">
+          <div className="h-[1px] md:h-24 w-full md:w-[1px] bg-sky-border" />
+          <span className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-muted bg-transparent select-none">
             Or
           </span>
-          <div className="h-[1px] md:h-24 w-full md:w-[1px] bg-white/10" />
+          <div className="h-[1px] md:h-24 w-full md:w-[1px] bg-sky-border" />
         </div>
 
         {/* Right Column: Social Sign-In buttons */}
         <div className="flex-1 p-8 md:p-12 md:pl-8 flex flex-col justify-center space-y-4">
 
           <div className="mb-2">
-            <p className="text-xs font-black uppercase tracking-widest text-slate-400">Masuk cepat dengan</p>
+            <p className="text-xs font-black uppercase tracking-widest text-text-secondary">Masuk cepat dengan</p>
           </div>
 
           {/* Google Button */}
-          <div
-            className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 hover:from-red-400/40 hover:to-yellow-400/30 transition-all duration-300"
-            style={bevelStyle}
-          >
+          <div className="relative p-[1.5px] bg-sky hover:bg-diamond transition-colors duration-300" style={bevelStyle}>
             <button
               type="button"
               onClick={() => handleOAuth("google")}
               disabled={oauthLoading === "google"}
-              className="w-full bg-slate-950/80 py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
               style={bevelStyle}
             >
               {oauthLoading === "google" ? (
-                <Loader2 className="h-4 w-4 animate-spin text-cyan-300" />
+                <Loader2 className="h-4 w-4 animate-spin text-sky" />
               ) : (
                 <svg className="h-4 w-4" viewBox="0 0 24 24">
                   <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -298,19 +261,16 @@ export default function LoginPage() {
           </div>
 
           {/* Discord Button */}
-          <div
-            className="relative p-[1px] bg-gradient-to-r from-white/10 to-white/5 hover:from-indigo-500/40 hover:to-blue-500/30 transition-all duration-300"
-            style={bevelStyle}
-          >
+          <div className="relative p-[1.5px] bg-sky hover:bg-diamond transition-colors duration-300" style={bevelStyle}>
             <button
               type="button"
               onClick={() => handleOAuth("discord")}
               disabled={oauthLoading === "discord"}
-              className="w-full bg-slate-950/80 py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
               style={bevelStyle}
             >
               {oauthLoading === "discord" ? (
-                <Loader2 className="h-4 w-4 animate-spin text-cyan-300" />
+                <Loader2 className="h-4 w-4 animate-spin text-sky" />
               ) : (
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="#5865F2">
                   <path d="M20.3 4.4C18.7 3.6 17.1 3 15.4 2.7c-.2.4-.4.8-.6 1.2-1.8-.3-3.7-.3-5.5 0-.2-.4-.4-.8-.6-1.2-1.7.3-3.3.9-4.9 1.7C.6 9 .1 13.5.3 17.9c2.4 1.8 4.7 2.9 7 3.6.6-.8 1-1.6 1.4-2.5-.8-.3-1.6-.7-2.4-1.2.2-.1.4-.3.6-.5 4.5 2.1 9.4 2.1 13.9 0 .2.2.4.3.6.5-.8.5-1.6.9-2.4 1.2.4.9.8 1.7 1.4 2.5 2.3-.7 4.6-1.8 7-3.6.3-5 .4-9.5-2.9-13.5zM8.9 15.1c-1.4 0-2.5-1.3-2.5-2.8 0-1.5 1.1-2.8 2.5-2.8s2.5 1.3 2.5 2.8c.1 1.5-1 2.8-2.5 2.8zm6.2 0c-1.4 0-2.5-1.3-2.5-2.8 0-1.5 1.1-2.8 2.5-2.8s2.5 1.3 2.5 2.8c0 1.5-1.1 2.8-2.5 2.8z" />
@@ -321,9 +281,8 @@ export default function LoginPage() {
           </div>
 
           {/* Info note */}
-          <p className="text-[10px] text-slate-600 text-center leading-relaxed pt-2">
-            Dengan masuk, Anda menyetujui<br />
-            <span className="text-cyan-400">Syarat &amp; Ketentuan</span> dan <span className="text-cyan-400">Kebijakan Privasi</span> Mitsuru.
+          <p className="text-[10px] text-text-muted text-center leading-relaxed pt-2">
+            Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi Mitsuru Top Up Hub.
           </p>
 
         </div>

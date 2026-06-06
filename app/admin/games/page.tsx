@@ -48,7 +48,7 @@ export default function AdminGamesPage() {
       try {
         const supabase = createClient()
         const { data: { user: authUser } } = await supabase.auth.getUser()
-        
+
         if (!authUser) {
           router.push("/auth/login")
           return
@@ -85,7 +85,7 @@ export default function AdminGamesPage() {
                 .from("products")
                 .select("*", { count: "exact", head: true })
                 .eq("game_id", game.id)
-              
+
               return {
                 id: game.id,
                 name: game.name,
@@ -179,7 +179,7 @@ export default function AdminGamesPage() {
                       <TableRow key={game.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5">
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-ice">
                               <img
                                 src={game.image}
                                 alt={game.name}
