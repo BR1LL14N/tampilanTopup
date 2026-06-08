@@ -15,7 +15,7 @@ import {
   Flame,
   Award,
 } from "lucide-react"
-import { gameAssets } from "@/lib/assets"
+import { gameAssets, getGameAsset } from "@/lib/assets"
 
 interface HomeContentProps {
   user?: {
@@ -23,6 +23,8 @@ interface HomeContentProps {
     email: string
     role: string
   } | null
+  dbGames?: any[]
+  flashSales?: any[]
 }
 
 const slides = [
@@ -76,8 +78,39 @@ const catalogItems = [
   { title: "BIGO LIVE", eyebrow: "LIVE APP", publisher: "BIGO", bg: gameAssets.bigo.poster, tab: "live", slug: "bigo" },
 ]
 
-export function HomeContent({ user }: HomeContentProps) {
+export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContentProps) {
   const router = useRouter()
+  
+  // Map games dynamically from Supabase if present
+  const popularGames = dbGames.length > 0
+    ? dbGames.slice(0, 6).map((game) => ({
+        name: game.name,
+        publisher: game.category || "Game",
+        image: getGameAsset(game.slug)?.icon || game.image || "/assets/games/mobile-legends/icon.png",
+        slug: game.slug,
+      }))
+    : diagonalCards;
+
+  const catalogList = dbGames.length > 0
+    ? dbGames.map((game) => {
+        let tab = "all";
+        const categoryLower = game.category?.toLowerCase() || "";
+        if (categoryLower.includes("voucher") || categoryLower.includes("gift card")) {
+          tab = "voucher";
+        } else if (categoryLower.includes("live") || categoryLower.includes("app") || categoryLower.includes("coin")) {
+          tab = "live";
+        }
+        
+        return {
+          title: game.name.toUpperCase(),
+          eyebrow: tab === "voucher" ? "VOUCHER" : tab === "live" ? "LIVE APP" : "TOP UP GAME",
+          publisher: game.category || "Game",
+          bg: getGameAsset(game.slug)?.poster || game.image || "/assets/games/mobile-legends/poster.png",
+          tab,
+          slug: game.slug,
+        };
+      })
+    : catalogItems;
 
   const handleSliderClick = (action: string) => {
     if (action === "Topup Sekarang" || action === "Lihat Produk" || action === "Buka Katalog") {
@@ -296,59 +329,76 @@ export function HomeContent({ user }: HomeContentProps) {
 
           {/* Flash Sale Cards with Clean Rounded Borders */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 relative z-10">
-            {[
-              { game: "Mobile Legends", name: "86 Diamonds", oriPrice: 25000, salePrice: 19800, discount: 20, sold: 82, slug: "mobile-legends" },
-              { game: "Free Fire", name: "140 Diamonds", oriPrice: 34000, salePrice: 27500, discount: 19, sold: 64, slug: "free-fire" },
-              { game: "PUBG Mobile", name: "325 UC", oriPrice: 105000, salePrice: 88000, discount: 16, sold: 91, slug: "pubg-mobile" },
-              { game: "Valorant", name: "1000 VP", oriPrice: 85000, salePrice: 73200, discount: 14, sold: 45, slug: "valorant" }
-            ].map((item, idx) => {
-              const flashSaleThumbnails: Record<string, string> = {
-                "mobile-legends": gameAssets["mobile-legends"].icon,
-                "free-fire": gameAssets["free-fire"].icon,
-                "pubg-mobile": gameAssets["pubg-mobile"].icon,
-                "valorant": gameAssets.valorant.icon,
-              }
+            {(flashSales && flashSales.length > 0 ? flashSales : [
+              { game: "Mobile Legends", name: "86 Diamonds", oriPrice: 25000, salePrice: 19800, discount: 20, sold: 82, stock: 100, slug: "mobile-legends" },
+              { game: "Free Fire", name: "140 Diamonds", oriPrice: 34000, salePrice: 27500, discount: 19, sold: 64, stock: 100, slug: "free-fire" },
+              { game: "PUBG Mobile", name: "325 UC", oriPrice: 105000, salePrice: 88000, discount: 16, sold: 91, stock: 100, slug: "pubg-mobile" },
+              { game: "Valorant", name: "1000 VP", oriPrice: 85000, salePrice: 73200, discount: 14, sold: 45, stock: 100, slug: "valorant" }
+            ].map(item => ({
+              game_name: item.game,
+              name: item.name,
+              sell_price: item.oriPrice,
+              flash_sale_price: item.salePrice,
+              flash_sale_discount: item.discount,
+              flash_sale_sold: item.sold,
+              flash_sale_stock: item.stock,
+              game_slug: item.slug
+            }))).map((item: any, idx) => {
+              const oriPrice = Number(item.sell_price) || 0;
+              const salePrice = Number(item.flash_sale_price) || 0;
+              const discount = item.flash_sale_discount 
+                ? Number(item.flash_sale_discount) 
+                : (oriPrice > 0 ? Math.round(((oriPrice - salePrice) / oriPrice) * 100) : 0);
+              const sold = Number(item.flash_sale_sold) || 0;
+              const stock = Number(item.flash_sale_stock) || 100;
+              const slug = item.game_slug;
+              const name = item.name;
+              const gameName = item.game_name;
+
+              const icon = getGameAsset(slug)?.icon || "/assets/games/mobile-legends/icon.png";
+              const percentSold = Math.min(100, Math.round((sold / stock) * 100));
+
               return (
                 <button
                   key={idx}
-                  onClick={() => router.push(`/games/${item.slug}`)}
+                  onClick={() => router.push(`/games/${slug}`)}
                   className="w-full relative overflow-hidden bg-white border border-sky-border hover:border-sky/40 text-left group flex flex-col justify-between h-full min-h-[160px] shimmer-hover rounded-[20px] p-4 shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 hover:-translate-y-1"
                   type="button"
                 >
                   {/* Discount Badge */}
                   <span className="absolute top-3 right-3 rounded-full bg-red-500 px-2.5 py-0.5 text-[9px] font-black text-white z-10 shadow-sm leading-none">
-                    -{item.discount}%
+                    -{discount}%
                   </span>
 
                   <div className="flex gap-3 items-center w-full">
                     {/* Small Game Cover Thumbnail */}
                     <div className="h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-sky-border group-hover:border-sky/30 transition-colors">
                       <img
-                        src={flashSaleThumbnails[item.slug]}
-                        alt={item.name}
+                        src={icon}
+                        alt={name}
                         className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[9px] font-bold text-text-muted uppercase tracking-wider truncate">{item.game}</p>
-                      <h4 className="mt-0.5 font-black text-text-primary text-xs group-hover:text-sky transition-colors uppercase tracking-tight truncate pr-6">{item.name}</h4>
+                      <p className="text-[9px] font-bold text-text-muted uppercase tracking-wider truncate">{gameName}</p>
+                      <h4 className="mt-0.5 font-black text-text-primary text-xs group-hover:text-sky transition-colors uppercase tracking-tight truncate pr-6">{name}</h4>
                     </div>
                   </div>
 
                   <div className="mt-4 w-full">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-sm font-black text-sky font-mono">Rp {item.salePrice.toLocaleString("id-ID")}</span>
-                      <span className="text-[10px] text-text-muted line-through font-mono">Rp {item.oriPrice.toLocaleString("id-ID")}</span>
+                      <span className="text-sm font-black text-sky font-mono">Rp {salePrice.toLocaleString("id-ID")}</span>
+                      <span className="text-[10px] text-text-muted line-through font-mono">Rp {oriPrice.toLocaleString("id-ID")}</span>
                     </div>
 
                     {/* Progress Bar with labels above it */}
                     <div className="mt-4">
                       <div className="flex justify-between text-[9px] font-black uppercase tracking-wider text-text-muted mb-1.5">
-                        <span>Tersisa <span className="text-sky font-mono">{100 - item.sold}</span></span>
-                        <span>Terjual <span className="text-sky font-mono">{item.sold}</span></span>
+                        <span>Tersisa <span className="text-sky font-mono">{stock - sold}</span></span>
+                        <span>Terjual <span className="text-sky font-mono">{sold}</span></span>
                       </div>
                       <div className="h-1.5 w-full bg-ice rounded-full overflow-hidden border border-sky-border/50">
-                        <div className="h-full bg-sky rounded-full" style={{ width: `${item.sold}%` }}></div>
+                        <div className="h-full bg-sky rounded-full" style={{ width: `${percentSold}%` }}></div>
                       </div>
                     </div>
                   </div>
@@ -368,7 +418,7 @@ export function HomeContent({ user }: HomeContentProps) {
             </div>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {diagonalCards.map((card, idx) => (
+            {popularGames.map((card, idx) => (
               <button
                 key={idx}
                 onClick={() => router.push(`/games/${card.slug}`)}
@@ -422,7 +472,7 @@ export function HomeContent({ user }: HomeContentProps) {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {catalogItems
+            {catalogList
               .filter((item) => activeTab === "all" ? item.tab === "all" : item.tab === activeTab)
               .map((item, idx) => (
                 <button

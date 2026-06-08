@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { ProductService } from '@/lib/services/product-service';
+import { TransactionService } from '@/lib/services/transaction-service';
 import { createTopup } from '@/lib/digiflazz';
 
 export async function POST(req: NextRequest) {
@@ -10,16 +11,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invoice is required' }, { status: 400 });
     }
 
-    const supabase = await createClient();
-
     // 1. Fetch transaction
-    const { data: transaction, error: txError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('invoice', invoice)
-      .single();
+    const transaction = await TransactionService.getByInvoice(invoice);
 
-    if (txError || !transaction) {
+    if (!transaction) {
       return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
     }
 
@@ -31,29 +26,22 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Fetch associated product to get sku
-    const { data: product, error: prodError } = await supabase
-      .from('products')
-      .select('provider_sku')
-      .eq('id', transaction.product_id)
-      .single();
+    const product = await ProductService.getById(transaction.product_id);
 
-    if (prodError || !product) {
+    if (!product) {
       return NextResponse.json({ error: 'Product SKU not found' }, { status: 404 });
     }
 
     // 3. Mark as paid in database and set status to processing
     const now = new Date().toISOString();
-    const { error: updateError } = await supabase
-      .from('transactions')
-      .update({
+    try {
+      await TransactionService.update(transaction.id, {
         payment_status: 'paid',
         paid_at: now,
         topup_status: 'processing',
         updated_at: now,
-      })
-      .eq('id', transaction.id);
-
-    if (updateError) {
+      });
+    } catch (updateError) {
       console.error('Failed to update payment status:', updateError);
       return NextResponse.json({ error: 'Failed to update transaction status' }, { status: 500 });
     }
@@ -98,26 +86,24 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Save Digiflazz response to transaction
-    const { data: updatedTx, error: finalUpdateError } = await supabase
-      .from('transactions')
-      .update({
+    try {
+      await TransactionService.update(transaction.id, {
         topup_status: topupStatus,
         provider_ref: providerRef,
-        provider_response: providerResponse,
+        provider_response: JSON.stringify(providerResponse),
         updated_at: new Date().toISOString(),
-      })
-      .eq('id', transaction.id)
-      .select('*')
-      .single();
-
-    if (finalUpdateError) {
+      });
+    } catch (finalUpdateError) {
       console.error('Failed to update final topup status:', finalUpdateError);
       return NextResponse.json({ error: 'Failed to complete topup status update' }, { status: 500 });
     }
 
+    // Fetch refreshed transaction to return
+    const refreshedTx = await TransactionService.getByInvoice(transaction.invoice);
+
     return NextResponse.json({ 
       message: 'Payment verified and topup processed', 
-      data: updatedTx 
+      data: refreshedTx 
     });
   } catch (error: any) {
     console.error('Pay transaction API error:', error);

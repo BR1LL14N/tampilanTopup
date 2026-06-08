@@ -22,7 +22,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Gamepad2,
-  ShoppingBag
+  ShoppingBag,
+  Percent
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -86,6 +87,7 @@ export function Header({ user }: HeaderProps) {
 
   // Search states
   const [searchQuery, setSearchQuery] = useState("")
+  const [games, setGames] = useState<any[]>([])
   const [filteredGames, setFilteredGames] = useState<any[]>([])
   const [searchFocused, setSearchFocused] = useState(false)
   const searchContainerRef = useRef<HTMLDivElement>(null)
@@ -159,47 +161,27 @@ export function Header({ user }: HeaderProps) {
 
     const fetchUser = async () => {
       try {
-        const { createClient } = await import("@/lib/supabase/client")
-        const supabase = createClient()
+        const res = await fetch("/api/auth/me")
+        const json = await res.json()
         
-        // Use getSession for instant render from local storage cache
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session?.user) {
-          const user = session.user
+        if (json.user) {
           const userObj = {
-            name: user.user_metadata?.name || user.email || '',
-            email: user.email || '',
-            role: user.user_metadata?.role || 'user'
+            name: json.user.name || '',
+            email: json.user.email || '',
+            role: json.user.role || 'user'
           }
           setCurrentUser(userObj)
           
           // Save to cache
           const { setCachedUser } = await import("@/lib/auth-cache")
           setCachedUser(userObj)
-
-          // Fetch detailed profile asynchronously to confirm custom role/name
-          const { data: profile } = await supabase
-            .from("user_profiles")
-            .select("role, name")
-            .eq("id", user.id)
-            .single()
-
-          if (profile) {
-            const updatedUser = {
-              name: profile.name || user.user_metadata?.name || user.email || '',
-              email: user.email || '',
-              role: profile.role || user.user_metadata?.role || 'user'
-            }
-            setCurrentUser(updatedUser)
-            setCachedUser(updatedUser)
-          }
         } else {
           setCurrentUser(null)
           const { setCachedUser } = await import("@/lib/auth-cache")
           setCachedUser(null)
         }
       } catch (e) {
-        // Fallback if supabase client is not ready
+        // Fallback if API is not ready
       }
     }
     fetchUser()
@@ -214,6 +196,27 @@ export function Header({ user }: HeaderProps) {
       window.removeEventListener("auth-state-change", handleAuthChange)
     }
   }, [user])
+  
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const res = await fetch("/api/calculator/data")
+        const json = await res.json()
+
+        if (json.games) {
+          setGames(json.games.map((g: any) => ({
+            name: g.name,
+            publisher: g.category || "Game",
+            image: gameAssets[g.slug as keyof typeof gameAssets]?.icon || g.image || "/assets/games/mobile-legends/icon.png",
+            slug: g.slug
+          })))
+        }
+      } catch (e) {
+        console.error("Failed to fetch games for search:", e)
+      }
+    }
+    fetchGames()
+  }, [])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -238,19 +241,29 @@ export function Header({ user }: HeaderProps) {
       return
     }
     const query = searchQuery.toLowerCase()
-    const matches = staticGames.filter(g =>
+    const gamesList = games.length > 0 ? games : staticGames
+    const matches = gamesList.filter(g =>
       g.name.toLowerCase().includes(query) ||
       g.publisher.toLowerCase().includes(query)
     )
     setFilteredGames(matches)
-  }, [searchQuery])
+  }, [searchQuery, games])
 
   const handleLogout = async () => {
-    const { createClient } = await import("@/lib/supabase/client")
-    const { setCachedUser } = await import("@/lib/auth-cache")
-    const supabase = createClient()
-    setCachedUser(null)
-    await supabase.auth.signOut()
+    try {
+      const { setCachedUser } = await import("@/lib/auth-cache")
+      setCachedUser(null)
+      await fetch("/api/auth/logout", { method: "POST" })
+      
+      // Try to sign out client-side for completeness, if Supabase is configured
+      try {
+        const { createClient } = await import("@/lib/supabase/client")
+        const supabase = createClient()
+        await supabase.auth.signOut()
+      } catch (_) {}
+    } catch (e) {
+      console.error("Logout failed:", e)
+    }
     window.location.href = "/"
   }
 
@@ -527,6 +540,17 @@ export function Header({ user }: HeaderProps) {
                   >
                     Transaksi Masuk
                   </Link>
+                  <Link
+                    href="/admin/promos"
+                    className={cn(
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      pathname === "/admin/promos" && "nav-active bg-sky/10 text-sky"
+                    )}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Percent className="h-4 w-4 text-sky" />
+                    Kelola Promo
+                  </Link>
                 </>
               )}
 
@@ -708,6 +732,18 @@ export function Header({ user }: HeaderProps) {
                 >
                   <History className="h-4 w-4 group-hover:scale-105 transition-transform" />
                   {!isSidebarCollapsed && <span className="animate-fadeIn">Transaksi Masuk</span>}
+                </Link>
+                <Link
+                  href="/admin/promos"
+                  className={cn(
+                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+                    pathname === "/admin/promos" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
+                  )}
+                  title={isSidebarCollapsed ? "Kelola Promo" : undefined}
+                >
+                  <Percent className="h-4 w-4 group-hover:scale-105 transition-transform" />
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Kelola Promo</span>}
                 </Link>
               </div>
             )}

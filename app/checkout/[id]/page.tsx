@@ -54,6 +54,13 @@ export default function CheckoutPage() {
     qr_string?: string
   } | null>(null)
 
+  // Promo code states
+  const [promoInput, setPromoInput] = useState("")
+  const [promoApplied, setPromoApplied] = useState(false)
+  const [validatingPromo, setValidatingPromo] = useState(false)
+  const [promoError, setPromoError] = useState("")
+  const [promoData, setPromoData] = useState<any>(null)
+
   const [product, setProduct] = useState<any>(null)
   const [loadingProduct, setLoadingProduct] = useState(true)
 
@@ -65,11 +72,8 @@ export default function CheckoutPage() {
       setLoadingProduct(true)
       try {
         const skuStr = String(id)
-        const { data, error } = await supabase
-          .from("product_details")
-          .select("*")
-          .eq("provider_sku", skuStr)
-          .single()
+        const res = await fetch(`/api/products/${skuStr}`)
+        const { product: data, error } = await res.json()
 
         if (error || !data) {
           console.error("Failed to load product details:", error)
@@ -77,8 +81,10 @@ export default function CheckoutPage() {
           setProduct({
             id: data.id,
             name: data.name,
-            sell_price: data.sell_price,
+            sell_price: Number(data.sell_price) || 0,
             provider_sku: data.provider_sku,
+            is_flash_sale: data.is_flash_sale ? true : false,
+            flash_sale_price: Number(data.flash_sale_price) || 0,
             game: {
               name: data.game_name,
               icon: data.game_icon || "🎮",
@@ -109,6 +115,37 @@ export default function CheckoutPage() {
     }
   }, [paymentFromUrl])
 
+  const handleApplyPromo = async () => {
+    if (!promoInput.trim() || !product) return
+    setValidatingPromo(true)
+    setPromoError("")
+    try {
+      const response = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput }),
+      })
+      const resJson = await response.json()
+      if (resJson.error) {
+        setPromoError(resJson.error)
+      } else {
+        setPromoData(resJson.promo)
+        setPromoApplied(true)
+      }
+    } catch (err: any) {
+      setPromoError("Gagal memvalidasi kode promo.")
+    } finally {
+      setValidatingPromo(false)
+    }
+  }
+
+  const handleRemovePromo = () => {
+    setPromoInput("")
+    setPromoApplied(false)
+    setPromoData(null)
+    setPromoError("")
+  }
+
   const handleSubmitTarget = async (e: React.FormEvent) => {
     e.preventDefault()
     setStep(2)
@@ -134,6 +171,7 @@ export default function CheckoutPage() {
           target_name: formData.target_name || null,
           payment_method: selectedPayment,
           quantity: qtyFromUrl,
+          promo_code: promoApplied ? promoInput : null,
         }),
       })
 
@@ -187,6 +225,23 @@ export default function CheckoutPage() {
       setIsLoading(false)
     }
   }
+
+  const basePrice = product?.is_flash_sale && product?.flash_sale_price
+    ? Number(product.flash_sale_price)
+    : product?.sell_price || 0;
+
+  const rawTotal = basePrice * qtyFromUrl;
+
+  let discount = 0;
+  if (promoApplied && promoData) {
+    if (Number(promoData.discount_percent) > 0) {
+      discount = Math.round(rawTotal * (Number(promoData.discount_percent) / 100));
+    } else if (Number(promoData.discount_amount) > 0) {
+      discount = Number(promoData.discount_amount);
+    }
+    discount = Math.min(discount, rawTotal - 1);
+  }
+  const finalTotal = rawTotal - discount;
 
   if (loadingProduct || !product) {
     return (
@@ -339,12 +394,18 @@ export default function CheckoutPage() {
                   <div className="border-t border-sky-border pt-4">
                     <div className="flex justify-between mb-2">
                       <span className="text-muted-foreground">Harga</span>
-                      <span>{formatCurrency(product.sell_price)}</span>
+                      <span>{formatCurrency(basePrice)}</span>
                     </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between mb-2 text-green-600 font-semibold">
+                        <span>Diskon Promo</span>
+                        <span>-{formatCurrency(discount)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span>
                       <span className="text-primary">
-                        {formatCurrency(product.sell_price * qtyFromUrl)}
+                        {formatCurrency(finalTotal)}
                       </span>
                     </div>
                   </div>
@@ -384,6 +445,45 @@ export default function CheckoutPage() {
                           setFormData({ ...formData, target_name: e.target.value })
                         }
                       />
+                    </div>
+
+                    <div className="space-y-2 pt-2 border-t border-sky-border/40">
+                      <Label htmlFor="promo_code">Kode Promo / Referral (Opsional)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="promo_code"
+                          placeholder="Contoh: MITSURU20"
+                          value={promoInput}
+                          onChange={(e) => setPromoInput(e.target.value)}
+                          disabled={promoApplied}
+                          className="flex-1"
+                        />
+                        {promoApplied ? (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={handleRemovePromo}
+                          >
+                            Hapus
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            onClick={handleApplyPromo}
+                            disabled={!promoInput.trim() || validatingPromo}
+                          >
+                            {validatingPromo ? <Loader2 className="h-4 w-4 animate-spin" /> : "Terapkan"}
+                          </Button>
+                        )}
+                      </div>
+                      {promoError && (
+                        <p className="text-xs text-red-500 font-semibold">{promoError}</p>
+                      )}
+                      {promoApplied && promoData && (
+                        <p className="text-xs text-green-600 font-bold">
+                          Promo berhasil diterapkan! Diskon: {Number(promoData.discount_percent) > 0 ? `${promoData.discount_percent}%` : formatCurrency(promoData.discount_amount)}
+                        </p>
+                      )}
                     </div>
 
                     <Button type="submit" className="w-full">
@@ -465,10 +565,16 @@ export default function CheckoutPage() {
                       <span className="text-muted-foreground">Target</span>
                       <span>{formData.target_id}</span>
                     </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between text-green-600 font-semibold">
+                        <span>Diskon Promo</span>
+                        <span>-{formatCurrency(discount)}</span>
+                      </div>
+                    )}
                     <div className="border-t border-sky-border pt-4 flex justify-between font-semibold text-lg">
                       <span>Total</span>
                       <span className="text-primary">
-                        {formatCurrency(product.sell_price * qtyFromUrl)}
+                        {formatCurrency(finalTotal)}
                       </span>
                     </div>
                   </div>

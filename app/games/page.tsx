@@ -5,39 +5,54 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
-import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser } from "@/lib/auth"
+import { GameService } from "@/lib/services/game-service"
+import { executeQuery } from "@/lib/db"
 import { ArrowRight } from "lucide-react"
 import { gameAssets, getGameAsset } from "@/lib/assets"
 
+export const dynamic = "force-dynamic";
+
 export default async function GamesPage() {
-  const supabase = await createClient()
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const sessionUser = await getCurrentUser()
 
   let user = null
-  if (authUser) {
+  if (sessionUser) {
     user = {
-      name: authUser.user_metadata?.name || authUser.email || '',
-      email: authUser.email || '',
-      role: 'user'
+      name: sessionUser.name,
+      email: sessionUser.email,
+      role: sessionUser.role
     }
   }
 
-  // Fetch games dynamically from Supabase
-  const { data: dbGames } = await supabase
-    .from('games')
-    .select('*, products(id, status)')
-    .eq('status', true)
-    .order('sort_order', { ascending: true })
+  // Fetch games dynamically from database
+  let games: any[] = []
+  try {
+    const dbGames = await GameService.getAllActive()
 
-  const games = (dbGames || []).map((game: any) => ({
-    name: game.name,
-    icon: game.icon || "🎮",
-    slug: game.slug,
-    image: getGameAsset(game.slug)?.banner || game.image || gameAssets["mobile-legends"].banner,
-    description: game.description || "",
-    category: game.category || "Game",
-    products: game.products ? game.products.filter((p: any) => p.status).length : 0,
-  }))
+    games = await Promise.all(
+      dbGames.map(async (game: any) => {
+        // Calculate active products for this game
+        const rows = await executeQuery(
+          `SELECT COUNT(*) as count FROM products WHERE game_id = $1 AND status = $2`,
+          [game.id, true]
+        );
+        const count = Number(rows[0]?.count ?? rows[0]?.COUNT ?? 0);
+
+        return {
+          name: game.name,
+          icon: game.icon || "🎮",
+          slug: game.slug,
+          image: game.image || getGameAsset(game.slug)?.banner || gameAssets["mobile-legends"].banner,
+          description: game.description || "",
+          category: game.category || "Game",
+          products: count,
+        };
+      })
+    )
+  } catch (err) {
+    console.error("Error loading games page database content:", err)
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

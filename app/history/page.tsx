@@ -11,7 +11,6 @@ import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapp
 import { Skeleton } from "@/components/ui/skeleton"
 import { TransactionCard } from "@/components/transaction/transaction-card"
 import { Search, Filter, Loader2 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 import { getGameAssetByName } from "@/lib/assets"
 
 // Mock transactions
@@ -65,36 +64,28 @@ export default function HistoryPage() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const res = await fetch("/api/user/dashboard")
+        const dataJson = await res.json()
 
-        if (user) {
-          const { data: txs } = await supabase
-            .from("transaction_details")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("created_at", { ascending: false })
-
-          if (txs && txs.length > 0) {
-            const mapped = txs.map((tx: any) => ({
-              id: tx.invoice,
-              invoice: tx.invoice,
-              target_id: tx.target_id,
-              amount: tx.amount,
-              payment_status: tx.payment_status,
-              topup_status: tx.topup_status,
-              created_at: tx.created_at,
-              product: {
-                name: tx.product_name,
-                game: {
-                  name: tx.game_name,
-                  icon: getGameAssetByName(tx.game_name)?.icon,
-                }
+        if (dataJson.transactions && dataJson.transactions.length > 0) {
+          const mapped = dataJson.transactions.map((tx: any) => ({
+            id: tx.invoice,
+            invoice: tx.invoice,
+            target_id: tx.target_id,
+            amount: Number(tx.amount),
+            payment_status: tx.payment_status,
+            topup_status: tx.topup_status,
+            created_at: tx.created_at,
+            product: {
+              name: tx.product_name,
+              game: {
+                name: tx.game_name,
+                icon: getGameAssetByName(tx.game_name)?.icon,
               }
-            }))
-            setTransactions(mapped)
-            return
-          }
+            }
+          }))
+          setTransactions(mapped)
+          return
         }
 
         // Fallback to mock data if not logged in or no transactions

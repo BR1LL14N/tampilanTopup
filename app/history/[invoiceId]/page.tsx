@@ -7,7 +7,6 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
-import { createClient } from "@/lib/supabase/client"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
@@ -94,23 +93,20 @@ export default function InvoiceDetailPage() {
           return
         }
 
-        // 2. Check Supabase database
-        const supabase = createClient()
-        const { data, error: fetchError } = await supabase
-          .from("transaction_details")
-          .select("*")
-          .eq("invoice", invStr)
-          .single()
+        // 2. Check Database via API
+        const res = await fetch(`/api/transactions/check?invoice=${encodeURIComponent(invStr)}`)
+        const dataJson = await res.json()
 
-        if (fetchError || !data) {
-          setError("Transaksi tidak ditemukan. Harap periksa kembali nomor invoice Anda.")
+        if (dataJson.error || !dataJson.transaction) {
+          setError(dataJson.error || "Transaksi tidak ditemukan. Harap periksa kembali nomor invoice Anda.")
         } else {
+          const data = dataJson.transaction
           setResult({
             invoice: data.invoice,
             product: data.product_name,
             game: data.game_name,
             target_id: data.target_id,
-            amount: data.amount,
+            amount: Number(data.amount),
             status: data.topup_status,
             payment_method: data.payment_method,
             payment_status: data.payment_status,

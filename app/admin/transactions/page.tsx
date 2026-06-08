@@ -23,7 +23,7 @@ import {
 import { Header } from "@/components/layout/header"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getCachedUser } from "@/lib/auth-cache"
+import { getCachedUser, setCachedUser } from "@/lib/auth-cache"
 import { formatCurrency, formatDate, getStatusBgColor } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -40,7 +40,6 @@ import {
   XCircle,
   Loader2,
 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 
 export default function AdminTransactionsPage() {
   const router = useRouter()
@@ -50,69 +49,55 @@ export default function AdminTransactionsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
+  const fetchAdminData = async () => {
+    try {
+      // Verify user auth session
+      const resUser = await fetch("/api/auth/me")
+      const { user } = await resUser.json()
+
+      if (!user || user.role !== "admin") {
+        setCachedUser(null)
+        router.push("/auth/login")
+        return
+      }
+
+      setCurrentUser(user)
+      setCachedUser(user)
+
+      // Fetch transactions list
+      const resTransactions = await fetch("/api/admin/transactions")
+      const { transactions, error } = await resTransactions.json()
+
+      if (error) throw new Error(error)
+
+      if (transactions) {
+        setTransactionsList(transactions.map((tx: any) => ({
+          id: tx.id,
+          invoice: tx.invoice,
+          user: tx.user_email || "Guest",
+          product: tx.product_name,
+          game: tx.game_name || "Game",
+          target_id: tx.target_id,
+          amount: Number(tx.amount) || 0,
+          topup_status: tx.topup_status,
+          created_at: tx.created_at,
+        })))
+      } else {
+        setTransactionsList([])
+      }
+    } catch (err) {
+      console.error("Failed to load admin transactions:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     // Read cache on mount
     const cached = getCachedUser()
     if (cached) {
       setCurrentUser(cached)
     }
-
-    const fetchAdminData = async () => {
-      try {
-        const supabase = createClient()
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-
-        if (!authUser) {
-          router.push("/auth/login")
-          return
-        }
-
-        // Fetch profile and check role
-        const { data: profile } = await supabase
-          .from("user_profiles")
-          .select("name, email, role")
-          .eq("id", authUser.id)
-          .single()
-
-        if (!profile || profile.role !== "admin") {
-          router.push("/dashboard")
-          return
-        }
-
-        setCurrentUser({
-          name: profile.name || authUser.user_metadata?.name || authUser.email || "Admin",
-          email: authUser.email || "",
-          role: profile.role
-        })
-
-        // Fetch transactions from view
-        const { data: dbTransactions } = await supabase
-          .from("transaction_details")
-          .select("*")
-          .order("created_at", { ascending: false })
-
-        if (dbTransactions) {
-          setTransactionsList(dbTransactions.map((tx: any) => ({
-            id: tx.id,
-            invoice: tx.invoice,
-            user: tx.user_email || "Guest",
-            product: tx.product_name,
-            game: tx.game_name || "Game",
-            target_id: tx.target_id,
-            amount: tx.amount,
-            topup_status: tx.topup_status,
-            created_at: tx.created_at,
-          })))
-        } else {
-          setTransactionsList([])
-        }
-      } catch (err) {
-        console.error("Failed to load admin transactions:", err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchAdminData()
   }, [router])
 
@@ -347,7 +332,7 @@ export default function AdminTransactionsPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.push(`/history/${tx.invoice}`)}>
                               <Eye className="h-4 w-4 mr-2" />
                               Detail
                             </DropdownMenuItem>
