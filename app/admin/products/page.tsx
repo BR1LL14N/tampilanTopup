@@ -21,6 +21,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import { Header } from "@/components/layout/header"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -46,6 +54,111 @@ export default function AdminProductsPage() {
   const [productsList, setProductsList] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
+  const [syncing, setSyncing] = useState(false)
+  const [markupPercent, setMarkupPercent] = useState("10")
+  const [syncStatus, setSyncStatus] = useState<string | null>(null)
+  const [editingProduct, setEditingProduct] = useState<any | null>(null)
+  const [editedSellPrice, setEditedSellPrice] = useState("")
+  const [warnBelowCost, setWarnBelowCost] = useState(false)
+
+  const handleSync = async () => {
+    // Bug #5 fix: validate markup is not negative before sending to API
+    const markupNum = parseFloat(markupPercent)
+    if (isNaN(markupNum) || markupNum < 0) {
+      setSyncStatus("Error: Markup tidak boleh negatif. Masukkan nilai antara 0–100.")
+      return
+    }
+    try {
+      setSyncing(true)
+      setSyncStatus(null)
+      const res = await fetch(`/api/admin/sync-products?markup=${markupPercent}`, {
+        method: "POST"
+      })
+      const data = await res.json()
+      if (data.success) {
+        const { newAdded, updated, skipped, totalFromDigiflazz } = data.summary;
+        let msg = `Berhasil menyinkronkan: ${newAdded} produk baru, ${updated} produk diperbarui.`;
+        if (totalFromDigiflazz > 0 && (newAdded + updated) === 0) {
+          msg += ` (${skipped} produk dari Digiflazz tidak cocok dengan game yang terdaftar di database — cek konsol browser untuk detail sampleItems.)`;
+        } else if (totalFromDigiflazz === 0) {
+          msg += ` Digiflazz mengembalikan 0 produk — kemungkinan API key atau koneksi bermasalah.`;
+        }
+        setSyncStatus(msg);
+        // Log Digiflazz sample items to console for debugging category/brand names
+        if (data.sampleItems?.length > 0) {
+          console.log('[Digiflazz Sync] Sample items dari API (10 pertama):', data.sampleItems);
+        }
+        if (data.log?.length > 0) {
+          console.log('[Digiflazz Sync] Produk yang cocok:', data.log);
+        }
+        
+        // Refresh products list
+        const supabase = createClient()
+        const { data: dbProducts } = await supabase
+          .from("product_details")
+          .select("*")
+          .order("sort_order", { ascending: true })
+        
+        if (dbProducts && dbProducts.length > 0) {
+          setProductsList(dbProducts.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            game: p.game_name,
+            slug: p.game_slug,
+            icon: p.game_icon || "🎮",
+            provider_sku: p.provider_sku,
+            price: p.price,
+            sell_price: p.sell_price,
+            status: p.status,
+            transactions: 0
+          })))
+        }
+      } else {
+        setSyncStatus(`Error: ${data.error || "Gagal melakukan sync"}`)
+      }
+    } catch (err: any) {
+      console.error(err)
+      setSyncStatus(`Error: ${err.message || "Gagal melakukan sync"}`)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  const handleSavePrice = async (forceSubmit = false) => {
+    if (!editingProduct) return
+    const priceNum = parseInt(editedSellPrice)
+    if (isNaN(priceNum) || priceNum <= 0) {
+      alert("Harga jual tidak valid. Harus lebih dari 0.")
+      return
+    }
+
+    // Bug #4 fix: warn if sell price is below cost price (HPP) but allow with confirmation
+    if (!forceSubmit && priceNum < editingProduct.price) {
+      setWarnBelowCost(true)
+      return
+    }
+
+    setWarnBelowCost(false)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from("products")
+        .update({ 
+          sell_price: priceNum, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq("id", editingProduct.id)
+
+      if (error) {
+        alert(`Gagal mengupdate harga: ${error.message}`)
+      } else {
+        setProductsList(prev => prev.map(p => p.id === editingProduct.id ? { ...p, sell_price: priceNum } : p))
+        setEditingProduct(null)
+      }
+    } catch (err: any) {
+      alert(`Error: ${err.message}`)
+    }
+  }
 
   useEffect(() => {
     // Read cache on mount
@@ -189,18 +302,63 @@ export default function AdminProductsPage() {
         <main className="flex-1 py-8">
         <div className="container">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
               <h1 className="text-3xl font-bold mb-2">Kelola Produk</h1>
               <p className="text-muted-foreground">
                 Kelola produk top up untuk setiap game
               </p>
             </div>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Tambah Produk
-            </Button>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-sky-border shadow-sm">
+                <span className="text-xs font-semibold text-text-secondary whitespace-nowrap">Markup:</span>
+                <Input
+                  type="number"
+                  value={markupPercent}
+                  onChange={(e) => setMarkupPercent(e.target.value)}
+                  className="w-14 h-7 text-center text-xs font-semibold p-1 focus-visible:ring-sky"
+                  min="0"
+                  max="100"
+                />
+                <span className="text-xs font-semibold text-text-secondary">%</span>
+              </div>
+              
+              <Button 
+                variant="outline"
+                onClick={handleSync} 
+                disabled={syncing}
+                className="gap-2 border-sky text-sky hover:bg-sky/5 rounded-xl shadow-sm h-10"
+              >
+                {syncing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Syncing...
+                  </>
+                ) : (
+                  <>
+                    <TrendingUp className="h-4 w-4" />
+                    Sync dari Digiflazz
+                  </>
+                )}
+              </Button>
+
+              <Button className="gap-2 rounded-xl h-10">
+                <Plus className="h-4 w-4" />
+                Tambah Produk
+              </Button>
+            </div>
           </div>
+
+          {/* Sync Status Banner */}
+          {syncStatus && (
+            <div className={`mb-6 p-4 rounded-xl border text-sm font-medium ${
+              syncStatus.startsWith('Error') 
+                ? 'bg-red-50 border-red-200 text-red-700' 
+                : 'bg-green-50 border-green-200 text-green-700'
+            }`}>
+              {syncStatus}
+            </div>
+          )}
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mb-8">
@@ -325,9 +483,12 @@ export default function AdminProductsPage() {
                               <Eye className="h-4 w-4 mr-2" />
                               Lihat
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setEditingProduct(product);
+                              setEditedSellPrice(product.sell_price.toString());
+                            }}>
                               <Edit className="h-4 w-4 mr-2" />
-                              Edit
+                              Edit Harga
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-500">
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -345,6 +506,86 @@ export default function AdminProductsPage() {
         </div>
         </main>
       </SidebarContentWrapper>
+
+      {/* Dialog Edit Harga */}
+      <Dialog open={!!editingProduct} onOpenChange={(open) => { if (!open) setEditingProduct(null); }}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Harga Jual</DialogTitle>
+            <DialogDescription>
+              Ubah harga jual untuk produk <strong>{editingProduct?.name}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <span className="text-right text-sm font-medium text-text-secondary">
+                Harga Modal
+              </span>
+              <div className="col-span-3 font-mono text-sm font-semibold text-text-primary">
+                {editingProduct ? formatCurrency(editingProduct.price) : "-"}
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="sell-price" className="text-right text-sm font-medium text-text-secondary">
+                Harga Jual
+              </label>
+              <Input
+                id="sell-price"
+                type="number"
+                value={editedSellPrice}
+                onChange={(e) => { setEditedSellPrice(e.target.value); setWarnBelowCost(false); }}
+                className="col-span-3 rounded-xl border-sky-border"
+              />
+            </div>
+            {editingProduct && parseInt(editedSellPrice) > 0 && (() => {
+              const profit = parseInt(editedSellPrice) - editingProduct.price;
+              return (
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="text-right text-xs font-semibold text-text-secondary">Profit</span>
+                  <span className={`col-span-3 text-xs font-black ${profit >= 0 ? "text-green-500" : "text-red-500"}`}>
+                    {profit >= 0 ? "+" : ""}{formatCurrency(profit)}
+                  </span>
+                </div>
+              );
+            })()}
+
+            {/* Bug #4 fix: Warning banner when sell_price < HPP */}
+            {warnBelowCost && (
+              <div className="col-span-4 rounded-xl bg-amber-50 border border-amber-300 p-3 text-sm text-amber-800">
+                <p className="font-semibold mb-2">⚠️ Harga jual di bawah harga modal!</p>
+                <p className="text-xs mb-3">
+                  Menetapkan harga jual lebih rendah dari harga modal akan menyebabkan <strong>kerugian per transaksi</strong>. Apakah Anda yakin ingin menyimpan?
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setWarnBelowCost(false)}
+                    className="rounded-lg text-xs h-7 border-amber-400 text-amber-700 hover:bg-amber-100"
+                  >
+                    Ubah Harga
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => handleSavePrice(true)}
+                    className="rounded-lg text-xs h-7 bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    Tetap Simpan
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEditingProduct(null); setWarnBelowCost(false); }} className="rounded-xl">
+              Batal
+            </Button>
+            <Button onClick={() => handleSavePrice(false)} className="rounded-xl">
+              Simpan Perubahan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
