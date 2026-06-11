@@ -64,11 +64,12 @@ export async function POST(req: NextRequest) {
     let providerResponse = null;
 
     try {
+      const isTesting = process.env.DIGIFLAZZ_MODE !== 'production';
       const response = await createTopup(
         product.provider_sku,
         transaction.target_id,
         transaction.invoice,
-        true // testing = true for dev/sandbox env
+        isTesting // false in production, true in development/sandbox
       );
 
       providerResponse = response;

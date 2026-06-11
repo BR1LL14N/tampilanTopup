@@ -101,7 +101,13 @@ export const paymentAssets = {
 export type GameAssetSlug = keyof typeof gameAssets;
 
 export function getGameAsset(slug: string) {
-  return gameAssets[slug as GameAssetSlug];
+  const asset = gameAssets[slug as GameAssetSlug];
+  if (asset) return asset;
+  return {
+    icon: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=128&h=128&fit=crop",
+    poster: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=600&h=400&fit=crop",
+    banner: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=600&h=400&fit=crop",
+  };
 }
 
 export function slugFromGameName(name?: string | null) {
