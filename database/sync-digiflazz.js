@@ -65,10 +65,6 @@ async function executeQuery(sql, params = []) {
     const [rows] = await mysqlPool.execute(formattedSql, formattedParams);
     return rows;
   } else {
-    for (let i = 0; i < formattedParams.length; i++) {
-      if (formattedParams[i] === 1) formattedParams[i] = true;
-      if (formattedParams[i] === 0) formattedParams[i] = false;
-    }
     if (!pgPool) {
       pgPool = new Pool({
         connectionString: env.POSTGRES_URL,
