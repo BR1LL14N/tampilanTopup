@@ -26,15 +26,6 @@ export async function executeQuery<T = any>(sql: string, params: any[] = []): Pr
         formattedParams[i] = formattedParams[i] ? 1 : 0;
       }
     }
-  } else {
-    // For PostgreSQL, ensure boolean parameters are actual booleans
-    for (let i = 0; i < formattedParams.length; i++) {
-      if (formattedParams[i] === 1) {
-        formattedParams[i] = true;
-      } else if (formattedParams[i] === 0) {
-        formattedParams[i] = false;
-      }
-    }
   }
 
   if (provider === 'mysql') {
