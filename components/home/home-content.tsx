@@ -97,8 +97,39 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
         })
         .map((game) => {
           let tab = "all";
+          const nameLower = game.name.toLowerCase();
           const categoryLower = game.category?.toLowerCase() || "";
-          if (categoryLower.includes("voucher") || categoryLower.includes("gift card")) {
+          const slugLower = game.slug?.toLowerCase() || "";
+          
+          const isVoucherBrand = 
+            nameLower.includes("xl") ||
+            nameLower.includes("axis") ||
+            nameLower.includes("telkomsel") ||
+            nameLower.includes("indosat") ||
+            nameLower.includes("smartfren") ||
+            nameLower.includes("tri") ||
+            nameLower.includes("three") ||
+            nameLower.includes("by.u") ||
+            nameLower.includes("pulsa") ||
+            nameLower.includes("kuota") ||
+            nameLower.includes("data") ||
+            slugLower.includes("xl") ||
+            slugLower.includes("axis") ||
+            slugLower.includes("telkomsel") ||
+            slugLower.includes("indosat") ||
+            slugLower.includes("smartfren") ||
+            slugLower.includes("tri") ||
+            slugLower.includes("three");
+
+          if (
+            categoryLower.includes("voucher") || 
+            categoryLower.includes("gift card") ||
+            categoryLower.includes("pulsa") ||
+            categoryLower.includes("data") ||
+            categoryLower.includes("kuota") ||
+            categoryLower.includes("internet") ||
+            isVoucherBrand
+          ) {
             tab = "voucher";
           }
           

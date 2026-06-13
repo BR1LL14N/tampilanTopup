@@ -93,13 +93,34 @@ export async function POST(req: NextRequest) {
         }
         
         const newGameId = crypto.randomUUID();
+        let gameCategory = 'Games';
+        
+        if (
+          category.includes('voucher') ||
+          category.includes('gift') ||
+          category.includes('pulsa') ||
+          category.includes('data') ||
+          category.includes('kuota') ||
+          category.includes('internet') ||
+          brandLower.includes('xl') ||
+          brandLower.includes('axis') ||
+          brandLower.includes('telkomsel') ||
+          brandLower.includes('indosat') ||
+          brandLower.includes('smartfren') ||
+          brandLower.includes('tri') ||
+          brandLower.includes('three') ||
+          brandLower.includes('by.u')
+        ) {
+          gameCategory = 'Voucher';
+        }
+
         const newGame = {
           id: newGameId,
           name: brand,
           slug: slug,
           image: 'https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400',
           icon: '🎮',
-          category: 'Games',
+          category: gameCategory,
           status: true,
           description: `Top up ${brand} murah dan proses instan.`,
           publisher: 'Digiflazz'
