@@ -17,6 +17,9 @@ export interface TransactionData {
   qr_string?: string | null;
   payment_url?: string | null;
   expired_at?: string | null;
+  login_method?: string | null;
+  password?: string | null;
+  request_notes?: string | null;
 }
 
 export class TransactionService {
@@ -29,9 +32,10 @@ export class TransactionService {
       INSERT INTO transactions (
         id, invoice, user_id, product_id, target_id, target_name, amount,
         discount_amount, promo_code_id, payment_method, payment_status,
-        topup_status, qr_string, payment_url, expired_at
+        topup_status, qr_string, payment_url, expired_at,
+        login_method, password, request_notes
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
     `;
     await executeQuery(sql, [
       id,
@@ -48,7 +52,10 @@ export class TransactionService {
       data.topup_status || "pending",
       data.qr_string || null,
       data.payment_url || null,
-      data.expired_at || null
+      data.expired_at || null,
+      data.login_method || null,
+      data.password || null,
+      data.request_notes || null
     ]);
     return { id, ...data };
   }

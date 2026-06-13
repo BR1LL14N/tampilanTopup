@@ -40,6 +40,9 @@ export default function CheckoutPage() {
   const targetFromUrl = searchParams.get("target") || ""
   const qtyFromUrl = parseInt(searchParams.get("qty") || "1", 10)
   const paymentFromUrl = searchParams.get("payment") || ""
+  const loginMethodFromUrl = searchParams.get("login_method") || ""
+  const passwordFromUrl = searchParams.get("password") || ""
+  const notesFromUrl = searchParams.get("notes") || ""
 
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -47,6 +50,9 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState({
     target_id: "",
     target_name: "",
+    login_method: "",
+    password: "",
+    request_notes: "",
   })
   const [transactionData, setTransactionData] = useState<{
     invoice: string
@@ -105,9 +111,15 @@ export default function CheckoutPage() {
   // Populate data from URL params
   useEffect(() => {
     if (targetFromUrl) {
-      setFormData((prev) => ({ ...prev, target_id: targetFromUrl }))
+      setFormData((prev) => ({ 
+        ...prev, 
+        target_id: targetFromUrl,
+        login_method: loginMethodFromUrl,
+        password: passwordFromUrl,
+        request_notes: notesFromUrl
+      }))
     }
-  }, [targetFromUrl])
+  }, [targetFromUrl, loginMethodFromUrl, passwordFromUrl, notesFromUrl])
 
   useEffect(() => {
     if (paymentFromUrl) {
@@ -172,6 +184,9 @@ export default function CheckoutPage() {
           payment_method: selectedPayment,
           quantity: qtyFromUrl,
           promo_code: promoApplied ? promoInput : null,
+          login_method: formData.login_method || null,
+          password: formData.password || null,
+          request_notes: formData.request_notes || null,
         }),
       })
 
@@ -181,6 +196,11 @@ export default function CheckoutPage() {
       }
 
       const tx = resJson.data
+      if (tx.payment_url) {
+        window.location.href = tx.payment_url;
+        return;
+      }
+
       setTransactionData({
         invoice: tx.invoice,
         amount: tx.amount,
@@ -446,6 +466,43 @@ export default function CheckoutPage() {
                         }
                       />
                     </div>
+
+                    {formData.login_method && (
+                      <div className="space-y-2">
+                        <Label htmlFor="login_method">Metode Login</Label>
+                        <Input
+                          id="login_method"
+                          value={formData.login_method}
+                          disabled
+                          className="bg-slate-50 text-muted-foreground"
+                        />
+                      </div>
+                    )}
+
+                    {formData.password && (
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password Akun</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          value={formData.password}
+                          disabled
+                          className="bg-slate-50 text-muted-foreground"
+                        />
+                      </div>
+                    )}
+
+                    {formData.request_notes && (
+                      <div className="space-y-2">
+                        <Label htmlFor="request_notes">Catatan Khusus</Label>
+                        <Input
+                          id="request_notes"
+                          value={formData.request_notes}
+                          disabled
+                          className="bg-slate-50 text-muted-foreground"
+                        />
+                      </div>
+                    )}
 
                     <div className="space-y-2 pt-2 border-t border-sky-border/40">
                       <Label htmlFor="promo_code">Kode Promo / Referral (Opsional)</Label>

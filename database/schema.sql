@@ -78,6 +78,9 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     qr_string TEXT,
     expired_at TIMESTAMP WITH TIME ZONE,
     paid_at TIMESTAMP WITH TIME ZONE,
+    login_method TEXT,
+    password TEXT,
+    request_notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

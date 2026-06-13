@@ -63,6 +63,7 @@ export default function InvoiceDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     if (!invoiceId) return
@@ -111,6 +112,9 @@ export default function InvoiceDetailPage() {
             payment_method: data.payment_method,
             payment_status: data.payment_status,
             date: data.created_at,
+            login_method: data.login_method,
+            password: data.password,
+            request_notes: data.request_notes,
           })
         }
       } catch (err) {
@@ -267,6 +271,35 @@ export default function InvoiceDetailPage() {
                       <span className="text-text-secondary font-medium">User ID Tujuan</span>
                       <span className="font-mono bg-ice px-2.5 py-1 rounded text-text-primary font-semibold border border-sky-border/30">{result.target_id}</span>
                     </div>
+                    {result.login_method && (
+                      <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                        <span className="text-text-secondary font-medium">Metode Login</span>
+                        <span className="font-bold text-text-primary">{result.login_method}</span>
+                      </div>
+                    )}
+                    {result.password && (
+                      <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                        <span className="text-text-secondary font-medium">Password Akun</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono bg-ice px-2 py-0.5 rounded border border-sky-border/30 font-semibold">
+                            {showPassword ? result.password : "••••••••"}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="text-[10px] text-sky font-black uppercase hover:underline"
+                          >
+                            {showPassword ? "Sembunyikan" : "Tampilkan"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {result.request_notes && (
+                      <div className="flex flex-col gap-1 border-b border-sky-border/50 pb-2 text-left">
+                        <span className="text-text-secondary font-medium">Catatan Khusus Admin</span>
+                        <span className="text-text-primary bg-white/60 p-2 rounded border border-sky-border/30 font-medium whitespace-pre-wrap leading-relaxed">{result.request_notes}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
                       <span className="text-text-secondary font-medium">Metode Pembayaran</span>
                       <span className="flex items-center gap-2 font-bold text-text-primary uppercase">

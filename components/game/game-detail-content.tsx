@@ -110,8 +110,30 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
 
     // Redirect to dynamic checkout/invoice route
     const target = serverId ? `${gameId} (${serverId})` : gameId
+    
+    const queryParams = new URLSearchParams({
+      target,
+      whatsapp,
+      qty: String(quantity),
+      payment: paymentMethod.toLowerCase(),
+      promo: promoCode
+    })
+
+    if (loginMethod && loginMethod !== "Pilih Login") {
+      queryParams.set("login_method", loginMethod)
+    }
+    if (password) {
+      queryParams.set("password", password)
+    }
+    if (requestNotes) {
+      queryParams.set("notes", requestNotes)
+    }
+    if (email) {
+      queryParams.set("email", email)
+    }
+
     router.push(
-      `/checkout/${selectedProduct.provider_sku}?target=${target}&whatsapp=${whatsapp}&qty=${quantity}&payment=${paymentMethod.toLowerCase()}&promo=${promoCode}`
+      `/checkout/${selectedProduct.provider_sku}?${queryParams.toString()}`
     )
   }
 

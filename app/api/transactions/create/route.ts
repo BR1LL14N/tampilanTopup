@@ -7,7 +7,7 @@ import { generateInvoice } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   try {
-    const { product_id, target_id, target_name, payment_method, quantity, promo_code } = await req.json();
+    const { product_id, target_id, target_name, payment_method, quantity, promo_code, login_method, password, request_notes } = await req.json();
 
     if (!product_id || !target_id || !payment_method) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -66,15 +66,80 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Mock QRIS or Payment Details
+    // Real Mayar.id integration or Mock fallback
     let qr_string = null;
     let payment_url = null;
     
-    if (payment_method.toLowerCase() === 'qris') {
-      // Mock QRIS payload
-      qr_string = "00020101021226620009com.bri.ccho.id010911000000000001020326303003000000000000000052040000000000000000052069000016000000000000000000103015802091573303710501000008000005820333待定00000000000000000000000000";
+    const mayarApiKey = process.env.MAYAR_API_KEY;
+    if (mayarApiKey) {
+      try {
+        const authHeader = mayarApiKey.startsWith('Bearer ') ? mayarApiKey : `Bearer ${mayarApiKey}`;
+        const isProduction = process.env.DIGIFLAZZ_MODE === 'production';
+        const mayarBaseUrl = isProduction ? 'https://api.mayar.id' : 'https://api.mayar.club';
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        const redirectUrl = `${siteUrl}/history/${invoice}`;
+
+        let customerName = 'Pelanggan';
+        let customerEmail = `${invoice.toLowerCase()}@mitsuru-shop.sir-l.web.id`;
+        let customerPhone = '08123456789';
+
+        if (userId) {
+          try {
+            const { executeQuery } = await import('@/lib/db');
+            const userProfile = await executeQuery(
+              "SELECT name, email, phone FROM user_profiles WHERE id = $1 LIMIT 1",
+              [userId]
+            );
+            if (userProfile && userProfile.length > 0) {
+              customerName = userProfile[0].name || customerName;
+              customerEmail = userProfile[0].email || customerEmail;
+              customerPhone = userProfile[0].phone || customerPhone;
+            }
+          } catch (dbErr) {
+            console.error('Failed to fetch user profile for Mayar:', dbErr);
+          }
+        }
+
+        const mayarRes = await fetch(`${mayarBaseUrl}/hl/v1/invoice/create`, {
+          method: 'POST',
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: customerName,
+            email: customerEmail,
+            mobile: customerPhone,
+            description: `Top Up ${product.name} (${invoice})`,
+            redirectUrl: redirectUrl,
+            items: [
+              {
+                quantity: qty,
+                rate: amount,
+                description: product.name,
+              }
+            ]
+          })
+        });
+
+        const mayarData = await mayarRes.json();
+        if (mayarData && mayarData.link) {
+          payment_url = mayarData.link;
+        } else {
+          console.error('Mayar API error response:', mayarData);
+          payment_url = `${siteUrl}/checkout/mock?invoice=${invoice}`;
+        }
+      } catch (mayarErr) {
+        console.error('Failed to call Mayar API:', mayarErr);
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        payment_url = `${siteUrl}/checkout/mock?invoice=${invoice}`;
+      }
     } else {
-      payment_url = "https://checkout.sandbox.gateway.com/" + invoice;
+      if (payment_method.toLowerCase() === 'qris') {
+        qr_string = "00020101021226620009com.bri.ccho.id010911000000000001020326303003000000000000000052040000000000000000052069000016000000000000000000103015802091573303710501000008000005820333待定00000000000000000000000000";
+      } else {
+        payment_url = "https://checkout.sandbox.gateway.com/" + invoice;
+      }
     }
 
     const expired_at = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes from now
@@ -95,6 +160,9 @@ export async function POST(req: NextRequest) {
       expired_at,
       promo_code_id: promoCodeId,
       discount_amount: discountAmount,
+      login_method: login_method || null,
+      password: password || null,
+      request_notes: request_notes || null,
     });
 
     return NextResponse.json({ data: transaction });
