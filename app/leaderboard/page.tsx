@@ -29,7 +29,6 @@ import {
   Coins,
   ShoppingBag,
 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 import { formatCurrency } from "@/lib/utils"
 
 // Spender Leaderboard initial data matching top-up app theme
@@ -73,23 +72,17 @@ export default function LeaderboardPage() {
     return () => clearInterval(timer)
   }, [])
 
-  // Check Supabase session
+  // Check session
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const supabase = createClient()
-        const { data } = await supabase.auth.getUser()
-        if (data?.user) {
-          const { data: profile } = await supabase
-            .from("user_profiles")
-            .select("role, name")
-            .eq("id", data.user.id)
-            .single()
-
+        const res = await fetch("/api/auth/me")
+        const json = await res.json()
+        if (json.user) {
           setCurrentUser({
-            name: profile?.name || data.user.user_metadata?.name || data.user.email || 'Gamer',
-            email: data.user.email || '',
-            role: profile?.role || 'user'
+            name: json.user.name || 'Gamer',
+            email: json.user.email || '',
+            role: json.user.role || 'user'
           })
         }
       } catch (e) {

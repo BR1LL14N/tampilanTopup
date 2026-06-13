@@ -6,12 +6,10 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
-import { createClient } from "@/lib/supabase/client"
 import { getItemAssetForProduct } from "@/lib/assets"
 import { Loader2, Calculator, Info, Zap, ChevronRight, Award, Flame, RefreshCw, ShoppingCart } from "lucide-react"
 
 export default function CalculatorPage() {
-  const supabase = createClient()
   const [games, setGames] = useState<any[]>([])
   const [products, setProducts] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -26,14 +24,14 @@ export default function CalculatorPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: dbGames } = await supabase.from("games").select("*")
-        const { data: dbProducts } = await supabase.from("products").select("*")
+        const res = await fetch("/api/calculator/data")
+        const json = await res.json()
 
-        if (dbGames) setGames(dbGames)
-        if (dbProducts) setProducts(dbProducts)
+        if (json.games) setGames(json.games)
+        if (json.products) setProducts(json.products)
 
-        if (dbGames && dbGames.length > 0) {
-          setSelectedGameId(dbGames[0].id)
+        if (json.games && json.games.length > 0) {
+          setSelectedGameId(json.games[0].id)
         }
       } catch (err) {
         console.error("Error fetching data for calculator:", err)

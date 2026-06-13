@@ -109,10 +109,9 @@ export function SidebarContentWrapper({
     // Otherwise, perform background check to keep state in sync
     const checkAuth = async () => {
       try {
-        const { createClient } = await import("@/lib/supabase/client")
-        const supabase = createClient()
-        const { data } = await supabase.auth.getSession()
-        const hasSession = !!data?.session
+        const res = await fetch("/api/auth/me")
+        const json = await res.json()
+        const hasSession = !!json.user
         setIsAuth(hasSession)
         
         // Update the cache if mismatch is found
@@ -120,9 +119,9 @@ export function SidebarContentWrapper({
         if (hasSession && !currentCache) {
           const { setCachedUser } = await import("@/lib/auth-cache")
           setCachedUser({
-            name: data.session?.user.user_metadata?.name || data.session?.user.email || '',
-            email: data.session?.user.email || '',
-            role: data.session?.user.user_metadata?.role || 'user'
+            name: json.user.name || '',
+            email: json.user.email || '',
+            role: json.user.role || 'user'
           })
         } else if (!hasSession && currentCache) {
           const { setCachedUser } = await import("@/lib/auth-cache")

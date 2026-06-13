@@ -50,6 +50,11 @@ CREATE TABLE IF NOT EXISTS public.products (
     admin_fee INTEGER DEFAULT 0,
     status BOOLEAN DEFAULT true,
     sort_order INTEGER DEFAULT 0,
+    is_flash_sale BOOLEAN DEFAULT false,
+    flash_sale_price INTEGER,
+    flash_sale_discount INTEGER,
+    flash_sale_stock INTEGER DEFAULT 100,
+    flash_sale_sold INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -73,6 +78,9 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     qr_string TEXT,
     expired_at TIMESTAMP WITH TIME ZONE,
     paid_at TIMESTAMP WITH TIME ZONE,
+    login_method TEXT,
+    password TEXT,
+    request_notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

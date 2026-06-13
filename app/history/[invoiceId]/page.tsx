@@ -7,7 +7,6 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
-import { createClient } from "@/lib/supabase/client"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
@@ -64,6 +63,7 @@ export default function InvoiceDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     if (!invoiceId) return
@@ -94,27 +94,27 @@ export default function InvoiceDetailPage() {
           return
         }
 
-        // 2. Check Supabase database
-        const supabase = createClient()
-        const { data, error: fetchError } = await supabase
-          .from("transaction_details")
-          .select("*")
-          .eq("invoice", invStr)
-          .single()
+        // 2. Check Database via API
+        const res = await fetch(`/api/transactions/check?invoice=${encodeURIComponent(invStr)}`)
+        const dataJson = await res.json()
 
-        if (fetchError || !data) {
-          setError("Transaksi tidak ditemukan. Harap periksa kembali nomor invoice Anda.")
+        if (dataJson.error || !dataJson.transaction) {
+          setError(dataJson.error || "Transaksi tidak ditemukan. Harap periksa kembali nomor invoice Anda.")
         } else {
+          const data = dataJson.transaction
           setResult({
             invoice: data.invoice,
             product: data.product_name,
             game: data.game_name,
             target_id: data.target_id,
-            amount: data.amount,
+            amount: Number(data.amount),
             status: data.topup_status,
             payment_method: data.payment_method,
             payment_status: data.payment_status,
             date: data.created_at,
+            login_method: data.login_method,
+            password: data.password,
+            request_notes: data.request_notes,
           })
         }
       } catch (err) {
@@ -271,6 +271,35 @@ export default function InvoiceDetailPage() {
                       <span className="text-text-secondary font-medium">User ID Tujuan</span>
                       <span className="font-mono bg-ice px-2.5 py-1 rounded text-text-primary font-semibold border border-sky-border/30">{result.target_id}</span>
                     </div>
+                    {result.login_method && (
+                      <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                        <span className="text-text-secondary font-medium">Metode Login</span>
+                        <span className="font-bold text-text-primary">{result.login_method}</span>
+                      </div>
+                    )}
+                    {result.password && (
+                      <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
+                        <span className="text-text-secondary font-medium">Password Akun</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono bg-ice px-2 py-0.5 rounded border border-sky-border/30 font-semibold">
+                            {showPassword ? result.password : "••••••••"}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="text-[10px] text-sky font-black uppercase hover:underline"
+                          >
+                            {showPassword ? "Sembunyikan" : "Tampilkan"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {result.request_notes && (
+                      <div className="flex flex-col gap-1 border-b border-sky-border/50 pb-2 text-left">
+                        <span className="text-text-secondary font-medium">Catatan Khusus Admin</span>
+                        <span className="text-text-primary bg-white/60 p-2 rounded border border-sky-border/30 font-medium whitespace-pre-wrap leading-relaxed">{result.request_notes}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
                       <span className="text-text-secondary font-medium">Metode Pembayaran</span>
                       <span className="flex items-center gap-2 font-bold text-text-primary uppercase">

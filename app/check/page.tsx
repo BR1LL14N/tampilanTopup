@@ -5,11 +5,9 @@ import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
-import { createClient } from "@/lib/supabase/client"
 import { Loader2, Search, CheckCircle2, AlertTriangle, Clock, ArrowLeft, ShieldAlert } from "lucide-react"
 
 export default function CheckTransactionPage() {
-  const supabase = createClient()
   const [invoice, setInvoice] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
@@ -22,23 +20,22 @@ export default function CheckTransactionPage() {
     setResult(null)
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from("transaction_details")
-        .select("*")
-        .eq("invoice", invoice.trim().toUpperCase())
-        .single()
+      const res = await fetch(`/api/transactions/check?invoice=${encodeURIComponent(invoice.trim().toUpperCase())}`)
+      const dataJson = await res.json()
 
-      if (fetchError || !data) {
-        setError("Transaksi tidak ditemukan. Harap periksa kembali nomor invoice Anda.")
+      if (dataJson.error || !dataJson.transaction) {
+        setError(dataJson.error || "Transaksi tidak ditemukan. Harap periksa kembali nomor invoice Anda.")
         return
       }
+
+      const data = dataJson.transaction;
 
       setResult({
         invoice: data.invoice,
         product: data.product_name,
         game: data.game_name,
         target_id: data.target_id,
-        amount: data.amount,
+        amount: Number(data.amount),
         status: data.topup_status,
         payment_method: data.payment_method,
         payment_status: data.payment_status,

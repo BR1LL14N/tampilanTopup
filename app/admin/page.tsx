@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getCachedUser } from "@/lib/auth-cache"
+import { getCachedUser, setCachedUser } from "@/lib/auth-cache"
 import { formatCurrency } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -16,81 +16,71 @@ import {
   Users,
   Gamepad2,
   ArrowUpRight,
-  ArrowDownRight,
   ArrowRight,
   Shield,
-  Loader2,
+  RefreshCw,
+  Clock,
+  Power,
+  Settings,
+  AlertCircle,
+  CheckCircle2,
+  Code,
+  Wallet
 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 
 export default function AdminDashboardPage() {
   const router = useRouter()
-  const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
   const [stats, setStats] = useState<any[]>([])
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
   const [topProducts, setTopProducts] = useState<any[]>([])
+  const [currentUser, setCurrentUser] = useState<any>(null)
+
+  // Sync Settings States
+  const [isSyncActive, setIsSyncActive] = useState(true)
+  const [syncInterval, setSyncInterval] = useState(24)
+  const [lastSyncTime, setLastSyncTime] = useState("")
+  const [lastSyncStatus, setLastSyncStatus] = useState("idle")
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [saveLoading, setSaveLoading] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [syncMessage, setSyncMessage] = useState("")
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   useEffect(() => {
     // Read cache on mount
     const cached = getCachedUser()
     if (cached?.role === "admin") {
       setIsAdmin(true)
+      setCurrentUser(cached)
     }
 
     async function verifyAdminAndFetchData() {
       try {
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        if (!authUser) {
+        const resUser = await fetch("/api/auth/me")
+        const { user } = await resUser.json()
+
+        if (!user || user.role !== "admin") {
+          setCachedUser(null)
           router.push("/auth/login")
           return
         }
 
-        // Fetch user profile to check role
-        const { data: profile } = await supabase
-          .from("user_profiles")
-          .select("role")
-          .eq("id", authUser.id)
-          .single()
-
-        if (!profile || profile.role !== "admin") {
-          // Redirect non-admin to user dashboard
-          router.push("/dashboard")
-          return
-        }
-
         setIsAdmin(true)
+        setCachedUser(user)
+        setCurrentUser(user)
 
-        // 1. Fetch dynamic stats
-        const { count: userCount } = await supabase.from("user_profiles").select("*", { count: "exact", head: true })
-        const { count: gameCount } = await supabase.from("games").select("*", { count: "exact", head: true })
-        const { data: txs } = await supabase.from("transaction_details").select("*")
+        // Fetch stats
+        const resStats = await fetch("/api/admin/stats")
+        const data = await resStats.json()
 
-        let totalRevenue = 0
-        let totalTxCount = 0
-        if (txs) {
-          totalTxCount = txs.length
-          totalRevenue = txs
-            .filter((tx: any) => tx.payment_status === "paid" || tx.topup_status === "success")
-            .reduce((sum: number, tx: any) => sum + tx.amount, 0)
-
-          // Set recent transactions
-          const mappedTxs = txs.map((tx: any) => ({
-            invoice: tx.invoice,
-            product: tx.product_name,
-            game: tx.game_name,
-            amount: tx.amount,
-            status: tx.topup_status,
-            time: formatDateRelative(tx.created_at),
-          }))
-          setRecentTransactions(mappedTxs.slice(0, 5))
-        }
+        if (data.error) throw new Error(data.error)
 
         setStats([
           {
             title: "Total Revenue",
-            value: formatCurrency(totalRevenue),
+            value: formatCurrency(Number(data.stats.totalRevenue) || 0),
             change: "+12.5%",
             trend: "up",
             icon: TrendingUp,
@@ -98,7 +88,7 @@ export default function AdminDashboardPage() {
           },
           {
             title: "Total Transaksi",
-            value: String(totalTxCount),
+            value: String(data.stats.totalTxCount || 0),
             change: "+8.2%",
             trend: "up",
             icon: ShoppingBag,
@@ -106,7 +96,7 @@ export default function AdminDashboardPage() {
           },
           {
             title: "Total User",
-            value: String(userCount || 0),
+            value: String(data.stats.userCount || 0),
             change: "+15.3%",
             trend: "up",
             icon: Users,
@@ -114,27 +104,55 @@ export default function AdminDashboardPage() {
           },
           {
             title: "Total Game",
-            value: String(gameCount || 0),
+            value: String(data.stats.gameCount || 0),
             change: "0%",
             trend: "neutral",
             icon: Gamepad2,
             color: "text-purple-500 bg-purple-50 border-purple-500/20",
           },
+          {
+            title: "Saldo Digiflazz",
+            value: formatCurrency(Number(data.stats.digiflazzBalance) || 0),
+            change: "Live",
+            trend: "neutral",
+            icon: Wallet,
+            color: "text-amber-500 bg-amber-50 border-amber-500/20",
+          },
         ])
 
-        // 2. Fetch products for top seller mock/real calculation
-        const { data: dbProducts } = await supabase.from("product_details").select("*")
-        if (dbProducts) {
-          const sorted = dbProducts
-            .map((p: any) => ({
-              name: p.name,
-              game: p.game_name,
-              sku: p.provider_sku,
-              sold: Math.floor(Math.random() * 30) + 5, // Mocked sold count for dashboard display
-              revenue: p.sell_price * (Math.floor(Math.random() * 10) + 1),
-            }))
-            .sort((a: any, b: any) => b.revenue - a.revenue)
-          setTopProducts(sorted.slice(0, 4))
+        if (data.recentTransactions) {
+          setRecentTransactions(data.recentTransactions.map((tx: any) => ({
+            invoice: tx.invoice,
+            product: tx.product_name,
+            game: tx.game_name,
+            amount: Number(tx.amount) || 0,
+            status: tx.topup_status,
+            time: formatDateRelative(tx.created_at),
+          })))
+        }
+
+        if (data.topProducts) {
+          setTopProducts(data.topProducts.map((p: any) => ({
+            name: p.name,
+            game: p.game_name,
+            sku: p.sku,
+            sold: Number(p.sold) || 0,
+            revenue: Number(p.revenue) || 0
+          })))
+        }
+
+        // Fetch sync settings
+        try {
+          const resSettings = await fetch("/api/admin/settings")
+          const settingsData = await resSettings.json()
+          if (settingsData.settings) {
+            setIsSyncActive(settingsData.settings.isSyncActive)
+            setSyncInterval(settingsData.settings.syncInterval)
+            setLastSyncTime(settingsData.settings.lastSyncTime)
+            setLastSyncStatus(settingsData.settings.lastSyncStatus)
+          }
+        } catch (err) {
+          console.error("Error loading sync settings:", err)
         }
 
       } catch (err) {
@@ -144,7 +162,58 @@ export default function AdminDashboardPage() {
       }
     }
     verifyAdminAndFetchData()
-  }, [router])
+  }, [router, refreshTrigger])
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaveLoading(true)
+    setSaveSuccess(false)
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isSyncActive,
+          syncInterval,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setSaveSuccess(true)
+        setTimeout(() => setSaveSuccess(false), 3000)
+      } else {
+        alert(data.error || "Gagal menyimpan pengaturan")
+      }
+    } catch (err: any) {
+      alert(err.message || "Gagal menyimpan pengaturan")
+    } finally {
+      setSaveLoading(false)
+    }
+  }
+
+  const handleManualSync = async () => {
+    if (isSyncing) return
+    setIsSyncing(true)
+    setSyncMessage("")
+    try {
+      const res = await fetch("/api/admin/sync/trigger?manual=true", {
+        method: "POST",
+      })
+      const data = await res.json()
+      if (data.success) {
+        setSyncMessage(`Berhasil menyinkronkan ${data.gamesCount || 0} Game dan memperbarui produk.`)
+        setRefreshTrigger(prev => prev + 1)
+      } else {
+        setSyncMessage(`Gagal: ${data.error || "Kesalahan tidak dikenal"}`)
+      }
+    } catch (err: any) {
+      setSyncMessage(`Gagal: ${err.message || "Koneksi terputus"}`)
+    } finally {
+      setIsSyncing(false)
+    }
+  }
 
   // Simple human-readable date helper
   const formatDateRelative = (dateStr: string) => {
@@ -247,7 +316,7 @@ export default function AdminDashboardPage() {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-sky/5 rounded-full blur-3xl pointer-events-none" />
 
-      <Header user={{ name: "Admin", email: "admin@gametopup.com", role: "admin" }} />
+      <Header user={currentUser} />
 
       <SidebarContentWrapper isAuthenticated={isAdmin}>
         <main className="flex-1 py-10">
@@ -292,7 +361,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
           {stats.map((stat, index) => (
             <div key={index} className="relative p-[1px] bg-gradient-to-r from-sky/20 to-sky/10 hover:from-sky/30 hover:to-sky/20 transition-all duration-300" style={bevelStyle}>
               <div className="bg-white p-6 flex flex-col justify-between" style={bevelStyle}>
@@ -390,9 +459,190 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Top Products Panel */}
-          <div className="lg:col-span-4">
-            <div className="bg-white rounded-2xl border-sky-border shadow-sky-soft relative overflow-hidden">
+          {/* Right Column: Sync & Top Products */}
+          <div className="lg:col-span-4 space-y-8">
+            {/* Sync Settings Card */}
+            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft relative overflow-hidden">
+              <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
+              <div className="p-6 border-b border-sky-border flex items-center justify-between">
+                <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
+                  <Settings className="h-4 w-4 text-sky" />
+                  Auto-Sync Control
+                </h3>
+                <span className={`inline-block px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded ${
+                  lastSyncStatus === "success"
+                    ? "bg-green-50 text-green-500 border border-green-500/20"
+                    : lastSyncStatus === "failed"
+                    ? "bg-red-50 text-red-500 border border-red-500/20"
+                    : "bg-blue-50 text-sky border border-sky/20"
+                }`} style={tagBevelStyle}>
+                  {lastSyncStatus === "success" ? "Aktif & Ok" : lastSyncStatus === "failed" ? "Gagal" : "Idle"}
+                </span>
+              </div>
+
+              <form onSubmit={handleSaveSettings} className="p-6 space-y-5">
+                {/* Active Toggle */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                      <Power className="h-3.5 w-3.5 text-sky" />
+                      Status Sinkronisasi
+                    </label>
+                    <p className="text-[10px] text-text-muted">Aktifkan sinkronisasi otomatis harga.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsSyncActive(!isSyncActive)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      isSyncActive ? "bg-sky" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        isSyncActive ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Interval Input */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-sky" />
+                    Interval Sinkronisasi
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <div className="flex items-center bg-white" style={inputBevelStyle}>
+                      <input
+                        type="number"
+                        min="1"
+                        max="168"
+                        value={syncInterval}
+                        onChange={(e) => setSyncInterval(Math.max(1, parseInt(e.target.value) || 1))}
+                        className="w-full px-3 py-2 text-xs font-semibold font-mono text-text-primary focus:outline-none bg-transparent"
+                      />
+                      <span className="pr-3 text-[10px] font-black uppercase text-text-muted tracking-wider shrink-0 select-none">
+                        Jam Sekali
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-text-muted leading-relaxed">
+                    Sistem akan menyinkronkan katalog harga modal Digiflazz setiap {syncInterval} jam.
+                  </p>
+                </div>
+
+                {/* Save Button */}
+                <div className="flex gap-2">
+                  <div className="relative p-[1px] bg-sky/30 hover:bg-sky transition-all duration-300 flex-1" style={inputBevelStyle}>
+                    <button
+                      type="submit"
+                      disabled={saveLoading}
+                      className="w-full bg-white/95 py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors disabled:opacity-50"
+                      style={inputBevelStyle}
+                    >
+                      {saveLoading ? "Menyimpan..." : "Simpan Pengaturan"}
+                    </button>
+                  </div>
+
+                  <div className="relative p-[1px] bg-sky-border hover:bg-sky/30 transition-all duration-300" style={inputBevelStyle}>
+                    <button
+                      type="button"
+                      onClick={handleManualSync}
+                      disabled={isSyncing}
+                      className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                      style={inputBevelStyle}
+                    >
+                      <RefreshCw className={`h-3 w-3 text-sky ${isSyncing ? "animate-spin" : ""}`} />
+                      Sync
+                    </button>
+                  </div>
+                </div>
+
+                {/* Status Messages */}
+                {saveSuccess && (
+                  <div className="p-3 bg-green-50 border border-green-500/20 text-green-600 rounded-xl flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Pengaturan disimpan!</span>
+                  </div>
+                )}
+
+                {syncMessage && (
+                  <div className={`p-3 border rounded-xl flex items-start gap-2 ${
+                    syncMessage.startsWith("Berhasil")
+                      ? "bg-green-50 border-green-500/20 text-green-600"
+                      : "bg-red-50 border-red-500/20 text-red-600"
+                  }`}>
+                    {syncMessage.startsWith("Berhasil") ? (
+                      <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                    )}
+                    <span className="text-[10px] font-bold leading-normal">{syncMessage}</span>
+                  </div>
+                )}
+
+                {/* Metadata details */}
+                <div className="pt-3 border-t border-sky-border/50 space-y-1.5 text-[10px] text-text-muted font-medium">
+                  <div className="flex justify-between">
+                    <span>Terakhir Sinkron:</span>
+                    <span className="font-mono text-text-secondary">{lastSyncTime ? new Date(lastSyncTime).toLocaleString("id-ID") : "-"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Waktu Relatif:</span>
+                    <span className="font-semibold text-text-secondary">{lastSyncTime ? formatDateRelative(lastSyncTime) : "-"}</span>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* Rekomendasi Produksi (Cron Job Tips) Card */}
+            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft relative overflow-hidden">
+              <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
+              <div className="p-6 border-b border-sky-border">
+                <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
+                  <Code className="h-4 w-4 text-sky" />
+                  Rekomendasi Produksi (Cron)
+                </h3>
+              </div>
+              <div className="p-6 space-y-4 text-xs text-text-secondary leading-relaxed">
+                <p>
+                  Untuk memastikan harga modal &amp; jual selalu up-to-date, pasang penjadwal tugas otomatis (Cron Job / Task Scheduler) untuk memicu API di bawah:
+                </p>
+
+                <div className="space-y-1">
+                  <span className="font-bold text-text-primary uppercase tracking-wider text-[9px]">Langkah 1: Setup Kunci Keamanan</span>
+                  <p className="text-[10px] text-text-muted">
+                    Definisikan token rahasia di file <code className="bg-ice px-1 py-0.5 rounded text-sky font-mono font-bold text-[9px]">.env.local</code> Anda:
+                  </p>
+                  <pre className="bg-ice p-2.5 rounded-lg border border-sky-border/50 text-[10px] font-mono text-sky font-bold overflow-x-auto select-all">
+                    DIGIFLAZZ_WEBHOOK_SECRET=mitsurusecurewebhooksecret99f3a1b7c8d2e6a0a
+                  </pre>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="font-bold text-text-primary uppercase tracking-wider text-[9px]">Langkah 2: Konfigurasi Penjadwal</span>
+                  <p className="text-[10px] text-text-muted">
+                    Tambahkan perintah berikut di Linux Crontab (<code className="font-mono text-[9px]">crontab -e</code>) untuk berjalan otomatis setiap malam (00:00):
+                  </p>
+                  <pre className="bg-ice p-2.5 rounded-lg border border-sky-border/50 text-[9px] font-mono text-text-primary overflow-x-auto select-all whitespace-pre-wrap break-all">
+                    0 0 * * * curl -s "https://yourdomain.com/api/admin/sync/trigger?key=mitsurusecurewebhooksecret99f3a1b7c8d2e6a0a" &gt;/dev/null 2&gt;&amp;1
+                  </pre>
+                </div>
+
+                <div className="bg-amber-50/50 border border-amber-500/10 p-3 rounded-xl space-y-1 text-[10px] text-text-muted">
+                  <span className="font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    Catatan
+                  </span>
+                  <p className="leading-relaxed">
+                    Ganti <code className="font-mono text-[9px]">yourdomain.com</code> dengan domain web Anda. Token URL di atas disesuaikan dengan nilai env Anda.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Top Products Panel */}
+            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft relative overflow-hidden">
               <div className="p-6 border-b border-sky-border">
                 <h3 className="text-base font-black uppercase tracking-wide text-text-primary">
                   Produk Terlaris
@@ -408,7 +658,7 @@ export default function AdminDashboardPage() {
                       <div>
                       <p className="font-extrabold text-text-primary text-xs uppercase tracking-tight">{p.name}</p>
                       <p className="mt-0.5 flex items-center gap-1.5 text-[9px] font-bold text-text-muted uppercase tracking-wider">
-                        <img src={getGameAssetByName(p.game)?.icon} alt="" className="h-3 w-3 rounded object-cover" />
+                        <img src={getGameAssetByName(p.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
                         {p.game} • {p.sold} terjual
                       </p>
                       </div>

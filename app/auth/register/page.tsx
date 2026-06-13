@@ -39,17 +39,18 @@ export default function RegisterPage() {
     }
 
     try {
-      const { error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name,
-          },
-        },
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
       })
 
-      if (authError) throw authError
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
 
       // Redirect to login with success message
       router.push("/auth/login?registered=true")

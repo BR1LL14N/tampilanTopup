@@ -15,6 +15,13 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,7 +30,7 @@ import {
 import { Header } from "@/components/layout/header"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getCachedUser } from "@/lib/auth-cache"
+import { getCachedUser, setCachedUser } from "@/lib/auth-cache"
 import { formatCurrency, formatDate, getStatusBgColor } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
 import {
@@ -40,7 +47,6 @@ import {
   XCircle,
   Loader2,
 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 
 export default function AdminTransactionsPage() {
   const router = useRouter()
@@ -49,6 +55,138 @@ export default function AdminTransactionsPage() {
   const [transactionsList, setTransactionsList] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  
+  // Detail Dialog states
+  const [selectedTx, setSelectedTx] = useState<any | null>(null)
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [showAdminPassword, setShowAdminPassword] = useState(false)
+  const [updatingStatus, setUpdatingStatus] = useState(false)
+
+  const handleUpdateStatus = async (txId: string, paymentStatus: string | undefined, topupStatus: string) => {
+    setUpdatingStatus(true)
+    try {
+      const res = await fetch("/api/admin/transactions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          id: txId, 
+          payment_status: paymentStatus, 
+          topup_status: topupStatus 
+        })
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      
+      // Update local state list
+      setTransactionsList((prev: any[]) => prev.map(tx => tx.id === txId ? { ...tx, topup_status: topupStatus } : tx))
+      if (selectedTx && selectedTx.id === txId) {
+        setSelectedTx((prev: any) => prev ? { ...prev, topup_status: topupStatus } : null)
+      }
+    } catch (err: any) {
+      alert(`Gagal memperbarui status: ${err.message}`)
+    } finally {
+      setUpdatingStatus(false)
+    }
+  }
+
+  const handleRetry = async (txId: string) => {
+    if (!confirm("Apakah Anda yakin ingin memproses ulang transaksi ini via Digiflazz?")) return;
+    setUpdatingStatus(true)
+    try {
+      const res = await fetch("/api/admin/transactions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: txId, action: "retry" })
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      
+      const newStatus = data.topup_status
+      const providerRef = data.provider_ref
+      
+      // Update local state list
+      setTransactionsList((prev: any[]) => prev.map(tx => tx.id === txId ? { ...tx, topup_status: newStatus, provider_ref: providerRef } : tx))
+      if (selectedTx && selectedTx.id === txId) {
+        setSelectedTx((prev: any) => prev ? { ...prev, topup_status: newStatus, provider_ref: providerRef } : null)
+      }
+      alert(`Transaksi berhasil diproses ulang. Status terbaru: ${newStatus === "success" ? "Sukses" : newStatus === "processing" ? "Diproses/Pending" : "Gagal"}`)
+    } catch (err: any) {
+      alert(`Gagal memproses ulang: ${err.message}`)
+    } finally {
+      setUpdatingStatus(false)
+    }
+  }
+
+  const handleRefund = async (txId: string) => {
+    if (!confirm("Apakah Anda yakin ingin menandai transaksi ini sebagai REFUNDED dan menyetel status ke GAGAL?")) return;
+    setUpdatingStatus(true)
+    try {
+      const res = await fetch("/api/admin/transactions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: txId, action: "refund" })
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      
+      // Update local state list
+      setTransactionsList((prev: any[]) => prev.map(tx => tx.id === txId ? { ...tx, topup_status: "failed", provider_ref: "REFUNDED" } : tx))
+      if (selectedTx && selectedTx.id === txId) {
+        setSelectedTx((prev: any) => prev ? { ...prev, topup_status: "failed", provider_ref: "REFUNDED" } : null)
+      }
+      alert("Transaksi berhasil ditandai sebagai REFUNDED.")
+    } catch (err: any) {
+      alert(`Gagal memproses refund: ${err.message}`)
+    } finally {
+      setUpdatingStatus(false)
+    }
+  }
+
+  const fetchAdminData = async () => {
+    try {
+      // Verify user auth session
+      const resUser = await fetch("/api/auth/me")
+      const { user } = await resUser.json()
+
+      if (!user || user.role !== "admin") {
+        setCachedUser(null)
+        router.push("/auth/login")
+        return
+      }
+
+      setCurrentUser(user)
+      setCachedUser(user)
+
+      // Fetch transactions list
+      const resTransactions = await fetch("/api/admin/transactions")
+      const { transactions, error } = await resTransactions.json()
+
+      if (error) throw new Error(error)
+
+      if (transactions) {
+        setTransactionsList(transactions.map((tx: any) => ({
+          id: tx.id,
+          invoice: tx.invoice,
+          user: tx.user_email || "Guest",
+          product: tx.product_name,
+          game: tx.game_name || "Game",
+          target_id: tx.target_id,
+          amount: Number(tx.amount) || 0,
+          topup_status: tx.topup_status,
+          created_at: tx.created_at,
+          login_method: tx.login_method,
+          password: tx.password,
+          request_notes: tx.request_notes,
+        })))
+      } else {
+        setTransactionsList([])
+      }
+    } catch (err) {
+      console.error("Failed to load admin transactions:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     // Read cache on mount
@@ -56,63 +194,6 @@ export default function AdminTransactionsPage() {
     if (cached) {
       setCurrentUser(cached)
     }
-
-    const fetchAdminData = async () => {
-      try {
-        const supabase = createClient()
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-
-        if (!authUser) {
-          router.push("/auth/login")
-          return
-        }
-
-        // Fetch profile and check role
-        const { data: profile } = await supabase
-          .from("user_profiles")
-          .select("name, email, role")
-          .eq("id", authUser.id)
-          .single()
-
-        if (!profile || profile.role !== "admin") {
-          router.push("/dashboard")
-          return
-        }
-
-        setCurrentUser({
-          name: profile.name || authUser.user_metadata?.name || authUser.email || "Admin",
-          email: authUser.email || "",
-          role: profile.role
-        })
-
-        // Fetch transactions from view
-        const { data: dbTransactions } = await supabase
-          .from("transaction_details")
-          .select("*")
-          .order("created_at", { ascending: false })
-
-        if (dbTransactions) {
-          setTransactionsList(dbTransactions.map((tx: any) => ({
-            id: tx.id,
-            invoice: tx.invoice,
-            user: tx.user_email || "Guest",
-            product: tx.product_name,
-            game: tx.game_name || "Game",
-            target_id: tx.target_id,
-            amount: tx.amount,
-            topup_status: tx.topup_status,
-            created_at: tx.created_at,
-          })))
-        } else {
-          setTransactionsList([])
-        }
-      } catch (err) {
-        console.error("Failed to load admin transactions:", err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchAdminData()
   }, [router])
 
@@ -347,9 +428,13 @@ export default function AdminTransactionsPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setSelectedTx(tx); setIsDetailOpen(true); setShowAdminPassword(false); }}>
                               <Eye className="h-4 w-4 mr-2" />
-                              Detail
+                              Detail & Kelola
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.push(`/history/${tx.invoice}`)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Lihat Invoice
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -363,6 +448,136 @@ export default function AdminTransactionsPage() {
         </div>
         </main>
       </SidebarContentWrapper>
+
+      {/* Detail & Status Management Dialog */}
+      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+        <DialogContent className="max-w-md bg-white border border-sky-border shadow-sky-medium rounded-[24px] overflow-hidden p-6 text-text-primary">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-base font-black uppercase text-text-primary">
+              Detail Transaksi
+            </DialogTitle>
+            <DialogDescription className="text-xs text-text-muted font-bold tracking-wider font-mono">
+              Invoice: {selectedTx?.invoice}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedTx && (
+            <div className="space-y-5 text-xs">
+              {/* Product and general info */}
+              <div className="border border-sky-border rounded-xl bg-ice/40 p-4 space-y-2.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-text-secondary font-medium">Game / Produk</span>
+                  <span className="font-bold text-text-primary">{selectedTx.game} - {selectedTx.product}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-text-secondary font-medium">Target ID / No. Tujuan</span>
+                  <span className="font-mono font-bold text-text-primary bg-white px-2 py-0.5 rounded border border-sky-border/20">{selectedTx.target_id}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-text-secondary font-medium">Total Pembayaran</span>
+                  <span className="font-black text-sky text-sm">{formatCurrency(selectedTx.amount)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-text-secondary font-medium">Status Saat Ini</span>
+                  <span className={`px-2 py-0.5 rounded-full font-bold uppercase text-[9px] ${getStatusBgColor(selectedTx.topup_status)}`}>
+                    {selectedTx.topup_status === "success" ? "Berhasil" : selectedTx.topup_status === "processing" ? "Diproses" : selectedTx.topup_status === "pending" ? "Pending" : "Gagal"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Joki credentials if present */}
+              {selectedTx.login_method && (
+                <div className="bg-ice border border-sky-border/60 p-4 rounded-xl space-y-3">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-sky">Kredensial Akun Joki</h4>
+                  
+                  <div className="flex justify-between text-xs items-center">
+                    <span className="text-text-secondary font-medium">Metode Login:</span>
+                    <strong className="text-text-primary bg-white px-2.5 py-1 border border-sky-border/20 rounded-lg">{selectedTx.login_method}</strong>
+                  </div>
+                  
+                  {selectedTx.password && (
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-text-secondary font-medium">Password Akun:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono bg-white px-2.5 py-1 border border-sky-border/20 rounded-lg font-semibold text-text-primary">
+                          {showAdminPassword ? selectedTx.password : "••••••••"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowAdminPassword(!showAdminPassword)}
+                          className="text-[10px] text-sky font-black uppercase hover:underline"
+                        >
+                          {showAdminPassword ? "Sembunyikan" : "Tampilkan"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedTx.request_notes && (
+                    <div className="flex flex-col gap-1 text-xs text-left pt-1 border-t border-sky-border/30">
+                      <span className="text-text-secondary font-semibold">Catatan Khusus Pelanggan:</span>
+                      <p className="bg-white p-2.5 rounded-lg border border-sky-border/20 font-medium text-text-primary whitespace-pre-wrap leading-relaxed">{selectedTx.request_notes}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Action Buttons to edit topup status */}
+              <div className="space-y-2 pt-2 border-t border-sky-border/40">
+                <span className="text-text-secondary font-black uppercase tracking-wider text-[10px] block">Kelola Status Pesanan</span>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    disabled={updatingStatus || selectedTx.topup_status === "processing"}
+                    onClick={() => handleUpdateStatus(selectedTx.id, undefined, "processing")}
+                    variant="outline"
+                    className="h-9 text-[10px] font-black uppercase tracking-wider border-amber-300 hover:bg-amber-50 text-amber-600 shrink-0"
+                  >
+                    Set Diproses
+                  </Button>
+                  <Button
+                    disabled={updatingStatus || selectedTx.topup_status === "success"}
+                    onClick={() => handleUpdateStatus(selectedTx.id, undefined, "success")}
+                    className="h-9 text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white hover:bg-emerald-700 shrink-0"
+                  >
+                    Set Berhasil
+                  </Button>
+                  <Button
+                    disabled={updatingStatus || selectedTx.topup_status === "failed"}
+                    onClick={() => handleUpdateStatus(selectedTx.id, undefined, "failed")}
+                    variant="destructive"
+                    className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-500 text-white hover:bg-red-600 shrink-0"
+                  >
+                    Set Gagal
+                  </Button>
+                </div>
+              </div>
+
+              {/* Special Actions for failed or problem transactions */}
+              <div className="space-y-2 pt-2 border-t border-sky-border/40">
+                <span className="text-text-secondary font-black uppercase tracking-wider text-[10px] block">Tindakan Penyelesaian (Gagal/Error)</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    disabled={updatingStatus}
+                    onClick={() => handleRetry(selectedTx.id)}
+                    variant="outline"
+                    className="h-9 text-[10px] font-black uppercase tracking-wider border-sky-border hover:bg-sky-border/20 text-sky shrink-0"
+                  >
+                    Proses Ulang (API)
+                  </Button>
+                  <Button
+                    disabled={updatingStatus || selectedTx.provider_ref === "REFUNDED"}
+                    onClick={() => handleRefund(selectedTx.id)}
+                    variant="destructive"
+                    className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-600 hover:bg-red-700 text-white shrink-0"
+                  >
+                    Refund & Set Gagal
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

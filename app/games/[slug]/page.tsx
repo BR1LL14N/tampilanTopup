@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
+import { getCurrentUser } from "@/lib/auth"
+import { GameService } from "@/lib/services/game-service"
+import { ProductService } from "@/lib/services/product-service"
 import { GameDetailContent } from "@/components/game/game-detail-content"
 import { gameAssets, getGameAsset } from "@/lib/assets"
+
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -9,23 +13,16 @@ interface Props {
 
 export default async function GameDetailPage({ params }: Props) {
   const { slug } = await params
-  const supabase = await createClient()
 
-  // Fetch game and its products from Supabase
-  const { data: dbGame } = await supabase
-    .from('games')
-    .select('*, products(*)')
-    .eq('slug', slug)
-    .eq('status', true)
-    .eq('products.status', true)
-    .single()
+  // Fetch game by slug
+  const dbGame = await GameService.getBySlug(slug);
 
-  if (!dbGame) {
+  if (!dbGame || !dbGame.status) {
     notFound()
   }
 
-  // Sort products by sort_order
-  const sortedProducts = (dbGame.products || []).sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
+  // Fetch active products for this game slug
+  const dbProducts = await ProductService.getProductsByGameSlug(slug);
 
   const game = {
     name: dbGame.name,
@@ -34,23 +31,23 @@ export default async function GameDetailPage({ params }: Props) {
     image: getGameAsset(dbGame.slug)?.poster || dbGame.image || gameAssets["mobile-legends"].poster,
     description: dbGame.description || "",
     category: dbGame.category || "Game",
-    products: sortedProducts.map((p: any) => ({
+    products: dbProducts.map((p: any) => ({
       id: p.id,
       name: p.name,
-      price: p.price,
-      sell_price: p.sell_price,
+      price: Number(p.price) || 0,
+      sell_price: Number(p.sell_price) || 0,
       provider_sku: p.provider_sku,
     }))
   }
 
   let user = null
   try {
-    const { data } = await supabase.auth.getUser()
-    if (data?.user) {
+    const sessionUser = await getCurrentUser()
+    if (sessionUser) {
       user = {
-        name: data.user.user_metadata?.name || data.user.email || '',
-        email: data.user.email || '',
-        role: 'user'
+        name: sessionUser.name,
+        email: sessionUser.email,
+        role: sessionUser.role
       }
     }
   } catch (e) {

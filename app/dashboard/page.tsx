@@ -25,7 +25,6 @@ import {
   Shield,
   History,
 } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -39,6 +38,7 @@ export default function DashboardPage() {
     { label: "Gagal", value: "0", icon: XCircle, color: "text-red-500 bg-red-50 border-red-500/20" },
   ])
   const [totalSpent, setTotalSpent] = useState(0)
+  const [digiflazzBalance, setDigiflazzBalance] = useState<number | null>(null)
 
   useEffect(() => {
     // Read cache on mount
@@ -49,41 +49,34 @@ export default function DashboardPage() {
 
     const fetchDashboardData = async () => {
       try {
-        const supabase = createClient()
-        const { data: { user: authUser } } = await supabase.auth.getUser()
+        const res = await fetch("/api/user/dashboard")
+        const dataJson = await res.json()
 
+        if (dataJson.error) {
+          router.push("/auth/login")
+          return
+        }
+
+        const authUser = dataJson.user
         if (!authUser) {
           router.push("/auth/login")
           return
         }
 
-        // Fetch profile
-        const { data: profile } = await supabase
-          .from("user_profiles")
-          .select("name, email, role")
-          .eq("id", authUser.id)
-          .single()
-
         const userObj = {
-          name: profile?.name || authUser.user_metadata?.name || authUser.email || "Gamer",
+          name: authUser.name || authUser.email || "Gamer",
           email: authUser.email || "",
-          role: profile?.role || "user"
+          role: authUser.role || "user"
         }
         setCurrentUser(userObj)
 
-        // Fetch transactions from public.transaction_details
-        const { data: txs } = await supabase
-          .from("transaction_details")
-          .select("*")
-          .eq("user_id", authUser.id)
-          .order("created_at", { ascending: false })
-
+        const txs = dataJson.transactions
         if (txs) {
           const mappedTxs = txs.map((tx: any) => ({
             invoice: tx.invoice,
             product: tx.product_name,
             game: tx.game_name,
-            amount: tx.amount,
+            amount: Number(tx.amount),
             status: tx.topup_status,
             date: tx.created_at,
           }))
@@ -105,8 +98,12 @@ export default function DashboardPage() {
           // Total spent (successful payments)
           const spent = txs
             .filter((tx: any) => tx.payment_status === "paid" || tx.topup_status === "success")
-            .reduce((sum: number, tx: any) => sum + tx.amount, 0)
+            .reduce((sum: number, tx: any) => sum + Number(tx.amount), 0)
           setTotalSpent(spent)
+        }
+
+        if (dataJson.digiflazzBalance !== undefined) {
+          setDigiflazzBalance(dataJson.digiflazzBalance)
         }
       } catch (err) {
         console.error("Failed to load dashboard data:", err)
@@ -354,6 +351,26 @@ export default function DashboardPage() {
 
           {/* Right Column: Sidebar Actions */}
           <div className="lg:col-span-4 space-y-6">
+
+            {/* Admin-only Digiflazz Balance HUD */}
+            {currentUser?.role === "admin" && (
+              <div className="relative p-[1px] bg-gradient-to-tr from-amber-500/30 to-yellow-500/30 rounded-2xl shadow-sky-soft">
+                <div className="bg-white p-6 rounded-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-xl pointer-events-none" />
+
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-amber-600 mb-4 flex items-center gap-2">
+                    <Wallet className="h-4.5 w-4.5 text-amber-500" />
+                    Saldo Digiflazz (Admin)
+                  </h3>
+                  <p className="text-3xl font-black text-amber-500 font-mono leading-none mb-1">
+                    Rp {digiflazzBalance !== null ? digiflazzBalance.toLocaleString("id-ID") : "..."}
+                  </p>
+                  <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                    Saldo deposit H2H aktif
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Total Spending HUD */}
             <div className="relative p-[1px] bg-gradient-to-tr from-sky/30 to-diamond/30 rounded-2xl shadow-sky-soft">
