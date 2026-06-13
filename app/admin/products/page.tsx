@@ -25,10 +25,10 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog"
 import { Header } from "@/components/layout/header"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
@@ -55,79 +55,175 @@ export default function AdminProductsPage() {
   const [games, setGames] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
+  const [syncing, setSyncing] = useState(false)
+  const [markupPercent, setMarkupPercent] = useState("10")
+  const [syncStatus, setSyncStatus] = useState<string | null>(null)
+  const [editingProduct, setEditingProduct] = useState<any | null>(null)
+  const [editedSellPrice, setEditedSellPrice] = useState("")
+  const [warnBelowCost, setWarnBelowCost] = useState(false)
 
-  // Modal States
-  const [selectedProduct, setSelectedProduct] = useState<any>(null)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [editForm, setEditForm] = useState({
-    game_id: "",
-    name: "",
-    provider_sku: "",
-    price: 0,
-    sell_price: 0,
-    status: true,
-    sort_order: 0,
-    is_flash_sale: false,
-    flash_sale_price: 0,
-    flash_sale_stock: 100,
-  })
-
-  const fetchAdminData = async () => {
+  const handleSync = async () => {
+    // Bug #5 fix: validate markup is not negative before sending to API
+    const markupNum = parseFloat(markupPercent)
+    if (isNaN(markupNum) || markupNum < 0) {
+      setSyncStatus("Error: Markup tidak boleh negatif. Masukkan nilai antara 0–100.")
+      return
+    }
     try {
-      // Verify user auth session
-      const resUser = await fetch("/api/auth/me")
-      const { user } = await resUser.json()
-
-      if (!user || user.role !== "admin") {
-        setCachedUser(null)
-        router.push("/auth/login")
-        return
-      }
-
-      setCurrentUser(user)
-      setCachedUser(user)
-
-      // Fetch games list for select input
-      const resGames = await fetch("/api/admin/games")
-      const { games } = await resGames.json()
-      if (games) {
-        setGames(games)
-      }
-
-      // Fetch products list from API
-      const resProducts = await fetch("/api/admin/products")
-      const { products, error } = await resProducts.json()
-
-      if (error) throw new Error(error)
-
-      if (products && products.length > 0) {
-        setProductsList(products.map((p: any) => ({
-          id: p.id,
-          game_id: p.game_id,
-          name: p.name,
-          game: p.game_name,
-          slug: p.game_slug,
-          icon: p.game_icon || "🎮",
-          provider_sku: p.provider_sku,
-          price: Number(p.price) || 0,
-          sell_price: Number(p.sell_price) || 0,
-          status: p.status ? true : false,
-          sort_order: p.sort_order || 0,
-          is_flash_sale: p.is_flash_sale ? true : false,
-          flash_sale_price: Number(p.flash_sale_price) || 0,
-          flash_sale_stock: Number(p.flash_sale_stock) || 100,
-          transactions: 0
-        })))
+      setSyncing(true)
+      setSyncStatus(null)
+      const res = await fetch(`/api/admin/sync-products?markup=${markupPercent}`, {
+        method: "POST"
+      })
+      const data = await res.json()
+      if (data.success) {
+        const { newAdded, updated, skipped, totalFromDigiflazz } = data.summary;
+        let msg = `Berhasil menyinkronkan: ${newAdded} produk baru, ${updated} produk diperbarui.`;
+        if (totalFromDigiflazz > 0 && (newAdded + updated) === 0) {
+          msg += ` (${skipped} produk dari Digiflazz tidak cocok dengan game yang terdaftar di database — cek konsol browser untuk detail sampleItems.)`;
+        } else if (totalFromDigiflazz === 0) {
+          msg += ` Digiflazz mengembalikan 0 produk — kemungkinan API key atau koneksi bermasalah.`;
+        }
+        setSyncStatus(msg);
+        // Log Digiflazz sample items to console for debugging category/brand names
+        if (data.sampleItems?.length > 0) {
+          console.log('[Digiflazz Sync] Sample items dari API (10 pertama):', data.sampleItems);
+        }
+        if (data.log?.length > 0) {
+          console.log('[Digiflazz Sync] Produk yang cocok:', data.log);
+        }
+        
+        // Refresh products list
+        const supabase = createClient()
+        const { data: dbProducts } = await supabase
+          .from("product_details")
+          .select("*")
+          .order("sort_order", { ascending: true })
+        
+        if (dbProducts && dbProducts.length > 0) {
+          setProductsList(dbProducts.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            game: p.game_name,
+            slug: p.game_slug,
+            icon: p.game_icon || "🎮",
+            provider_sku: p.provider_sku,
+            price: p.price,
+            sell_price: p.sell_price,
+            status: p.status,
+            transactions: 0
+          })))
+        }
       } else {
-        setProductsList([])
+        setSyncStatus(`Error: ${data.error || "Gagal melakukan sync"}`)
       }
-    } catch (err) {
-      console.error("Failed to load admin products data:", err)
+    } catch (err: any) {
+      console.error(err)
+      setSyncStatus(`Error: ${err.message || "Gagal melakukan sync"}`)
     } finally {
-      setLoading(false)
+      setSyncing(false)
     }
   }
+
+  const handleSavePrice = async (forceSubmit = false) => {
+    if (!editingProduct) return
+    const priceNum = parseInt(editedSellPrice)
+    if (isNaN(priceNum) || priceNum <= 0) {
+      alert("Harga jual tidak valid. Harus lebih dari 0.")
+      return
+    }
+
+    // Bug #4 fix: warn if sell price is below cost price (HPP) but allow with confirmation
+    if (!forceSubmit && priceNum < editingProduct.price) {
+      setWarnBelowCost(true)
+      return
+    }
+
+    setWarnBelowCost(false)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from("products")
+        .update({ 
+          sell_price: priceNum, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq("id", editingProduct.id)
+
+      if (error) {
+        alert(`Gagal mengupdate harga: ${error.message}`)
+      } else {
+        setProductsList(prev => prev.map(p => p.id === editingProduct.id ? { ...p, sell_price: priceNum } : p))
+        setEditingProduct(null)
+      }
+    } catch (err: any) {
+      alert(`Error: ${err.message}`)
+    }
+  }
+
+  useEffect(() => {
+    // Read cache on mount
+    const cached = getCachedUser()
+    if (cached) {
+      setCurrentUser(cached)
+    }
+
+    const fetchAdminData = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+
+        if (!authUser) {
+          router.push("/auth/login")
+          return
+        }
+
+        // Fetch profile and check role
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("name, email, role")
+          .eq("id", authUser.id)
+          .single()
+
+        if (!profile || profile.role !== "admin") {
+          router.push("/dashboard")
+          return
+        }
+
+        setCurrentUser({
+          name: profile.name || authUser.user_metadata?.name || authUser.email || "Admin",
+          email: authUser.email || "",
+          role: profile.role
+        })
+
+        // Fetch products list from view public.product_details
+        const { data: dbProducts } = await supabase
+          .from("product_details")
+          .select("*")
+          .order("sort_order", { ascending: true })
+
+        if (dbProducts && dbProducts.length > 0) {
+          setProductsList(dbProducts.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            game: p.game_name,
+            slug: p.game_slug,
+            icon: p.game_icon || "🎮",
+            provider_sku: p.provider_sku,
+            price: p.price,
+            sell_price: p.sell_price,
+            status: p.status,
+            transactions: 0
+          })))
+        } else {
+          setProductsList([])
+        }
+      } catch (err) {
+        console.error("Failed to load admin products data:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
 
   useEffect(() => {
     // Read cache on mount
@@ -301,20 +397,65 @@ export default function AdminProductsPage() {
 
       <SidebarContentWrapper isAuthenticated={!!currentUser}>
         <main className="flex-1 py-8">
-          <div className="container">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">Kelola Produk</h1>
-                <p className="text-muted-foreground">
-                  Kelola produk top up untuk setiap game
-                </p>
+        <div className="container">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Kelola Produk</h1>
+              <p className="text-muted-foreground">
+                Kelola produk top up untuk setiap game
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-sky-border shadow-sm">
+                <span className="text-xs font-semibold text-text-secondary whitespace-nowrap">Markup:</span>
+                <Input
+                  type="number"
+                  value={markupPercent}
+                  onChange={(e) => setMarkupPercent(e.target.value)}
+                  className="w-14 h-7 text-center text-xs font-semibold p-1 focus-visible:ring-sky"
+                  min="0"
+                  max="100"
+                />
+                <span className="text-xs font-semibold text-text-secondary">%</span>
               </div>
-              <Button onClick={handleOpenAdd} className="gap-2 bg-sky text-white hover:bg-sky/90">
+              
+              <Button 
+                variant="outline"
+                onClick={handleSync} 
+                disabled={syncing}
+                className="gap-2 border-sky text-sky hover:bg-sky/5 rounded-xl shadow-sm h-10"
+              >
+                {syncing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Syncing...
+                  </>
+                ) : (
+                  <>
+                    <TrendingUp className="h-4 w-4" />
+                    Sync dari Digiflazz
+                  </>
+                )}
+              </Button>
+
+              <Button className="gap-2 rounded-xl h-10">
                 <Plus className="h-4 w-4" />
                 Tambah Produk
               </Button>
             </div>
+          </div>
+
+          {/* Sync Status Banner */}
+          {syncStatus && (
+            <div className={`mb-6 p-4 rounded-xl border text-sm font-medium ${
+              syncStatus.startsWith('Error') 
+                ? 'bg-red-50 border-red-200 text-red-700' 
+                : 'bg-green-50 border-green-200 text-green-700'
+            }`}>
+              {syncStatus}
+            </div>
+          )}
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mb-8">
@@ -363,269 +504,178 @@ export default function AdminProductsPage() {
               </Tabs>
             </div>
 
-            {/* Products Table */}
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Produk</TableHead>
-                      <TableHead>SKU</TableHead>
-                      <TableHead>Harga Modal</TableHead>
-                      <TableHead>Harga Jual</TableHead>
-                      <TableHead>Event</TableHead>
-                      <TableHead>Profit</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredProducts.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ice p-1.5">
-                              <img
-                                src={getItemAssetForProduct(product.name, product.provider_sku, product.game)}
-                                alt=""
-                                className="max-h-full max-w-full object-contain"
-                              />
-                            </span>
-                            <div>
-                              <p className="font-medium">{product.name}</p>
-                              <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                                <span className="text-[10px]">{getGameAsset(product.slug)?.icon}</span>
-                                {product.game}
-                              </p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">
-                          {product.provider_sku}
-                        </TableCell>
-                        <TableCell>{formatCurrency(product.price)}</TableCell>
-                        <TableCell>
-                          {product.is_flash_sale ? (
-                            <div>
-                              <span className="font-semibold text-sky">{formatCurrency(product.flash_sale_price)}</span>
-                              <span className="block text-[10px] text-text-muted line-through">{formatCurrency(product.sell_price)}</span>
-                            </div>
-                          ) : (
-                            formatCurrency(product.sell_price)
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {product.is_flash_sale ? (
-                            <span className="px-2 py-0.5 rounded bg-red-100 text-red-600 text-[10px] font-black uppercase">
-                              Flash Sale
-                            </span>
-                          ) : (
-                            <span className="text-[11px] text-text-muted">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-green-500">
-                          +{formatCurrency(
-                            (product.is_flash_sale ? product.flash_sale_price : product.sell_price) - product.price
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
-                              product.status ? "success" : "failed"
-                            )}`}
-                          >
-                            {product.status ? "Aktif" : "Nonaktif"}
+          {/* Products Table */}
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Produk</TableHead>
+                    <TableHead>SKU</TableHead>
+                    <TableHead>Harga Modal</TableHead>
+                    <TableHead>Harga Jual</TableHead>
+                    <TableHead>Profit</TableHead>
+                    <TableHead>Transaksi</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ice p-1.5">
+                            <img
+                              src={getItemAssetForProduct(product.name, product.provider_sku, product.game)}
+                              alt=""
+                              className="max-h-full max-w-full object-contain"
+                            />
                           </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => router.push("/games/" + product.slug)}>
-                                <Eye className="h-4 w-4 mr-2" />
-                                Lihat di Toko
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleOpenEdit(product)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit Produk
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-500" onClick={() => handleDeleteProduct(product.id)}>
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Hapus
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
+                          <div>
+                            <p className="font-medium">{product.name}</p>
+                            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                              <img
+                                src={getGameAsset(product.slug)?.icon}
+                                alt=""
+                                className="h-4 w-4 rounded object-cover"
+                              />
+                              {product.game}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {product.provider_sku}
+                      </TableCell>
+                      <TableCell>{formatCurrency(product.price)}</TableCell>
+                      <TableCell>{formatCurrency(product.sell_price)}</TableCell>
+                      <TableCell className="text-green-500">
+                        +{formatCurrency(product.sell_price - product.price)}
+                      </TableCell>
+                      <TableCell>{product.transactions}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
+                            product.status ? "success" : "failed"
+                          )}`}
+                        >
+                          {product.status ? "Aktif" : "Nonaktif"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Lihat
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setEditingProduct(product);
+                              setEditedSellPrice(product.sell_price.toString());
+                            }}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Harga
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-500">
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
         </main>
       </SidebarContentWrapper>
 
-      {/* Edit/Add Product Dialog Modal */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md bg-white border border-sky-border rounded-[24px] p-6 shadow-sky-medium">
+      {/* Dialog Edit Harga */}
+      <Dialog open={!!editingProduct} onOpenChange={(open) => { if (!open) setEditingProduct(null); }}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-text-primary uppercase tracking-wide">
-              {selectedProduct ? "Edit Produk" : "Tambah Produk Baru"}
-            </DialogTitle>
-            <DialogDescription className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-              {selectedProduct ? "Atur harga markup, status aktif, dan parameter Flash Sale." : "Masukkan data nominal produk baru."}
+            <DialogTitle>Edit Harga Jual</DialogTitle>
+            <DialogDescription>
+              Ubah harga jual untuk produk <strong>{editingProduct?.name}</strong>.
             </DialogDescription>
           </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <span className="text-right text-sm font-medium text-text-secondary">
+                Harga Modal
+              </span>
+              <div className="col-span-3 font-mono text-sm font-semibold text-text-primary">
+                {editingProduct ? formatCurrency(editingProduct.price) : "-"}
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="sell-price" className="text-right text-sm font-medium text-text-secondary">
+                Harga Jual
+              </label>
+              <Input
+                id="sell-price"
+                type="number"
+                value={editedSellPrice}
+                onChange={(e) => { setEditedSellPrice(e.target.value); setWarnBelowCost(false); }}
+                className="col-span-3 rounded-xl border-sky-border"
+              />
+            </div>
+            {editingProduct && parseInt(editedSellPrice) > 0 && (() => {
+              const profit = parseInt(editedSellPrice) - editingProduct.price;
+              return (
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="text-right text-xs font-semibold text-text-secondary">Profit</span>
+                  <span className={`col-span-3 text-xs font-black ${profit >= 0 ? "text-green-500" : "text-red-500"}`}>
+                    {profit >= 0 ? "+" : ""}{formatCurrency(profit)}
+                  </span>
+                </div>
+              );
+            })()}
 
-          <form onSubmit={handleSaveProduct} className="space-y-4 my-2">
-            {!selectedProduct && (
-              <div className="space-y-1.5">
-                <Label htmlFor="product_game" className="text-xs font-bold text-text-secondary uppercase">Game</Label>
-                <select
-                  id="product_game"
-                  value={editForm.game_id}
-                  onChange={(e) => setEditForm({ ...editForm, game_id: e.target.value })}
-                  className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  required
-                >
-                  {games.map((game) => (
-                    <option key={game.id} value={game.id}>{game.name}</option>
-                  ))}
-                </select>
+            {/* Bug #4 fix: Warning banner when sell_price < HPP */}
+            {warnBelowCost && (
+              <div className="col-span-4 rounded-xl bg-amber-50 border border-amber-300 p-3 text-sm text-amber-800">
+                <p className="font-semibold mb-2">⚠️ Harga jual di bawah harga modal!</p>
+                <p className="text-xs mb-3">
+                  Menetapkan harga jual lebih rendah dari harga modal akan menyebabkan <strong>kerugian per transaksi</strong>. Apakah Anda yakin ingin menyimpan?
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setWarnBelowCost(false)}
+                    className="rounded-lg text-xs h-7 border-amber-400 text-amber-700 hover:bg-amber-100"
+                  >
+                    Ubah Harga
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => handleSavePrice(true)}
+                    className="rounded-lg text-xs h-7 bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    Tetap Simpan
+                  </Button>
+                </div>
               </div>
             )}
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="product_name" className="text-xs font-bold text-text-secondary uppercase">Nama Item / Nominal</Label>
-                <Input
-                  id="product_name"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  placeholder="e.g. 86 Diamonds"
-                  required
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="product_sku" className="text-xs font-bold text-text-secondary uppercase">SKU Provider (Digiflazz)</Label>
-                <Input
-                  id="product_sku"
-                  value={editForm.provider_sku}
-                  onChange={(e) => setEditForm({ ...editForm, provider_sku: e.target.value })}
-                  placeholder="e.g. ML86"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="product_price" className="text-xs font-bold text-text-secondary uppercase">Harga Modal (Rp)</Label>
-                <Input
-                  id="product_price"
-                  type="number"
-                  value={editForm.price}
-                  onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) || 0 })}
-                  placeholder="Harga modal provider"
-                  required
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="product_sell_price" className="text-xs font-bold text-text-secondary uppercase">Harga Jual (Rp) - Markup</Label>
-                <Input
-                  id="product_sell_price"
-                  type="number"
-                  value={editForm.sell_price}
-                  onChange={(e) => setEditForm({ ...editForm, sell_price: Number(e.target.value) || 0 })}
-                  placeholder="Harga jual web"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="product_sort" className="text-xs font-bold text-text-secondary uppercase">Sort Order</Label>
-                <Input
-                  id="product_sort"
-                  type="number"
-                  value={editForm.sort_order}
-                  onChange={(e) => setEditForm({ ...editForm, sort_order: Number(e.target.value) || 0 })}
-                  placeholder="0"
-                />
-              </div>
-              <div className="flex items-center gap-2 pt-6">
-                <input
-                  id="product_status"
-                  type="checkbox"
-                  checked={editForm.status}
-                  onChange={(e) => setEditForm({ ...editForm, status: e.target.checked })}
-                  className="h-4 w-4 rounded border-gray-300 text-sky focus:ring-sky cursor-pointer"
-                />
-                <Label htmlFor="product_status" className="text-xs font-bold text-text-secondary uppercase cursor-pointer select-none">
-                  Produk Aktif
-                </Label>
-              </div>
-            </div>
-
-            {/* Flash Sale Section */}
-            <div className="border-t border-sky-border pt-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-black text-text-primary uppercase tracking-wide">Setting Event Flash Sale</h4>
-                  <p className="text-[10px] text-text-muted">Masukkan produk ini ke halaman promo flash sale</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={editForm.is_flash_sale}
-                  onChange={(e) => setEditForm({ ...editForm, is_flash_sale: e.target.checked })}
-                  className="h-4.5 w-4.5 rounded border-gray-300 text-sky focus:ring-sky cursor-pointer"
-                />
-              </div>
-
-              {editForm.is_flash_sale && (
-                <div className="grid grid-cols-2 gap-4 animate-in fade-in-50 duration-200">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="fs_price" className="text-[10px] font-bold text-text-secondary uppercase">Harga Flash Sale (Rp)</Label>
-                    <Input
-                      id="fs_price"
-                      type="number"
-                      value={editForm.flash_sale_price}
-                      onChange={(e) => setEditForm({ ...editForm, flash_sale_price: Number(e.target.value) || 0 })}
-                      placeholder="e.g. 19800"
-                      required={editForm.is_flash_sale}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="fs_stock" className="text-[10px] font-bold text-text-secondary uppercase">Kuota Stok Flash Sale</Label>
-                    <Input
-                      id="fs_stock"
-                      type="number"
-                      value={editForm.flash_sale_stock}
-                      onChange={(e) => setEditForm({ ...editForm, flash_sale_stock: Number(e.target.value) || 0 })}
-                      placeholder="100"
-                      required={editForm.is_flash_sale}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <DialogFooter className="pt-4 gap-2">
-              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                Batal
-              </Button>
-              <Button type="submit" className="bg-sky text-white hover:bg-sky/90" disabled={saving}>
-                {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Simpan
-              </Button>
-            </DialogFooter>
-          </form>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEditingProduct(null); setWarnBelowCost(false); }} className="rounded-xl">
+              Batal
+            </Button>
+            <Button onClick={() => handleSavePrice(false)} className="rounded-xl">
+              Simpan Perubahan
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
