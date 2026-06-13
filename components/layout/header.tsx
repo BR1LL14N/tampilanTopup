@@ -70,9 +70,7 @@ const staticGames = [
   { name: "Valorant", publisher: "Riot Games", image: gameAssets.valorant.icon, slug: "valorant" },
   { name: "PUBG Mobile", publisher: "Tencent Games", image: gameAssets["pubg-mobile"].icon, slug: "pubg-mobile" },
   { name: "Genshin Impact", publisher: "HoYoverse", image: gameAssets["genshin-impact"].icon, slug: "genshin-impact" },
-  { name: "Steam Wallet", publisher: "Valve", image: gameAssets.steam.icon, slug: "steam" },
-  { name: "TikTok Live", publisher: "TikTok", image: gameAssets.tiktok.icon, slug: "tiktok" },
-  { name: "Bigo Live", publisher: "BIGO", image: gameAssets.bigo.icon, slug: "bigo" }
+  { name: "Steam Wallet", publisher: "Valve", image: gameAssets.steam.icon, slug: "steam" }
 ]
 
 export function Header({ user }: HeaderProps) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { executeQuery } from "@/lib/db";
 import { hashPassword, signToken } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
   try {

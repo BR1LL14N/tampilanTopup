@@ -1,4 +1,5 @@
 import { executeQuery } from "@/lib/db";
+import crypto from "crypto";
 
 export interface GameData {
   id?: string;

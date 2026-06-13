@@ -1,76 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { verifyAdmin } from '@/lib/auth';
+import { executeQuery } from '@/lib/db';
 import { checkPriceList } from '@/lib/digiflazz';
+import crypto from 'crypto';
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // 1. Authenticate user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // 1. Authenticate user database-agnostically
+    const isAdmin = await verifyAdmin();
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // 2. Check if user is an admin
-    const { data: profile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile || profile.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    const adminSupabase = await createAdminClient();
-
-    // 3. Get query parameters / body options
+    // 2. Get query parameters / body options
     const url = new URL(req.url);
     const markupParam = url.searchParams.get('markup') || '10'; // Default 10% markup
     const markupPercent = parseFloat(markupParam);
     const multiplier = 1 + (isNaN(markupPercent) ? 10 : markupPercent) / 100;
 
-    // 4. Fetch Digiflazz price list
+    // 3. Fetch Digiflazz price list
     const priceListRes = await checkPriceList();
 
-    // Digiflazz wraps response in different ways depending on API version / mode.
-    // Possible structures:
-    //   A) { data: [ ...items ] }                          ← standard prepaid list
-    //   B) { data: { code, message, data: [ ...items ] } } ← error or alternate wrapper
-    //   C) { rc, message, ... }                            ← top-level error response
     let rawProducts: any[] | null = null;
 
     if (Array.isArray(priceListRes?.data)) {
-      // Structure A — standard
       rawProducts = priceListRes.data;
     } else if (Array.isArray(priceListRes?.data?.data)) {
-      // Structure B — nested
       rawProducts = priceListRes.data.data;
     } else if (Array.isArray(priceListRes)) {
-      // Structure C — response IS the array directly
       rawProducts = priceListRes;
     }
 
     if (!rawProducts) {
-      // Could not extract a product list — return debug info so admin can inspect
       return NextResponse.json({
         error: 'Gagal membaca daftar produk dari Digiflazz. Struktur respons tidak dikenali.',
         digiflazzRawResponse: priceListRes
       }, { status: 502 });
     }
 
-    // 5. Fetch current games and products from Supabase database
-    let { data: games, error: gamesError } = await adminSupabase
-      .from('games')
-      .select('id, name, slug');
-    
-    if (gamesError || !games) {
-      return NextResponse.json({ error: 'Failed to fetch games from database' }, { status: 500 });
-    }
+    // 4. Fetch current games from database
+    const dbGames = await executeQuery("SELECT id, name, slug FROM games");
+    let gamesList: any[] = [...dbGames];
 
-    // 5b. Auto-create missing games from Digiflazz brands
-    const missingGamesToInsert: any[] = [];
+    // 5. Auto-create missing games from Digiflazz brands
     const processedBrands = new Set<string>();
 
     for (const item of rawProducts) {
@@ -99,8 +73,8 @@ export async function POST(req: NextRequest) {
       }
       processedBrands.add(brandLower);
 
-      // Check if this brand has a match in current games
-      const existingGame = games.find(g => {
+      // Check if this brand has a match in current games list
+      const existingGame = gamesList.find(g => {
         const normalizedBrand = brandLower.trim();
         if (normalizedBrand.includes('mobile legend') && g.slug === 'mobile-legends') return true;
         if (normalizedBrand.includes('free fire') && g.slug === 'free-fire') return true;
@@ -113,14 +87,14 @@ export async function POST(req: NextRequest) {
       });
 
       if (!existingGame) {
-        // Generate a clean slug
         const slug = brandLower.trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        // If slug matches an existing slug exactly, avoid inserting it to prevent duplicate keys
-        if (games.some(g => g.slug === slug)) {
+        if (gamesList.some(g => g.slug === slug)) {
           continue;
         }
         
-        missingGamesToInsert.push({
+        const newGameId = crypto.randomUUID();
+        const newGame = {
+          id: newGameId,
           name: brand,
           slug: slug,
           image: 'https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400',
@@ -129,47 +103,30 @@ export async function POST(req: NextRequest) {
           status: true,
           description: `Top up ${brand} murah dan proses instan.`,
           publisher: 'Digiflazz'
-        });
-      }
-    }
+        };
 
-    if (missingGamesToInsert.length > 0) {
-      const { error: insertGamesError } = await adminSupabase
-        .from('games')
-        .insert(missingGamesToInsert);
-
-      if (insertGamesError) {
-        console.error('Failed to auto-insert missing games:', insertGamesError);
-      } else {
-        // Refresh games list to include newly inserted games
-        const { data: refreshedGames, error: refreshError } = await adminSupabase
-          .from('games')
-          .select('id, name, slug');
-        if (!refreshError && refreshedGames) {
-          games = refreshedGames;
+        try {
+          await executeQuery(
+            `INSERT INTO games (id, name, slug, image, icon, category, status, description, publisher) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+            [newGame.id, newGame.name, newGame.slug, newGame.image, newGame.icon, newGame.category, newGame.status ? 1 : 0, newGame.description, newGame.publisher]
+          );
+          gamesList.push(newGame);
+        } catch (insertErr) {
+          console.error(`Failed to auto-insert game ${brand}:`, insertErr);
         }
       }
     }
 
-    const { data: existingProducts, error: productsError } = await adminSupabase
-      .from('products')
-      .select('id, game_id, provider_sku, name, price, sell_price, status');
-
-    if (productsError || !existingProducts) {
-      return NextResponse.json({ error: 'Failed to fetch existing products from database' }, { status: 500 });
-    }
+    // 6. Fetch existing products from database
+    const dbProducts = await executeQuery("SELECT id, game_id, provider_sku, name, price, sell_price, status FROM products");
 
     // Create a map of existing products by provider_sku for fast lookup
     const existingProductsMap = new Map<string, any>();
-    existingProducts.forEach(p => {
+    dbProducts.forEach((p: any) => {
       existingProductsMap.set(p.provider_sku.toLowerCase(), p);
     });
 
-    // 6. Map Digiflazz products to existing games in database
-    // Separated into insertData (new) and updateData (existing) to avoid needing
-    // a UNIQUE constraint on provider_sku — we match existing rows by their primary key (id).
-    const insertData: any[] = [];
-    const updateData: { id: string; payload: any }[] = [];
     let newCount = 0;
     let updateCount = 0;
     let skippedCount = 0;
@@ -179,33 +136,32 @@ export async function POST(req: NextRequest) {
     const findMatchingGame = (brand: string) => {
       const normalizedBrand = brand.toLowerCase().trim();
       
-      // Match rules
       if (normalizedBrand.includes('mobile legend') || normalizedBrand.includes('mlbb')) {
-        return games.find(g => g.slug === 'mobile-legends');
+        return gamesList.find(g => g.slug === 'mobile-legends');
       }
       if (normalizedBrand.includes('free fire')) {
-        return games.find(g => g.slug === 'free-fire');
+        return gamesList.find(g => g.slug === 'free-fire');
       }
       if (normalizedBrand.includes('pubg')) {
-        return games.find(g => g.slug === 'pubg-mobile');
+        return gamesList.find(g => g.slug === 'pubg-mobile');
       }
       if (normalizedBrand.includes('valorant')) {
-        return games.find(g => g.slug === 'valorant');
+        return gamesList.find(g => g.slug === 'valorant');
       }
       if (normalizedBrand.includes('genshin')) {
-        return games.find(g => g.slug === 'genshin-impact');
+        return gamesList.find(g => g.slug === 'genshin-impact');
       }
       if (normalizedBrand.includes('honor of kings') || normalizedBrand.includes('hok')) {
-        return games.find(g => g.slug === 'honor-of-kings');
+        return gamesList.find(g => g.slug === 'honor-of-kings');
       }
       
-      // Try exact or prefix slug matching as fallback
-      return games.find(g => 
+      return gamesList.find(g => 
         normalizedBrand === g.name.toLowerCase() || 
         g.name.toLowerCase().includes(normalizedBrand)
       );
     };
 
+    // 7. Sync products database-agnostically
     for (const item of rawProducts) {
       const category = (item.category || '').toLowerCase();
       const brand = item.brand || '';
@@ -213,9 +169,6 @@ export async function POST(req: NextRequest) {
       const name = item.product_name;
       const price = parseInt(item.price) || 0;
 
-      // Filter: Only game vouchers/items that are active on both sides.
-      // Note: Digiflazz category names in production can differ from simulation.
-      // We use a broad match to catch variants like "Games", "Voucher Game", "game voucher", etc.
       const brandLower = brand.toLowerCase();
       const isGameCategory =
         category.includes('voucher') ||
@@ -228,7 +181,9 @@ export async function POST(req: NextRequest) {
         brandLower.includes('honor of kings') ||
         brandLower.includes('mlbb');
 
-      if (!isGameCategory || !item.buyer_product_status || !item.seller_product_status) {
+      const isActive = item.buyer_product_status === true && item.seller_product_status === true;
+
+      if (!isGameCategory || !isActive) {
         skippedCount++;
         continue;
       }
@@ -236,99 +191,69 @@ export async function POST(req: NextRequest) {
       const matchingGame = findMatchingGame(brand);
       if (!matchingGame) {
         skippedCount++;
-        continue; // Skip if no game matches the brand
+        continue; 
       }
 
       const skuLower = sku.toLowerCase();
       const existingProduct = existingProductsMap.get(skuLower);
 
       if (existingProduct) {
-        // Product exists - update the HPP price, keep sell_price unless it would cause a loss
+        // Product exists - update cost price and keep/adjust selling price to avoid loss
         let newSellPrice = existingProduct.sell_price;
         let adjusted = false;
 
         if (price >= existingProduct.sell_price) {
-          // New cost price is >= current sell price - auto-markup to avoid selling at a loss
-          newSellPrice = Math.round(price * multiplier);
+          // Auto-markup to avoid selling at a loss, rounded up to nearest Rp 100
+          const rawPrice = price * multiplier;
+          newSellPrice = Math.ceil(rawPrice / 100) * 100;
           adjusted = true;
         }
 
-        // Push to update batch: matched by primary key (id), no UNIQUE constraint needed
-        updateData.push({
-          id: existingProduct.id,
-          payload: {
-            game_id: matchingGame.id,
-            provider_sku: sku,
-            name: name,
-            price: price,
+        try {
+          await executeQuery(
+            `UPDATE products 
+             SET game_id = $1, name = $2, price = $3, sell_price = $4, status = $5, updated_at = CURRENT_TIMESTAMP 
+             WHERE id = $6`,
+            [matchingGame.id, name, price, newSellPrice, isActive ? 1 : 0, existingProduct.id]
+          );
+          updateCount++;
+          syncedItemsLog.push({
+            sku,
+            name,
+            game: matchingGame.name,
+            old_price: existingProduct.price,
+            new_price: price,
             sell_price: newSellPrice,
-            updated_at: new Date().toISOString()
-          }
-        });
-
-        updateCount++;
-        syncedItemsLog.push({
-          sku,
-          name,
-          game: matchingGame.name,
-          old_price: existingProduct.price,
-          new_price: price,
-          sell_price: newSellPrice,
-          type: 'UPDATE',
-          adjusted_sell_price: adjusted
-        });
+            type: 'UPDATE',
+            adjusted_sell_price: adjusted
+          });
+        } catch (err) {
+          console.error(`Failed to update product ${sku}:`, err);
+        }
       } else {
-        // Brand-new product - insert with default markup
-        const initialSellPrice = Math.round(price * multiplier);
+        // Brand-new product - insert with default markup, rounded to nearest Rp 100
+        const rawSellPrice = price * multiplier;
+        const initialSellPrice = Math.ceil(rawSellPrice / 100) * 100;
+        const id = crypto.randomUUID();
 
-        insertData.push({
-          game_id: matchingGame.id,
-          provider_sku: sku,
-          name: name,
-          price: price,
-          sell_price: initialSellPrice,
-          status: true
-        });
-
-        newCount++;
-        syncedItemsLog.push({
-          sku,
-          name,
-          game: matchingGame.name,
-          price: price,
-          sell_price: initialSellPrice,
-          type: 'NEW'
-        });
-      }
-    }
-
-    // 7a. Bulk INSERT new products (no unique constraint needed)
-    if (insertData.length > 0) {
-      const { error: insertError } = await adminSupabase
-        .from('products')
-        .insert(insertData);
-
-      if (insertError) {
-        console.error('Bulk insert failed during sync:', insertError);
-        return NextResponse.json({
-          error: 'Failed to insert new products to database',
-          details: insertError.message
-        }, { status: 500 });
-      }
-    }
-
-    // 7b. UPDATE existing products one-by-one using their primary key (id)
-    // This avoids needing a UNIQUE constraint on provider_sku.
-    const updateErrors: string[] = [];
-    for (const item of updateData) {
-      const { error: updateError } = await adminSupabase
-        .from('products')
-        .update(item.payload)
-        .eq('id', item.id);
-
-      if (updateError) {
-        console.error(`Failed to update product id=${item.id}:`, updateError);
-        updateErrors.push(`id=${item.id}: ${updateError.message}`);
+        try {
+          await executeQuery(
+            `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [id, matchingGame.id, sku, name, price, initialSellPrice, isActive ? 1 : 0, 0]
+          );
+          newCount++;
+          syncedItemsLog.push({
+            sku,
+            name,
+            game: matchingGame.name,
+            price: price,
+            sell_price: initialSellPrice,
+            type: 'NEW'
+          });
+        } catch (err) {
+          console.error(`Failed to insert product ${sku}:`, err);
+        }
       }
     }
 
@@ -338,10 +263,8 @@ export async function POST(req: NextRequest) {
         totalFromDigiflazz: rawProducts.length,
         newAdded: newCount,
         updated: updateCount,
-        skipped: skippedCount,
-        updateErrors: updateErrors.length > 0 ? updateErrors : undefined
+        skipped: skippedCount
       },
-      // First 10 items for debugging (so admin can verify categories/brands look correct)
       sampleItems: rawProducts.slice(0, 10).map((i: any) => ({
         name: i.product_name,
         brand: i.brand,

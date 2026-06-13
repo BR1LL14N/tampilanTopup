@@ -74,8 +74,6 @@ const catalogItems = [
   { title: "GENSHIN", eyebrow: "TOP UP GAME", publisher: "HoYoverse", bg: gameAssets["genshin-impact"].poster, tab: "all", slug: "genshin-impact" },
   { title: "ROBLOX", eyebrow: "VOUCHER", publisher: "Roblox Corporation", bg: gameAssets.roblox.poster, tab: "voucher", slug: "roblox" },
   { title: "STEAM WALLET", eyebrow: "VOUCHER", publisher: "Valve", bg: gameAssets.steam.poster, tab: "voucher", slug: "steam" },
-  { title: "TIKTOK LIVE", eyebrow: "LIVE APP", publisher: "TikTok", bg: gameAssets.tiktok.poster, tab: "live", slug: "tiktok" },
-  { title: "BIGO LIVE", eyebrow: "LIVE APP", publisher: "BIGO", bg: gameAssets.bigo.poster, tab: "live", slug: "bigo" },
 ]
 
 export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContentProps) {
@@ -92,24 +90,27 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
     : diagonalCards;
 
   const catalogList = dbGames.length > 0
-    ? dbGames.map((game) => {
-        let tab = "all";
-        const categoryLower = game.category?.toLowerCase() || "";
-        if (categoryLower.includes("voucher") || categoryLower.includes("gift card")) {
-          tab = "voucher";
-        } else if (categoryLower.includes("live") || categoryLower.includes("app") || categoryLower.includes("coin")) {
-          tab = "live";
-        }
-        
-        return {
-          title: game.name.toUpperCase(),
-          eyebrow: tab === "voucher" ? "VOUCHER" : tab === "live" ? "LIVE APP" : "TOP UP GAME",
-          publisher: game.category || "Game",
-          bg: getGameAsset(game.slug)?.poster || game.image || "/assets/games/mobile-legends/poster.png",
-          tab,
-          slug: game.slug,
-        };
-      })
+    ? dbGames
+        .filter((game) => {
+          const categoryLower = game.category?.toLowerCase() || "";
+          return !(categoryLower.includes("live") || categoryLower.includes("app") || categoryLower.includes("coin"));
+        })
+        .map((game) => {
+          let tab = "all";
+          const categoryLower = game.category?.toLowerCase() || "";
+          if (categoryLower.includes("voucher") || categoryLower.includes("gift card")) {
+            tab = "voucher";
+          }
+          
+          return {
+            title: game.name.toUpperCase(),
+            eyebrow: tab === "voucher" ? "VOUCHER" : "TOP UP GAME",
+            publisher: game.category || "Game",
+            bg: getGameAsset(game.slug)?.poster || game.image || "/assets/games/mobile-legends/poster.png",
+            tab,
+            slug: game.slug,
+          };
+        })
     : catalogItems;
 
   const handleSliderClick = (action: string) => {
@@ -458,16 +459,6 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               }`}
             >
               Voucher Digital
-            </button>
-            <button
-              onClick={() => setActiveTab("live")}
-              className={`px-6 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
-                activeTab === "live"
-                  ? "bg-sky text-white shadow-sky-soft"
-                  : "bg-white/60 hover:bg-white text-text-secondary hover:text-text-primary border border-sky-border/80"
-              }`}
-            >
-              Live App Coins
             </button>
           </div>
 
