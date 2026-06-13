@@ -29,13 +29,13 @@ export async function checkBalance(): Promise<any> {
 
   const sign = generateDepoSignature();
 
-  const response = await fetch('https://api.digiflazz.com/v1/depo', {
+  const response = await fetch('https://api.digiflazz.com/v1/cek-saldo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      cmd: 'depo',
+      cmd: 'deposit',
       username: DIGIFLAZZ_CONFIG.username,
       sign,
     }),
