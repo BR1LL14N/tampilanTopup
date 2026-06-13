@@ -11,6 +11,39 @@ export function generatePriceListSignature(): string {
   return crypto.createHash('md5').update(`${username}${apiKey}pricelist`).digest('hex');
 }
 
+export function generateDepoSignature(): string {
+  const { username, apiKey } = DIGIFLAZZ_CONFIG;
+  return crypto.createHash('md5').update(`${username}${apiKey}depo`).digest('hex');
+}
+
+export async function checkBalance(): Promise<any> {
+  const { mode } = DIGIFLAZZ_CONFIG;
+
+  if (mode === 'simulation') {
+    return {
+      data: {
+        deposit: 1250000
+      }
+    };
+  }
+
+  const sign = generateDepoSignature();
+
+  const response = await fetch('https://api.digiflazz.com/v1/depo', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      cmd: 'depo',
+      username: DIGIFLAZZ_CONFIG.username,
+      sign,
+    }),
+  });
+
+  return response.json();
+}
+
 export async function checkPriceList(): Promise<any> {
   const { mode } = DIGIFLAZZ_CONFIG;
 

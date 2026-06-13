@@ -89,6 +89,59 @@ export default function AdminTransactionsPage() {
     }
   }
 
+  const handleRetry = async (txId: string) => {
+    if (!confirm("Apakah Anda yakin ingin memproses ulang transaksi ini via Digiflazz?")) return;
+    setUpdatingStatus(true)
+    try {
+      const res = await fetch("/api/admin/transactions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: txId, action: "retry" })
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      
+      const newStatus = data.topup_status
+      const providerRef = data.provider_ref
+      
+      // Update local state list
+      setTransactionsList((prev: any[]) => prev.map(tx => tx.id === txId ? { ...tx, topup_status: newStatus, provider_ref: providerRef } : tx))
+      if (selectedTx && selectedTx.id === txId) {
+        setSelectedTx((prev: any) => prev ? { ...prev, topup_status: newStatus, provider_ref: providerRef } : null)
+      }
+      alert(`Transaksi berhasil diproses ulang. Status terbaru: ${newStatus === "success" ? "Sukses" : newStatus === "processing" ? "Diproses/Pending" : "Gagal"}`)
+    } catch (err: any) {
+      alert(`Gagal memproses ulang: ${err.message}`)
+    } finally {
+      setUpdatingStatus(false)
+    }
+  }
+
+  const handleRefund = async (txId: string) => {
+    if (!confirm("Apakah Anda yakin ingin menandai transaksi ini sebagai REFUNDED dan menyetel status ke GAGAL?")) return;
+    setUpdatingStatus(true)
+    try {
+      const res = await fetch("/api/admin/transactions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: txId, action: "refund" })
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      
+      // Update local state list
+      setTransactionsList((prev: any[]) => prev.map(tx => tx.id === txId ? { ...tx, topup_status: "failed", provider_ref: "REFUNDED" } : tx))
+      if (selectedTx && selectedTx.id === txId) {
+        setSelectedTx((prev: any) => prev ? { ...prev, topup_status: "failed", provider_ref: "REFUNDED" } : null)
+      }
+      alert("Transaksi berhasil ditandai sebagai REFUNDED.")
+    } catch (err: any) {
+      alert(`Gagal memproses refund: ${err.message}`)
+    } finally {
+      setUpdatingStatus(false)
+    }
+  }
+
   const fetchAdminData = async () => {
     try {
       // Verify user auth session
@@ -495,6 +548,29 @@ export default function AdminTransactionsPage() {
                     className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-500 text-white hover:bg-red-600 shrink-0"
                   >
                     Set Gagal
+                  </Button>
+                </div>
+              </div>
+
+              {/* Special Actions for failed or problem transactions */}
+              <div className="space-y-2 pt-2 border-t border-sky-border/40">
+                <span className="text-text-secondary font-black uppercase tracking-wider text-[10px] block">Tindakan Penyelesaian (Gagal/Error)</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    disabled={updatingStatus}
+                    onClick={() => handleRetry(selectedTx.id)}
+                    variant="outline"
+                    className="h-9 text-[10px] font-black uppercase tracking-wider border-sky-border hover:bg-sky-border/20 text-sky shrink-0"
+                  >
+                    Proses Ulang (API)
+                  </Button>
+                  <Button
+                    disabled={updatingStatus || selectedTx.provider_ref === "REFUNDED"}
+                    onClick={() => handleRefund(selectedTx.id)}
+                    variant="destructive"
+                    className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-600 hover:bg-red-700 text-white shrink-0"
+                  >
+                    Refund & Set Gagal
                   </Button>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdmin } from "@/lib/auth";
 import { executeQuery } from "@/lib/db";
+import { checkBalance } from "@/lib/digiflazz";
 
 export const dynamic = "force-dynamic";
 
@@ -60,12 +61,24 @@ export async function GET(req: NextRequest) {
       LIMIT 4
     `, ['paid', 'success']);
 
+    // 6. Fetch Digiflazz Balance
+    let digiflazzBalance = 0;
+    try {
+      const balanceRes = await checkBalance();
+      if (balanceRes && balanceRes.data) {
+        digiflazzBalance = Number(balanceRes.data.deposit) || 0;
+      }
+    } catch (balErr) {
+      console.error("Failed to fetch Digiflazz balance for stats:", balErr);
+    }
+
     return NextResponse.json({
       stats: {
         userCount,
         gameCount,
         totalTxCount,
-        totalRevenue
+        totalRevenue,
+        digiflazzBalance
       },
       recentTransactions: recentTxRows,
       topProducts: topProductRows

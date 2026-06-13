@@ -24,7 +24,8 @@ import {
   Settings,
   AlertCircle,
   CheckCircle2,
-  Code
+  Code,
+  Wallet
 } from "lucide-react"
 
 export default function AdminDashboardPage() {
@@ -108,6 +109,14 @@ export default function AdminDashboardPage() {
             trend: "neutral",
             icon: Gamepad2,
             color: "text-purple-500 bg-purple-50 border-purple-500/20",
+          },
+          {
+            title: "Saldo Digiflazz",
+            value: formatCurrency(Number(data.stats.digiflazzBalance) || 0),
+            change: "Live",
+            trend: "neutral",
+            icon: Wallet,
+            color: "text-amber-500 bg-amber-50 border-amber-500/20",
           },
         ])
 
@@ -352,7 +361,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
           {stats.map((stat, index) => (
             <div key={index} className="relative p-[1px] bg-gradient-to-r from-sky/20 to-sky/10 hover:from-sky/30 hover:to-sky/20 transition-all duration-300" style={bevelStyle}>
               <div className="bg-white p-6 flex flex-col justify-between" style={bevelStyle}>

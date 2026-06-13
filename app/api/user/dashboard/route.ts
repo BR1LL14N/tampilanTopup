@@ -42,9 +42,23 @@ export async function GET(req: NextRequest) {
     // Fetch transactions by user ID using TransactionService
     const transactions = await TransactionService.getByUserId(userId);
 
+    let digiflazzBalance = null;
+    if (role === 'admin') {
+      try {
+        const { checkBalance } = await import('@/lib/digiflazz');
+        const balanceRes = await checkBalance();
+        if (balanceRes && balanceRes.data) {
+          digiflazzBalance = Number(balanceRes.data.deposit) || 0;
+        }
+      } catch (balErr) {
+        console.error("Failed to fetch Digiflazz balance for user dashboard admin:", balErr);
+      }
+    }
+
     return NextResponse.json({
       user: { id: userId, name, email, role },
-      transactions
+      transactions,
+      digiflazzBalance
     });
   } catch (err: any) {
     console.error("User dashboard API error:", err);
