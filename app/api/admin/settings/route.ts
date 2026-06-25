@@ -15,13 +15,15 @@ export async function GET(req: NextRequest) {
     const syncInterval = await SettingService.get("sync_interval_hours", 24);
     const lastSyncTime = await SettingService.get("last_sync_time", "");
     const lastSyncStatus = await SettingService.get("last_sync_status", "idle");
+    const midtransMode = await SettingService.get("midtrans_mode", "sandbox");
 
     return NextResponse.json({
       settings: {
         isSyncActive,
         syncInterval,
         lastSyncTime,
-        lastSyncStatus
+        lastSyncStatus,
+        midtransMode
       }
     });
   } catch (err: any) {
@@ -36,13 +38,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const { isSyncActive, syncInterval } = await req.json();
+    const { isSyncActive, syncInterval, midtransMode } = await req.json();
 
     if (isSyncActive !== undefined) {
       await SettingService.set("is_sync_cron_active", !!isSyncActive);
     }
     if (syncInterval !== undefined) {
       await SettingService.set("sync_interval_hours", Number(syncInterval));
+    }
+    if (midtransMode !== undefined) {
+      await SettingService.set("midtrans_mode", String(midtransMode));
     }
 
     return NextResponse.json({ success: true });

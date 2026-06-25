@@ -42,6 +42,7 @@ export default function AdminDashboardPage() {
   const [syncInterval, setSyncInterval] = useState(24)
   const [lastSyncTime, setLastSyncTime] = useState("")
   const [lastSyncStatus, setLastSyncStatus] = useState("idle")
+  const [midtransMode, setMidtransMode] = useState("sandbox")
   const [isSyncing, setIsSyncing] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
@@ -150,6 +151,7 @@ export default function AdminDashboardPage() {
             setSyncInterval(settingsData.settings.syncInterval)
             setLastSyncTime(settingsData.settings.lastSyncTime)
             setLastSyncStatus(settingsData.settings.lastSyncStatus)
+            setMidtransMode(settingsData.settings.midtransMode || "sandbox")
           }
         } catch (err) {
           console.error("Error loading sync settings:", err)
@@ -177,6 +179,7 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({
           isSyncActive,
           syncInterval,
+          midtransMode,
         }),
       })
       const data = await res.json()
@@ -528,6 +531,29 @@ export default function AdminDashboardPage() {
                   </div>
                   <p className="text-[10px] text-text-muted leading-relaxed">
                     Sistem akan menyinkronkan katalog harga modal Digiflazz setiap {syncInterval} jam.
+                  </p>
+                </div>
+
+                {/* Midtrans Mode Input */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <Wallet className="h-3.5 w-3.5 text-sky" />
+                    Mode Pembayaran Midtrans
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <div className="flex items-center bg-white" style={inputBevelStyle}>
+                      <select
+                        value={midtransMode}
+                        onChange={(e) => setMidtransMode(e.target.value)}
+                        className="w-full px-3 py-2 text-xs font-bold text-text-primary focus:outline-none bg-transparent"
+                      >
+                        <option value="sandbox">SANDBOX (Testing)</option>
+                        <option value="production">PRODUCTION (Live)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-text-muted leading-relaxed">
+                    Pilih lingkungan pembayaran Midtrans yang aktif untuk transaksi.
                   </p>
                 </div>
 
