@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Montserrat, Poppins } from "next/font/google"
 import "./globals.css"
+import PWARegister from "@/components/pwa-register"
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -14,17 +15,116 @@ const poppins = Poppins({
   variable: "--font-poppins",
 })
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mitsurutopup.com"
+
 export const metadata: Metadata = {
-  title: "Mitsuru - Top Up Game Murah & Cepat 24/7",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Mitsuru - Top Up Game Murah, Cepat & Terpercaya 24/7",
+    template: "%s | Mitsuru Top Up Hub"
+  },
   description:
-    "Top up game favorite kamu dengan harga terbaik. Mobile Legends, Free Fire, PUBG, dan masih banyak lagi. Proses otomatis 24/7.",
+    "Top up game favorit kamu dengan harga termurah, aman, dan proses instan otomatis 24 jam. Beli Diamond Mobile Legends, Free Fire UC PUBG Mobile, dan game lainnya.",
   keywords: [
     "top up game",
-    "diamond mobile legends",
+    "top up game murah",
+    "diamond mobile legends murah",
     "top up free fire",
-    "jual diamond",
-    "top up murah",
+    "jual diamond ml",
+    "top up ml murah",
+    "pubg uc murah",
+    "valorant points",
+    "mitsuru",
+    "mitsuru topup",
+    "top up game otomatis",
+    "tempat top up game termurah"
   ],
+  authors: [{ name: "Mitsuru Team", url: siteUrl }],
+  creator: "Mitsuru",
+  publisher: "Mitsuru",
+  alternates: {
+    canonical: "/",
+  },
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" }
+    ],
+    shortcut: "/icon-192.png",
+    apple: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" }
+    ]
+  },
+  openGraph: {
+    title: "Mitsuru - Top Up Game Murah & Cepat 24/7",
+    description: "Top up game favorit kamu dengan harga termurah, aman, dan proses instan otomatis 24 jam. Beli Diamond Mobile Legends, Free Fire UC PUBG Mobile, dan game lainnya.",
+    url: siteUrl,
+    siteName: "Mitsuru Top Up Hub",
+    locale: "id_ID",
+    type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Mitsuru Top Up Hub Banner"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mitsuru - Top Up Game Murah & Cepat 24/7",
+    description: "Top up game favorit kamu dengan harga termurah, aman, dan proses instan otomatis 24 jam.",
+    images: ["/logo.png"]
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    }
+  },
+  applicationName: "Mitsuru Top Up Hub",
+  appleWebApp: {
+    capable: true,
+    title: "Mitsuru",
+    statusBarStyle: "default"
+  }
+}
+
+// Global JSON-LD Schema Markup
+const jsonLdWebsite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Mitsuru Top Up Hub",
+  "url": siteUrl,
+  "description": "Top up game favorit kamu dengan harga termurah, aman, dan proses instan otomatis 24 jam. Beli Diamond Mobile Legends, Free Fire UC PUBG Mobile, dan game lainnya.",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": `${siteUrl}/?search={search_term_string}`,
+    "query-input": "required name=search_term_string"
+  }
+}
+
+const jsonLdOrganization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Mitsuru",
+  "url": siteUrl,
+  "logo": `${siteUrl}/logo.png`,
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+62-812-3456-7890",
+    "contactType": "customer service",
+    "email": "support@mitsurutopup.com",
+    "availableLanguage": ["Indonesian", "English"]
+  }
 }
 
 export default function RootLayout({
@@ -37,6 +137,14 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -64,6 +172,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${montserrat.variable} ${poppins.variable} min-h-screen antialiased font-body`}>
+        <PWARegister />
         <div className="relative min-h-screen flex flex-col">
           {/* Mesh/Topography Background Pattern - Sky Fantasy */}
           <div className="pointer-events-none fixed inset-0 mesh opacity-60 z-0" />
