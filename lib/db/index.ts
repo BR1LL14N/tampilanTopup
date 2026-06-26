@@ -6,13 +6,12 @@ declare global {
   var pgPool: Pool | undefined;
 }
 
-const provider = process.env.DB_PROVIDER || 'mysql';
-
 /**
  * Executes a SQL query on the active database provider (MySQL or Supabase PostgreSQL).
  * Normalizes query parameter placeholders automatically (translates $1, $2 to ? for MySQL).
  */
 export async function executeQuery<T = any>(sql: string, params: any[] = []): Promise<T[]> {
+  const provider = process.env.DB_PROVIDER || 'mysql';
   let formattedSql = sql;
   const formattedParams = [...params];
 
