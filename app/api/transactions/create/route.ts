@@ -70,14 +70,20 @@ export async function POST(req: NextRequest) {
     let qr_string = null;
     let payment_url = null;
     
-    const mayarApiKey = process.env.MAYAR_API_KEY;
-    if (mayarApiKey) {
+    const { SettingService } = await import('@/lib/services/setting-service');
+    const dbMidtransMode = await SettingService.get('midtrans_mode', 'sandbox');
+    const isProduction = dbMidtransMode === 'production';
+    const midtransServerKey = isProduction
+      ? process.env.MIDTRANS_SERVER_KEY
+      : (process.env.MIDTRANS_SANDBOX_SERVER_KEY || process.env.MIDTRANS_SERVER_KEY);
+
+    if (midtransServerKey) {
       try {
-        const authHeader = mayarApiKey.startsWith('Bearer ') ? mayarApiKey : `Bearer ${mayarApiKey}`;
-        const isProduction = process.env.DIGIFLAZZ_MODE === 'production';
-        const mayarBaseUrl = isProduction ? 'https://api.mayar.id' : 'https://api.mayar.club';
+        const authHeader = 'Basic ' + Buffer.from(midtransServerKey + ':').toString('base64');
+        const midtransUrl = isProduction 
+          ? 'https://app.midtrans.com/snap/v1/transactions' 
+          : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-        const redirectUrl = `${siteUrl}/history/${invoice}`;
 
         let customerName = 'Pelanggan';
         let customerEmail = `${invoice.toLowerCase()}@mitsuru-shop.sir-l.web.id`;
@@ -96,41 +102,58 @@ export async function POST(req: NextRequest) {
               customerPhone = userProfile[0].phone || customerPhone;
             }
           } catch (dbErr) {
-            console.error('Failed to fetch user profile for Mayar:', dbErr);
+            console.error('Failed to fetch user profile for Midtrans:', dbErr);
           }
         }
 
-        const mayarRes = await fetch(`${mayarBaseUrl}/hl/v1/invoice/create`, {
+        const itemDetails: any[] = [
+          {
+            id: product.id,
+            price: basePrice,
+            quantity: qty,
+            name: product.name.substring(0, 50),
+          }
+        ];
+
+        if (discountAmount > 0) {
+          itemDetails.push({
+            id: 'PROMO-DISCOUNT',
+            price: -discountAmount,
+            quantity: 1,
+            name: 'Diskon Promo',
+          });
+        }
+
+        const midtransRes = await fetch(midtransUrl, {
           method: 'POST',
           headers: {
-            'Authorization': authHeader,
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': authHeader,
           },
           body: JSON.stringify({
-            name: customerName,
-            email: customerEmail,
-            mobile: customerPhone,
-            description: `Top Up ${product.name} (${invoice})`,
-            redirectUrl: redirectUrl,
-            items: [
-              {
-                quantity: qty,
-                rate: amount,
-                description: product.name,
-              }
-            ]
-          })
+            transaction_details: {
+              order_id: invoice,
+              gross_amount: amount,
+            },
+            customer_details: {
+              first_name: customerName,
+              email: customerEmail,
+              phone: customerPhone,
+            },
+            item_details: itemDetails,
+          }),
         });
 
-        const mayarData = await mayarRes.json();
-        if (mayarData && mayarData.link) {
-          payment_url = mayarData.link;
+        const midtransData = await midtransRes.json();
+        if (midtransData && midtransData.redirect_url) {
+          payment_url = midtransData.redirect_url;
         } else {
-          console.error('Mayar API error response:', mayarData);
+          console.error('Midtrans API error response:', midtransData);
           payment_url = `${siteUrl}/checkout/mock?invoice=${invoice}`;
         }
-      } catch (mayarErr) {
-        console.error('Failed to call Mayar API:', mayarErr);
+      } catch (midtransErr) {
+        console.error('Failed to call Midtrans API:', midtransErr);
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
         payment_url = `${siteUrl}/checkout/mock?invoice=${invoice}`;
       }
