@@ -1,8 +1,10 @@
 import { executeQuery } from "@/lib/db";
 import crypto from "crypto";
 
-const provider = process.env.DB_PROVIDER || "mysql";
-const keyQuote = provider === "mysql" ? "`key`" : '"key"';
+function getKeyQuote() {
+  const provider = process.env.DB_PROVIDER || "mysql";
+  return provider === "mysql" ? "`key`" : '"key"';
+}
 
 export class SettingService {
   /**
@@ -10,6 +12,7 @@ export class SettingService {
    * Automatically parses JSON strings if applicable.
    */
   static async get<T = any>(key: string, defaultValue: T): Promise<T> {
+    const keyQuote = getKeyQuote();
     try {
       const rows = await executeQuery(`SELECT value FROM settings WHERE ${keyQuote} = $1 LIMIT 1`, [key]);
       if (rows.length === 0) return defaultValue;
@@ -33,6 +36,7 @@ export class SettingService {
    * Stores the value as a serialized JSON string.
    */
   static async set(key: string, value: any): Promise<void> {
+    const keyQuote = getKeyQuote();
     try {
       const jsonStr = JSON.stringify(value);
       const existing = await executeQuery(`SELECT id FROM settings WHERE ${keyQuote} = $1 LIMIT 1`, [key]);
