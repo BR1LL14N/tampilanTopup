@@ -6,7 +6,14 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = await req.json();
+    let payload;
+    try {
+      payload = await req.json();
+    } catch (jsonErr) {
+      console.log('Received empty or non-JSON request on Midtrans callback (likely test ping).');
+      return NextResponse.json({ success: true, message: 'Mitsuru Callback Endpoint Active' });
+    }
+
     console.log('Received Midtrans Notification Callback:', payload);
 
     const {
