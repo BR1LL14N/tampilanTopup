@@ -20,6 +20,7 @@ export interface TransactionData {
   login_method?: string | null;
   password?: string | null;
   request_notes?: string | null;
+  customer_phone?: string | null;
 }
 
 export class TransactionService {
@@ -33,9 +34,9 @@ export class TransactionService {
         id, invoice, user_id, product_id, target_id, target_name, amount,
         discount_amount, promo_code_id, payment_method, payment_status,
         topup_status, qr_string, payment_url, expired_at,
-        login_method, password, request_notes
+        login_method, password, request_notes, customer_phone
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
     `;
     await executeQuery(sql, [
       id,
@@ -55,7 +56,8 @@ export class TransactionService {
       data.expired_at || null,
       data.login_method || null,
       data.password || null,
-      data.request_notes || null
+      data.request_notes || null,
+      data.customer_phone || null
     ]);
     return { id, ...data };
   }

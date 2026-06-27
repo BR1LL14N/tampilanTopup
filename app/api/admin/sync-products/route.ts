@@ -53,18 +53,8 @@ export async function POST(req: NextRequest) {
       if (!brand) continue;
 
       const brandLower = brand.toLowerCase();
-      const isGameCategory =
-        category.includes('voucher') ||
-        category.includes('game') ||
-        brandLower.includes('mobile legend') ||
-        brandLower.includes('free fire') ||
-        brandLower.includes('pubg') ||
-        brandLower.includes('valorant') ||
-        brandLower.includes('genshin') ||
-        brandLower.includes('honor of kings') ||
-        brandLower.includes('mlbb');
 
-      if (!isGameCategory || !item.buyer_product_status || !item.seller_product_status) {
+      if (!item.buyer_product_status || !item.seller_product_status) {
         continue;
       }
 
@@ -93,25 +83,37 @@ export async function POST(req: NextRequest) {
         }
         
         const newGameId = crypto.randomUUID();
+        const categoryLower = category.toLowerCase();
         let gameCategory = 'Games';
         
-        if (
-          category.includes('voucher') ||
-          category.includes('gift') ||
-          category.includes('pulsa') ||
-          category.includes('data') ||
-          category.includes('kuota') ||
-          category.includes('internet') ||
-          brandLower.includes('xl') ||
-          brandLower.includes('axis') ||
-          brandLower.includes('telkomsel') ||
-          brandLower.includes('indosat') ||
-          brandLower.includes('smartfren') ||
-          brandLower.includes('tri') ||
-          brandLower.includes('three') ||
-          brandLower.includes('by.u')
+        if (categoryLower.includes('pulsa') || categoryLower.includes('telepon') || categoryLower.includes('sms')) {
+          gameCategory = 'Pulsa';
+        } else if (categoryLower.includes('data') || categoryLower.includes('internet') || categoryLower.includes('paket internet') || categoryLower.includes('kuota')) {
+          gameCategory = 'Data';
+        } else if (categoryLower.includes('pln') || categoryLower.includes('token') || categoryLower.includes('listrik')) {
+          gameCategory = 'PLN';
+        } else if (
+          categoryLower.includes('money') ||
+          categoryLower.includes('wallet') ||
+          categoryLower.includes('balance') ||
+          categoryLower.includes('pay') ||
+          brandLower.includes('ovo') ||
+          brandLower.includes('gopay') ||
+          brandLower.includes('dana') ||
+          brandLower.includes('linkaja') ||
+          brandLower.includes('shopeepay') ||
+          brandLower.includes('grab') ||
+          brandLower.includes('gojek') ||
+          brandLower.includes('isaku') ||
+          brandLower.includes('doku')
         ) {
+          gameCategory = 'E-Money';
+        } else if (categoryLower.includes('voucher') && !categoryLower.includes('game')) {
           gameCategory = 'Voucher';
+        } else if (categoryLower.includes('game') || categoryLower.includes('voucher game') || brandLower.includes('mobile legend') || brandLower.includes('free fire') || brandLower.includes('pubg') || brandLower.includes('valorant') || brandLower.includes('hok') || brandLower.includes('honor of kings') || brandLower.includes('steam')) {
+          gameCategory = 'Games';
+        } else {
+          gameCategory = item.category ? (item.category.charAt(0).toUpperCase() + item.category.slice(1)) : 'Games';
         }
 
         const newGame = {
@@ -191,20 +193,9 @@ export async function POST(req: NextRequest) {
       const price = parseInt(item.price) || 0;
 
       const brandLower = brand.toLowerCase();
-      const isGameCategory =
-        category.includes('voucher') ||
-        category.includes('game') ||
-        brandLower.includes('mobile legend') ||
-        brandLower.includes('free fire') ||
-        brandLower.includes('pubg') ||
-        brandLower.includes('valorant') ||
-        brandLower.includes('genshin') ||
-        brandLower.includes('honor of kings') ||
-        brandLower.includes('mlbb');
-
       const isActive = item.buyer_product_status === true && item.seller_product_status === true;
 
-      if (!isGameCategory || !isActive) {
+      if (!isActive) {
         skippedCount++;
         continue;
       }
@@ -233,9 +224,9 @@ export async function POST(req: NextRequest) {
         try {
           await executeQuery(
             `UPDATE products 
-             SET game_id = $1, name = $2, price = $3, sell_price = $4, status = $5, updated_at = CURRENT_TIMESTAMP 
-             WHERE id = $6`,
-            [matchingGame.id, name, price, newSellPrice, isActive ? 1 : 0, existingProduct.id]
+             SET game_id = $1, name = $2, price = $3, sell_price = $4, status = $5, provider = $6, updated_at = CURRENT_TIMESTAMP 
+             WHERE id = $7`,
+            [matchingGame.id, name, price, newSellPrice, isActive ? 1 : 0, 'digiflazz', existingProduct.id]
           );
           updateCount++;
           syncedItemsLog.push({
@@ -259,9 +250,9 @@ export async function POST(req: NextRequest) {
 
         try {
           await executeQuery(
-            `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-            [id, matchingGame.id, sku, name, price, initialSellPrice, isActive ? 1 : 0, 0]
+            `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order, provider) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+            [id, matchingGame.id, sku, name, price, initialSellPrice, isActive ? 1 : 0, 0, 'digiflazz']
           );
           newCount++;
           syncedItemsLog.push({

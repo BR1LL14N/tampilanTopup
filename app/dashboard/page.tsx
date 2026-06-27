@@ -24,6 +24,9 @@ import {
   User,
   Shield,
   History,
+  Bell,
+  MessageSquare,
+  Check,
 } from "lucide-react"
 
 export default function DashboardPage() {
@@ -39,6 +42,53 @@ export default function DashboardPage() {
   ])
   const [totalSpent, setTotalSpent] = useState(0)
   const [digiflazzBalance, setDigiflazzBalance] = useState<number | null>(null)
+  const [activeTab, setActiveTab] = useState("transactions")
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [notifLoading, setNotifLoading] = useState(false)
+
+  const fetchNotifications = async () => {
+    setNotifLoading(true)
+    try {
+      const res = await fetch("/api/notifications")
+      const data = await res.json()
+      if (data.notifications) {
+        setNotifications(data.notifications)
+      }
+    } catch (err) {
+      console.error("Failed to load notifications:", err)
+    } finally {
+      setNotifLoading(false)
+    }
+  }
+
+  const handleMarkAsRead = async (notifId: string, link?: string) => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: notifId }),
+      })
+      fetchNotifications()
+      if (link) {
+        router.push(link)
+      }
+    } catch (err) {
+      console.error("Failed to mark notification read:", err)
+    }
+  }
+
+  const handleMarkAllRead = async () => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ all: true }),
+      })
+      fetchNotifications()
+    } catch (err) {
+      console.error("Failed to mark all read:", err)
+    }
+  }
 
   useEffect(() => {
     // Read cache on mount
@@ -113,6 +163,7 @@ export default function DashboardPage() {
     }
 
     fetchDashboardData()
+    fetchNotifications()
   }, [router])
 
   // Get dynamic gamer rank based on total spending
@@ -279,71 +330,168 @@ export default function DashboardPage() {
         {/* Two Column Layout */}
         <div className="grid lg:grid-cols-12 gap-8">
 
-          {/* Left Column: Recent Transactions Table */}
+          {/* Left Column: Recent Transactions & Notifications Tabs */}
           <div className="lg:col-span-8 space-y-6">
             <div className="glass-sky rounded-2xl border-sky-border shadow-sky-soft relative overflow-hidden">
-              <div className="p-6 border-b border-sky-border flex items-center justify-between">
-                <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
-                  <History className="h-4 w-4 text-sky" />
-                  Transaksi Terakhir
-                </h3>
-                <Link href="/history">
-                  <div className="relative p-[1px] bg-sky-border/50 hover:bg-sky/20 transition-all duration-300" style={inputBevelStyle}>
+              {/* Tab Header Selector */}
+              <div className="border-b border-sky-border flex items-center justify-between bg-slate-50/50">
+                <div className="flex">
+                  <button
+                    onClick={() => setActiveTab("transactions")}
+                    className={`px-6 py-4 text-xs font-black uppercase tracking-wider border-r border-sky-border transition-all flex items-center gap-2 ${
+                      activeTab === "transactions"
+                        ? "bg-white text-sky border-b-2 border-b-sky"
+                        : "text-text-secondary hover:text-sky"
+                    }`}
+                  >
+                    <History className="h-4 w-4" />
+                    Riwayat Transaksi
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("notifications")}
+                    className={`px-6 py-4 text-xs font-black uppercase tracking-wider border-r border-sky-border transition-all flex items-center gap-2 relative ${
+                      activeTab === "notifications"
+                        ? "bg-white text-sky border-b-2 border-b-sky"
+                        : "text-text-secondary hover:text-sky"
+                    }`}
+                  >
+                    <Bell className="h-4 w-4" />
+                    Notifikasi Anda
+                    {notifications.filter(n => !n.is_read).length > 0 && (
+                      <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                    )}
+                  </button>
+                </div>
+                
+                {/* Secondary Action */}
+                {activeTab === "transactions" ? (
+                  <Link href="/history" className="mr-6">
+                    <div className="relative p-[1px] bg-sky-border/50 hover:bg-sky/20 transition-all duration-300" style={inputBevelStyle}>
+                      <button
+                        className="bg-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-text-secondary hover:text-sky transition-colors flex items-center gap-1.5"
+                        style={inputBevelStyle}
+                      >
+                        Lihat Semua
+                        <ArrowRight className="h-3 w-3 text-sky" />
+                      </button>
+                    </div>
+                  </Link>
+                ) : (
+                  notifications.filter(n => !n.is_read).length > 0 && (
                     <button
-                      className="bg-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-text-secondary hover:text-sky transition-colors flex items-center gap-1.5"
-                      style={inputBevelStyle}
+                      onClick={handleMarkAllRead}
+                      className="mr-6 text-[9px] font-black uppercase text-sky hover:text-sky-dark tracking-widest border border-sky-border bg-white px-3 py-1 rounded-lg shadow-sky-soft hover:shadow-sky-medium transition-all"
                     >
-                      Lihat Semua
-                      <ArrowRight className="h-3 w-3 text-sky" />
+                      Tandai Semua Dibaca
                     </button>
-                  </div>
-                </Link>
+                  )
+                )}
               </div>
 
+              {/* Tab Panel Content */}
               <div className="p-6">
-                {recentTransactions.length > 0 ? (
-                  <div className="space-y-4">
-                    {recentTransactions.map((tx, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-4 bg-ice border border-sky-border/50 hover:border-sky/20 rounded-xl transition-all duration-300 group"
-                      >
-                        <div className="flex items-center gap-4">
-                          <span className="grid h-10 w-10 place-items-center bg-sky/10 text-sky border border-sky/10 rounded-lg group-hover:bg-sky/10 group-hover:border-sky/30 transition-colors">
-                            <img src={getItemAssetForProduct(tx.product, undefined, tx.game)} alt="" className="max-h-7 max-w-7 object-contain" />
-                          </span>
-                          <div>
-                            <p className="font-bold text-text-primary group-hover:text-sky transition-colors text-sm uppercase tracking-tight">{tx.product}</p>
-                            <p className="mt-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
-                              <img src={getGameAssetByName(tx.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                              {tx.game} • <span className="font-mono">{tx.invoice}</span>
+                {activeTab === "transactions" ? (
+                  /* TRANSACTION TAB CONTENT */
+                  recentTransactions.length > 0 ? (
+                    <div className="space-y-4">
+                      {recentTransactions.map((tx, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-4 bg-ice border border-sky-border/50 hover:border-sky/20 rounded-xl transition-all duration-300 group"
+                        >
+                          <div className="flex items-center gap-4">
+                            <span className="grid h-10 w-10 place-items-center bg-sky/10 text-sky border border-sky/10 rounded-lg group-hover:bg-sky/10 group-hover:border-sky/30 transition-colors">
+                              <img src={getItemAssetForProduct(tx.product, undefined, tx.game)} alt="" className="max-h-7 max-w-7 object-contain" />
+                            </span>
+                            <div>
+                              <p className="font-bold text-text-primary group-hover:text-sky transition-colors text-sm uppercase tracking-tight">{tx.product}</p>
+                              <p className="mt-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                                <img src={getGameAssetByName(tx.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                                {tx.game} • <span className="font-mono">{tx.invoice}</span>
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-black text-text-primary font-mono text-sm">
+                              Rp {tx.amount.toLocaleString("id-ID")}
                             </p>
+                            <span className={`inline-block px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded mt-1.5 ${
+                              tx.status === "success"
+                                ? "bg-emerald-50 text-emerald-500 border border-emerald-500/20"
+                                : tx.status === "pending" || tx.status === "processing"
+                                ? "bg-amber-50 text-amber-500 border border-amber-500/20"
+                                : "bg-red-50 text-red-500 border border-red-500/20"
+                            }`} style={tagBevelStyle}>
+                              {tx.status === "success" ? "Berhasil" :
+                               tx.status === "processing" || tx.status === "pending" ? "Diproses" : "Gagal"}
+                            </span>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-black text-text-primary font-mono text-sm">
-                            Rp {tx.amount.toLocaleString("id-ID")}
-                          </p>
-                          <span className={`inline-block px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded mt-1.5 ${
-                            tx.status === "success"
-                              ? "bg-emerald-50 text-emerald-500 border border-emerald-500/20"
-                              : tx.status === "pending" || tx.status === "processing"
-                              ? "bg-amber-50 text-amber-500 border border-amber-500/20"
-                              : "bg-red-50 text-red-500 border border-red-500/20"
-                          }`} style={tagBevelStyle}>
-                            {tx.status === "success" ? "Berhasil" :
-                             tx.status === "processing" || tx.status === "pending" ? "Diproses" : "Gagal"}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-10 flex flex-col items-center justify-center">
+                      <ShoppingBag className="h-10 w-10 text-text-muted mb-3 animate-pulse" />
+                      <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">Belum ada transaksi</p>
+                      <p className="text-[10px] text-text-muted mt-1 max-w-xs">Gunakan Pusat Topup kami untuk mengisi diamond game Anda sekarang.</p>
+                    </div>
+                  )
                 ) : (
-                  <div className="text-center py-10 flex flex-col items-center justify-center">
-                    <ShoppingBag className="h-10 w-10 text-text-muted mb-3 animate-pulse" />
-                    <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">Belum ada transaksi</p>
-                    <p className="text-[10px] text-text-muted mt-1 max-w-xs">Gunakan Pusat Topup kami untuk mengisi diamond game Anda sekarang.</p>
-                  </div>
+                  /* NOTIFICATIONS TAB CONTENT */
+                  notifLoading ? (
+                    <div className="text-center py-10 text-xs font-bold text-text-muted uppercase tracking-widest">
+                      Memuat Notifikasi...
+                    </div>
+                  ) : notifications.length > 0 ? (
+                    <div className="space-y-3">
+                      {notifications.map((notif) => {
+                        const isUnread = !notif.is_read
+                        const isFeedback = notif.type === "feedback_reply" || notif.type === "new_feedback"
+                        return (
+                          <div
+                            key={notif.id}
+                            onClick={() => handleMarkAsRead(notif.id, notif.link)}
+                            className={`p-4 border rounded-xl flex items-start gap-4 transition-all duration-350 cursor-pointer ${
+                              isUnread
+                                ? "bg-sky/5 border-sky/30 hover:bg-sky/10"
+                                : "bg-white border-sky-border/40 hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className={`p-2 rounded-lg ${isUnread ? "bg-sky/10 text-sky animate-pulse" : "bg-slate-100 text-slate-400"}`}>
+                              {isFeedback ? <MessageSquare className="h-4.5 w-4.5" /> : <Bell className="h-4.5 w-4.5" />}
+                            </div>
+                            <div className="flex-grow">
+                              <div className="flex justify-between items-start">
+                                <p className={`text-xs uppercase tracking-wide leading-tight ${isUnread ? "font-black text-text-primary" : "font-bold text-text-secondary"}`}>
+                                  {notif.title}
+                                </p>
+                                <span className="text-[8px] font-bold text-text-muted uppercase">
+                                  {new Date(notif.created_at).toLocaleDateString("id-ID", {
+                                    day: "numeric",
+                                    month: "short",
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                  })}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">{notif.message}</p>
+                              {isUnread && (
+                                <span className="inline-flex items-center gap-0.5 text-[8px] font-black uppercase text-sky tracking-wider mt-1.5">
+                                  <Check className="h-3 w-3" /> Baru / Klik untuk buka & tandai dibaca
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-10 flex flex-col items-center justify-center">
+                      <Bell className="h-10 w-10 text-text-muted mb-3 animate-pulse" />
+                      <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">Tidak ada notifikasi</p>
+                      <p className="text-[10px] text-text-muted mt-1 max-w-xs">Kotak masuk Anda bersih! Notifikasi pembelian atau chat ulasan Anda akan muncul di sini.</p>
+                    </div>
+                  )
                 )}
               </div>
             </div>

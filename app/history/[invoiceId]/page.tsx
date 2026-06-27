@@ -64,6 +64,22 @@ export default function InvoiceDetailPage() {
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [waAdminNumber, setWaAdminNumber] = useState("6281234567890")
+
+  useEffect(() => {
+    const fetchWaNumber = async () => {
+      try {
+        const res = await fetch("/api/settings/public")
+        const data = await res.json()
+        if (data.wa_admin_number) {
+          setWaAdminNumber(data.wa_admin_number)
+        }
+      } catch (err) {
+        console.error("Failed to load public WA number:", err)
+      }
+    }
+    fetchWaNumber()
+  }, [])
 
   useEffect(() => {
     if (!invoiceId) return
@@ -323,6 +339,18 @@ export default function InvoiceDetailPage() {
                       <span className="text-text-secondary font-medium">Total Pembayaran</span>
                       <span className="text-lg font-black text-sky">{formatCurrency(result.amount)}</span>
                     </div>
+                  </div>
+
+                  {/* WhatsApp Support Button */}
+                  <div className="pt-6 border-t border-sky-border/40">
+                    <a
+                      href={`https://wa.me/${waAdminNumber.replace(/[^0-9]/g, "")}?text=Halo%20Admin%20Mitsuru,%20saya%20butuh%20bantuan%20mengenai%20transaksi%20Invoice%20${result.invoice}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black uppercase tracking-widest py-3 px-4 rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      Hubungi Admin via WhatsApp 💬
+                    </a>
                   </div>
 
                   {/* Back Link */}

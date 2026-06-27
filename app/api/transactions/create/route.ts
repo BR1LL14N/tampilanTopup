@@ -7,7 +7,7 @@ import { generateInvoice } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   try {
-    const { product_id, target_id, target_name, payment_method, quantity, promo_code, login_method, password, request_notes } = await req.json();
+    const { product_id, target_id, target_name, payment_method, quantity, promo_code, login_method, password, request_notes, customer_phone } = await req.json();
 
     if (!product_id || !target_id || !payment_method) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -186,7 +186,55 @@ export async function POST(req: NextRequest) {
       login_method: login_method || null,
       password: password || null,
       request_notes: request_notes || null,
+      customer_phone: customer_phone || null,
     });
+
+    // Trigger WhatsApp checkout notification asynchronously
+    try {
+      const { executeQuery } = await import("@/lib/db");
+      const gameRows = await executeQuery("SELECT * FROM games WHERE id = $1 LIMIT 1", [product.game_id]);
+      if (gameRows && gameRows.length > 0) {
+        const { WhatsappService } = await import("@/lib/services/whatsapp-service");
+        WhatsappService.sendCheckoutNotification(transaction, product, gameRows[0]).catch(err => {
+          console.error("Failed sending checkout WA notification asynchronously:", err);
+        });
+      }
+    } catch (waErr) {
+      console.error("Failed initiating checkout WA notification:", waErr);
+    }
+
+    // Trigger In-App Notification for Admin
+    try {
+      const { executeQuery } = await import("@/lib/db");
+      const provider = process.env.DB_PROVIDER || "mysql";
+      const notifTable = provider === "supabase" ? "public.notifications" : "notifications";
+      const notifId = crypto.randomUUID();
+      const userTable = provider === "supabase" ? "public.user_profiles" : "users";
+      
+      let clientName = "Pelanggan";
+      if (userId) {
+        const uRows = await executeQuery(`SELECT name FROM ${userTable} WHERE id = $1 LIMIT 1`, [userId]);
+        if (uRows && uRows.length > 0) {
+          clientName = uRows[0].name;
+        }
+      }
+
+      const adminNotifSql = `
+        INSERT INTO ${notifTable} (id, user_id, is_admin, title, message, type, link)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `;
+      await executeQuery(adminNotifSql, [
+        notifId,
+        null,
+        provider === "supabase" ? true : 1, // is_admin
+        "Pesanan Baru Masuk",
+        `Order #${transaction.invoice} dari ${clientName} sebesar Rp ${transaction.amount.toLocaleString("id-ID")} pending pembayaran.`,
+        "checkout",
+        `/admin/transactions`
+      ]);
+    } catch (inAppErr) {
+      console.error("Failed creating in-app admin checkout notification:", inAppErr);
+    }
 
     return NextResponse.json({ data: transaction });
   } catch (error: any) {

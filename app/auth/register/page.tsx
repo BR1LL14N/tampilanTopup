@@ -49,8 +49,16 @@ export default function RegisterPage() {
         }),
       })
 
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
+      let data;
+      try {
+        data = await res.json()
+      } catch (jsonErr) {
+        throw new Error("Gagal terhubung ke server. Silakan coba kembali nanti.")
+      }
+
+      if (!res.ok || data.error) {
+        throw new Error(data?.error || "Registrasi gagal. Silakan periksa kembali data Anda.")
+      }
 
       // Redirect to login with success message
       router.push("/auth/login?registered=true")

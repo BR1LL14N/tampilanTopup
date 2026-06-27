@@ -71,6 +71,23 @@ async function runMigration() {
       await connection.query(schemaSql);
       console.log("✓ Database schema created successfully.");
 
+      // Ensure customer_phone column is present
+      try {
+        await connection.query("ALTER TABLE transactions ADD COLUMN customer_phone VARCHAR(50) NULL;");
+        console.log("✓ Ensured 'customer_phone' column is in transactions.");
+      } catch (err) {
+        // Already exists
+      }
+
+      // Ensure provider column is present in products
+      try {
+        await connection.query("ALTER TABLE products ADD COLUMN provider VARCHAR(50) NOT NULL DEFAULT 'manual';");
+        await connection.query("UPDATE products SET provider = 'digiflazz' WHERE provider_sku IS NOT NULL AND provider_sku != '';");
+        console.log("✓ Ensured 'provider' column is in products.");
+      } catch (err) {
+        // Already exists
+      }
+
       // 4. Eksekusi Seed Data
       console.log("Running seed-mysql.sql...");
       const seedPath = path.join(__dirname, "seed-mysql.sql");
@@ -109,6 +126,23 @@ async function runMigration() {
       const schemaSql = fs.readFileSync(schemaPath, "utf-8");
       await client.query(schemaSql);
       console.log("✓ Database schema created successfully.");
+
+      // Ensure customer_phone column is present
+      try {
+        await client.query("ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS customer_phone TEXT;");
+        console.log("✓ Ensured 'customer_phone' column is in transactions.");
+      } catch (err) {
+        // Already exists
+      }
+
+      // Ensure provider column is present in products
+      try {
+        await client.query("ALTER TABLE public.products ADD COLUMN IF NOT EXISTS provider VARCHAR(50) NOT NULL DEFAULT 'manual';");
+        await client.query("UPDATE public.products SET provider = 'digiflazz' WHERE provider_sku IS NOT NULL AND provider_sku != '';");
+        console.log("✓ Ensured 'provider' column is in products.");
+      } catch (err) {
+        // Already exists
+      }
 
       // 2. Eksekusi Seed Data (Bila ada)
       const seedPath = path.join(__dirname, "seed_users.sql");
