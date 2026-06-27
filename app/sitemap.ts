@@ -1,14 +1,14 @@
-import { MetadataRoute } from "next"
-import { GameService } from "@/lib/services/game-service"
+import { MetadataRoute } from "next";
+import { GameService } from "@/lib/services/game-service";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mitsurutopup.com"
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mitsurushop.com";
 
-  let games: any[] = []
+  let games: any[] = [];
   try {
-    games = await GameService.getAllActive()
+    games = await GameService.getAllActive();
   } catch (error) {
-    console.error("Error fetching active games for sitemap:", error)
+    console.error("Error fetching active games for sitemap:", error);
   }
 
   // Buat URL sitemap dinamis untuk tiap game yang aktif
@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
     changeFrequency: "daily" as const,
     priority: 0.8,
-  }))
+  }));
 
   // Daftar URL statis utama
   const staticUrls = [
@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "always" as const,
       priority: 0.7,
     },
-  ]
+  ];
 
-  return [...staticUrls, ...gameUrls]
+  return [...staticUrls, ...gameUrls];
 }
