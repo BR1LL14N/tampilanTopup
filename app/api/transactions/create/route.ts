@@ -142,6 +142,9 @@ export async function POST(req: NextRequest) {
               phone: customerPhone,
             },
             item_details: itemDetails,
+            callbacks: {
+              finish: `${siteUrl}/history/${invoice}`
+            }
           }),
         });
 
