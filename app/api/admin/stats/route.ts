@@ -72,6 +72,48 @@ export async function GET(req: NextRequest) {
       console.error("Failed to fetch Digiflazz balance for stats:", balErr);
     }
 
+    // Fetch checkout activities
+    const checkoutRows = await executeQuery(`
+      SELECT t.*, p.name as product_name, g.name as game_name, u.name as user_name
+      FROM transactions t
+      LEFT JOIN products p ON t.product_id = p.id
+      LEFT JOIN games g ON p.game_id = g.id
+      LEFT JOIN ${userTable} u ON t.user_id = u.id
+      ORDER BY t.created_at DESC
+      LIMIT 10
+    `);
+
+    // Fetch payment activities
+    const paymentRows = await executeQuery(`
+      SELECT t.*, p.name as product_name, g.name as game_name, u.name as user_name
+      FROM transactions t
+      LEFT JOIN products p ON t.product_id = p.id
+      LEFT JOIN games g ON p.game_id = g.id
+      LEFT JOIN ${userTable} u ON t.user_id = u.id
+      WHERE t.payment_status = $1 OR t.topup_status = $2
+      ORDER BY COALESCE(t.paid_at, t.updated_at) DESC
+      LIMIT 10
+    `, ['paid', 'success']);
+
+    // Fetch sync activities
+    const syncRows = await executeQuery(`
+      SELECT p.name as product_name, p.provider_sku as sku, p.price, p.sell_price, p.updated_at, g.name as game_name
+      FROM products p
+      LEFT JOIN games g ON p.game_id = g.id
+      WHERE p.provider = 'digiflazz'
+      ORDER BY p.updated_at DESC
+      LIMIT 10
+    `);
+
+    // Fetch feedbacks (reviews)
+    const feedbackRows = await executeQuery(`
+      SELECT r.*, u.name as user_name, u.email as user_email
+      FROM reviews r
+      LEFT JOIN ${userTable} u ON r.user_id = u.id
+      ORDER BY r.created_at DESC
+      LIMIT 10
+    `);
+
     return NextResponse.json({
       stats: {
         userCount,
@@ -81,7 +123,13 @@ export async function GET(req: NextRequest) {
         digiflazzBalance
       },
       recentTransactions: recentTxRows,
-      topProducts: topProductRows
+      topProducts: topProductRows,
+      activities: {
+        checkouts: checkoutRows,
+        payments: paymentRows,
+        syncs: syncRows,
+        feedbacks: feedbackRows
+      }
     });
   } catch (err: any) {
     console.error("Admin stats API error:", err);
