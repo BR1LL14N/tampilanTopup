@@ -40,6 +40,20 @@ export default function AdminDashboardPage() {
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
   const [topProducts, setTopProducts] = useState<any[]>([])
   const [currentUser, setCurrentUser] = useState<any>(null)
+  
+  // Activity Tabs States
+  const [activities, setActivities] = useState<{
+    checkouts: any[];
+    payments: any[];
+    syncs: any[];
+    feedbacks: any[];
+  }>({
+    checkouts: [],
+    payments: [],
+    syncs: [],
+    feedbacks: []
+  })
+  const [activeTab, setActiveTab] = useState<"checkout" | "pembayaran" | "sync" | "feedback">("checkout")
 
   // Sync Settings States
   const [isSyncActive, setIsSyncActive] = useState(true)
@@ -155,6 +169,15 @@ export default function AdminDashboardPage() {
             sold: Number(p.sold) || 0,
             revenue: Number(p.revenue) || 0
           })))
+        }
+
+        if (data.activities) {
+          setActivities({
+            checkouts: data.activities.checkouts || [],
+            payments: data.activities.payments || [],
+            syncs: data.activities.syncs || [],
+            feedbacks: data.activities.feedbacks || []
+          });
         }
 
         // Fetch sync settings
@@ -467,71 +490,182 @@ export default function AdminDashboardPage() {
         {/* Tables Split Layout */}
         <div className="grid lg:grid-cols-12 gap-8">
 
-          {/* Recent Transactions Panel */}
+          {/* Recent Transactions Panel -> Web Activity Panel */}
           <div className="lg:col-span-8 space-y-6">
             <div className="bg-white rounded-2xl border-sky-border shadow-sky-soft relative overflow-hidden">
-              <div className="p-6 border-b border-sky-border flex items-center justify-between">
+              <div className="p-6 border-b border-sky-border flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
                   <ShoppingBag className="h-4 w-4 text-sky" />
-                  Transaksi Terbaru
+                  Aktivitas Web Mitsuru
                 </h3>
-                <Link href="/admin/transactions">
-                  <div className="relative p-[1px] bg-sky-border hover:bg-sky/30 transition-all duration-300" style={inputBevelStyle}>
+                
+                {/* Tabs selection */}
+                <div className="flex flex-wrap gap-1.5 bg-slate-100 p-1 rounded-xl">
+                  {(["checkout", "pembayaran", "sync", "feedback"] as const).map((tab) => (
                     <button
-                      className="bg-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5"
-                      style={inputBevelStyle}
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                        activeTab === tab
+                          ? "bg-white text-sky shadow-sm border border-sky-border/30"
+                          : "text-text-muted hover:text-text-primary"
+                      }`}
                     >
-                      Semua Transaksi
-                      <ArrowRight className="h-3 w-3 text-sky" />
+                      {tab === "checkout" && "Checkout"}
+                      {tab === "pembayaran" && "Pembayaran"}
+                      {tab === "sync" && "Sync Digiflazz"}
+                      {tab === "feedback" && "Kritik & Saran"}
                     </button>
-                  </div>
-                </Link>
+                  ))}
+                </div>
               </div>
 
-              <div className="p-6">
-                {recentTransactions.length > 0 ? (
+              <div className="p-6 max-h-[500px] overflow-y-auto scrollbar-thin">
+                {/* Tab: Checkout */}
+                {activeTab === "checkout" && (
                   <div className="space-y-4">
-                    {recentTransactions.map((tx, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-4 bg-ice border border-sky-border/50 hover:border-sky/20 rounded-xl transition-all duration-300 group"
-                      >
-                        <div>
-                          <p className="flex items-center gap-2 font-bold text-text-primary group-hover:text-sky transition-colors text-sm uppercase tracking-tight">
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1">
-                              <img src={getItemAssetForProduct(tx.product, undefined, tx.game)} alt="" className="max-h-full max-w-full object-contain" />
-                            </span>
-                            {tx.product}
-                          </p>
-                          <p className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
-                            <img src={getGameAssetByName(tx.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                            {tx.game} • <span className="font-mono">{tx.invoice}</span>
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-black text-text-primary font-mono text-sm">
-                            Rp {tx.amount.toLocaleString("id-ID")}
-                          </p>
-                          <div className="flex items-center gap-2 justify-end mt-1">
-                            <span className="text-[9px] text-text-muted font-medium">{tx.time}</span>
-                            <span className={`inline-block px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded ${
-                              tx.status === "success"
-                                ? "bg-green-50 text-green-500 border border-green-500/20"
-                                : tx.status === "pending" || tx.status === "processing"
-                                ? "bg-amber-50 text-amber-500 border border-amber-500/20"
-                                : "bg-red-50 text-red-500 border border-red-500/20"
-                            }`} style={tagBevelStyle}>
-                              {tx.status === "success" ? "Berhasil" :
-                               tx.status === "processing" || tx.status === "pending" ? "Diproses" : "Gagal"}
+                    {activities.checkouts.length > 0 ? (
+                      activities.checkouts.map((tx, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-4 bg-ice border border-sky-border/50 hover:border-sky/20 rounded-xl transition-all duration-300 group"
+                        >
+                          <div>
+                            <p className="flex items-center gap-2 font-bold text-text-primary group-hover:text-sky transition-colors text-sm uppercase tracking-tight">
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1">
+                                <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
+                              </span>
+                              {tx.product_name}
+                            </p>
+                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                              <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                              {tx.game_name} • <span className="font-mono text-text-secondary">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-black text-text-primary font-mono text-sm">
+                              Rp {Number(tx.amount).toLocaleString("id-ID")}
+                            </p>
+                            <span className="inline-block mt-1 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded bg-amber-50 text-amber-500 border border-amber-500/20">
+                              Checkout
                             </span>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada aktivitas checkout</p>
+                    )}
                   </div>
-                ) : (
-                  <div className="text-center py-10">
-                    <p className="text-xs text-text-muted uppercase tracking-widest font-bold">Tidak ada transaksi ditemukan</p>
+                )}
+
+                {/* Tab: Pembayaran */}
+                {activeTab === "pembayaran" && (
+                  <div className="space-y-4">
+                    {activities.payments.length > 0 ? (
+                      activities.payments.map((tx, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-4 bg-green-50/20 border border-green-500/10 hover:border-green-500/30 rounded-xl transition-all duration-300 group"
+                        >
+                          <div>
+                            <p className="flex items-center gap-2 font-bold text-text-primary group-hover:text-green-500 transition-colors text-sm uppercase tracking-tight">
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1">
+                                <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
+                              </span>
+                              {tx.product_name}
+                            </p>
+                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                              <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                              {tx.game_name} • <span className="font-mono text-text-secondary">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-black text-green-600 font-mono text-sm">
+                              Rp {Number(tx.amount).toLocaleString("id-ID")}
+                            </p>
+                            <span className="inline-block mt-1 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded bg-green-50 text-green-500 border border-green-500/20">
+                              Lunas
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada aktivitas pembayaran</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Tab: Sync Digiflazz */}
+                {activeTab === "sync" && (
+                  <div className="space-y-4">
+                    {activities.syncs.length > 0 ? (
+                      activities.syncs.map((prod, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-4 bg-sky/5 border border-sky/10 hover:border-sky/30 rounded-xl transition-all duration-300"
+                        >
+                          <div>
+                            <p className="font-bold text-text-primary text-sm uppercase tracking-tight">
+                              {prod.product_name}
+                            </p>
+                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                              <img src={getGameAssetByName(prod.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                              {prod.game_name} • SKU: <span className="font-mono text-text-secondary">{prod.sku}</span>
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-text-primary text-xs font-mono">
+                              Harga: Rp {Number(prod.sell_price).toLocaleString("id-ID")}
+                            </p>
+                            <span className="inline-block mt-1 text-[8px] font-medium text-text-muted">
+                              Sync: {prod.updated_at ? new Date(prod.updated_at).toLocaleString("id-ID") : ""}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada sinkronisasi Digiflazz</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Tab: Kritik & Saran */}
+                {activeTab === "feedback" && (
+                  <div className="space-y-4">
+                    {activities.feedbacks.length > 0 ? (
+                      activities.feedbacks.map((fb, idx) => (
+                        <div
+                          key={idx}
+                          className="p-4 bg-purple-50/20 border border-purple-500/10 hover:border-purple-500/30 rounded-xl transition-all duration-300"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="font-bold text-text-primary text-xs uppercase tracking-tight">
+                              {fb.user_name} <span className="text-[10px] text-text-muted lowercase flex items-center">({fb.user_email})</span>
+                            </p>
+                            <div className="flex items-center gap-0.5">
+                              {Array.from({ length: fb.rating }).map((_, rIdx) => (
+                                <span key={rIdx} className="text-amber-400 text-xs">★</span>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-xs text-text-secondary leading-relaxed bg-white/50 p-2.5 rounded-lg border border-sky-border/40 font-medium">
+                            "{fb.comment}"
+                          </p>
+                          <div className="flex justify-between items-center mt-2.5">
+                            <span className="text-[8px] font-bold text-text-muted">
+                              Dikirim: {fb.created_at ? new Date(fb.created_at).toLocaleString("id-ID") : ""}
+                            </span>
+                            <Link href={`/admin/feedbacks`}>
+                              <span className="text-[9px] font-extrabold text-sky hover:underline cursor-pointer uppercase tracking-wider">
+                                Balas Ulasan &rarr;
+                              </span>
+                            </Link>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada kritik &amp; saran</p>
+                    )}
                   </div>
                 )}
               </div>
