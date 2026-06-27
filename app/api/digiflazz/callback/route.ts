@@ -98,6 +98,70 @@ export async function POST(req: NextRequest) {
         provider_response: JSON.stringify(providerResponse),
         updated_at: new Date().toISOString(),
       });
+
+      // Trigger WhatsApp Success Notification asynchronously if top-up is completed
+      if (topupStatus === 'success') {
+        try {
+          const { WhatsappService } = await import("@/lib/services/whatsapp-service");
+          const freshTx = await TransactionService.getByInvoice(ref_id);
+          if (freshTx) {
+            WhatsappService.sendSuccessNotification(freshTx).catch(err => {
+              console.error("Failed sending success WA notification via Digiflazz callback:", err);
+            });
+          }
+        } catch (waErr) {
+          console.error("Failed initiating success WA notification in Digiflazz callback:", waErr);
+        }
+
+        // Trigger In-App Notifications asynchronously
+        try {
+          const { executeQuery } = await import("@/lib/db");
+          const provider = process.env.DB_PROVIDER || "mysql";
+          const notifTable = provider === "supabase" ? "public.notifications" : "notifications";
+
+          let prodName = "Produk Top-Up";
+          const pRows = await executeQuery("SELECT name FROM products WHERE id = $1 LIMIT 1", [transaction.product_id]);
+          if (pRows && pRows.length > 0) {
+            prodName = pRows[0].name;
+          }
+
+          // 1. Notify Customer (if logged in)
+          if (transaction.user_id) {
+            const cNotifId = require("crypto").randomUUID();
+            const clientNotifSql = `
+              INSERT INTO ${notifTable} (id, user_id, is_admin, title, message, type, link)
+              VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `;
+            await executeQuery(clientNotifSql, [
+              cNotifId,
+              transaction.user_id,
+              provider === "supabase" ? false : 0,
+              "Top-Up Sukses! 🎉",
+              `Pembelian ${prodName} untuk Target ${transaction.target_id} berhasil dikirim. SN: ${sn || "-"}`,
+              "payment_success",
+              `/history/${transaction.invoice}`
+            ]);
+          }
+
+          // 2. Notify Admin
+          const aNotifId = require("crypto").randomUUID();
+          const adminNotifSql = `
+            INSERT INTO ${notifTable} (id, user_id, is_admin, title, message, type, link)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+          `;
+          await executeQuery(adminNotifSql, [
+            aNotifId,
+            null,
+            provider === "supabase" ? true : 1,
+            "Top-Up Sukses Diproses",
+            `Transaksi #${transaction.invoice} selesai via callback. SN: ${sn || "-"}`,
+            "payment_success",
+            `/admin/transactions`
+          ]);
+        } catch (inAppErr) {
+          console.error("Failed creating in-app topup success notifications in Digiflazz callback:", inAppErr);
+        }
+      }
     } catch (updateError) {
       console.error(`Failed to update transaction ${ref_id} status via callback:`, updateError);
       return NextResponse.json({ error: 'Failed to update transaction' }, { status: 500 });

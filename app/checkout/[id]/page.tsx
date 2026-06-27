@@ -43,6 +43,7 @@ export default function CheckoutPage() {
   const loginMethodFromUrl = searchParams.get("login_method") || ""
   const passwordFromUrl = searchParams.get("password") || ""
   const notesFromUrl = searchParams.get("notes") || ""
+  const whatsappFromUrl = searchParams.get("whatsapp") || ""
 
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -53,12 +54,30 @@ export default function CheckoutPage() {
     login_method: "",
     password: "",
     request_notes: "",
+    customer_phone: "",
   })
   const [transactionData, setTransactionData] = useState<{
     invoice: string
     amount: number
     qr_string?: string
   } | null>(null)
+
+  const [waAdminNumber, setWaAdminNumber] = useState("6281234567890")
+
+  useEffect(() => {
+    const fetchWaNumber = async () => {
+      try {
+        const res = await fetch("/api/settings/public")
+        const data = await res.json()
+        if (data.wa_admin_number) {
+          setWaAdminNumber(data.wa_admin_number)
+        }
+      } catch (err) {
+        console.error("Failed to load public WA number:", err)
+      }
+    }
+    fetchWaNumber()
+  }, [])
 
   // Promo code states
   const [promoInput, setPromoInput] = useState("")
@@ -108,7 +127,6 @@ export default function CheckoutPage() {
     fetchProduct()
   }, [id])
 
-  // Populate data from URL params
   useEffect(() => {
     if (targetFromUrl) {
       setFormData((prev) => ({ 
@@ -116,10 +134,11 @@ export default function CheckoutPage() {
         target_id: targetFromUrl,
         login_method: loginMethodFromUrl,
         password: passwordFromUrl,
-        request_notes: notesFromUrl
+        request_notes: notesFromUrl,
+        customer_phone: whatsappFromUrl
       }))
     }
-  }, [targetFromUrl, loginMethodFromUrl, passwordFromUrl, notesFromUrl])
+  }, [targetFromUrl, loginMethodFromUrl, passwordFromUrl, notesFromUrl, whatsappFromUrl])
 
   useEffect(() => {
     if (paymentFromUrl) {
@@ -187,6 +206,7 @@ export default function CheckoutPage() {
           login_method: formData.login_method || null,
           password: formData.password || null,
           request_notes: formData.request_notes || null,
+          customer_phone: formData.customer_phone || null,
         }),
       })
 
@@ -709,6 +729,18 @@ export default function CheckoutPage() {
                   <p className="text-xs text-muted-foreground text-center mt-4">
                     Jangan tutup halaman ini sampai pembayaran selesai
                   </p>
+
+                  {/* Help Button */}
+                  <div className="mt-4 border-t border-sky-border pt-4">
+                    <a
+                      href={`https://wa.me/${waAdminNumber.replace(/[^0-9]/g, "")}?text=Halo%20Admin%20Mitsuru,%20saya%20butuh%20bantuan%20mengenai%20transaksi%20Invoice%20${transactionData.invoice}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black uppercase tracking-widest py-3 px-4 rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      Bantuan WhatsApp Admin 💬
+                    </a>
+                  </div>
                 </CardContent>
               </Card>
             </div>

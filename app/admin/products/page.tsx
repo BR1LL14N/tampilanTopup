@@ -509,13 +509,20 @@ export default function AdminProductsPage() {
                               />
                             </span>
                             <div>
-                              <p className="font-extrabold text-sm text-text-primary uppercase tracking-tight flex items-center gap-1.5">
+                              <p className="font-extrabold text-sm text-text-primary uppercase tracking-tight flex items-center gap-1.5 flex-wrap">
                                 {product.name}
                                 {isFlash && (
                                   <span className="inline-block bg-amber-50 text-amber-500 border border-amber-500/20 text-[8px] font-black uppercase px-1.5 py-0.5 rounded">
                                     Flash Sale
                                   </span>
                                 )}
+                                <span className={`inline-block text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${
+                                  product.provider === 'digiflazz'
+                                    ? "bg-sky/10 text-sky border border-sky/20"
+                                    : "bg-purple-50 text-purple-600 border border-purple-500/20"
+                                }`}>
+                                  {product.provider === 'digiflazz' ? 'Digiflazz' : 'Manual'}
+                                </span>
                               </p>
                               <p className="flex items-center gap-1.5 text-[10px] font-bold text-text-muted uppercase tracking-wider mt-0.5">
                                 <img

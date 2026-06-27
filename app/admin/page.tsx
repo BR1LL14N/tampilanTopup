@@ -25,7 +25,11 @@ import {
   AlertCircle,
   CheckCircle2,
   Code,
-  Wallet
+  Wallet,
+  MessageSquare,
+  Smartphone,
+  ExternalLink,
+  QrCode
 } from "lucide-react"
 
 export default function AdminDashboardPage() {
@@ -48,6 +52,17 @@ export default function AdminDashboardPage() {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [syncMessage, setSyncMessage] = useState("")
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // WhatsApp States
+  const [waStatus, setWaStatus] = useState("disabled")
+  const [waMethod, setWaMethod] = useState("baileys")
+  const [waEndpoint, setWaEndpoint] = useState("http://localhost:5000/send")
+  const [waToken, setWaToken] = useState("")
+  const [waAdminNumber, setWaAdminNumber] = useState("")
+  const [waCustomerNotif, setWaCustomerNotif] = useState(true)
+  const [baileysStatus, setBaileysStatus] = useState("disconnected")
+  const [baileysQr, setBaileysQr] = useState<string | null>(null)
+  const [waStatusLoading, setWaStatusLoading] = useState(false)
 
   useEffect(() => {
     // Read cache on mount
@@ -128,7 +143,7 @@ export default function AdminDashboardPage() {
             game: tx.game_name,
             amount: Number(tx.amount) || 0,
             status: tx.topup_status,
-            time: formatDateRelative(tx.created_at),
+            time: tx.created_at ? new Date(tx.created_at).toLocaleDateString("id-ID") : "",
           })))
         }
 
@@ -152,6 +167,12 @@ export default function AdminDashboardPage() {
             setLastSyncTime(settingsData.settings.lastSyncTime)
             setLastSyncStatus(settingsData.settings.lastSyncStatus)
             setMidtransMode(settingsData.settings.midtransMode || "sandbox")
+            setWaStatus(settingsData.settings.waStatus || "disabled")
+            setWaMethod(settingsData.settings.waMethod || "baileys")
+            setWaEndpoint(settingsData.settings.waEndpoint || "http://localhost:5000/send")
+            setWaToken(settingsData.settings.waToken || "")
+            setWaAdminNumber(settingsData.settings.waAdminNumber || "")
+            setWaCustomerNotif(settingsData.settings.waCustomerNotif !== false)
           }
         } catch (err) {
           console.error("Error loading sync settings:", err)
@@ -165,6 +186,55 @@ export default function AdminDashboardPage() {
     }
     verifyAdminAndFetchData()
   }, [router, refreshTrigger])
+
+  // Polling WhatsApp status if enabled
+  useEffect(() => {
+    if (waStatus !== "enabled" || waMethod !== "baileys") {
+      setBaileysStatus("disconnected")
+      setBaileysQr(null)
+      return
+    }
+
+    async function checkWaStatus() {
+      try {
+        const res = await fetch("/api/admin/whatsapp?action=status")
+        const data = await res.json()
+        setBaileysStatus(data.status || "disconnected")
+        setBaileysQr(data.qr || null)
+      } catch (err) {
+        setBaileysStatus("disconnected")
+        setBaileysQr(null)
+      }
+    }
+
+    checkWaStatus()
+    const interval = setInterval(checkWaStatus, 7000) // Poll every 7 seconds
+    return () => clearInterval(interval)
+  }, [waStatus, waMethod])
+
+  const handleWaLogout = async () => {
+    if (!confirm("Apakah Anda yakin ingin memutuskan (unlink) WhatsApp Anda?")) return
+    setWaStatusLoading(true)
+    try {
+      const res = await fetch("/api/admin/whatsapp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "logout" }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setBaileysStatus("disconnected")
+        setBaileysQr(null)
+        alert("Berhasil memutuskan koneksi WhatsApp.")
+      } else {
+        alert("Gagal mematikan sesi WhatsApp: " + (data.error || ""))
+      }
+    } catch (err: any) {
+      alert("Gagal: " + err.message)
+    } finally {
+      setWaStatusLoading(false)
+    }
+  }
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -180,6 +250,12 @@ export default function AdminDashboardPage() {
           isSyncActive,
           syncInterval,
           midtransMode,
+          waStatus,
+          waMethod,
+          waEndpoint,
+          waToken,
+          waAdminNumber,
+          waCustomerNotif
         }),
       })
       const data = await res.json()
@@ -618,6 +694,214 @@ export default function AdminDashboardPage() {
                     <span className="font-semibold text-text-secondary">{lastSyncTime ? formatDateRelative(lastSyncTime) : "-"}</span>
                   </div>
                 </div>
+              </form>
+            </div>
+
+            {/* WhatsApp Integration Card */}
+            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft relative overflow-hidden">
+              <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
+              <div className="p-6 border-b border-sky-border flex items-center justify-between">
+                <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-sky" />
+                  WhatsApp Integration
+                </h3>
+                <span className={`inline-block px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded ${
+                  waStatus === "enabled"
+                    ? "bg-green-50 text-green-500 border border-green-500/20"
+                    : "bg-gray-50 text-text-muted border border-gray-200"
+                }`} style={tagBevelStyle}>
+                  {waStatus === "enabled" ? "Aktif" : "Nonaktif"}
+                </span>
+              </div>
+
+              <form onSubmit={handleSaveSettings} className="p-6 space-y-5">
+                {/* Status Toggle */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                      <Power className="h-3.5 w-3.5 text-sky" />
+                      Status Notifikasi
+                    </label>
+                    <p className="text-[10px] text-text-muted font-medium">Aktifkan notifikasi otomatis ke WhatsApp.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setWaStatus(waStatus === "enabled" ? "disabled" : "enabled")}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      waStatus === "enabled" ? "bg-sky" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        waStatus === "enabled" ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Gateway Method Dropdown */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <Smartphone className="h-3.5 w-3.5 text-sky" />
+                    Metode Gateway
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <div className="flex items-center bg-white" style={inputBevelStyle}>
+                      <select
+                        value={waMethod}
+                        onChange={(e) => setWaMethod(e.target.value)}
+                        className="w-full px-3 py-2 text-xs font-bold text-text-primary focus:outline-none bg-transparent"
+                      >
+                        <option value="baileys">Baileys (Lokal / VPS)</option>
+                        <option value="fonnte">Fonnte API Gateway</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Endpoint API */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <ExternalLink className="h-3.5 w-3.5 text-sky" />
+                    API Endpoint URL
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <input
+                      type="text"
+                      value={waEndpoint}
+                      onChange={(e) => setWaEndpoint(e.target.value)}
+                      className="w-full px-3 py-2 text-xs font-semibold text-text-primary focus:outline-none bg-transparent"
+                      placeholder="e.g. http://localhost:5000/send"
+                      style={inputBevelStyle}
+                    />
+                  </div>
+                </div>
+
+                {/* API Token / Auth Key */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <Shield className="h-3.5 w-3.5 text-sky" />
+                    API Token / Authorization Key
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <input
+                      type="password"
+                      value={waToken}
+                      onChange={(e) => setWaToken(e.target.value)}
+                      className="w-full px-3 py-2 text-xs font-semibold text-text-primary focus:outline-none bg-transparent"
+                      placeholder="Masukkan Token Rahasia (jika ada)"
+                      style={inputBevelStyle}
+                    />
+                  </div>
+                </div>
+
+                {/* Admin WA Number */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <Smartphone className="h-3.5 w-3.5 text-sky" />
+                    Nomor WhatsApp Admin (Notif Order)
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <input
+                      type="text"
+                      value={waAdminNumber}
+                      onChange={(e) => setWaAdminNumber(e.target.value)}
+                      className="w-full px-3 py-2 text-xs font-semibold text-text-primary focus:outline-none bg-transparent"
+                      placeholder="e.g. 6281234567890"
+                      style={inputBevelStyle}
+                    />
+                  </div>
+                </div>
+
+                {/* Customer Notif Toggle */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+                      Notifikasi Pelanggan
+                    </label>
+                    <p className="text-[10px] text-text-muted font-medium">Kirim tagihan &amp; status pesanan ke WA pembeli.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setWaCustomerNotif(!waCustomerNotif)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      waCustomerNotif ? "bg-sky" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        waCustomerNotif ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Submit Settings Button */}
+                <div className="relative p-[1px] bg-sky/30 hover:bg-sky transition-all duration-300" style={inputBevelStyle}>
+                  <button
+                    type="submit"
+                    disabled={saveLoading}
+                    className="w-full bg-white py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors disabled:opacity-50"
+                    style={inputBevelStyle}
+                  >
+                    {saveLoading ? "Menyimpan..." : "Simpan Pengaturan WhatsApp"}
+                  </button>
+                </div>
+
+                {/* Baileys QR Code / Connection HUD */}
+                {waStatus === "enabled" && waMethod === "baileys" && (
+                  <div className="pt-4 border-t border-sky-border/50 space-y-4">
+                    <span className="font-bold text-text-primary uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                      <QrCode className="h-3.5 w-3.5 text-sky" />
+                      Status Koneksi WhatsApp (Baileys)
+                    </span>
+
+                    <div className="flex flex-col items-center justify-center p-4 border border-sky-border/40 bg-ice/40 rounded-xl space-y-3">
+                      {baileysStatus === "connected" ? (
+                        <div className="text-center space-y-2 w-full">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 border border-green-500/20 text-green-600 rounded-full text-[10px] font-black uppercase tracking-wider">
+                            <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                            Connected / Terhubung
+                          </div>
+                          <p className="text-[10px] text-text-muted">
+                            Siap mengirimkan notifikasi transaksi ke WhatsApp pelanggan &amp; admin.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={handleWaLogout}
+                            disabled={waStatusLoading}
+                            className="text-[9px] font-black uppercase text-red-500 hover:text-red-700 tracking-wider underline disabled:opacity-50 pt-1"
+                          >
+                            Unlink / Logout WhatsApp
+                          </button>
+                        </div>
+                      ) : baileysStatus === "qr" && baileysQr ? (
+                        <div className="text-center space-y-3">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-500/20 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-wider">
+                            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                            Menunggu Scan QR
+                          </div>
+                          <div className="bg-white p-2 border border-sky-border/60 rounded-xl inline-block shadow-sm">
+                            <img src={baileysQr} alt="WhatsApp Web QR Code" className="h-40 w-40 object-contain animate-fade-in" />
+                          </div>
+                          <p className="text-[9px] text-text-muted leading-relaxed max-w-[200px] mx-auto">
+                            Buka WhatsApp di HP Anda &gt; Perangkat Tertaut &gt; Tautkan Perangkat, lalu scan QR code di atas.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4 w-full space-y-2">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-50 border border-gray-200 text-text-muted rounded-full text-[10px] font-black uppercase tracking-wider">
+                            <span className="h-2 w-2 rounded-full bg-gray-400" />
+                            Connecting / Memulai...
+                          </div>
+                          <p className="text-[9px] text-text-muted max-w-[200px] mx-auto leading-relaxed">
+                            Sedang memuat koneksi server lokal Baileys. Pastikan microservice gateway sudah menyala di VPS Anda.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </form>
             </div>
 

@@ -532,7 +532,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             </span>
             <div>
               <div className="text-yellow-400 text-lg leading-none mb-1">★★★★★</div>
-              <p className="text-xs font-bold text-text-muted uppercase tracking-wide">Berdasarkan total 870 rating pengguna terverifikasi</p>
+              <p className="text-xs font-bold text-text-muted uppercase tracking-wide">Berdasarkan total ulasan pengguna terverifikasi</p>
             </div>
           </div>
 
@@ -551,10 +551,243 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
 
         </div>
 
+        {/* Dynamic Reviews & Critique/Feedback Section */}
+        <ReviewsSection user={user} router={router} />
+
         </main>
 
         <Footer />
       </SidebarContentWrapper>
+    </div>
+  )
+}
+
+// ==========================================
+// Testimonials & Reviews Component
+// ==========================================
+function ReviewsSection({ user, router }: { user: any; router: any }) {
+  const [reviews, setReviews] = useState<any[]>([])
+  const [rating, setRating] = useState(5)
+  const [comment, setComment] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [hoverRating, setHoverRating] = useState<number | null>(null)
+
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        const res = await fetch("/api/feedback")
+        const data = await res.json()
+        if (data.reviews) {
+          setReviews(data.reviews)
+        }
+      } catch (err) {
+        console.error("Failed to load reviews:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadReviews()
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) {
+      router.push("/auth/login")
+      return
+    }
+    if (!comment.trim()) return
+
+    setSubmitting(true)
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, comment }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setComment("")
+        setRating(5)
+        router.push(`/reviews/${data.id}`)
+      } else {
+        alert(data.error || "Gagal mengirim ulasan.")
+      }
+    } catch (err) {
+      console.error("Error submitting review:", err)
+      alert("Terjadi kesalahan sistem. Sila coba kembali.")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="mt-16 border-t border-sky-border pt-16">
+      <div className="text-center mb-10">
+        <h2 className="text-2xl font-black text-text-primary uppercase tracking-wider">
+          Kritik, Saran & Ulasan 💬
+        </h2>
+        <p className="text-sm font-bold text-text-muted mt-2">
+          Apa kata mereka yang sudah berbelanja di Mitsuru? Berikan masukan Anda juga!
+        </p>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Testimonials List */}
+        <div className="lg:col-span-2 space-y-4">
+          <h3 className="text-xs font-black uppercase tracking-widest text-text-secondary mb-2">
+            Ulasan Pelanggan Terbaru
+          </h3>
+
+          {loading ? (
+            <div className="text-center py-10 text-xs font-bold text-text-muted uppercase">
+              Memuat Ulasan...
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="bg-white/50 p-8 text-center rounded-[20px] border border-sky-border shadow-sky-soft">
+              <p className="text-xs font-bold text-text-muted uppercase tracking-wider">
+                Belum ada ulasan terverifikasi. Jadilah yang pertama memberikan kritik & saran!
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {reviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="bg-white p-5 rounded-[20px] border border-sky-border shadow-sky-soft flex flex-col justify-between hover:shadow-sky-medium hover:border-sky/30 transition-all duration-300"
+                >
+                  <div className="flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-center gap-2">
+                          {rev.avatar_url ? (
+                            <img
+                              src={rev.avatar_url}
+                              alt={rev.user_name}
+                              className="w-7 h-7 rounded-full border border-sky/30"
+                            />
+                          ) : (
+                            <div className="w-7 h-7 rounded-full bg-sky/10 text-sky text-[10px] font-black grid place-items-center uppercase border border-sky-border">
+                              {rev.user_name?.substring(0, 2)}
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-xs font-black text-text-primary uppercase tracking-wide leading-tight">
+                              {rev.user_name}
+                            </p>
+                            <p className="text-[9px] font-bold text-text-muted uppercase">
+                              {new Date(rev.created_at).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-yellow-400 text-xs leading-none">
+                          {"★".repeat(rev.rating) + "☆".repeat(5 - rev.rating)}
+                        </div>
+                      </div>
+                      <p className="text-xs font-bold text-text-secondary leading-relaxed italic mt-1">
+                        "{rev.comment}"
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-sky-border flex justify-end">
+                      <Link
+                        href={`/reviews/${rev.id}`}
+                        className="text-[10px] font-black uppercase text-sky hover:text-sky-dark tracking-wider flex items-center gap-1 group"
+                      >
+                        Buka Chat Diskusi 💬
+                        <span className="transform group-hover:translate-x-0.5 transition-transform">→</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Feedback Form */}
+        <div className="bg-white p-6 rounded-[20px] border border-sky-border shadow-sky-soft h-fit">
+          <h3 className="text-xs font-black uppercase tracking-widest text-text-secondary mb-4">
+            Kirim Ulasan & Rating Anda
+          </h3>
+
+          {user ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Rating Selector */}
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-text-muted mb-2">
+                  Rating Bintang *
+                </label>
+                <div className="flex gap-2 items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(null)}
+                      className="text-2xl transition-transform hover:scale-110 focus:outline-none"
+                    >
+                      <span
+                        className={
+                          star <= (hoverRating ?? rating)
+                            ? "text-yellow-400"
+                            : "text-slate-200"
+                        }
+                      >
+                        ★
+                      </span>
+                    </button>
+                  ))}
+                  <span className="text-[10px] font-black text-sky uppercase tracking-wide ml-2 bg-sky/5 px-2 py-0.5 rounded border border-sky-border">
+                    {rating} / 5 Bintang
+                  </span>
+                </div>
+              </div>
+
+              {/* Comment Textarea */}
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-text-muted mb-2">
+                  Kritik, Saran atau Masukan *
+                </label>
+                <textarea
+                  required
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Tulis kritik, saran, atau masukan Anda di sini. Admin akan merespons melalui chat khusus..."
+                  rows={4}
+                  className="w-full text-xs font-bold text-text-primary placeholder:text-text-muted/60 p-3 bg-slate-50/50 rounded-xl border border-sky-border focus:border-sky/40 focus:bg-white focus:outline-none focus:ring-0 transition-all duration-300"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full bg-sky hover:bg-sky-dark text-white text-xs font-black uppercase tracking-widest py-3 px-4 rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {submitting ? "Mengirimkan..." : "Kirim Ulasan & Buka Chat"}
+              </button>
+            </form>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4 leading-relaxed">
+                Anda harus masuk akun terlebih dahulu untuk mengirim kritik, saran, dan memberikan rating.
+              </p>
+              <button
+                onClick={() => router.push("/auth/login")}
+                className="w-full bg-sky hover:bg-sky-dark text-white text-xs font-black uppercase tracking-widest py-3 px-4 rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300"
+              >
+                Login Akun Sekarang
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

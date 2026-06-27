@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     login_method TEXT,
     password TEXT,
     request_notes TEXT,
+    customer_phone TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -92,6 +93,40 @@ CREATE TABLE IF NOT EXISTS public.settings (
     value JSONB NOT NULL,
     description TEXT,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Reviews Table (Authenticated Customer Feedbacks)
+CREATE TABLE IF NOT EXISTS public.reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL,
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT NOT NULL,
+    status BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES public.user_profiles(id) ON DELETE CASCADE
+);
+
+-- Review Messages Table (Chat threads for Reviews/Tickets)
+CREATE TABLE IF NOT EXISTS public.review_messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    review_id UUID NOT NULL,
+    sender TEXT NOT NULL, -- 'user', 'admin'
+    message TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    FOREIGN KEY (review_id) REFERENCES public.reviews(id) ON DELETE CASCADE
+);
+
+-- Notifications Table (In-app Alerts)
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID, -- NULL = target is admin
+    is_admin BOOLEAN DEFAULT FALSE,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    type TEXT NOT NULL,
+    link TEXT,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- =============================================
@@ -106,6 +141,12 @@ CREATE INDEX IF NOT EXISTS idx_transactions_invoice ON public.transactions(invoi
 CREATE INDEX IF NOT EXISTS idx_transactions_payment_status ON public.transactions(payment_status);
 CREATE INDEX IF NOT EXISTS idx_transactions_topup_status ON public.transactions(topup_status);
 CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON public.transactions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON public.reviews(user_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_status ON public.reviews(status);
+CREATE INDEX IF NOT EXISTS idx_review_messages_review_id ON public.review_messages(review_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON public.notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON public.notifications(created_at DESC);
 
 -- =============================================
 -- 4. ROW LEVEL SECURITY (RLS)

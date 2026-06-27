@@ -23,7 +23,9 @@ import {
   ChevronRight,
   Gamepad2,
   ShoppingBag,
-  Percent
+  Percent,
+  Bell,
+  MessageSquare,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -412,6 +414,7 @@ export function Header({ user }: HeaderProps) {
             <div className="hidden lg:flex items-center gap-2">
               {currentUser ? (
                 <>
+                  <HeaderNotificationBell />
                   <Link href="/dashboard" className="flex items-center gap-1.5 border border-sky-border bg-white text-text-primary hover:text-sky px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-300 shadow-sky-soft hover:shadow-sky-medium">
                     <User className="h-3.5 w-3.5 text-sky" />
                     {currentUser.name}
@@ -548,6 +551,17 @@ export function Header({ user }: HeaderProps) {
                   >
                     <Percent className="h-4 w-4 text-sky" />
                     Kelola Promo
+                  </Link>
+                  <Link
+                    href="/admin/feedbacks"
+                    className={cn(
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      pathname === "/admin/feedbacks" && "nav-active bg-sky/10 text-sky"
+                    )}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <MessageSquare className="h-4 w-4 text-sky" />
+                    Kelola Ulasan
                   </Link>
                 </>
               )}
@@ -743,6 +757,18 @@ export function Header({ user }: HeaderProps) {
                   <Percent className="h-4 w-4 group-hover:scale-105 transition-transform" />
                   {!isSidebarCollapsed && <span className="animate-fadeIn">Kelola Promo</span>}
                 </Link>
+                <Link
+                  href="/admin/feedbacks"
+                  className={cn(
+                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+                    pathname === "/admin/feedbacks" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
+                  )}
+                  title={isSidebarCollapsed ? "Kelola Ulasan" : undefined}
+                >
+                  <MessageSquare className="h-4 w-4 group-hover:scale-105 transition-transform" />
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Kelola Ulasan</span>}
+                </Link>
               </div>
             )}
 
@@ -922,5 +948,161 @@ export function Header({ user }: HeaderProps) {
         </div>
       )}
     </>
+  )
+}
+
+// ==========================================
+// Header Notification Bell Dropdown
+// ==========================================
+function HeaderNotificationBell() {
+  const router = useRouter()
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetch("/api/notifications")
+      const data = await res.json()
+      if (data.notifications) {
+        setNotifications(data.notifications)
+      }
+    } catch (err) {
+      console.error("Failed to load notifications in header:", err)
+    }
+  }
+
+  useEffect(() => {
+    fetchNotifications()
+    // Poll notifications every 10 seconds
+    const interval = setInterval(fetchNotifications, 10000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const handleMarkAsRead = async (notifId: string, link?: string) => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: notifId }),
+      })
+      fetchNotifications()
+      setIsOpen(false)
+      if (link) {
+        router.push(link)
+      }
+    } catch (err) {
+      console.error("Failed to mark read:", err)
+    }
+  }
+
+  const handleMarkAllRead = async () => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ all: true }),
+      })
+      fetchNotifications()
+    } catch (err) {
+      console.error("Failed to mark all read:", err)
+    }
+  }
+
+  const unreadCount = notifications.filter((n) => !n.is_read).length
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative p-2 border border-sky-border hover:border-sky/30 rounded-full bg-white hover:bg-ice text-text-muted hover:text-sky transition duration-300 flex items-center justify-center h-[34px] w-[34px]"
+        title="Notifikasi"
+      >
+        <Bell className="h-4.5 w-4.5" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white font-mono text-[9px] font-black grid place-items-center animate-pulse leading-none">
+            {unreadCount}
+          </span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-80 bg-white border border-sky-border rounded-[20px] shadow-sky-medium overflow-hidden z-50 p-2 space-y-1 animate-fadeIn">
+          <div className="px-4 py-3 border-b border-sky-border flex items-center justify-between">
+            <p className="text-[10px] font-black text-text-primary uppercase tracking-widest">
+              Notifikasi Baru ({unreadCount})
+            </p>
+            {unreadCount > 0 && (
+              <button
+                onClick={handleMarkAllRead}
+                className="text-[8px] font-black uppercase text-sky hover:text-sky-dark tracking-widest"
+              >
+                Semua Dibaca
+              </button>
+            )}
+          </div>
+
+          <div className="max-h-64 overflow-y-auto divide-y divide-sky-border/40">
+            {notifications.length > 0 ? (
+              notifications.slice(0, 5).map((notif) => {
+                const isUnread = !notif.is_read
+                const isFeedback = notif.type === "feedback_reply" || notif.type === "new_feedback"
+                return (
+                  <div
+                    key={notif.id}
+                    onClick={() => handleMarkAsRead(notif.id, notif.link)}
+                    className={`p-3 text-[11px] flex gap-3 cursor-pointer transition-colors ${
+                      isUnread ? "bg-sky/5 text-text-primary" : "bg-white hover:bg-slate-50 text-text-secondary"
+                    }`}
+                  >
+                    <div className={`p-1.5 rounded-lg shrink-0 h-fit ${isUnread ? "bg-sky/10 text-sky" : "bg-slate-100 text-slate-400"}`}>
+                      {isFeedback ? <MessageSquare className="h-3.5 w-3.5" /> : <Bell className="h-3.5 w-3.5" />}
+                    </div>
+                    <div className="flex-grow min-w-0">
+                      <div className="flex justify-between items-start gap-1">
+                        <p className={`font-black truncate ${isUnread ? "text-text-primary" : "text-text-secondary"}`}>
+                          {notif.title}
+                        </p>
+                        <span className="text-[7.5px] font-bold text-text-muted uppercase shrink-0">
+                          {new Date(notif.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-text-secondary mt-0.5 line-clamp-2 leading-relaxed">
+                        {notif.message}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })
+            ) : (
+              <div className="p-8 text-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
+                Kotak masuk kosong
+              </div>
+            )}
+          </div>
+
+          <div className="p-2 border-t border-sky-border flex justify-center">
+            <Link
+              href="/dashboard"
+              onClick={() => setIsOpen(false)}
+              className="w-full text-center py-2 text-[9px] font-black uppercase text-sky hover:text-sky-dark tracking-widest bg-sky/5 rounded-xl border border-sky-border/40 transition"
+            >
+              Buka Semua Notifikasi
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

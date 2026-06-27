@@ -1,13 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-text-secondary font-bold text-xs uppercase tracking-widest">
+        Memuat...
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isRegistered = searchParams.get("registered") === "true"
+
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<"google" | "discord" | null>(null)
@@ -34,8 +49,16 @@ export default function LoginPage() {
         }),
       })
 
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
+      let data;
+      try {
+        data = await res.json()
+      } catch (jsonErr) {
+        throw new Error("Gagal terhubung ke server. Silakan coba kembali nanti.")
+      }
+
+      if (!res.ok || data.error) {
+        throw new Error(data?.error || "Email atau password Anda salah.")
+      }
 
       router.push("/dashboard")
       router.refresh()
@@ -138,6 +161,12 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {isRegistered && !error && (
+              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-semibold animate-fadeIn">
+                Registrasi berhasil! Silakan masuk menggunakan akun baru Anda.
+              </div>
+            )}
+
             {error && (
               <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold animate-fadeIn">
                 {error}

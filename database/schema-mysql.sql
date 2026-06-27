@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   login_method TEXT NULL,
   password TEXT NULL,
   request_notes TEXT NULL,
+  customer_phone VARCHAR(50) NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
@@ -105,8 +106,42 @@ CREATE TABLE IF NOT EXISTS settings (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- 7. Reviews Table (Authenticated Customer Feedbacks)
+CREATE TABLE IF NOT EXISTS reviews (
+  id VARCHAR(36) PRIMARY KEY,
+  user_id VARCHAR(36) NOT NULL,
+  rating INT NOT NULL,
+  comment TEXT NOT NULL,
+  status TINYINT(1) DEFAULT 1, -- 1 = Show on Landing Page, 0 = Hidden
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 8. Review Messages Table (Chat threads for Reviews/Tickets)
+CREATE TABLE IF NOT EXISTS review_messages (
+  id VARCHAR(36) PRIMARY KEY,
+  review_id VARCHAR(36) NOT NULL,
+  sender VARCHAR(20) NOT NULL, -- 'user', 'admin'
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE
+);
+
+-- 9. Notifications Table (In-app Alerts)
+CREATE TABLE IF NOT EXISTS notifications (
+  id VARCHAR(36) PRIMARY KEY,
+  user_id VARCHAR(36) NULL, -- Target user. If NULL and is_admin = 1, sent to admins
+  is_admin TINYINT(1) DEFAULT 0, -- 1 = Admin alert, 0 = Customer alert
+  title VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  type VARCHAR(50) NOT NULL, -- checkout, payment_success, new_feedback, feedback_reply
+  link VARCHAR(255) NULL, -- Redirection link when clicked
+  is_read TINYINT(1) DEFAULT 0, -- 0 = Unread, 1 = Read
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ==========================================================
--- 7. INDEXES (For Query Performance Optimization)
+-- 10. INDEXES (For Query Performance Optimization)
 -- ==========================================================
 CREATE INDEX idx_games_slug ON games(slug);
 CREATE INDEX idx_games_status ON games(status);
@@ -117,6 +152,12 @@ CREATE INDEX idx_transactions_invoice ON transactions(invoice);
 CREATE INDEX idx_transactions_payment_status ON transactions(payment_status);
 CREATE INDEX idx_transactions_topup_status ON transactions(topup_status);
 CREATE INDEX idx_transactions_created_at ON transactions(created_at DESC);
+CREATE INDEX idx_reviews_user_id ON reviews(user_id);
+CREATE INDEX idx_reviews_status ON reviews(status);
+CREATE INDEX idx_review_messages_review_id ON review_messages(review_id);
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX idx_notifications_created_at ON notifications(created_at DESC);
 
 -- ==========================================================
 -- 8. VIEWS
