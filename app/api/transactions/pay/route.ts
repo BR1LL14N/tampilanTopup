@@ -11,6 +11,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invoice is required' }, { status: 400 });
     }
 
+    // Security check: If running in production mode, require authorization token matching Midtrans Server Key
+    try {
+      const { SettingService } = await import('@/lib/services/setting-service');
+      const dbMidtransMode = await SettingService.get('midtrans_mode', 'sandbox');
+      const isProduction = dbMidtransMode === 'production';
+      const serverKey = isProduction
+        ? process.env.MIDTRANS_SERVER_KEY
+        : (process.env.MIDTRANS_SANDBOX_SERVER_KEY || process.env.MIDTRANS_SERVER_KEY);
+
+      if (isProduction && serverKey) {
+        const authHeader = req.headers.get('authorization');
+        if (!authHeader || authHeader !== `Bearer ${serverKey}`) {
+          console.warn(`Unauthorized attempt to call pay API directly for invoice: ${invoice}`);
+          return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
+        }
+      }
+    } catch (secError) {
+      console.error('Failed to perform API pay security verification:', secError);
+      return NextResponse.json({ error: 'Internal security check error' }, { status: 500 });
+    }
+
     // 1. Fetch transaction
     const transaction = await TransactionService.getByInvoice(invoice);
 
