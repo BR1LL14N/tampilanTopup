@@ -107,6 +107,10 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
       alert("Silakan masukkan ID Game Anda.")
       return
     }
+    if (!whatsapp) {
+      alert("Silakan masukkan nomor WhatsApp Aktif Anda.")
+      return
+    }
 
     // Redirect to dynamic checkout/invoice route
     const target = serverId ? `${gameId} (${serverId})` : gameId
@@ -310,38 +314,22 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                       </div>
 
                       <div className="space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">Metode Login</span>
-                        <select
-                          value={loginMethod}
-                          onChange={(e) => setLoginMethod(e.target.value)}
-                          className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-text-primary outline-none"
-                        >
-                          <option value="Pilih Login">Pilih Login</option>
-                          <option value="Moonton">Moonton</option>
-                          <option value="Facebook">Facebook</option>
-                          <option value="Tiktok">Tiktok</option>
-                          <option value="VK">VK</option>
-                          <option value="Google">Google</option>
-                        </select>
-                      </div>
-
-                      <div className="sm:col-span-2 space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">Password (Khusus Joki Rank)</span>
+                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">No. WhatsApp Aktif <span className="text-sky">*</span></span>
                         <input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Masukkan password akun game Anda jika memesan Joki"
+                          value={whatsapp}
+                          onChange={(e) => setWhatsapp(e.target.value)}
+                          placeholder="Contoh: 081234567890"
                           className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none"
+                          required
                         />
                       </div>
 
                       <div className="sm:col-span-2 space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">Catatan Khusus untuk Admin</span>
+                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">Catatan Khusus untuk Admin (Opsional)</span>
                         <input
                           value={requestNotes}
                           onChange={(e) => setRequestNotes(e.target.value)}
-                          placeholder="Contoh: Tolong matikan verifikasi 2 langkah, push di jam malam saja"
+                          placeholder="Contoh: Tolong proses cepat ya admin, kirim sebagai hadiah"
                           className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none"
                         />
                       </div>
@@ -497,32 +485,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                     </div>
                   </div>
 
-                  {/* Step 6: Detail Kontak */}
-                  <div className="bg-white border border-sky-border rounded-[24px] shadow-sky-medium overflow-hidden">
-                    <div className="p-4 bg-white border-b border-sky-border flex items-center gap-3">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg">6</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">Detail Kontak WhatsApp</h3>
-                    </div>
-
-                    <div className="p-6 space-y-4 bg-white">
-                      <div className="space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">No. WhatsApp Aktif <span className="text-sky">*</span></span>
-                        <div className="grid grid-cols-[80px_1fr] gap-3">
-                          <span className="rounded-xl bg-white border border-sky-border flex items-center justify-center font-bold text-text-muted text-xs">ID (+62)</span>
-                          <input
-                            value={whatsapp}
-                            onChange={(e) => setWhatsapp(e.target.value)}
-                            placeholder="81234567890"
-                            className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-muted outline-none"
-                            required
-                          />
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-text-muted font-bold uppercase tracking-wide">
-                        *Bukti status pengiriman dan kwitansi invoice akan dikirimkan otomatis ke WhatsApp Anda.
-                      </p>
-                    </div>
-                  </div>
                 </>
               ) : (
                 /* Description & Rules Tab */
