@@ -4,7 +4,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Card, CardContent } from "@/components/ui/card"
-import { HelpCircle, ChevronRight, ShoppingBag, CreditCard, CheckCircle2 } from "lucide-react"
+import { HelpCircle, ChevronRight, ShoppingBag, CreditCard, CheckCircle2, QrCode } from "lucide-react"
 
 export default function HowItWorksPage() {
   return (
@@ -34,9 +34,9 @@ export default function HowItWorksPage() {
                   <div className="h-12 w-12 rounded-2xl bg-sky/10 text-sky grid place-items-center mb-4">
                     <ShoppingBag className="h-6 w-6" />
                   </div>
-                  <h3 className="font-extrabold text-xs uppercase text-text-primary mb-2">Pilih Game &amp; Produk</h3>
+                  <h3 className="font-extrabold text-xs uppercase text-text-primary mb-2">Pilih Game &amp; Isi Data</h3>
                   <p className="text-[11px] text-text-secondary leading-relaxed">
-                    Pilih judul game yang ingin Anda isi, lalu tentukan nominal item/diamond yang Anda inginkan.
+                    Pilih game favorit Anda, tentukan nominal item, isi data ID Akun Game, dan lengkapi nomor WhatsApp aktif Anda.
                   </p>
                 </CardContent>
               </Card>
@@ -46,11 +46,11 @@ export default function HowItWorksPage() {
                 <div className="absolute top-4 right-4 text-3xl font-black text-sky/15">02</div>
                 <CardContent className="pt-4 flex flex-col items-center">
                   <div className="h-12 w-12 rounded-2xl bg-sky/10 text-sky grid place-items-center mb-4">
-                    <HelpCircle className="h-6 w-6" />
+                    <CreditCard className="h-6 w-6" />
                   </div>
-                  <h3 className="font-extrabold text-xs uppercase text-text-primary mb-2">Masukkan Data Akun</h3>
+                  <h3 className="font-extrabold text-xs uppercase text-text-primary mb-2">Pilih Pembayaran</h3>
                   <p className="text-[11px] text-text-secondary leading-relaxed">
-                    Isi data ID Akun Anda (dan Zone ID jika ada) secara benar di form masukan yang kami sediakan.
+                    Di halaman checkout, pilih jalur pembayaran yang Anda inginkan (QRIS, E-Wallet, atau VA) dan gunakan voucher promo jika ada.
                   </p>
                 </CardContent>
               </Card>
@@ -60,11 +60,11 @@ export default function HowItWorksPage() {
                 <div className="absolute top-4 right-4 text-3xl font-black text-sky/15">03</div>
                 <CardContent className="pt-4 flex flex-col items-center">
                   <div className="h-12 w-12 rounded-2xl bg-sky/10 text-sky grid place-items-center mb-4">
-                    <CreditCard className="h-6 w-6" />
+                    <QrCode className="h-6 w-6" />
                   </div>
-                  <h3 className="font-extrabold text-xs uppercase text-text-primary mb-2">Pilih Pembayaran</h3>
+                  <h3 className="font-extrabold text-xs uppercase text-text-primary mb-2">Scan QRIS &amp; Bayar</h3>
                   <p className="text-[11px] text-text-secondary leading-relaxed">
-                    Selesaikan tagihan Anda melalui berbagai metode instan seperti QRIS, E-Wallet, atau Bank Transfer.
+                    Scan kode QRIS dinamis yang muncul di layar Anda atau salin kode pembayaran sebelum batas waktu kedaluwarsa.
                   </p>
                 </CardContent>
               </Card>
@@ -76,9 +76,9 @@ export default function HowItWorksPage() {
                   <div className="h-12 w-12 rounded-2xl bg-sky/10 text-sky grid place-items-center mb-4">
                     <CheckCircle2 className="h-6 w-6" />
                   </div>
-                  <h3 className="font-extrabold text-xs uppercase text-text-primary mb-2">Top Up Masuk Instan</h3>
+                  <h3 className="font-extrabold text-xs uppercase text-text-primary mb-2">Proses Otomatis &amp; Masuk</h3>
                   <p className="text-[11px] text-text-secondary leading-relaxed">
-                    Sistem otomatisasi kami akan memverifikasi pembayaran Anda, lalu mengirimkan diamond langsung ke akun Anda.
+                    Sistem kami memverifikasi pembayaran secara otomatis, memicu pengiriman item oleh distributor, dan langsung masuk ke akun Anda.
                   </p>
                 </CardContent>
               </Card>

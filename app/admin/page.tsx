@@ -29,7 +29,8 @@ import {
   MessageSquare,
   Smartphone,
   ExternalLink,
-  QrCode
+  QrCode,
+  Loader2
 } from "lucide-react"
 
 export default function AdminDashboardPage() {
@@ -77,6 +78,12 @@ export default function AdminDashboardPage() {
   const [baileysStatus, setBaileysStatus] = useState("disconnected")
   const [baileysQr, setBaileysQr] = useState<string | null>(null)
   const [waStatusLoading, setWaStatusLoading] = useState(false)
+
+  // WhatsApp Test States
+  const [testPhone, setTestPhone] = useState("")
+  const [testMessage, setTestMessage] = useState("Uji coba koneksi WhatsApp Mitsuru Top Up Hub. Koneksi sukses! ✅")
+  const [testLoading, setTestLoading] = useState(false)
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
 
   useEffect(() => {
     // Read cache on mount
@@ -256,6 +263,33 @@ export default function AdminDashboardPage() {
       alert("Gagal: " + err.message)
     } finally {
       setWaStatusLoading(false)
+    }
+  }
+
+  const handleSendTestMessage = async () => {
+    if (!testPhone.trim()) return
+    setTestLoading(true)
+    setTestResult(null)
+    try {
+      const res = await fetch("/api/admin/whatsapp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "test",
+          phone: testPhone,
+          message: testMessage,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setTestResult({ success: true, message: data.message || "Pesan uji coba berhasil dikirim!" })
+      } else {
+        setTestResult({ success: false, message: data.error || "Gagal mengirim pesan uji coba." })
+      }
+    } catch (err: any) {
+      setTestResult({ success: false, message: "Gagal: " + err.message })
+    } finally {
+      setTestLoading(false)
     }
   }
 
@@ -1022,15 +1056,94 @@ export default function AdminDashboardPage() {
                             Buka WhatsApp di HP Anda &gt; Perangkat Tertaut &gt; Tautkan Perangkat, lalu scan QR code di atas.
                           </p>
                         </div>
-                      ) : (
+                      ) : baileysStatus === "connecting" ? (
                         <div className="text-center py-4 w-full space-y-2">
-                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-50 border border-gray-200 text-text-muted rounded-full text-[10px] font-black uppercase tracking-wider">
-                            <span className="h-2 w-2 rounded-full bg-gray-400" />
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-500/20 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-wider">
+                            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                             Connecting / Memulai...
                           </div>
                           <p className="text-[9px] text-text-muted max-w-[200px] mx-auto leading-relaxed">
-                            Sedang memuat koneksi server lokal Baileys. Pastikan microservice gateway sudah menyala di VPS Anda.
+                            Sedang memuat koneksi server lokal Baileys. Harap tunggu...
                           </p>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4 w-full space-y-2">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 border border-red-500/20 text-red-600 rounded-full text-[10px] font-black uppercase tracking-wider">
+                            <span className="h-2 w-2 rounded-full bg-red-500" />
+                            Offline / Terputus
+                          </div>
+                          <p className="text-[9px] text-text-muted max-w-[220px] mx-auto leading-relaxed">
+                            Gagal terhubung ke microservice gateway WhatsApp. Pastikan service gateway Baileys/Fonnte sudah aktif di URL Endpoint Anda (port 5000).
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Connection Test Section */}
+                {waStatus === "enabled" && (
+                  <div className="pt-4 border-t border-sky-border/50 space-y-3">
+                    <span className="font-bold text-text-primary uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                      <ExternalLink className="h-3.5 w-3.5 text-sky" />
+                      Uji Coba Kirim Notifikasi WhatsApp
+                    </span>
+
+                    <div className="p-4 border border-sky-border/40 bg-slate-50 rounded-xl space-y-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold text-text-secondary uppercase tracking-wider text-left block">
+                          Nomor HP Tujuan Tes
+                        </label>
+                        <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                          <input
+                            type="text"
+                            value={testPhone}
+                            onChange={(e) => setTestPhone(e.target.value)}
+                            placeholder="e.g. 628123456789"
+                            className="w-full px-3 py-1.5 text-xs font-semibold text-text-primary focus:outline-none bg-white"
+                            style={inputBevelStyle}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-bold text-text-secondary uppercase tracking-wider text-left block">
+                          Isi Pesan Tes
+                        </label>
+                        <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                          <textarea
+                            value={testMessage}
+                            onChange={(e) => setTestMessage(e.target.value)}
+                            rows={2}
+                            className="w-full px-3 py-1.5 text-xs font-semibold text-text-primary focus:outline-none bg-white"
+                            style={inputBevelStyle}
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleSendTestMessage}
+                        disabled={testLoading || !testPhone.trim()}
+                        className="w-full bg-sky hover:bg-sky/90 text-white py-1.5 text-[9px] font-black uppercase tracking-widest transition-colors rounded-lg disabled:opacity-50 flex items-center justify-center gap-1"
+                      >
+                        {testLoading ? (
+                          <>
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Mengirim...
+                          </>
+                        ) : (
+                          "Kirim Pesan Uji Coba"
+                        )}
+                      </button>
+
+                      {testResult && (
+                        <div className={`p-2.5 rounded-lg border text-[10px] font-semibold text-left ${
+                          testResult.success 
+                            ? "bg-green-50 border-green-500/20 text-green-700" 
+                            : "bg-red-50 border-red-500/20 text-red-700"
+                        }`}>
+                          {testResult.message}
                         </div>
                       )}
                     </div>
