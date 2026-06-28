@@ -20,9 +20,12 @@ export async function executeQuery<T = any>(sql: string, params: any[] = []): Pr
     formattedSql = sql.replace(/\$\d+/g, '?');
     
     // For MySQL, convert boolean parameters (true/false) to 1/0
+    // and format ISO 8601 strings to YYYY-MM-DD HH:MM:SS standard datetime
     for (let i = 0; i < formattedParams.length; i++) {
       if (typeof formattedParams[i] === 'boolean') {
         formattedParams[i] = formattedParams[i] ? 1 : 0;
+      } else if (typeof formattedParams[i] === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(formattedParams[i])) {
+        formattedParams[i] = formattedParams[i].slice(0, 19).replace('T', ' ');
       }
     }
   }
