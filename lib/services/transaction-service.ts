@@ -76,7 +76,7 @@ export class TransactionService {
    */
   static async getDetailsByInvoice(invoice: string): Promise<any | null> {
     const sql = `
-      SELECT t.*, p.name as product_name, g.name as game_name, g.slug as game_slug
+      SELECT t.*, p.name as product_name, p.provider_sku, g.name as game_name, g.slug as game_slug
       FROM transactions t
       LEFT JOIN products p ON t.product_id = p.id
       LEFT JOIN games g ON p.game_id = g.id

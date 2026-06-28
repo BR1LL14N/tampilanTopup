@@ -47,6 +47,7 @@ export default function CheckoutPage() {
 
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+  const [autoSubmitted, setAutoSubmitted] = useState(false)
   const [selectedPayment, setSelectedPayment] = useState("")
   const [formData, setFormData] = useState({
     target_id: "",
@@ -89,14 +90,41 @@ export default function CheckoutPage() {
   const [product, setProduct] = useState<any>(null)
   const [loadingProduct, setLoadingProduct] = useState(true)
 
-  // Fetch product from Supabase based on provider_sku
+  // Fetch product based on provider_sku (with fallback support for mock checkout invoice lookup)
   useEffect(() => {
     if (!id) return
 
     const fetchProduct = async () => {
       setLoadingProduct(true)
       try {
-        const skuStr = String(id)
+        let skuStr = String(id)
+        const invoiceNo = searchParams.get("invoice")
+
+        if (skuStr === "mock" && invoiceNo) {
+          const txRes = await fetch(`/api/transactions/check?invoice=${invoiceNo}`)
+          const txData = await txRes.json()
+          if (!txData.error && txData.transaction) {
+            const tx = txData.transaction
+            skuStr = tx.provider_sku
+            
+            setTransactionData({
+              invoice: tx.invoice,
+              amount: Number(tx.amount),
+              qr_string: tx.qr_string || "MOCK_QR_STRING"
+            })
+            setFormData((prev) => ({
+              ...prev,
+              target_id: tx.target_id,
+              customer_phone: tx.customer_phone || ""
+            }))
+            setStep(3)
+          } else {
+            console.error("Failed to load mock transaction:", txData.error)
+            setLoadingProduct(false)
+            return
+          }
+        }
+
         const res = await fetch(`/api/products/${skuStr}`)
         const { product: data, error } = await res.json()
 
@@ -125,7 +153,7 @@ export default function CheckoutPage() {
     }
 
     fetchProduct()
-  }, [id])
+  }, [id, searchParams])
 
   useEffect(() => {
     if (targetFromUrl) {
@@ -142,9 +170,106 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (paymentFromUrl) {
-      setSelectedPayment(paymentFromUrl.toLowerCase())
+      const pm = paymentFromUrl.toLowerCase();
+      if (pm === "va") {
+        setSelectedPayment("qris")
+      } else if (pm === "e-wallet") {
+        setSelectedPayment("gopay")
+      } else {
+        setSelectedPayment(pm)
+      }
     }
   }, [paymentFromUrl])
+
+  // Automatically submit payment generation if user comes with complete URL params
+  useEffect(() => {
+    if (loadingProduct || !product) return
+    if (autoSubmitted) return
+    
+    const targetVal = searchParams.get("target")
+    const paymentVal = searchParams.get("payment")
+    const whatsappVal = searchParams.get("whatsapp")
+
+    // Do not run if id === "mock" because it is a mockup screen for already existing invoice
+    if (id === "mock") return
+
+    if (targetVal && paymentVal && whatsappVal) {
+      setAutoSubmitted(true)
+      
+      let pm = paymentVal.toLowerCase()
+      if (pm === "va") pm = "qris"
+      else if (pm === "e-wallet") pm = "gopay"
+      
+      const matchedMethod = paymentMethods.find(m => m.id === pm)
+      if (matchedMethod) {
+        setSelectedPayment(matchedMethod.id)
+        
+        const autoSubmit = async () => {
+          setIsLoading(true)
+          try {
+            // Check promo code if present
+            const promoVal = searchParams.get("promo")
+            let activePromo = null
+            if (promoVal) {
+              const promoRes = await fetch("/api/promo/validate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code: promoVal }),
+              })
+              const promoJson = await promoRes.json()
+              if (!promoJson.error) {
+                activePromo = promoVal
+              }
+            }
+
+            const response = await fetch("/api/transactions/create", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                product_id: product.id,
+                target_id: targetVal,
+                target_name: null,
+                payment_method: matchedMethod.id,
+                quantity: qtyFromUrl,
+                promo_code: activePromo,
+                login_method: loginMethodFromUrl || null,
+                password: passwordFromUrl || null,
+                request_notes: notesFromUrl || null,
+                customer_phone: whatsappFromUrl || null,
+              }),
+            })
+
+            const resJson = await response.json()
+            if (resJson.error) {
+              throw new Error(resJson.error)
+            }
+
+            const tx = resJson.data
+            if (tx.payment_url) {
+              window.location.href = tx.payment_url;
+              return;
+            }
+
+            setTransactionData({
+              invoice: tx.invoice,
+              amount: tx.amount,
+              qr_string: tx.qr_string,
+            })
+            setStep(3)
+          } catch (error: any) {
+            console.error("Auto checkout payment creation failed:", error)
+            alert(`Gagal membuat pembayaran otomatis: ${error.message}`)
+          } finally {
+            setIsLoading(false)
+          }
+        }
+        
+        setTimeout(autoSubmit, 500)
+      }
+    }
+  }, [id, loadingProduct, product, autoSubmitted, searchParams, qtyFromUrl, loginMethodFromUrl, passwordFromUrl, notesFromUrl, whatsappFromUrl])
 
   const handleApplyPromo = async () => {
     if (!promoInput.trim() || !product) return
