@@ -25,12 +25,14 @@ export default function ReviewChatPage() {
   const fetchChatData = async () => {
     try {
       const res = await fetch(`/api/feedback/${id}`)
-      const data = await res.json()
       
       if (res.status === 401) {
+        setError("Silakan login terlebih dahulu untuk mengakses halaman ini.")
         router.push("/auth/login")
         return
       }
+
+      const data = await res.json()
       
       if (data.error) {
         setError(data.error)
@@ -154,7 +156,7 @@ export default function ReviewChatPage() {
                         <p className="text-[9px] font-bold text-text-muted uppercase tracking-wide">
                           Pengirim
                         </p>
-                        <p className="text-text-primary uppercase">{review.user_name}</p>
+                        <p className="text-text-primary uppercase">{review?.user_name || "Pelanggan"}</p>
                       </div>
 
                       <div>
@@ -162,7 +164,7 @@ export default function ReviewChatPage() {
                           Rating Bintang
                         </p>
                         <div className="text-yellow-400 text-sm mt-0.5">
-                          {"★".repeat(review.rating) + "☆".repeat(5 - review.rating)}
+                          {review ? "★".repeat(review.rating) + "☆".repeat(5 - review.rating) : ""}
                         </div>
                       </div>
 
@@ -171,13 +173,13 @@ export default function ReviewChatPage() {
                           Dibuat Pada
                         </p>
                         <p className="text-text-primary">
-                          {new Date(review.created_at).toLocaleDateString("id-ID", {
+                          {review?.created_at ? new Date(review.created_at).toLocaleDateString("id-ID", {
                             day: "numeric",
                             month: "long",
                             year: "numeric",
                             hour: "2-digit",
                             minute: "2-digit"
-                          })}
+                          }) : "-"}
                         </p>
                       </div>
 
@@ -186,7 +188,7 @@ export default function ReviewChatPage() {
                           Masukan Pertama:
                         </p>
                         <p className="text-[11px] leading-relaxed text-text-primary italic">
-                          "{review.comment}"
+                          "{review?.comment || ""}"
                         </p>
                       </div>
                     </div>

@@ -94,8 +94,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
   // Selection states
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(game.products[0] || null)
   const [quantity, setQuantity] = useState(1)
-  const [paymentMethod, setPaymentMethod] = useState("QRIS")
-  const [promoCode, setPromoCode] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
 
   const handleOrder = () => {
@@ -119,8 +117,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
       target,
       whatsapp,
       qty: String(quantity),
-      payment: paymentMethod.toLowerCase(),
-      promo: promoCode
     })
 
     if (loginMethod && loginMethod !== "Pilih Login") {
@@ -419,72 +415,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                     </div>
                   </div>
 
-                  {/* Step 4: Pilih Pembayaran */}
-                  <div className="bg-white border border-sky-border rounded-[24px] shadow-sky-medium overflow-hidden">
-                    <div className="p-4 bg-white border-b border-sky-border flex items-center gap-3">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg">4</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">Pilih Jalur Pembayaran</h3>
-                    </div>
-
-                    <div className="grid gap-4 p-6 md:grid-cols-3 bg-white">
-                      {[
-                        { id: "QRIS", desc: "Verifikasi Otomatis (Instan)", logo: paymentAssets.qris },
-                        { id: "VA", desc: "Transfer Bank Virtual Account", logo: paymentAssets.dana },
-                        { id: "E-Wallet", desc: "DANA, OVO, LinkAja, ShopeePay", logo: paymentAssets.gopay },
-                      ].map((pm) => {
-                        const isSelected = paymentMethod === pm.id
-                        return (
-                          <button
-                            key={pm.id}
-                            onClick={() => setPaymentMethod(pm.id)}
-                            className={`w-full p-4 text-left group shimmer-hover rounded-[20px] transition-all duration-300 border flex flex-col justify-between ${
-                              isSelected
-                                ? "border-sky bg-sky/[0.03] shadow-sky-soft scale-[1.02] ring-2 ring-sky/20"
-                                : "border-sky-border bg-white hover:border-sky/40 hover:-translate-y-0.5 shadow-sky-soft hover:shadow-sky-medium"
-                            }`}
-                            type="button"
-                          >
-                            <span className="mb-3 flex h-9 w-16 items-center justify-center rounded bg-white p-1.5 border border-sky-border">
-                              <img src={pm.logo} alt={pm.id} className="max-h-full max-w-full object-contain" />
-                            </span>
-                            <strong className="block text-xs font-black uppercase tracking-wide text-text-primary group-hover:text-sky transition-colors">{pm.id}</strong>
-                            <span className="mt-2 block text-[10px] text-text-muted font-semibold uppercase leading-normal">{pm.desc}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Step 5: Kode Promo */}
-                  <div className="bg-white border border-sky-border rounded-[24px] shadow-sky-medium overflow-hidden">
-                    <div className="p-4 bg-white border-b border-sky-border flex items-center gap-3">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg">5</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">Gunakan Kode Promo</h3>
-                    </div>
-
-                    <div className="grid gap-4 p-6 sm:grid-cols-[1fr_auto] bg-white">
-                      <input
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value)}
-                        placeholder="Masukkan kode promo jika ada"
-                        className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-3 text-sm text-text-primary placeholder-text-muted outline-none"
-                      />
-                      <button
-                        className="bg-white border border-sky-border hover:border-sky/40 rounded-xl px-6 py-3 text-xs font-black uppercase tracking-wider text-text-secondary hover:text-text-primary transition-colors hover:bg-sky/5 shadow-sky-soft"
-                        type="button"
-                      >
-                        Pakai
-                      </button>
-                      <button
-                        onClick={() => setPromoCode("PROMO-MHS")}
-                        className="sm:col-span-2 rounded-lg border border-dashed border-sky/20 hover:border-sky/40 bg-sky/[0.02] hover:bg-sky/[0.05] p-3 text-left text-xs font-black text-sky uppercase tracking-widest transition-all duration-300"
-                        type="button"
-                      >
-                        Dapatkan Diskon Tambahan 5%: PROMO-MHS
-                      </button>
-                    </div>
-                  </div>
-
                 </>
               ) : (
                 /* Description & Rules Tab */
@@ -562,10 +492,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                     <div className="flex justify-between items-center">
                       <span className="text-text-muted uppercase text-[10px] tracking-wider">Jumlah</span>
                       <span className="font-mono text-sky font-bold bg-sky/10 px-2 py-0.5 rounded">x{quantity}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-text-muted uppercase text-[10px] tracking-wider">Jalur Bayar</span>
-                      <span className="font-bold text-text-primary uppercase">{paymentMethod}</span>
                     </div>
                     {gameId && (
                       <div className="flex justify-between items-center border-t border-sky-border/50 pt-3">

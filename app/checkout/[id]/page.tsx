@@ -29,6 +29,7 @@ const paymentMethods = [
   { id: "gopay", name: "GoPay", icon: Smartphone, logo: paymentAssets.gopay, description: "Bayar dengan GoPay" },
   { id: "shopeepay", name: "ShopeePay", icon: CreditCard, logo: paymentAssets.shopeepay, description: "Bayar dengan ShopeePay" },
   { id: "ovo", name: "OVO", icon: CreditCard, logo: paymentAssets.ovo, description: "Bayar dengan OVO" },
+  { id: "dana", name: "DANA", icon: Smartphone, logo: paymentAssets.dana, description: "Bayar dengan saldo DANA" },
 ]
 
 export default function CheckoutPage() {
@@ -167,6 +168,12 @@ export default function CheckoutPage() {
       }))
     }
   }, [targetFromUrl, loginMethodFromUrl, passwordFromUrl, notesFromUrl, whatsappFromUrl])
+
+  useEffect(() => {
+    if (targetFromUrl && whatsappFromUrl && id !== "mock") {
+      setStep(2)
+    }
+  }, [targetFromUrl, whatsappFromUrl, id])
 
   useEffect(() => {
     if (paymentFromUrl) {
@@ -757,25 +764,70 @@ export default function CheckoutPage() {
                 <CardHeader>
                   <CardTitle>Ringkasan Pesanan</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="space-y-6">
+                  <div className="space-y-4 pb-4 border-b border-sky-border/40">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Produk</span>
-                      <span>{product.name} (x{qtyFromUrl})</span>
+                      <span className="text-muted-foreground text-sm">Produk</span>
+                      <span className="font-semibold text-sm">{product.name} (x{qtyFromUrl})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Target</span>
-                      <span>{formData.target_id}</span>
+                      <span className="text-muted-foreground text-sm">Target</span>
+                      <span className="font-semibold text-sm">{formData.target_id}</span>
                     </div>
+                  </div>
+
+                  {/* Promo Voucher block in Step 2 */}
+                  <div className="space-y-2">
+                    <Label htmlFor="promo_code_step2" className="text-xs font-bold uppercase tracking-wider text-text-secondary">Kode Promo / Voucher (Opsional)</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="promo_code_step2"
+                        placeholder="Masukkan kode promo"
+                        value={promoInput}
+                        onChange={(e) => setPromoInput(e.target.value)}
+                        disabled={promoApplied}
+                        className="flex-1 text-sm h-10"
+                      />
+                      {promoApplied ? (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          onClick={handleRemovePromo}
+                          className="h-10"
+                        >
+                          Hapus
+                        </Button>
+                      ) : (
+                        <Button
+                          type="button"
+                          onClick={handleApplyPromo}
+                          disabled={!promoInput.trim() || validatingPromo}
+                          className="h-10 px-4"
+                        >
+                          {validatingPromo ? <Loader2 className="h-4 w-4 animate-spin" /> : "Gunakan"}
+                        </Button>
+                      )}
+                    </div>
+                    {promoError && (
+                      <p className="text-xs text-red-500 font-semibold mt-1">{promoError}</p>
+                    )}
+                    {promoApplied && promoData && (
+                      <p className="text-xs text-green-600 font-bold mt-1">
+                        Promo berhasil diterapkan! Diskon: {Number(promoData.discount_percent) > 0 ? `${promoData.discount_percent}%` : formatCurrency(promoData.discount_amount)}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="pt-2">
                     {discount > 0 && (
-                      <div className="flex justify-between text-green-600 font-semibold">
+                      <div className="flex justify-between text-green-600 font-semibold mb-2 text-sm">
                         <span>Diskon Promo</span>
                         <span>-{formatCurrency(discount)}</span>
                       </div>
                     )}
                     <div className="border-t border-sky-border pt-4 flex justify-between font-semibold text-lg">
                       <span>Total</span>
-                      <span className="text-primary">
+                      <span className="text-primary font-mono text-xl">
                         {formatCurrency(finalTotal)}
                       </span>
                     </div>
@@ -794,8 +846,12 @@ export default function CheckoutPage() {
                   <CardTitle>Scan QRIS</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
-                  <div className="bg-white p-4 rounded-xl inline-block mb-4">
-                    <QrCode className="h-48 w-48 text-black" />
+                  <div className="bg-white p-4 rounded-xl inline-block mb-4 shadow-sm border border-sky-border/40">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(transactionData.qr_string || transactionData.invoice)}`}
+                      alt="QRIS Code"
+                      className="h-48 w-48 object-contain"
+                    />
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
                     Scan QRIS di atas menggunakan aplikasi E-Wallet atau Mobile
