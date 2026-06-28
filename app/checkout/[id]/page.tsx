@@ -13,7 +13,7 @@ import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/lib/supabase/client"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, cn } from "@/lib/utils"
 import { gameAssets, getItemAssetForProduct, paymentAssets, getGameAsset } from "@/lib/assets"
 import {
   ArrowLeft,
@@ -31,6 +31,18 @@ const paymentMethods = [
   { id: "ovo", name: "OVO", icon: CreditCard, logo: paymentAssets.ovo, description: "Bayar dengan OVO" },
   { id: "dana", name: "DANA", icon: Smartphone, logo: paymentAssets.dana, description: "Bayar dengan saldo DANA" },
 ]
+
+const WhatsappIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="16"
+    height="16"
+    fill="currentColor"
+    {...props}
+  >
+    <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 001.37 5.054L2 22l5.077-1.331a9.927 9.927 0 004.93 1.315h.005c5.505 0 9.989-4.478 9.99-9.984 0-2.667-1.037-5.176-2.922-7.062C17.198 3.053 14.686 2 12.012 2zm5.726 14.195c-.3.845-1.5 1.55-2.073 1.65-.5.086-1.15.114-1.85-.114-2.883-1.02-4.743-3.957-4.887-4.148-.144-.19-1.15-1.529-1.15-2.916a2.916 2.916 0 01.865-2.122c.26-.26.577-.327.768-.327.144 0 .288.006.41.012.13.006.3.018.47.42.173.407.605 1.472.656 1.579.052.107.087.23.012.378-.076.15-.116.242-.23.379-.115.13-.242.29-.346.39-.115.11-.237.23-.104.46.133.226.592.977 1.272 1.58.877.78 1.616 1.02 1.84.113.226-.226.502-.605.696-.86.23-.3.467-.256.768-.144.301.11.1.91 1.906.96.225.052.45.1.583.127.133.023.266.113.202.22-.064.108-.362.613-.666 1.458z" />
+  </svg>
+)
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -498,37 +510,66 @@ export default function CheckoutPage() {
           {/* Back Button */}
           <Link
             href="/games/mobile-legends"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-text-primary mb-6"
+            className="inline-flex items-center gap-2 bg-white/95 border border-sky-border shadow-sky-soft hover:bg-sky/5 hover:border-sky/40 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl transition duration-300 mb-6 text-text-secondary hover:text-text-primary"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 text-sky" />
             Kembali
           </Link>
 
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            {["Input Data", "Pembayaran", "Selesai"].map((label, index) => (
-              <div key={label} className="flex items-center gap-2">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    step > index + 1
-                      ? "bg-green-500 text-white"
-                      : step === index + 1
-                      ? "bg-primary text-white"
-                      : "bg-ice text-muted-foreground"
-                  }`}
-                >
-                  {step > index + 1 ? (
-                    <CheckCircle className="h-4 w-4" />
-                  ) : (
-                    index + 1
-                  )}
-                </div>
-                <span className="text-sm hidden sm:inline">{label}</span>
-                {index < 2 && (
-                  <div className="w-12 h-0.5 bg-sky-border hidden sm:block" />
-                )}
-              </div>
-            ))}
+          {/* Progress Steps Redesign */}
+          <div className="flex items-center justify-center mb-8">
+            <div className="bg-white/80 border border-sky-border shadow-sky-soft rounded-2xl px-6 py-4 flex items-center justify-between w-full max-w-xl relative">
+              {["Input Data", "Pembayaran", "Selesai"].map((label, index) => {
+                const isActive = step === index + 1
+                const isCompleted = step > index + 1
+                return (
+                  <div key={label} className="flex items-center flex-1 last:flex-none relative z-10">
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={cn(
+                          "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 shadow-sm",
+                          isCompleted
+                            ? "bg-green-500 text-white ring-4 ring-green-100"
+                            : isActive
+                            ? "bg-primary text-white ring-4 ring-primary/20 scale-105"
+                            : "bg-ice text-muted-foreground border border-sky-border/60"
+                        )}
+                      >
+                        {isCompleted ? (
+                          <CheckCircle className="h-5 w-5" />
+                        ) : (
+                          index + 1
+                        )}
+                      </div>
+                      <span
+                        className={cn(
+                          "text-xs font-black uppercase tracking-wider hidden md:inline",
+                          isActive
+                            ? "text-primary font-black"
+                            : isCompleted
+                            ? "text-green-600 font-bold"
+                            : "text-text-muted font-bold"
+                        )}
+                      >
+                        {label}
+                      </span>
+                    </div>
+
+                    {index < 2 && (
+                      <div className="flex-1 mx-4 h-0.5 relative hidden sm:block">
+                        <div className="absolute inset-0 bg-sky-border/40 rounded" />
+                        <div
+                          className={cn(
+                            "absolute inset-y-0 left-0 bg-primary transition-all duration-500 rounded",
+                            step > index + 1 ? "w-full" : "w-0"
+                          )}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
 
           {/* Step 1: Input Target */}
@@ -741,21 +782,6 @@ export default function CheckoutPage() {
                       </button>
                     ))}
                   </div>
-
-                  <Button
-                    onClick={handleCreatePayment}
-                    disabled={!selectedPayment || isLoading}
-                    className="w-full mt-6"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Membuat Pembayaran...
-                      </>
-                    ) : (
-                      "Bayar Sekarang"
-                    )}
-                  </Button>
                 </CardContent>
               </Card>
 
@@ -832,6 +858,21 @@ export default function CheckoutPage() {
                       </span>
                     </div>
                   </div>
+
+                  <Button
+                    onClick={handleCreatePayment}
+                    disabled={!selectedPayment || isLoading}
+                    className="w-full mt-4"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Membuat Pembayaran...
+                      </>
+                    ) : (
+                      "Bayar Sekarang"
+                    )}
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -919,7 +960,8 @@ export default function CheckoutPage() {
                       rel="noopener noreferrer"
                       className="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black uppercase tracking-widest py-3 px-4 rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 flex items-center justify-center gap-2"
                     >
-                      Bantuan WhatsApp Admin 💬
+                      <WhatsappIcon className="h-4 w-4 shrink-0 fill-white" />
+                      Bantuan WhatsApp Admin
                     </a>
                   </div>
                 </CardContent>

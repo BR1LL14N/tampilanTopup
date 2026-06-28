@@ -64,8 +64,9 @@ export class ProductService {
    * Retrieves active flash sale products.
    */
   static async getFlashSales(limit: number = 4): Promise<any[]> {
-    const sql = `SELECT * FROM product_details WHERE status = $1 AND is_flash_sale = $2 LIMIT $3`;
-    return await executeQuery(sql, [true, true, limit]);
+    const safeLimit = Math.max(1, parseInt(String(limit), 10) || 4);
+    const sql = `SELECT * FROM product_details WHERE status = $1 AND is_flash_sale = $2 LIMIT ${safeLimit}`;
+    return await executeQuery(sql, [true, true]);
   }
 
   /**
