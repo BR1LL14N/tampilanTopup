@@ -95,6 +95,18 @@ export async function GET(req: NextRequest) {
       LIMIT 10
     `, ['paid', 'success']);
 
+    // Fetch failed activities (Topup Gagal / Pembayaran Gagal)
+    const failedRows = await executeQuery(`
+      SELECT t.*, p.name as product_name, g.name as game_name, u.name as user_name
+      FROM transactions t
+      LEFT JOIN products p ON t.product_id = p.id
+      LEFT JOIN games g ON p.game_id = g.id
+      LEFT JOIN ${userTable} u ON t.user_id = u.id
+      WHERE t.payment_status = 'failed' OR t.topup_status = 'failed'
+      ORDER BY t.updated_at DESC
+      LIMIT 10
+    `);
+
     // Fetch sync activities
     const syncRows = await executeQuery(`
       SELECT p.name as product_name, p.provider_sku as sku, p.price, p.sell_price, p.updated_at, g.name as game_name
@@ -127,6 +139,7 @@ export async function GET(req: NextRequest) {
       activities: {
         checkouts: checkoutRows,
         payments: paymentRows,
+        failed: failedRows,
         syncs: syncRows,
         feedbacks: feedbackRows
       }
