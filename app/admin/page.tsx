@@ -46,15 +46,17 @@ export default function AdminDashboardPage() {
   const [activities, setActivities] = useState<{
     checkouts: any[];
     payments: any[];
+    failed: any[];
     syncs: any[];
     feedbacks: any[];
   }>({
     checkouts: [],
     payments: [],
+    failed: [],
     syncs: [],
     feedbacks: []
   })
-  const [activeTab, setActiveTab] = useState<"checkout" | "pembayaran" | "sync" | "feedback">("checkout")
+  const [activeTab, setActiveTab] = useState<"checkout" | "pembayaran" | "failed" | "sync" | "feedback">("checkout")
 
   // Sync Settings States
   const [isSyncActive, setIsSyncActive] = useState(true)
@@ -182,6 +184,7 @@ export default function AdminDashboardPage() {
           setActivities({
             checkouts: data.activities.checkouts || [],
             payments: data.activities.payments || [],
+            failed: data.activities.failed || [],
             syncs: data.activities.syncs || [],
             feedbacks: data.activities.feedbacks || []
           });
@@ -535,7 +538,7 @@ export default function AdminDashboardPage() {
                 
                 {/* Tabs selection */}
                 <div className="flex flex-wrap gap-1.5 bg-slate-100 p-1 rounded-xl">
-                  {(["checkout", "pembayaran", "sync", "feedback"] as const).map((tab) => (
+                  {(["checkout", "pembayaran", "failed", "sync", "feedback"] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -547,6 +550,7 @@ export default function AdminDashboardPage() {
                     >
                       {tab === "checkout" && "Checkout"}
                       {tab === "pembayaran" && "Pembayaran"}
+                      {tab === "failed" && "Gagal & Eror"}
                       {tab === "sync" && "Sync Digiflazz"}
                       {tab === "feedback" && "Kritik & Saran"}
                     </button>
@@ -625,6 +629,68 @@ export default function AdminDashboardPage() {
                       ))
                     ) : (
                       <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada aktivitas pembayaran</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Tab: Gagal & Eror */}
+                {activeTab === "failed" && (
+                  <div className="space-y-4">
+                    {activities.failed.length > 0 ? (
+                      activities.failed.map((tx, idx) => {
+                        let errorMsg = "Transaksi gagal diproses.";
+                        try {
+                          if (tx.provider_response) {
+                            const parsed = typeof tx.provider_response === "string" ? JSON.parse(tx.provider_response) : tx.provider_response;
+                            if (parsed.data && parsed.data.message) {
+                              errorMsg = `${parsed.data.message} (RC: ${parsed.data.rc || 'unknown'})`;
+                            } else if (parsed.error) {
+                              errorMsg = parsed.error;
+                            } else if (parsed.message) {
+                              errorMsg = parsed.message;
+                            }
+                          }
+                        } catch (e) {
+                          // ignore parsing errors
+                        }
+
+                        return (
+                          <div
+                            key={idx}
+                            className="flex flex-col p-4 bg-red-50/20 border border-red-500/10 hover:border-red-500/30 rounded-xl transition-all duration-300 gap-3 text-left animate-fade-in"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="flex items-center gap-2 font-bold text-text-primary text-sm uppercase tracking-tight">
+                                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1 border border-sky-border/30">
+                                    <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
+                                  </span>
+                                  {tx.product_name}
+                                </p>
+                                <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                                  <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                                  {tx.game_name} • <span className="font-mono text-text-secondary">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-black text-red-600 font-mono text-sm">
+                                  Rp {Number(tx.amount).toLocaleString("id-ID")}
+                                </p>
+                                <span className="inline-block mt-1 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded bg-red-50 text-red-500 border border-red-500/20">
+                                  {tx.topup_status === 'failed' ? 'Topup Gagal' : 'Pembayaran Gagal'}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-red-50/40 p-2.5 rounded-lg border border-red-500/10 text-[10px] text-red-700 font-bold flex flex-col gap-0.5">
+                              <span className="text-[8px] uppercase tracking-wider text-red-500/70 font-black">Detail Penyebab Eror (Digiflazz/System):</span>
+                              <span>{errorMsg}</span>
+                            </div>
+                          </div>
+                        )
+                      })
+                    ) : (
+                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada aktivitas transaksi gagal</p>
                     )}
                   </div>
                 )}
