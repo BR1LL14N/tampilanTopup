@@ -18,7 +18,7 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // Base design system (Sky Fantasy)
+        // Base design system
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -52,40 +52,32 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Legacy HTML reference colors (kept for backward compat)
-        ink: "#080b12",
-        panel: "#101522",
-        cyan: {
-          100: "#d5f4f9",
-          200: "#82b7c2",
-          300: "#8bb8c2",
-        },
-        // ===== SKY FANTASY COLOR SYSTEM =====
-        // Primary palette
+        // ===== DEEP TEAL COLOR SYSTEM (#28657E) =====
+        // Keeping key names (sky, diamond, etc) for backward compatibility with existing components
         sky: {
-          DEFAULT: "#5CB8FF", // Primary Sky Blue
-          soft: "#8DD3FF", // Soft Blue
-          light: "#D9F1FF", // Light Blue
+          DEFAULT: "#28657E", // Primary Deep Teal
+          soft: "#4CA1AF", // Soft Teal
+          light: "#E8F1F5", // Light Background Teal
         },
-        // Secondary palette (Ice/Mist)
-        cloud: "#FFFFFF", // Cloud White
-        mist: "#F7FBFF", // Mist White
-        ice: "#EEF8FF", // Ice Blue
+        // Secondary palette
+        cloud: "#FFFFFF",
+        mist: "#F4F7F9",
+        ice: "#E0E9EC",
         // Accent palette
-        diamond: "#39AFFF", // Diamond Blue
-        fantasy: "#63CFFF", // Fantasy Cyan
-        glow: "#7FD7FF", // Glow Blue
+        diamond: "#4CA1AF", // Accent Teal
+        fantasy: "#28657E", // Main Teal
+        glow: "#E28743", // Warm Orange/Gold Accent
         // Text colors
-        "text-primary": "#1B3A57",
+        "text-primary": "#1A2B35", // Darkest Teal/Slate
         "text-secondary": "#53718E",
-        "text-muted": "#7F99B0",
+        "text-muted": "#8A9EA8",
         // Background gradient stops
-        "skybg-start": "#F7FBFF",
-        "skybg-mid": "#EAF7FF",
-        "skybg-end": "#DFF2FF",
+        "skybg-start": "#F4F7F9",
+        "skybg-mid": "#E8F1F5",
+        "skybg-end": "#DCE5EA",
         // Border colors
-        "sky-border": "#A8D8F5",   // Visible sky blue border
-        "card-border": "#C8E8F8",  // Light card border
+        "sky-border": "#9DB8C4",
+        "card-border": "#C9D6DC",
       },
       fontFamily: {
         heading: ["var(--font-montserrat)", "sans-serif"],

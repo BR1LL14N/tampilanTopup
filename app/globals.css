@@ -6,98 +6,98 @@
 @layer utilities {
   /* Shadows */
   .shadow-sky-soft {
-    box-shadow: 0 8px 20px rgba(92, 184, 255, 0.12);
+    box-shadow: 0 8px 20px rgba(40, 101, 126, 0.12);
   }
   .shadow-sky-medium {
-    box-shadow: 0 12px 30px rgba(92, 184, 255, 0.18);
+    box-shadow: 0 12px 30px rgba(40, 101, 126, 0.18);
   }
   .shadow-sky-glow {
-    box-shadow: 0 0 25px rgba(92, 184, 255, 0.35);
+    box-shadow: 0 0 25px rgba(40, 101, 126, 0.35);
   }
 
   /* Text colors */
-  .text-text-primary { color: hsl(210 40% 18%); }
-  .text-text-secondary { color: hsl(210 30% 40%); }
-  .text-text-muted { color: hsl(210 25% 55%); }
-  .text-sky { color: hsl(207 100% 62%); }
-  .text-diamond { color: hsl(207 100% 56%); }
+  .text-text-primary { color: hsl(197 34% 15%); }
+  .text-text-secondary { color: hsl(210 25% 44%); }
+  .text-text-muted { color: hsl(200 17% 60%); }
+  .text-sky { color: hsl(197 52% 33%); }
+  .text-diamond { color: hsl(188 39% 49%); }
 
   /* Background colors */
-  .bg-ice { background-color: hsl(206 100% 95%); }
-  .bg-mist { background-color: hsl(210 40% 98%); }
-  .bg-sky { background-color: hsl(207 100% 62%); }
-  .bg-sky\/5 { background-color: rgba(92, 184, 255, 0.05); }
-  .bg-sky\/10 { background-color: rgba(92, 184, 255, 0.1); }
-  .bg-sky\/20 { background-color: rgba(92, 184, 255, 0.2); }
-  .bg-sky\/30 { background-color: rgba(92, 184, 255, 0.3); }
+  .bg-ice { background-color: hsl(197 20% 90%); }
+  .bg-mist { background-color: hsl(204 33% 96%); }
+  .bg-sky { background-color: hsl(197 52% 33%); }
+  .bg-sky\/5 { background-color: rgba(40, 101, 126, 0.05); }
+  .bg-sky\/10 { background-color: rgba(40, 101, 126, 0.1); }
+  .bg-sky\/20 { background-color: rgba(40, 101, 126, 0.2); }
+  .bg-sky\/30 { background-color: rgba(40, 101, 126, 0.3); }
 
   /* Border colors */
-  .border-sky-border { border-color: hsl(207 60% 90%); }
-  .border-card-border { border-color: hsl(207 60% 87%); }
-  .border-sky { border-color: hsl(207 100% 62%); }
-  .border-sky\/20 { border-color: rgba(92, 184, 255, 0.2); }
-  .border-sky\/30 { border-color: rgba(92, 184, 255, 0.3); }
-  .border-sky\/40 { border-color: rgba(92, 184, 255, 0.4); }
-  .border-sky-border\/50 { border-color: rgba(207, 96, 144, 0.5); }
+  .border-sky-border { border-color: hsl(197 27% 69%); }
+  .border-card-border { border-color: hsl(197 27% 82%); }
+  .border-sky { border-color: hsl(197 52% 33%); }
+  .border-sky\/20 { border-color: rgba(40, 101, 126, 0.2); }
+  .border-sky\/30 { border-color: rgba(40, 101, 126, 0.3); }
+  .border-sky\/40 { border-color: rgba(40, 101, 126, 0.4); }
+  .border-sky-border\/50 { border-color: rgba(157, 184, 196, 0.5); }
 
   /* Ring colors */
-  .ring-sky\/20 { --tw-ring-color: rgba(92, 184, 255, 0.2); }
+  .ring-sky\/20 { --tw-ring-color: rgba(40, 101, 126, 0.2); }
 
   /* Focus states */
-  .focus\:border-sky:focus { border-color: hsl(207 100% 62%); }
-  .focus\:ring-sky\/20:focus { --tw-ring-color: rgba(92, 184, 255, 0.2); }
-  .focus\:ring-sky\/20:focus-visible { --tw-ring-color: rgba(92, 184, 255, 0.2); }
+  .focus\:border-sky:focus { border-color: hsl(197 52% 33%); }
+  .focus\:ring-sky\/20:focus { --tw-ring-color: rgba(40, 101, 126, 0.2); }
+  .focus\:ring-sky\/20:focus-visible { --tw-ring-color: rgba(40, 101, 126, 0.2); }
 
   /* Hover states */
-  .hover\:bg-sky\/5:hover { background-color: rgba(92, 184, 255, 0.05); }
-  .hover\:bg-sky\/10:hover { background-color: rgba(92, 184, 255, 0.1); }
-  .hover\:border-sky\/30:hover { border-color: rgba(92, 184, 255, 0.3); }
-  .hover\:text-sky:hover { color: hsl(207 100% 62%); }
+  .hover\:bg-sky\/5:hover { background-color: rgba(40, 101, 126, 0.05); }
+  .hover\:bg-sky\/10:hover { background-color: rgba(40, 101, 126, 0.1); }
+  .hover\:border-sky\/30:hover { border-color: rgba(40, 101, 126, 0.3); }
+  .hover\:text-sky:hover { color: hsl(197 52% 33%); }
 }
 
 @layer base {
   :root {
-    /* ===== SKY FANTASY THEME - Light Mode ===== */
+    /* ===== DEEP TEAL THEME (#28657E) - Light Mode ===== */
     /* Background */
-    --background: 210 40% 98%;    /* #F7FBFF - Mist White */
-    --foreground: 210 40% 18%;     /* #1B3A57 - Text Primary */
+    --background: 204 33% 96%;    /* #F4F7F9 */
+    --foreground: 197 34% 15%;     /* #1A2B35 */
     /* Card */
-    --card: 0 0% 100%;            /* #FFFFFF - Cloud White */
-    --card-foreground: 210 40% 18%; /* #1B3A57 */
+    --card: 0 0% 100%;            /* #FFFFFF */
+    --card-foreground: 197 34% 15%; /* #1A2B35 */
     /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 210 40% 18%;
-    /* Primary - Sky Blue */
-    --primary: 207 100% 62%;      /* #5CB8FF - Sky Blue */
+    --popover-foreground: 197 34% 15%;
+    /* Primary */
+    --primary: 197 52% 33%;      /* #28657E */
     --primary-foreground: 0 0% 100%; /* White */
-    /* Secondary - Ice Blue */
-    --secondary: 206 100% 95%;     /* #EEF8FF - Ice Blue */
-    --secondary-foreground: 210 40% 18%; /* #1B3A57 */
+    /* Secondary */
+    --secondary: 188 39% 49%;     /* #4CA1AF */
+    --secondary-foreground: 0 0% 100%;
     /* Muted */
-    --muted: 210 20% 94%;         /* Light muted */
-    --muted-foreground: 210 30% 46%; /* #53718E - Text Secondary */
-    /* Accent - Diamond Blue */
-    --accent: 207 100% 56%;       /* #39AFFF - Diamond Blue */
+    --muted: 200 20% 94%;
+    --muted-foreground: 200 17% 60%; /* #8A9EA8 */
+    /* Accent */
+    --accent: 25 74% 57%;       /* #E28743 */
     --accent-foreground: 0 0% 100%;
     /* Destructive */
     --destructive: 0 84.2% 55%;
     --destructive-foreground: 0 0% 100%;
     /* Border */
-    --border: 207 60% 90%;        /* #CFEFFF - Sky Border */
-    --input: 207 60% 90%;
-    --ring: 207 100% 62%;          /* #5CB8FF - Sky Blue ring */
+    --border: 197 27% 69%;        /* #9DB8C4 */
+    --input: 197 27% 69%;
+    --ring: 197 52% 33%;          /* #28657E */
     --radius: 0.75rem;
     /* Sidebar */
-    --sidebar-bg: 210 40% 98%;
-    --sidebar-border: 207 60% 90%;
-    /* Custom Sky Fantasy tokens */
-    --sky: 207 100% 62%;          /* #5CB8FF */
-    --sky-soft: 207 100% 76%;     /* #8DD3FF */
-    --sky-light: 207 100% 90%;    /* #D9F1FF */
-    --diamond: 207 100% 56%;      /* #39AFFF */
-    --fantasy: 207 100% 71%;      /* #63CFFF */
-    --glow: 207 100% 78%;        /* #7FD7FF */
-    --mist: 210 40% 98%;          /* #F7FBFF */
+    --sidebar-bg: 204 33% 96%;
+    --sidebar-border: 197 27% 69%;
+    /* Custom Theme tokens */
+    --sky: 197 52% 33%;          /* #28657E */
+    --sky-soft: 188 39% 49%;     /* #4CA1AF */
+    --sky-light: 197 40% 93%;    /* #E8F1F5 */
+    --diamond: 188 39% 49%;      /* #4CA1AF */
+    --fantasy: 197 52% 33%;      /* #28657E */
+    --glow: 25 74% 57%;        /* #E28743 */
+    --mist: 204 33% 96%;          /* #F4F7F9 */
     --ice: 206 100% 95%;          /* #EEF8FF */
     --text-secondary: 210 30% 40%; /* #53718E */
     --text-muted: 210 25% 55%;    /* #7F99B0 */
