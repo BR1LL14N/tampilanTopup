@@ -104,7 +104,7 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
       {/* Main Glass login card */}
-      <div className="w-full max-w-4xl bg-sky/95 relative z-20 overflow-hidden rounded-2xl shadow-sky-glow border border-sky-border backdrop-blur-xl flex flex-col md:flex-row">
+      <div className="w-full max-w-4xl bg-[#12313E]/65 relative z-20 overflow-hidden rounded-2xl shadow-sky-glow border border-white/10 backdrop-blur-xl flex flex-col md:flex-row">
 
         {/* Decorative corner glows */}
         <div className="absolute top-0 left-0 w-24 h-24 bg-sky/10 rounded-full blur-2xl pointer-events-none" />
@@ -272,11 +272,11 @@ function LoginForm() {
               type="button"
               onClick={() => handleOAuth("google")}
               disabled={oauthLoading === "google"}
-              className="w-full bg-white/10 hover:bg-white/20 py-3 px-4 text-xs font-bold uppercase tracking-wider text-white transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white hover:bg-slate-50 py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
               style={bevelStyle}
             >
               {oauthLoading === "google" ? (
-                <Loader2 className="h-4 w-4 animate-spin text-white" />
+                <Loader2 className="h-4 w-4 animate-spin text-sky" />
               ) : (
                 <svg className="h-4 w-4" viewBox="0 0 24 24">
                   <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -288,20 +288,20 @@ function LoginForm() {
               <span>{oauthLoading === "google" ? "Menghubungkan..." : "Sign in with Google"}</span>
             </button>
           </div>
-
+ 
           {/* Discord Button */}
           <div className="relative p-[1.5px] bg-white/20 hover:bg-white transition-colors duration-300" style={bevelStyle}>
             <button
               type="button"
               onClick={() => handleOAuth("discord")}
               disabled={oauthLoading === "discord"}
-              className="w-full bg-white/10 hover:bg-white/20 py-3 px-4 text-xs font-bold uppercase tracking-wider text-white transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white hover:bg-slate-50 py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
               style={bevelStyle}
             >
               {oauthLoading === "discord" ? (
-                <Loader2 className="h-4 w-4 animate-spin text-white" />
+                <Loader2 className="h-4 w-4 animate-spin text-sky" />
               ) : (
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="#FFFFFF">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="#5865F2">
                   <path d="M20.3 4.4C18.7 3.6 17.1 3 15.4 2.7c-.2.4-.4.8-.6 1.2-1.8-.3-3.7-.3-5.5 0-.2-.4-.4-.8-.6-1.2-1.7.3-3.3.9-4.9 1.7C.6 9 .1 13.5.3 17.9c2.4 1.8 4.7 2.9 7 3.6.6-.8 1-1.6 1.4-2.5-.8-.3-1.6-.7-2.4-1.2.2-.1.4-.3.6-.5 4.5 2.1 9.4 2.1 13.9 0 .2.2.4.3.6.5-.8.5-1.6.9-2.4 1.2.4.9.8 1.7 1.4 2.5 2.3-.7 4.6-1.8 7-3.6.3-5 .4-9.5-2.9-13.5zM8.9 15.1c-1.4 0-2.5-1.3-2.5-2.8 0-1.5 1.1-2.8 2.5-2.8s2.5 1.3 2.5 2.8c.1 1.5-1 2.8-2.5 2.8zm6.2 0c-1.4 0-2.5-1.3-2.5-2.8 0-1.5 1.1-2.8 2.5-2.8s2.5 1.3 2.5 2.8c0 1.5-1.1 2.8-2.5 2.8z" />
                 </svg>
               )}

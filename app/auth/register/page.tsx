@@ -103,13 +103,8 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
-      {/* Light gradient overlay on wallpaper background */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/40 to-white/60 z-10" />
-      </div>
-
       {/* Main Glass register card */}
-      <div className="w-full max-w-4xl glass-sky relative z-20 overflow-hidden rounded-2xl shadow-sky-glow border-sky-border backdrop-blur-md flex flex-col md:flex-row">
+      <div className="w-full max-w-4xl bg-[#12313E]/65 relative z-20 overflow-hidden rounded-2xl shadow-sky-glow border border-white/10 backdrop-blur-xl flex flex-col md:flex-row">
 
         {/* Decorative corner glows */}
         <div className="absolute top-0 left-0 w-24 h-24 bg-sky/10 rounded-full blur-2xl pointer-events-none" />
@@ -118,27 +113,27 @@ export default function RegisterPage() {
         {/* Tab switchers at the top absolute container */}
         <div className="absolute top-0 left-6 flex z-30 items-center">
           <Link href="/auth/login">
-            <div className="p-[1.5px] bg-sky hover:bg-diamond transition-colors duration-300" style={tabBevelStyle}>
+            <div className="p-[1.5px] bg-white/20 hover:bg-white transition-colors duration-300" style={tabBevelStyle}>
               <button
-                className="px-6 py-2 bg-white text-text-secondary hover:text-sky font-black text-xs uppercase tracking-wider transition duration-300 shimmer-hover"
+                className="px-6 py-2 bg-white/10 text-white/80 hover:text-sky font-black text-xs uppercase tracking-wider transition duration-300 shimmer-hover hover:bg-white"
                 style={tabBevelStyle}
               >
                 Sign in
               </button>
             </div>
           </Link>
-          <div className="p-[1.5px] bg-sky ml-[-1px]" style={tabBevelStyle}>
+          <div className="p-[1.5px] bg-white/20 ml-[-1px]" style={tabBevelStyle}>
             <button
-              className="px-6 py-2 bg-sky text-white font-black text-xs uppercase tracking-wider shimmer-hover"
+              className="px-6 py-2 bg-white text-sky font-black text-xs uppercase tracking-wider shimmer-hover"
               style={tabBevelStyle}
             >
               Register
             </button>
           </div>
           <Link href="/">
-            <div className="p-[1.5px] bg-sky hover:bg-diamond ml-2 transition-colors duration-300" style={tabBevelStyle}>
+            <div className="p-[1.5px] bg-white/20 hover:bg-white ml-2 transition-colors duration-300" style={tabBevelStyle}>
               <button
-                className="px-4 py-2 bg-white text-sky font-black text-xs uppercase tracking-wider transition hover:bg-sky hover:text-white flex items-center gap-1.5 transition duration-300 shimmer-hover"
+                className="px-4 py-2 bg-white/10 text-white/80 font-black text-xs uppercase tracking-wider transition hover:bg-white hover:text-sky flex items-center gap-1.5 transition duration-300 shimmer-hover"
                 style={tabBevelStyle}
                 title="Kembali ke Beranda"
               >
@@ -152,10 +147,10 @@ export default function RegisterPage() {
         {/* Left Column: Form Content */}
         <div className="flex-1 p-8 md:p-12 pt-16 md:pt-20">
           <div className="mb-6">
-            <h2 className="text-3xl font-black tracking-tight text-text-primary mb-2 uppercase bg-clip-text text-transparent bg-gradient-to-r from-text-primary to-text-secondary">
+            <h2 className="text-3xl font-black tracking-tight text-white mb-2 uppercase">
               Join Us!
             </h2>
-            <p className="text-xs tracking-wider text-sky font-semibold uppercase">
+            <p className="text-xs tracking-wider text-white/70 font-semibold uppercase">
               Create an account to start top up
             </p>
           </div>
@@ -169,17 +164,17 @@ export default function RegisterPage() {
 
             {/* Name field */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary block">
-                Full Name <span className="text-sky">*</span>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-white/90 block">
+                Full Name <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-sky focus-within:bg-diamond transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="name"
                   type="text"
                   placeholder="John Doe"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-white px-4 py-2 text-text-primary placeholder-text-muted outline-none border-none text-sm"
+                  className="w-full bg-white/10 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
                   style={inputBevelStyle}
                   required
                 />
@@ -188,17 +183,17 @@ export default function RegisterPage() {
 
             {/* Email field */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary block">
-                Email Address <span className="text-sky">*</span>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-white/90 block">
+                Email Address <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-sky focus-within:bg-diamond transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="email"
                   type="email"
                   placeholder="name@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-white px-4 py-2 text-text-primary placeholder-text-muted outline-none border-none text-sm"
+                  className="w-full bg-white/10 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
                   style={inputBevelStyle}
                   required
                 />
@@ -207,10 +202,10 @@ export default function RegisterPage() {
 
             {/* Password field */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary block">
-                Password <span className="text-sky">*</span>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-white/90 block">
+                Password <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-sky focus-within:bg-diamond transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
                 <div className="relative">
                   <input
                     id="password"
@@ -218,14 +213,14 @@ export default function RegisterPage() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full bg-white pl-4 pr-12 py-2 text-text-primary placeholder-text-muted outline-none border-none text-sm"
+                    className="w-full bg-white/10 pl-4 pr-12 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
                     style={inputBevelStyle}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -238,10 +233,10 @@ export default function RegisterPage() {
                   <div
                     key={index}
                     className={`flex items-center gap-1 text-[10px] ${
-                      req.met ? "text-sky font-bold" : "text-text-muted"
+                      req.met ? "text-emerald-400 font-bold" : "text-white/40"
                     }`}
                   >
-                    <Check className={`h-3 w-3 ${req.met ? "text-sky" : "text-text-muted"}`} />
+                    <Check className={`h-3 w-3 ${req.met ? "text-emerald-400" : "text-white/40"}`} />
                     <span>{req.text}</span>
                   </div>
                 ))}
@@ -250,17 +245,17 @@ export default function RegisterPage() {
 
             {/* Confirm Password field */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-text-secondary block">
-                Confirm Password <span className="text-sky">*</span>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-white/90 block">
+                Confirm Password <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-sky focus-within:bg-diamond transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="confirmPassword"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full bg-white px-4 py-2 text-text-primary placeholder-text-muted outline-none border-none text-sm"
+                  className="w-full bg-white/10 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
                   style={inputBevelStyle}
                   required
                 />
@@ -268,16 +263,16 @@ export default function RegisterPage() {
             </div>
 
             {/* Submit Button */}
-            <div className="relative p-[1.5px] bg-sky hover:bg-diamond transition-colors duration-300 shadow-sky-soft" style={bevelStyle}>
+            <div className="relative p-[1.5px] bg-white hover:bg-diamond transition-colors duration-300 shadow-sky-glow" style={bevelStyle}>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-white hover:bg-sky hover:text-white py-2.5 text-sm font-bold uppercase tracking-wider text-sky transition flex items-center justify-center gap-2 shimmer-hover"
+                className="w-full bg-white hover:bg-diamond py-3 text-sm font-black uppercase tracking-wider text-sky hover:text-white transition flex items-center justify-center gap-2 shimmer-hover"
                 style={bevelStyle}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin text-sky" />
                     Registering...
                   </>
                 ) : (
@@ -301,16 +296,16 @@ export default function RegisterPage() {
         <div className="flex-1 p-8 md:p-12 md:pl-8 flex flex-col justify-center space-y-4">
 
           <div className="mb-2">
-            <p className="text-xs font-black uppercase tracking-widest text-text-secondary">Masuk cepat dengan</p>
+            <p className="text-xs font-black uppercase tracking-widest text-white/90">Masuk cepat dengan</p>
           </div>
 
           {/* Google Button */}
-          <div className="relative p-[1.5px] bg-sky hover:bg-diamond transition-colors duration-300" style={bevelStyle}>
+          <div className="relative p-[1.5px] bg-white/20 hover:bg-white transition-colors duration-300" style={bevelStyle}>
             <button
               type="button"
               onClick={() => handleOAuth("google")}
               disabled={oauthLoading === "google"}
-              className="w-full bg-white py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white hover:bg-slate-50 py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
               style={bevelStyle}
             >
               {oauthLoading === "google" ? (
@@ -328,12 +323,12 @@ export default function RegisterPage() {
           </div>
 
           {/* Discord Button */}
-          <div className="relative p-[1.5px] bg-sky hover:bg-diamond transition-colors duration-300" style={bevelStyle}>
+          <div className="relative p-[1.5px] bg-white/20 hover:bg-white transition-colors duration-300" style={bevelStyle}>
             <button
               type="button"
               onClick={() => handleOAuth("discord")}
               disabled={oauthLoading === "discord"}
-              className="w-full bg-white py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white hover:bg-slate-50 py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
               style={bevelStyle}
             >
               {oauthLoading === "discord" ? (
@@ -348,7 +343,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Info note */}
-          <p className="text-[10px] text-text-muted text-center leading-relaxed pt-2">
+          <p className="text-[10px] text-white/50 text-center leading-relaxed pt-2">
             Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi Mitsuru Top Up Hub.
           </p>
 

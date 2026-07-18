@@ -119,10 +119,10 @@
     font-family: var(--font-poppins), 'Poppins', ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     color: hsl(210 40% 18%); /* #1B3A57 */
-    /* Sky Fantasy background: wallpaper + gradient overlay */
+    /* Sky Fantasy background: wallpaper + gradient overlay matching #28657E */
     background:
-      url('/assets/app/wallpaper-bg.webp') center/cover no-repeat fixed,
-      linear-gradient(180deg, #F7FBFF 0%, #EAF7FF 40%, #DFF2FF 100%);
+      linear-gradient(180deg, rgba(40, 101, 126, 0.95) 0%, rgba(26, 75, 96, 0.95) 100%),
+      url('/assets/app/wallpaper-bg.webp') center/cover no-repeat fixed;
     min-height: 100vh;
   }
 
@@ -147,8 +147,8 @@
 /* Mesh/Topography Background Pattern */
 .mesh {
   background-image:
-    linear-gradient(rgba(92, 184, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(92, 184, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
@@ -778,5 +778,31 @@ select:focus {
   html.no-user .sidebar-content-wrapper {
     margin-left: 0 !important;
   }
+}
+
+/* ==========================================================
+   AUTO-CONTRAST TEXT ADJUSTMENT FOR TEAL THEME BACKDROP
+   ========================================================== */
+
+/* Make headings and text colors automatically light/white when directly on the dark body background */
+h1:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *),
+h2:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *),
+h3:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *),
+h4:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *),
+h5:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *),
+h6:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *) {
+  color: #ffffff !important;
+}
+
+.text-text-primary:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *) {
+  color: #ffffff !important;
+}
+
+.text-text-secondary:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *) {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.text-text-muted:not(.glass *):not(.glass-sky *):not(.bg-white *):not(.bg-slate-50 *):not(.bg-slate-100 *):not(.bg-ice *):not(.bg-mist *):not(header *):not(footer *) {
+  color: rgba(255, 255, 255, 0.60) !important;
 }
 

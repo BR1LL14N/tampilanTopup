@@ -256,18 +256,22 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                 className="carousel-slide min-h-[440px] bg-cover bg-center flex items-center relative w-full shrink-0 auto-shimmer-bg"
                 style={{ backgroundImage: `url('${slide.bg}')` }}
               >
-                {/* Very thin dark overlay for readability of white text */}
-                <div className="absolute inset-0 bg-black/20 z-0" />
+                {/* Smooth left-to-right dark gradient overlay to blend backdrop and elevate readability */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent z-0" />
 
-                <div className="relative z-10 flex min-h-[440px] items-center p-7 sm:p-10 lg:p-16">
-                  <div className="max-w-2xl">
-                    <span className="rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-white">
+                <div className="relative z-10 flex min-h-[440px] items-center p-6 sm:py-10 sm:px-24 lg:py-16 lg:px-28">
+                  {/* Glassmorphism content panel to completely separate text from busy backgrounds */}
+                  <div className="max-w-2xl bg-[#12313E]/30 backdrop-blur-[12px] p-6 sm:p-8 md:p-10 rounded-[20px] border border-white/10 shadow-2xl relative overflow-hidden group/panel transition-all duration-300 hover:bg-[#12313E]/45 hover:border-white/20">
+                    {/* Subtle corner hover glow effect */}
+                    <div className="absolute -top-10 -left-10 w-24 h-24 bg-sky/20 rounded-full blur-2xl pointer-events-none transition-all duration-500 group-hover/panel:bg-diamond/30 group-hover/panel:scale-150" />
+                    
+                    <span className="inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-white">
                       {slide.tag}
                     </span>
-                    <h2 className="mt-5 text-4xl font-black uppercase leading-none text-white sm:text-6xl tracking-tight">
+                    <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-black uppercase leading-tight text-white tracking-tight" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                       {slide.title}
                     </h2>
-                    <p className="mt-4 max-w-xl text-base font-semibold text-white/95">
+                    <p className="mt-4 max-w-xl text-xs sm:text-sm font-medium text-white/80 leading-relaxed">
                       {slide.desc}
                     </p>
 
@@ -276,7 +280,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                       {/* Primary button: solid sky blue with glow default */}
                       <button
                         onClick={() => handleSliderClick(slide.btn1)}
-                        className="bg-sky text-white hover:bg-diamond font-black px-6 py-3.5 text-xs tracking-widest uppercase rounded-xl shadow-sky-soft hover:shadow-sky-glow transition-all duration-300 hover:scale-105 active:scale-95 shimmer-hover"
+                        className="bg-sky text-white hover:bg-diamond font-black px-5 py-3.5 text-[10px] tracking-widest uppercase rounded-xl shadow-sky-soft hover:shadow-sky-glow transition-all duration-300 hover:scale-105 active:scale-95 shimmer-hover"
                       >
                         {slide.btn1}
                       </button>
@@ -284,7 +288,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                       {/* Secondary button: outline sky blue */}
                       <button
                         onClick={() => handleSliderClick(slide.btn2)}
-                        className="bg-white text-sky border border-sky-border hover:bg-sky hover:text-white font-black px-6 py-3.5 text-xs tracking-widest uppercase rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 hover:scale-105 active:scale-95 shimmer-hover"
+                        className="bg-white text-sky border border-sky-border hover:bg-sky hover:text-white font-black px-5 py-3.5 text-[10px] tracking-widest uppercase rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 hover:scale-105 active:scale-95 shimmer-hover"
                       >
                         {slide.btn2}
                       </button>
@@ -298,7 +302,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
 
           <button
             onClick={handlePrevSlide}
-            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-xl text-text-secondary hover:text-sky hover:bg-white hover:border-sky/30 transition-all hover:scale-105 active:scale-95 z-20"
+            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 hidden sm:grid h-12 w-12 place-items-center rounded-xl text-text-secondary hover:text-sky hover:bg-white hover:border-sky/30 transition-all hover:scale-105 active:scale-95 z-20"
             type="button"
             aria-label="Slide sebelumnya"
           >
@@ -306,7 +310,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           </button>
           <button
             onClick={handleNextSlide}
-            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 grid h-12 w-12 place-items-center rounded-xl text-text-secondary hover:text-sky hover:bg-white hover:border-sky/30 transition-all hover:scale-105 active:scale-95 z-20"
+            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 hidden sm:grid h-12 w-12 place-items-center rounded-xl text-text-secondary hover:text-sky hover:bg-white hover:border-sky/30 transition-all hover:scale-105 active:scale-95 z-20"
             type="button"
             aria-label="Slide berikutnya"
           >
