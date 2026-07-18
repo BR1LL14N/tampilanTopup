@@ -449,8 +449,8 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           <div className="mb-6 flex items-center gap-3">
             <Flame className="h-8 w-8 text-sky animate-pulse" />
             <div>
-              <h2 className="text-2xl font-black tracking-wide text-text-primary uppercase">POPULER SEKARANG!</h2>
-              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Berikut adalah beberapa produk yang paling populer saat ini.</p>
+              <h2 className="text-2xl font-black tracking-wide text-white uppercase" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.15)' }}>POPULER SEKARANG!</h2>
+              <p className="text-xs font-semibold text-white/70 uppercase tracking-wide">Berikut adalah beberapa produk yang paling populer saat ini.</p>
             </div>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -628,10 +628,10 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
   return (
     <div className="mt-16 border-t border-sky-border pt-16">
       <div className="text-center mb-10">
-        <h2 className="text-2xl font-black text-text-primary uppercase tracking-wider">
+        <h2 className="text-2xl font-black text-white uppercase tracking-wider" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.15)' }}>
           Kritik, Saran & Ulasan 💬
         </h2>
-        <p className="text-sm font-bold text-text-muted mt-2">
+        <p className="text-sm font-bold text-white/70 mt-2">
           Apa kata mereka yang sudah berbelanja di Mitsuru? Berikan masukan Anda juga!
         </p>
       </div>
@@ -639,7 +639,7 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Testimonials List */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-xs font-black uppercase tracking-widest text-text-secondary mb-2">
+          <h3 className="text-xs font-black uppercase tracking-widest text-white/60 mb-2">
             Ulasan Pelanggan Terbaru
           </h3>
 
