@@ -3,11 +3,16 @@ const path = require("path");
 const mysql = require("mysql2/promise");
 const { Client } = require("pg");
 
-// 1. Baca konfigurasi dari .env.local secara manual
-const envPath = path.join(__dirname, "..", ".env.local");
+// 1. Baca konfigurasi dari .env.local atau .env secara manual
+let envPath = path.join(__dirname, "..", ".env.local");
+if (!fs.existsSync(envPath)) {
+  envPath = path.join(__dirname, "..", ".env");
+}
+
 let env = {};
 
 if (fs.existsSync(envPath)) {
+  console.log(`Membaca konfigurasi dari: ${path.basename(envPath)}`);
   const envFile = fs.readFileSync(envPath, "utf-8");
   envFile.split(/\r?\n/).forEach((line) => {
     const trimmed = line.trim();
@@ -23,7 +28,7 @@ if (fs.existsSync(envPath)) {
     }
   });
 } else {
-  console.error("Error: Berkas .env.local tidak ditemukan!");
+  console.error("Error: Berkas .env.local atau .env tidak ditemukan!");
   process.exit(1);
 }
 

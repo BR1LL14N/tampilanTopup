@@ -229,10 +229,10 @@ export default function CalculatorPage() {
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-sky text-white mb-4 shadow-lg shadow-sky/20">
             <Calculator className="h-6 w-6" />
           </div>
-          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-text-primary mb-2">
+          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white mb-2">
             Topup Optimizer
           </h1>
-          <p className="text-xs font-semibold tracking-widest text-sky uppercase">
+          <p className="text-xs font-semibold tracking-widest text-diamond uppercase">
             Kalkulator Belanja & Kombinasi Paket Hemat Game
           </p>
         </div>

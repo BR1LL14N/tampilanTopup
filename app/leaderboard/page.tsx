@@ -210,8 +210,8 @@ export default function LeaderboardPage() {
                 <ArrowLeft className="h-5 w-5" />
               </Link>
               <div>
-                <h1 className="text-3xl font-extrabold tracking-tight text-text-primary">Leaderboard Top Spender</h1>
-                <p className="text-sm text-text-secondary">Daftar pelanggan paling aktif dan loyal bulan ini</p>
+                <h1 className="text-3xl font-extrabold tracking-tight text-white">Leaderboard Top Spender</h1>
+                <p className="text-sm text-white/80">Daftar pelanggan paling aktif dan loyal bulan ini</p>
               </div>
             </div>
 
@@ -311,33 +311,38 @@ export default function LeaderboardPage() {
           </div>
 
           {/* Top 3 Podium Layout Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-12">
+          <div className="grid grid-cols-3 gap-2 md:gap-6 items-end mb-12">
 
             {/* Podium Rank 2 (Silver) */}
             {secondPlace && (
-              <div className="order-2 md:order-1 transition-all duration-300 hover:-translate-y-2">
+              <div className="order-1 transition-all duration-300 hover:-translate-y-2">
                 <Card className="glass-sky shimmer-hover relative overflow-hidden border-sky-border bg-white hover:border-sky hover:shadow-lg hover:shadow-sky/10 transition-all duration-300 rounded-[20px]">
                   {/* Decorative corner tag */}
-                  <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-ice border border-sky-border text-text-secondary font-bold">
+                  <div className="absolute top-2 right-2 md:top-3 md:right-3 flex h-5 w-5 md:h-8 md:w-8 text-[10px] md:text-sm items-center justify-center rounded-full bg-ice border border-sky-border text-text-secondary font-bold">
                     2
                   </div>
-                  <CardContent className="p-6 text-center">
-                    <div className="relative mx-auto mb-4 w-20 h-20 rounded-full border-2 border-text-secondary bg-ice p-1 flex items-center justify-center">
+                  <CardContent className="p-2 sm:p-4 md:p-6 text-center">
+                    <div className="relative mx-auto mb-2 md:mb-4 w-12 h-12 md:w-20 md:h-20 rounded-full border-2 border-text-secondary bg-ice p-0.5 md:p-1 flex items-center justify-center">
                       <img src={secondPlace.avatar} alt={secondPlace.nickname} className="w-full h-full object-cover rounded-full" />
-                      <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-text-secondary text-white shadow text-[10px] font-extrabold">
+                      <div className="absolute -bottom-1 -right-1 flex h-4 w-4 md:h-6 md:w-6 items-center justify-center rounded-full bg-text-secondary text-white shadow text-[8px] md:text-[10px] font-extrabold">
                         🥈
                       </div>
                     </div>
 
-                    <h3 className="text-xl font-extrabold text-text-primary mb-1 flex items-center justify-center gap-1">
+                    <h3 className="text-[10px] md:text-xl font-extrabold text-text-primary mb-1 flex items-center justify-center gap-1 truncate w-full">
                       {secondPlace.nickname}
-                      <Trophy className="h-4 w-4 text-text-secondary" />
+                      <Trophy className="h-3 w-3 md:h-4 md:w-4 text-text-secondary shrink-0" />
                     </h3>
-                    <span className={`text-[10px] px-2.5 py-0.5 rounded-full border font-bold ${getLevelBadgeClass(secondPlace.level)}`}>
+                    <span className={`hidden md:inline-block text-[10px] px-2.5 py-0.5 rounded-full border font-bold ${getLevelBadgeClass(secondPlace.level)}`}>
                       {secondPlace.level} Member
                     </span>
 
-                    <div className="grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border/50">
+                    {/* Mobile Only Score */}
+                    <p className="md:hidden text-[8px] sm:text-[10px] font-bold text-sky mt-1 truncate">
+                      {sortBy === "spent" ? formatCurrency(secondPlace.totalSpent) : sortBy === "transactions" ? `${secondPlace.transactions} Trx` : `${secondPlace.points} Pts`}
+                    </p>
+
+                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border/50">
                       <div>
                         <p className="text-[10px] text-text-muted uppercase font-semibold">Total Belanja</p>
                         <p className="text-xs font-bold text-text-secondary">{formatCurrency(secondPlace.totalSpent)}</p>
@@ -358,33 +363,38 @@ export default function LeaderboardPage() {
 
             {/* Podium Rank 1 (Gold) */}
             {firstPlace && (
-              <div className="order-1 md:order-2 transition-all duration-300 hover:-translate-y-2">
+              <div className="order-2 transition-all duration-300 hover:-translate-y-2">
                 <Card className="glass-sky shimmer-hover relative overflow-hidden border-sky bg-sky/5 shadow-lg shadow-sky/10 py-4 hover:border-sky hover:shadow-sky/20 transition-all duration-300 rounded-[20px]">
                   {/* Decorative glow line at top */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky to-diamond" />
 
                   {/* Gold Rank Tag */}
-                  <div className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-sky text-white font-black shadow-lg shadow-sky/30">
+                  <div className="absolute top-2 right-2 md:top-4 md:right-4 flex h-6 w-6 md:h-10 md:w-10 text-[10px] md:text-base items-center justify-center rounded-full bg-sky text-white font-black shadow-lg shadow-sky/30">
                     1
                   </div>
 
-                  <CardContent className="p-6 text-center">
-                    <div className="relative mx-auto mb-4 w-24 h-24 rounded-full border-4 border-sky bg-sky/10 p-1 flex items-center justify-center shadow-lg shadow-sky/10">
+                  <CardContent className="p-2 sm:p-4 md:p-6 text-center">
+                    <div className="relative mx-auto mb-2 md:mb-4 w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-sky bg-sky/10 p-1 flex items-center justify-center shadow-lg shadow-sky/10">
                       <img src={firstPlace.avatar} alt={firstPlace.nickname} className="w-full h-full object-cover rounded-full" />
-                      <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-sky text-white shadow text-[10px] font-extrabold">
+                      <div className="absolute -bottom-1 -right-1 flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-sky text-white shadow text-[10px] font-extrabold">
                         👑
                       </div>
                     </div>
 
-                    <h3 className="text-2xl font-black text-text-primary mb-1 flex items-center justify-center gap-1.5">
+                    <h3 className="text-xs md:text-2xl font-black text-text-primary mb-1 flex items-center justify-center gap-1 md:gap-1.5 truncate w-full">
                       {firstPlace.nickname}
-                      <Trophy className="h-5 w-5 text-sky animate-bounce" />
+                      <Trophy className="h-4 w-4 md:h-5 md:w-5 text-sky animate-bounce shrink-0" />
                     </h3>
-                    <span className={`text-[10px] px-3 py-1 rounded-full border font-bold ${getLevelBadgeClass(firstPlace.level)}`}>
+                    <span className={`hidden md:inline-block text-[10px] px-3 py-1 rounded-full border font-bold ${getLevelBadgeClass(firstPlace.level)}`}>
                       {firstPlace.level} Member
                     </span>
 
-                    <div className="grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border">
+                    {/* Mobile Only Score */}
+                    <p className="md:hidden text-[9px] sm:text-xs font-black text-sky mt-1 truncate">
+                      {sortBy === "spent" ? formatCurrency(firstPlace.totalSpent) : sortBy === "transactions" ? `${firstPlace.transactions} Trx` : `${firstPlace.points} Pts`}
+                    </p>
+
+                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border">
                       <div>
                         <p className="text-[10px] text-text-secondary uppercase font-semibold">Total Belanja</p>
                         <p className="text-xs font-black text-text-primary">{formatCurrency(firstPlace.totalSpent)}</p>
@@ -408,26 +418,31 @@ export default function LeaderboardPage() {
               <div className="order-3 transition-all duration-300 hover:-translate-y-2">
                 <Card className="glass-sky shimmer-hover relative overflow-hidden border-amber-600/40 bg-white hover:border-amber-500/50 hover:shadow-lg hover:shadow-sky/10 transition-all duration-300 rounded-[20px]">
                   {/* Decorative corner tag */}
-                  <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-amber-50 border border-amber-600/30 text-amber-600 font-bold">
+                  <div className="absolute top-2 right-2 md:top-3 md:right-3 flex h-5 w-5 md:h-8 md:w-8 text-[10px] md:text-sm items-center justify-center rounded-full bg-amber-50 border border-amber-600/30 text-amber-600 font-bold">
                     3
                   </div>
-                  <CardContent className="p-6 text-center">
-                    <div className="relative mx-auto mb-4 w-20 h-20 rounded-full border-2 border-amber-600 bg-amber-50 p-1 flex items-center justify-center">
+                  <CardContent className="p-2 sm:p-4 md:p-6 text-center">
+                    <div className="relative mx-auto mb-2 md:mb-4 w-12 h-12 md:w-20 md:h-20 rounded-full border-2 border-amber-600 bg-amber-50 p-0.5 md:p-1 flex items-center justify-center">
                       <img src={thirdPlace.avatar} alt={thirdPlace.nickname} className="w-full h-full object-cover rounded-full" />
-                      <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-600 text-white shadow text-[10px] font-extrabold">
+                      <div className="absolute -bottom-1 -right-1 flex h-4 w-4 md:h-6 md:w-6 items-center justify-center rounded-full bg-amber-600 text-white shadow text-[8px] md:text-[10px] font-extrabold">
                         🥉
                       </div>
                     </div>
 
-                    <h3 className="text-xl font-extrabold text-text-primary mb-1 flex items-center justify-center gap-1">
+                    <h3 className="text-[10px] md:text-xl font-extrabold text-text-primary mb-1 flex items-center justify-center gap-1 truncate w-full">
                       {thirdPlace.nickname}
-                      <Trophy className="h-4 w-4 text-amber-600" />
+                      <Trophy className="h-3 w-3 md:h-4 md:w-4 text-amber-600 shrink-0" />
                     </h3>
-                    <span className={`text-[10px] px-2.5 py-0.5 rounded-full border font-bold ${getLevelBadgeClass(thirdPlace.level)}`}>
+                    <span className={`hidden md:inline-block text-[10px] px-2.5 py-0.5 rounded-full border font-bold ${getLevelBadgeClass(thirdPlace.level)}`}>
                       {thirdPlace.level} Member
                     </span>
 
-                    <div className="grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border/50">
+                    {/* Mobile Only Score */}
+                    <p className="md:hidden text-[8px] sm:text-[10px] font-bold text-amber-600 mt-1 truncate">
+                      {sortBy === "spent" ? formatCurrency(thirdPlace.totalSpent) : sortBy === "transactions" ? `${thirdPlace.transactions} Trx` : `${thirdPlace.points} Pts`}
+                    </p>
+
+                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border/50">
                       <div>
                         <p className="text-[10px] text-text-muted uppercase font-semibold">Total Belanja</p>
                         <p className="text-xs font-bold text-text-secondary">{formatCurrency(thirdPlace.totalSpent)}</p>
@@ -464,13 +479,13 @@ export default function LeaderboardPage() {
               <Table>
                 <TableHeader className="bg-ice border-b border-sky-border">
                   <TableRow className="hover:bg-transparent border-b border-sky-border">
-                    <TableHead className="text-text-secondary font-bold w-20">RANK</TableHead>
+                    <TableHead className="text-text-secondary font-bold w-12 md:w-20">RANK</TableHead>
                     <TableHead className="text-text-secondary font-bold">PENGGUNA</TableHead>
-                    <TableHead className="text-text-secondary font-bold">LEVEL MEMBER</TableHead>
-                    <TableHead className="text-text-secondary font-bold">TRANSAKSI</TableHead>
-                    <TableHead className="text-text-secondary font-bold">LOYALTY POIN</TableHead>
-                    <TableHead className="text-text-secondary font-bold">TOTAL BELANJA</TableHead>
-                    <TableHead className="text-text-secondary font-bold">RATA-RATA TOPUP</TableHead>
+                    <TableHead className="hidden md:table-cell text-text-secondary font-bold">LEVEL</TableHead>
+                    <TableHead className="hidden lg:table-cell text-text-secondary font-bold">TRANSAKSI</TableHead>
+                    <TableHead className="hidden lg:table-cell text-text-secondary font-bold">POIN</TableHead>
+                    <TableHead className="text-right sm:text-left text-text-secondary font-bold">TOTAL BELANJA</TableHead>
+                    <TableHead className="hidden md:table-cell text-text-secondary font-bold">RATA-RATA</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -494,21 +509,23 @@ export default function LeaderboardPage() {
                               )}
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="hidden md:table-cell">
                             <span className={`px-2 py-0.5 rounded-full border text-xs font-semibold font-mono ${getLevelBadgeClass(player.level)}`}>
                               {player.level}
                             </span>
                           </TableCell>
-                          <TableCell className="font-medium text-text-secondary">{player.transactions}</TableCell>
-                          <TableCell className="text-text-secondary">{new Intl.NumberFormat("id-ID").format(player.points)}</TableCell>
-                          <TableCell className="font-bold text-text-secondary">
+                          <TableCell className="hidden lg:table-cell font-medium text-text-secondary">{player.transactions}</TableCell>
+                          <TableCell className="hidden lg:table-cell text-text-secondary">{new Intl.NumberFormat("id-ID").format(player.points)}</TableCell>
+                          <TableCell className="font-bold text-text-secondary text-right sm:text-left whitespace-nowrap">
                             {formatCurrency(player.totalSpent)}
                           </TableCell>
-                          <TableCell className="text-sky font-semibold flex items-center gap-1">
-                            {formatCurrency(player.average)}
-                            {player.average > 50000 && (
-                              <ChevronUp className="h-3.5 w-3.5 text-emerald-500" />
-                            )}
+                          <TableCell className="hidden md:table-cell text-sky font-semibold">
+                            <div className="flex items-center gap-1">
+                              {formatCurrency(player.average)}
+                              {player.average > 50000 && (
+                                <ChevronUp className="h-3.5 w-3.5 text-emerald-500" />
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       )

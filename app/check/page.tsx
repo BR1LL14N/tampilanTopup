@@ -72,10 +72,10 @@ export default function CheckTransactionPage() {
 
           {/* Section Title */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-text-primary mb-3 bg-clip-text text-transparent bg-gradient-to-r from-text-primary to-text-secondary">
+            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
               Cek Transaksi
             </h1>
-            <p className="text-xs font-semibold tracking-wider text-sky uppercase">
+            <p className="text-xs font-semibold tracking-wider text-diamond uppercase">
               Pantau Status Pengiriman Topup Game Anda
             </p>
           </div>

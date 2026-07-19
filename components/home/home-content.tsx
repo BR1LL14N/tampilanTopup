@@ -364,7 +364,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           </div>
 
           {/* Flash Sale Cards with Clean Rounded Borders */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 relative z-10">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4 relative z-10">
             {(flashSales && flashSales.length > 0 ? flashSales : [
               { game: "Mobile Legends", name: "86 Diamonds", oriPrice: 25000, salePrice: 19800, discount: 20, sold: 82, stock: 100, slug: "mobile-legends" },
               { game: "Free Fire", name: "140 Diamonds", oriPrice: 34000, salePrice: 27500, discount: 19, sold: 64, stock: 100, slug: "free-fire" },
@@ -398,7 +398,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                 <button
                   key={idx}
                   onClick={() => router.push(`/games/${slug}`)}
-                  className="w-full relative overflow-hidden dark-stripes-teal border border-sky/30 hover:border-diamond/60 text-left group flex flex-col justify-between h-full min-h-[160px] shimmer-hover rounded-[20px] p-4 shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
+                  className="w-full relative overflow-hidden dark-stripes-teal border border-sky/30 hover:border-diamond/60 text-left group flex flex-col justify-between h-full min-h-[140px] sm:min-h-[160px] shimmer-hover rounded-[16px] sm:rounded-[20px] p-3 sm:p-4 shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
                   type="button"
                 >
                   {/* Discount Badge */}
@@ -406,25 +406,25 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                     -{discount}%
                   </span>
 
-                  <div className="flex gap-3 items-center w-full">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center w-full">
                     {/* Small Game Cover Thumbnail */}
-                    <div className="h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-white/15 group-hover:border-diamond/50 transition-colors">
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl overflow-hidden shrink-0 border border-white/15 group-hover:border-diamond/50 transition-colors">
                       <img
                         src={icon}
                         alt={name}
                         className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-[9px] font-bold text-white/50 uppercase tracking-wider truncate">{gameName}</p>
-                      <h4 className="mt-0.5 font-black text-white text-xs group-hover:text-diamond transition-colors uppercase tracking-tight truncate pr-6">{name}</h4>
+                    <div className="min-w-0 w-full mt-1 sm:mt-0">
+                      <p className="text-[8px] sm:text-[9px] font-bold text-white/50 uppercase tracking-wider truncate">{gameName}</p>
+                      <h4 className="mt-0.5 font-black text-white text-[10px] sm:text-xs group-hover:text-diamond transition-colors uppercase tracking-tight truncate sm:pr-6">{name}</h4>
                     </div>
                   </div>
 
-                  <div className="mt-4 w-full">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-sm font-black text-diamond font-mono">Rp {salePrice.toLocaleString("id-ID")}</span>
-                      <span className="text-[10px] text-white/40 line-through font-mono">Rp {oriPrice.toLocaleString("id-ID")}</span>
+                  <div className="mt-3 sm:mt-4 w-full">
+                    <div className="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5">
+                      <span className="text-xs sm:text-sm font-black text-diamond font-mono">Rp {salePrice.toLocaleString("id-ID")}</span>
+                      <span className="text-[9px] sm:text-[10px] text-white/40 line-through font-mono">Rp {oriPrice.toLocaleString("id-ID")}</span>
                     </div>
 
                     {/* Progress Bar with labels above it */}
@@ -453,19 +453,19 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               <p className="text-xs font-semibold text-white/70 uppercase tracking-wide">Berikut adalah beberapa produk yang paling populer saat ini.</p>
             </div>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {popularGames.map((card, idx) => (
               <button
                 key={idx}
                 onClick={() => router.push(`/games/${card.slug}`)}
-                className="w-full flex min-h-28 items-center gap-5 dark-stripes-teal border border-sky/30 hover:border-diamond/60 p-4 text-left group shimmer-hover rounded-[20px] shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
+                className="w-full flex flex-col sm:flex-row min-h-24 sm:min-h-28 items-center sm:items-center gap-3 sm:gap-5 dark-stripes-teal border border-sky/30 hover:border-diamond/60 p-3 sm:p-4 text-center sm:text-left group shimmer-hover rounded-[16px] sm:rounded-[20px] shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-white/15 group-hover:border-diamond/50 transition-colors">
+                <div className="relative h-14 w-14 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl border border-white/15 group-hover:border-diamond/50 transition-colors">
                   <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />
                 </div>
-                <span>
-                  <strong className="block text-lg font-black text-white group-hover:text-diamond transition-colors uppercase tracking-tight">{card.name}</strong>
-                  <span className="mt-1 block text-xs font-bold text-white/50 uppercase tracking-wider">{card.publisher}</span>
+                <span className="w-full">
+                  <strong className="block text-[11px] sm:text-lg font-black text-white group-hover:text-diamond transition-colors uppercase tracking-tight leading-tight">{card.name}</strong>
+                  <span className="mt-1 block text-[9px] sm:text-xs font-bold text-white/50 uppercase tracking-wider truncate">{card.publisher}</span>
                 </span>
               </button>
             ))}
@@ -497,7 +497,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             </button>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {catalogList
               .filter((item) => activeTab === "all" ? item.tab === "all" : item.tab === activeTab)
               .map((item, idx) => (
