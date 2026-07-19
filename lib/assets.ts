@@ -67,12 +67,14 @@ export const gameAssets = {
 } as const;
 
 export const itemAssets = {
-  diamond: "/assets/games/mobile-legends/icon.png",
+  "diamond-ml": "/assets/items/Diamond ML.webp",
+  "diamond-ff": "/assets/items/Diamond FF.webp",
+  diamond: "/assets/items/Diamond ML.webp",
   uc: "/assets/items/uc.png",
   "valorant-point": "/assets/items/valorant-point.png",
-  "genesis-crystal": "/assets/items/genesis-crystal.png",
+  "genesis-crystal": "/assets/items/Genesis Cristal Genshin.webp",
   "welkin-moon": "/assets/items/welkin-moon.png",
-  "honor-token": "/assets/items/honor-token.png",
+  "honor-token": "/assets/items/Diamon HOK.webp",
   robux: "/assets/items/robux.png",
   "steam-wallet-code": "/assets/items/steam-wallet-code.png",
   "tiktok-coin": "/assets/items/tiktok-coin.png",
@@ -147,7 +149,9 @@ export function getItemAssetForProduct(productName?: string | null, sku?: string
   if (text.includes("gift card") || text.includes("steam")) return itemAssets["steam-wallet-code"];
   if (text.includes("tiktok") || text.includes("coin")) return itemAssets["tiktok-coin"];
   if (text.includes("bigo")) return itemAssets["bigo-diamond"];
-  if (text.includes("diamond") || text.includes("ml") || text.includes("ff")) return itemAssets.diamond;
+  if (text.includes("ml") || (text.includes("diamond") && gameName?.toLowerCase().includes("mobile legends"))) return itemAssets["diamond-ml"];
+  if (text.includes("ff") || (text.includes("diamond") && gameName?.toLowerCase().includes("free fire"))) return itemAssets["diamond-ff"];
+  if (text.includes("diamond")) return itemAssets.diamond;
 
   return getGameAssetByName(gameName)?.icon || itemAssets.diamond;
 }

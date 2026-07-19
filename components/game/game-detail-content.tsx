@@ -267,20 +267,20 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
               {activeTab === "transaksi" ? (
                 <>
                   {/* Step 1: Input Akun */}
-                  <div className="bg-white border border-sky-border rounded-[24px] shadow-sky-medium overflow-hidden">
-                    <div className="p-4 bg-white border-b border-sky-border flex items-center gap-3">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg">1</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">Masukkan Data Akun</h3>
+                  <div className="bg-[#182024] border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden">
+                    <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
+                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">1</span>
+                      <h3 className="text-xs font-black uppercase tracking-widest text-white">Masukkan Data Akun</h3>
                     </div>
 
-                    <div className="grid gap-5 p-6 sm:grid-cols-2 bg-white">
+                    <div className="grid gap-5 p-6 sm:grid-cols-2">
                       <div className="space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">User ID <span className="text-sky">*</span></span>
+                        <span className="block text-xs font-bold uppercase tracking-wider text-white/60">User ID <span className="text-sky">*</span></span>
                         <input
                           value={gameId}
                           onChange={(e) => setGameId(e.target.value)}
                           placeholder="Masukkan User ID"
-                          className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none"
+                          className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
                           required
                         />
                       </div>
@@ -288,58 +288,58 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                       {/* Conditionally show Server ID for Mobile Legends */}
                       {game.slug === "mobile-legends" && (
                         <div className="space-y-2">
-                          <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">Server ID <span className="text-sky">*</span></span>
+                          <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Server ID <span className="text-sky">*</span></span>
                           <input
                             value={serverId}
                             onChange={(e) => setServerId(e.target.value)}
                             placeholder="Masukkan Server ID"
-                            className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none"
+                            className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
                             required
                           />
                         </div>
                       )}
 
                       <div className="space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">Email (Opsional)</span>
+                        <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Email (Opsional)</span>
                         <input
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="name@email.com"
-                          className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none"
+                          className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">No. WhatsApp Aktif <span className="text-sky">*</span></span>
+                        <span className="block text-xs font-bold uppercase tracking-wider text-white/60">No. WhatsApp Aktif <span className="text-sky">*</span></span>
                         <input
                           value={whatsapp}
                           onChange={(e) => setWhatsapp(e.target.value)}
                           placeholder="Contoh: 081234567890"
-                          className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none"
+                          className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
                           required
                         />
                       </div>
 
                       <div className="sm:col-span-2 space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-text-secondary">Catatan Khusus untuk Admin (Opsional)</span>
+                        <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Catatan Khusus untuk Admin (Opsional)</span>
                         <input
                           value={requestNotes}
                           onChange={(e) => setRequestNotes(e.target.value)}
                           placeholder="Contoh: Tolong proses cepat ya admin, kirim sebagai hadiah"
-                          className="w-full bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted outline-none"
+                          className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Step 2: Pilih Nominal */}
-                  <div className="bg-white border border-sky-border rounded-[24px] shadow-sky-medium overflow-hidden">
-                    <div className="p-4 bg-white border-b border-sky-border flex items-center gap-3">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg">2</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">Pilih Nominal Top Up</h3>
+                  <div className="bg-[#182024] border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
+                    <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
+                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">2</span>
+                      <h3 className="text-xs font-black uppercase tracking-widest text-white">Pilih Nominal Top Up</h3>
                     </div>
 
-                    <div className="p-6 bg-white">
+                    <div className="p-6">
                       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                         {game.products.map((prod) => {
                           const originalPrice = Math.round(prod.sell_price * 1.25)
@@ -349,31 +349,31 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                             <button
                               key={prod.id}
                               onClick={() => setSelectedProduct(prod)}
-                              className={`w-full p-4 text-left group shimmer-hover rounded-[20px] transition-all duration-300 border ${
+                              className={`w-full p-4 text-left group rounded-[20px] transition-all duration-300 border ${
                                 isSelected
-                                  ? "border-sky bg-sky/[0.03] shadow-sky-soft scale-[1.02] ring-2 ring-sky/20"
-                                  : "border-sky-border bg-white hover:border-sky/40 hover:-translate-y-0.5 shadow-sky-soft hover:shadow-sky-medium"
+                                  ? "border-sky bg-sky/10 shadow-lg scale-[1.02] ring-2 ring-sky/30"
+                                  : "border-white/10 bg-black/20 hover:border-white/30 hover:-translate-y-0.5 shadow-md hover:bg-white/5 hover:shadow-lg"
                               }`}
                               type="button"
                             >
-                              <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1.5 border border-sky-border">
+                              <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-black/30 p-1.5 border border-white/10 group-hover:border-white/20 transition-colors">
                                 <img
                                   src={getItemAssetForProduct(prod.name, prod.provider_sku, game.name)}
                                   alt=""
-                                  className="max-h-full max-w-full object-contain"
+                                  className="max-h-full max-w-full object-contain drop-shadow-md"
                                 />
                               </span>
-                              <span className="block font-black text-xs uppercase tracking-wide text-text-primary group-hover:text-sky transition-colors">{prod.name}</span>
+                              <span className="block font-black text-xs uppercase tracking-wide text-white group-hover:text-sky transition-colors">{prod.name}</span>
                               <div className="mt-3 flex items-baseline justify-between">
                                 <span className="text-base font-black text-sky font-mono">
                                   Rp {prod.sell_price.toLocaleString("id-ID")}
                                 </span>
-                                <span className="text-[10px] text-red-500 line-through font-mono">
+                                <span className="text-[10px] text-red-400 line-through font-mono">
                                   Rp {originalPrice.toLocaleString("id-ID")}
                                 </span>
                               </div>
                               <span className={`inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider mt-3 ${
-                                isSelected ? "bg-sky text-white" : "bg-red-500/10 text-red-500"
+                                isSelected ? "bg-sky text-white shadow-sm shadow-sky/50" : "bg-red-500/20 text-red-400"
                               }`}>
                                 HEMAT {discount}%
                               </span>
@@ -385,18 +385,18 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                   </div>
 
                   {/* Step 3: Jumlah Pembelian */}
-                  <div className="bg-white border border-sky-border rounded-[24px] shadow-sky-medium overflow-hidden">
-                    <div className="p-4 bg-white border-b border-sky-border flex items-center gap-3">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg">3</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">Tentukan Jumlah Pembelian</h3>
+                  <div className="bg-[#182024] border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
+                    <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
+                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">3</span>
+                      <h3 className="text-xs font-black uppercase tracking-widest text-white">Tentukan Jumlah Pembelian</h3>
                     </div>
 
-                    <div className="flex gap-3.5 p-6 bg-white items-center">
+                    <div className="flex gap-3.5 p-6 items-center">
                       <input
                         type="number"
                         value={quantity}
                         onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                        className="w-16 bg-white border border-sky-border hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl py-3 text-center text-sm font-bold text-text-primary outline-none"
+                        className="w-16 bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl py-3 text-center text-sm font-bold text-white outline-none"
                       />
                       <button
                         onClick={() => setQuantity((q) => q + 1)}
@@ -407,7 +407,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                       </button>
                       <button
                         onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                        className="grid h-11 w-11 place-items-center rounded-xl bg-ice hover:bg-sky-border text-text-secondary hover:text-text-primary border border-sky-border/50 transition-all hover:scale-105 active:scale-95"
+                        className="grid h-11 w-11 place-items-center rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 hover:border-white/20 transition-all hover:scale-105 active:scale-95"
                         type="button"
                       >
                         <Minus className="h-5 w-5" />
@@ -418,13 +418,13 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                 </>
               ) : (
                 /* Description & Rules Tab */
-                <div className="glass-sky p-6 md:p-8 rounded-2xl border-sky-border relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-sky/5 rounded-full blur-2xl pointer-events-none" />
-                  <h2 className="text-lg font-black uppercase tracking-wide text-text-primary border-b border-sky-border/50 pb-3 flex items-center gap-2">
+                <div className="dark-stripes-teal p-6 md:p-8 rounded-[24px] border border-sky/30 relative overflow-hidden shadow-sky-medium mt-6">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-sky/10 rounded-full blur-2xl pointer-events-none" />
+                  <h2 className="text-lg font-black uppercase tracking-wide text-white border-b border-sky/30 pb-3 flex items-center gap-2">
                     <FileText className="h-5 w-5 text-sky" />
                     Keterangan Game {game.name}
                   </h2>
-                  <p className="mt-4 text-xs font-medium leading-relaxed text-text-secondary">
+                  <p className="mt-4 text-sm font-medium leading-relaxed text-white/70">
                     {game.description}
                   </p>
 
@@ -445,13 +445,13 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
             <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
 
               {/* Reviews Card */}
-              <div className="glass-sky p-5 rounded-2xl border-sky-border relative overflow-hidden">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-text-muted mb-3">Ulasan Pengguna</h2>
-                <div className="flex items-center gap-4 bg-white/60 p-3 rounded-xl border border-sky-border/50">
+              <div className="bg-[#182024] p-5 rounded-2xl border border-sky/30 relative overflow-hidden shadow-sky-medium">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-white/60 mb-3">Ulasan Pengguna</h2>
+                <div className="flex items-center gap-4 bg-black/20 p-3 rounded-xl border border-sky/10">
                   <span className="text-4xl font-black text-sky font-mono leading-none">4.99</span>
                   <div>
                     <span className="text-amber-500 text-base leading-none block">★★★★★</span>
-                    <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mt-1">Berdasarkan 870 rating terverifikasi</p>
+                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-wider mt-1">Berdasarkan 870 rating terverifikasi</p>
                   </div>
                 </div>
               </div>
@@ -459,55 +459,55 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
               {/* CS Support Card */}
               <div
                 onClick={() => router.push("https://wa.me/6281234567890")}
-                className="glass-sky p-5 rounded-2xl border-sky-border flex items-center gap-4 hover:border-sky/30 cursor-pointer transition-all duration-300 group"
+                className="bg-[#182024] p-5 rounded-2xl border border-sky/30 flex items-center gap-4 hover:border-sky/50 cursor-pointer transition-all duration-300 group shadow-sky-medium"
               >
                 <span className="grid h-11 w-11 place-items-center rounded bg-sky/10 text-sky group-hover:bg-sky group-hover:text-white transition-colors">
                   <Headphones className="h-5 w-5" />
                 </span>
                 <div>
-                  <p className="font-black text-text-primary text-xs uppercase group-hover:text-sky transition-colors">Customer Service</p>
-                  <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mt-0.5">Siap melayani keluhan 24/7 jam</p>
+                  <p className="font-black text-white text-xs uppercase group-hover:text-sky transition-colors">Customer Service</p>
+                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-wider mt-0.5">Siap melayani keluhan 24/7 jam</p>
                 </div>
               </div>
 
               {/* Selected Product Summary */}
-              <div className="glass-sky p-6 rounded-2xl border border-sky-border relative overflow-hidden">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-text-primary border-b border-sky-border/50 pb-3">Ringkasan Invoice</h3>
+              <div className="bg-[#182024] p-6 rounded-2xl border border-sky/30 relative overflow-hidden shadow-sky-medium">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white border-b border-sky/30 pb-3">Ringkasan Invoice</h3>
 
                 {selectedProduct ? (
                   <div className="mt-4 space-y-3.5 text-xs font-semibold">
                     <div className="flex justify-between items-center">
-                      <span className="text-text-muted uppercase text-[10px] tracking-wider">Item Produk</span>
-                      <span className="flex items-center gap-2 font-bold text-text-primary">
-                        <span className="flex h-7 w-7 items-center justify-center rounded bg-white p-1 border border-sky-border">
+                      <span className="text-white/60 uppercase text-[10px] tracking-wider">Item Produk</span>
+                      <span className="flex items-center gap-2 font-bold text-white">
+                        <span className="flex h-7 w-7 items-center justify-center rounded bg-black/30 p-1 border border-sky/20">
                           <img
                             src={getItemAssetForProduct(selectedProduct.name, selectedProduct.provider_sku, game.name)}
                             alt=""
-                            className="max-h-full max-w-full object-contain"
+                            className="max-h-full max-w-full object-contain drop-shadow-md"
                           />
                         </span>
                         {selectedProduct.name}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-text-muted uppercase text-[10px] tracking-wider">Jumlah</span>
+                      <span className="text-white/60 uppercase text-[10px] tracking-wider">Jumlah</span>
                       <span className="font-mono text-sky font-bold bg-sky/10 px-2 py-0.5 rounded">x{quantity}</span>
                     </div>
                     {gameId && (
-                      <div className="flex justify-between items-center border-t border-sky-border/50 pt-3">
-                        <span className="text-text-muted uppercase text-[10px] tracking-wider">ID Akun</span>
-                        <span className="font-mono text-text-primary font-bold">{gameId} {serverId && `(${serverId})`}</span>
+                      <div className="flex justify-between items-center border-t border-sky/20 pt-3">
+                        <span className="text-white/60 uppercase text-[10px] tracking-wider">ID Akun</span>
+                        <span className="font-mono text-white font-bold">{gameId} {serverId && `(${serverId})`}</span>
                       </div>
                     )}
-                    <div className="flex justify-between items-center border-t border-sky-border pt-4">
-                      <span className="text-text-primary font-black uppercase text-xs">Total Tagihan</span>
+                    <div className="flex justify-between items-center border-t border-sky/30 pt-4">
+                      <span className="text-white font-black uppercase text-xs">Total Tagihan</span>
                       <span className="text-lg font-black text-sky font-mono">
                         Rp {(selectedProduct.sell_price * quantity).toLocaleString("id-ID")}
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <p className="mt-4 text-xs text-text-muted text-center py-4 font-bold uppercase tracking-widest">
+                  <p className="mt-4 text-xs text-white/40 text-center py-4 font-bold uppercase tracking-widest">
                     Silakan pilih nominal produk
                   </p>
                 )}
