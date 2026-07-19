@@ -480,7 +480,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               className={`px-6 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
                 activeTab === "all"
                   ? "bg-sky text-white shadow-sky-soft"
-                  : "bg-white/60 hover:bg-white text-text-secondary hover:text-text-primary border border-sky-border/80"
+                  : "bg-white/10 hover:bg-white/20 text-white/60 hover:text-white border border-white/15"
               }`}
             >
               Top Up Game
@@ -490,7 +490,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               className={`px-6 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 hover:translate-y-[-1px] shimmer-hover ${
                 activeTab === "voucher"
                   ? "bg-sky text-white shadow-sky-soft"
-                  : "bg-white/60 hover:bg-white text-text-secondary hover:text-text-primary border border-sky-border/80"
+                  : "bg-white/10 hover:bg-white/20 text-white/60 hover:text-white border border-white/15"
               }`}
             >
               Voucher Digital
