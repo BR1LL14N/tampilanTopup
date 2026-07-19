@@ -225,6 +225,20 @@
   backdrop-filter: blur(20px);
 }
 
+/* Dark Striped Panel - dasar gelap netral + motif garis diagonal halus */
+.dark-stripes {
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.045) 0 40px, transparent 40px 80px),
+    linear-gradient(135deg, #26292e 0%, #1b1e21 100%);
+}
+
+/* Varian teal - charcoal di-blend dengan deep teal sistem (#28657E) */
+.dark-stripes-teal {
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.04) 0 40px, transparent 40px 80px),
+    linear-gradient(135deg, #24373f 0%, #17262c 100%);
+}
+
 /* Soft Panel */
 .soft-panel {
   @apply bg-white rounded-xl p-6 border border-card-border transition-all duration-300;
@@ -539,9 +553,8 @@
 }
 
 .carousel-nav:hover {
-  background: hsl(207 100% 62%);
-  border-color: hsl(207 100% 62%);
-  transform: translate-y(-50%) scale(1.05);
+  background: #4CA1AF;
+  border-color: #4CA1AF;
 }
 
 .carousel-nav:hover svg {

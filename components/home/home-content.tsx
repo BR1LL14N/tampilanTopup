@@ -302,7 +302,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
 
           <button
             onClick={handlePrevSlide}
-            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 hidden sm:grid h-12 w-12 place-items-center rounded-xl text-text-secondary hover:text-sky hover:bg-white hover:border-sky/30 transition-all hover:scale-105 active:scale-95 z-20"
+            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 hidden sm:grid h-12 w-12 place-items-center rounded-xl text-text-secondary transition-all hover:scale-105 active:scale-95 z-20"
             type="button"
             aria-label="Slide sebelumnya"
           >
@@ -310,7 +310,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           </button>
           <button
             onClick={handleNextSlide}
-            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 hidden sm:grid h-12 w-12 place-items-center rounded-xl text-text-secondary hover:text-sky hover:bg-white hover:border-sky/30 transition-all hover:scale-105 active:scale-95 z-20"
+            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 hidden sm:grid h-12 w-12 place-items-center rounded-xl text-text-secondary transition-all hover:scale-105 active:scale-95 z-20"
             type="button"
             aria-label="Slide berikutnya"
           >
@@ -329,23 +329,23 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           </div>
         </div>
 
-        {/* Flash Sale Section - Sky Fantasy White Card */}
-        <div className="section-wrap mb-12 bg-white border border-sky-border rounded-[24px] shadow-sky-medium p-6 md:p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-sky/5 rounded-full blur-3xl pointer-events-none" />
+        {/* Flash Sale Section - Dark Striped Panel */}
+        <div className="section-wrap mb-12 dark-stripes border border-white/10 rounded-[24px] shadow-lg shadow-black/30 p-6 md:p-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-sky/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 relative z-10">
             <div className="flex items-center gap-3.5">
-              <span className="flex h-12 w-12 place-items-center justify-center rounded-xl bg-sky/10 border border-sky/20 text-sky animate-pulse shadow-lg shadow-sky/10">
+              <span className="flex h-12 w-12 place-items-center justify-center rounded-xl bg-sky/15 border border-sky/30 text-sky animate-pulse shadow-lg shadow-sky/10">
                 <Zap className="h-6 w-6 fill-sky/20" />
               </span>
               <div>
-                <h2 className="text-2xl font-black tracking-wide text-text-primary uppercase">FLASH SALE HARI INI</h2>
-                <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Promo terbatas dengan harga miring untuk game favoritmu.</p>
+                <h2 className="text-2xl font-black tracking-wide text-white uppercase">FLASH SALE HARI INI</h2>
+                <p className="text-xs font-semibold text-white/60 uppercase tracking-wide">Promo terbatas dengan harga miring untuk game favoritmu.</p>
               </div>
             </div>
             {/* Timer */}
-            <div className="flex items-center gap-2 bg-ice border border-sky-border rounded-xl px-4 py-2.5">
-              <span className="text-[10px] font-black text-sky uppercase tracking-widest mr-2">Berakhir dalam</span>
+            <div className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-2.5">
+              <span className="text-[10px] font-black text-diamond uppercase tracking-widest mr-2">Berakhir dalam</span>
               <div className="flex gap-1.5">
                 {[
                   { value: timeLeft.hours, label: "H" },
@@ -353,10 +353,10 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                   { value: timeLeft.seconds, label: "S" }
                 ].map((t, idx) => (
                   <div key={idx} className="flex items-center">
-                    <span className="bg-sky text-white font-black px-2.5 py-1 rounded text-sm min-w-[32px] text-center shadow-lg shadow-sky/25 font-mono">
+                    <span className="bg-diamond text-white font-black px-2.5 py-1 rounded text-sm min-w-[32px] text-center shadow-lg shadow-diamond/25 font-mono">
                       {String(t.value).padStart(2, '0')}
                     </span>
-                    {idx < 2 && <span className="font-black text-sky mx-1">:</span>}
+                    {idx < 2 && <span className="font-black text-diamond mx-1">:</span>}
                   </div>
                 ))}
               </div>
@@ -398,7 +398,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                 <button
                   key={idx}
                   onClick={() => router.push(`/games/${slug}`)}
-                  className="w-full relative overflow-hidden bg-white border border-sky-border hover:border-sky/40 text-left group flex flex-col justify-between h-full min-h-[160px] shimmer-hover rounded-[20px] p-4 shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 hover:-translate-y-1"
+                  className="w-full relative overflow-hidden dark-stripes-teal border border-sky/30 hover:border-diamond/60 text-left group flex flex-col justify-between h-full min-h-[160px] shimmer-hover rounded-[20px] p-4 shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
                   type="button"
                 >
                   {/* Discount Badge */}
@@ -408,7 +408,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
 
                   <div className="flex gap-3 items-center w-full">
                     {/* Small Game Cover Thumbnail */}
-                    <div className="h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-sky-border group-hover:border-sky/30 transition-colors">
+                    <div className="h-12 w-12 rounded-xl overflow-hidden shrink-0 border border-white/15 group-hover:border-diamond/50 transition-colors">
                       <img
                         src={icon}
                         alt={name}
@@ -416,25 +416,25 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[9px] font-bold text-text-muted uppercase tracking-wider truncate">{gameName}</p>
-                      <h4 className="mt-0.5 font-black text-text-primary text-xs group-hover:text-sky transition-colors uppercase tracking-tight truncate pr-6">{name}</h4>
+                      <p className="text-[9px] font-bold text-white/50 uppercase tracking-wider truncate">{gameName}</p>
+                      <h4 className="mt-0.5 font-black text-white text-xs group-hover:text-diamond transition-colors uppercase tracking-tight truncate pr-6">{name}</h4>
                     </div>
                   </div>
 
                   <div className="mt-4 w-full">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-sm font-black text-sky font-mono">Rp {salePrice.toLocaleString("id-ID")}</span>
-                      <span className="text-[10px] text-text-muted line-through font-mono">Rp {oriPrice.toLocaleString("id-ID")}</span>
+                      <span className="text-sm font-black text-diamond font-mono">Rp {salePrice.toLocaleString("id-ID")}</span>
+                      <span className="text-[10px] text-white/40 line-through font-mono">Rp {oriPrice.toLocaleString("id-ID")}</span>
                     </div>
 
                     {/* Progress Bar with labels above it */}
                     <div className="mt-4">
-                      <div className="flex justify-between text-[9px] font-black uppercase tracking-wider text-text-muted mb-1.5">
-                        <span>Tersisa <span className="text-sky font-mono">{stock - sold}</span></span>
-                        <span>Terjual <span className="text-sky font-mono">{sold}</span></span>
+                      <div className="flex justify-between text-[9px] font-black uppercase tracking-wider text-white/50 mb-1.5">
+                        <span>Tersisa <span className="text-diamond font-mono">{stock - sold}</span></span>
+                        <span>Terjual <span className="text-diamond font-mono">{sold}</span></span>
                       </div>
-                      <div className="h-1.5 w-full bg-ice rounded-full overflow-hidden border border-sky-border/50">
-                        <div className="h-full bg-sky rounded-full" style={{ width: `${percentSold}%` }}></div>
+                      <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden border border-white/10">
+                        <div className="h-full bg-diamond rounded-full" style={{ width: `${percentSold}%` }}></div>
                       </div>
                     </div>
                   </div>
@@ -447,7 +447,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
         {/* Section: Populer Sekarang - Sky Fantasy Rounded Cards */}
         <div className="section-wrap mb-12">
           <div className="mb-6 flex items-center gap-3">
-            <Flame className="h-8 w-8 text-sky animate-pulse" />
+            <Flame className="h-8 w-8 text-diamond animate-pulse" />
             <div>
               <h2 className="text-2xl font-black tracking-wide text-white uppercase" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.15)' }}>POPULER SEKARANG!</h2>
               <p className="text-xs font-semibold text-white/70 uppercase tracking-wide">Berikut adalah beberapa produk yang paling populer saat ini.</p>
@@ -458,14 +458,14 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               <button
                 key={idx}
                 onClick={() => router.push(`/games/${card.slug}`)}
-                className="w-full flex min-h-28 items-center gap-5 bg-white/60 backdrop-blur-md border border-sky-border hover:border-sky/40 p-4 text-left group shimmer-hover rounded-[20px] shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 hover:bg-white hover:-translate-y-1"
+                className="w-full flex min-h-28 items-center gap-5 dark-stripes-teal border border-sky/30 hover:border-diamond/60 p-4 text-left group shimmer-hover rounded-[20px] shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-sky-border group-hover:border-sky/30 transition-colors">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-white/15 group-hover:border-diamond/50 transition-colors">
                   <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />
                 </div>
                 <span>
-                  <strong className="block text-lg font-black text-text-primary group-hover:text-sky transition-colors uppercase tracking-tight">{card.name}</strong>
-                  <span className="mt-1 block text-xs font-bold text-text-muted uppercase tracking-wider">{card.publisher}</span>
+                  <strong className="block text-lg font-black text-white group-hover:text-diamond transition-colors uppercase tracking-tight">{card.name}</strong>
+                  <span className="mt-1 block text-xs font-bold text-white/50 uppercase tracking-wider">{card.publisher}</span>
                 </span>
               </button>
             ))}
