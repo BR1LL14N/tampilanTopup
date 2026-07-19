@@ -5,7 +5,7 @@ import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapp
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col bg-background relative">
+    <div className="min-h-screen flex flex-col relative">
       {/* Mesh Background */}
       <div className="pointer-events-none fixed inset-0 mesh opacity-50 z-0"></div>
       

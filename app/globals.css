@@ -119,9 +119,9 @@
     font-family: var(--font-poppins), 'Poppins', ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     color: hsl(210 40% 18%); /* #1B3A57 */
-    /* Sky Fantasy background: wallpaper + gradient overlay matching #28657E */
+    /* Background: solid dark #181818 overlay di atas wallpaper */
     background:
-      linear-gradient(180deg, rgba(40, 101, 126, 0.95) 0%, rgba(26, 75, 96, 0.95) 100%),
+      linear-gradient(180deg, rgba(24, 24, 24, 0.97) 0%, rgba(24, 24, 24, 0.97) 100%),
       url('/assets/app/wallpaper-bg.webp') center/cover no-repeat fixed;
     min-height: 100vh;
   }

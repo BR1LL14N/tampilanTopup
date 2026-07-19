@@ -11,7 +11,7 @@ export const gameAssets = {
   },
   "pubg-mobile": {
     icon: "/assets/games/pubg-mobile/icon.png",
-    poster: "/assets/games/pubg-mobile/poster.png",
+    poster: "/assets/games/pubg-mobile/card.png",
     banner: "/assets/games/pubg-mobile/banner.png",
   },
   valorant: {

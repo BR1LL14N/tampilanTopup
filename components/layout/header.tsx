@@ -308,25 +308,25 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <>
-      {/* Top Navbar - Sky Fantasy Glassmorphism Light */}
-      <header className="sticky top-0 z-50 w-full border-b border-sky-border bg-white/80 backdrop-blur-xl shadow-sky-soft">
+      {/* Top Navbar - Dark Glassmorphism */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#181818]/90 backdrop-blur-xl shadow-lg shadow-black/20">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
 
           {/* Left: Logo */}
           <Link href="/" className="group flex items-center gap-3 shrink-0 relative z-20">
-            <div className="h-10 w-10 rounded-lg overflow-hidden bg-white border border-sky-border shadow-sky-soft group-hover:border-sky/50 group-hover:shadow-sky-medium transition-all duration-300">
+            <div className="h-10 w-10 rounded-lg overflow-hidden bg-white border border-white/15 group-hover:border-sky/50 transition-all duration-300">
               <img src="/mitsuru.png" alt="Mitsuru Logo" className="h-full w-full object-cover" />
             </div>
             <span className="hidden sm:block">
-              <span className="block text-left text-base font-black tracking-wider uppercase text-text-primary group-hover:text-sky transition-colors">Mitsuru</span>
-              <span className="block text-left text-[10px] font-bold text-text-muted uppercase tracking-widest leading-none">Top Up HUB</span>
+              <span className="block text-left text-base font-black tracking-wider uppercase text-white group-hover:text-sky transition-colors">Mitsuru</span>
+              <span className="block text-left text-[10px] font-bold text-white/50 uppercase tracking-widest leading-none">Top Up HUB</span>
             </span>
           </Link>
 
           {/* Center: Search input with real-time live preview */}
           <div ref={searchContainerRef} className="relative flex-1 max-w-md mx-2 md:mx-6">
             <div className="relative flex items-center">
-              <span className="absolute left-4 text-text-muted pointer-events-none">
+              <span className="absolute left-4 text-white/40 pointer-events-none">
                 <Search className="h-4 w-4" />
               </span>
               <input
@@ -335,12 +335,12 @@ export function Header({ user }: HeaderProps) {
                 value={searchQuery}
                 onFocus={() => setSearchFocused(true)}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-sky-border rounded-full pl-11 pr-10 py-2 text-xs font-semibold text-text-primary placeholder:text-text-muted outline-none transition-all duration-300 hover:border-sky/50 focus:border-sky focus:ring-2 focus:ring-sky/20 focus:bg-white"
+                className="w-full bg-white/[0.07] border border-white/15 rounded-full pl-11 pr-10 py-2 text-xs font-semibold text-white placeholder:text-white/40 outline-none transition-all duration-300 hover:border-sky/50 focus:border-sky focus:ring-2 focus:ring-sky/25 focus:bg-white/10"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 p-1 rounded-full text-text-muted hover:text-text-primary transition"
+                  className="absolute right-3 p-1 rounded-full text-white/40 hover:text-white transition"
                   type="button"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -383,7 +383,7 @@ export function Header({ user }: HeaderProps) {
             {/* Lang / Currency selector */}
             <button
               onClick={() => setShowLangModal(true)}
-              className="flex items-center gap-1.5 px-3 py-2 border border-sky-border rounded-full bg-white hover:bg-ice text-text-primary hover:text-sky transition duration-300 text-xs font-bold shadow-sky-soft"
+              className="flex items-center gap-1.5 px-3 py-2 border border-white/15 rounded-full bg-white/[0.07] hover:bg-white/15 text-white hover:text-sky transition duration-300 text-xs font-bold"
               title="Pilih Lokasi & Bahasa"
             >
               <span>{selectedLocation === "id" ? <IndonesiaFlag /> : <USFlag />}</span>
@@ -400,8 +400,8 @@ export function Header({ user }: HeaderProps) {
                     className={cn(
                       "border px-4 py-2 text-xs font-black uppercase tracking-wider rounded-full transition-all duration-300",
                       isActive(link.href)
-                        ? "border-sky-border bg-white text-sky shadow-sky-soft"
-                        : "border-transparent text-text-secondary hover:text-sky hover:bg-ice"
+                        ? "border-white/15 bg-white/10 text-sky"
+                        : "border-transparent text-white/70 hover:text-sky hover:bg-white/10"
                     )}
                   >
                     {link.label}
@@ -415,20 +415,20 @@ export function Header({ user }: HeaderProps) {
               {currentUser ? (
                 <>
                   <HeaderNotificationBell />
-                  <Link href="/dashboard" className="flex items-center gap-1.5 border border-sky-border bg-white text-text-primary hover:text-sky px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-300 shadow-sky-soft hover:shadow-sky-medium">
+                  <Link href="/dashboard" className="flex items-center gap-1.5 border border-white/15 bg-white/[0.07] text-white hover:text-sky hover:bg-white/15 px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-300">
                     <User className="h-3.5 w-3.5 text-sky" />
                     {currentUser.name}
                   </Link>
                   <button
                     onClick={() => setShowLogoutConfirm(true)}
-                    className="p-2 border border-sky-border hover:border-red-400/30 rounded-full bg-white hover:bg-red-50 text-text-muted hover:text-red-500 transition duration-300 flex items-center justify-center h-[34px] w-[34px]"
+                    className="p-2 border border-white/15 hover:border-red-400/40 rounded-full bg-white/[0.07] hover:bg-red-500/10 text-white/60 hover:text-red-400 transition duration-300 flex items-center justify-center h-[34px] w-[34px]"
                     title="Keluar"
                   >
                     <LogOut className="h-4 w-4" />
                   </button>
                 </>
               ) : (
-                <Link href="/auth/login" className="flex items-center gap-1.5 border border-sky-border bg-white text-sky hover:bg-sky hover:text-white px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-300 shadow-sky-soft hover:shadow-sky-medium shimmer-hover">
+                <Link href="/auth/login" className="flex items-center gap-1.5 border border-transparent bg-sky text-white hover:bg-diamond px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-300 shadow-sky-glow shimmer-hover">
                   <UserRoundPlus className="h-3.5 w-3.5" />
                   {t.masuk}
                 </Link>
@@ -438,7 +438,7 @@ export function Header({ user }: HeaderProps) {
             {/* Mobile Hamburger menu trigger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl border border-sky-border hover:border-sky/30 text-text-secondary hover:text-sky transition-all bg-white"
+              className="lg:hidden p-2 rounded-xl border border-white/15 hover:border-sky/40 text-white/70 hover:text-sky transition-all bg-white/[0.07]"
               aria-label="Menu"
             >
               <Menu className="h-5 w-5" />
@@ -1026,7 +1026,7 @@ function HeaderNotificationBell() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 border border-sky-border hover:border-sky/30 rounded-full bg-white hover:bg-ice text-text-muted hover:text-sky transition duration-300 flex items-center justify-center h-[34px] w-[34px]"
+        className="relative p-2 border border-white/15 hover:border-sky/40 rounded-full bg-white/[0.07] hover:bg-white/15 text-white/60 hover:text-sky transition duration-300 flex items-center justify-center h-[34px] w-[34px]"
         title="Notifikasi"
       >
         <Bell className="h-4.5 w-4.5" />

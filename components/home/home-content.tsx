@@ -504,24 +504,25 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                 <button
                   key={idx}
                   onClick={() => router.push(`/games/${item.slug}`)}
-                  className="poster-card relative overflow-hidden text-left h-72 group transition duration-300 hover:-translate-y-1 shadow-md rounded-[20px]"
+                  className="poster-card relative overflow-hidden text-left aspect-[3/4] group transition duration-300 hover:-translate-y-1 shadow-md rounded-[20px]"
                   style={{
                     backgroundImage: `url('${item.bg}')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}
                 >
-                  {/* Transparent black overlay that fades out on hover */}
-                  <div className="absolute inset-0 bg-black/50 group-hover:opacity-0 transition-opacity duration-300 z-0" />
+                  {/* Overlay hitam dinonaktifkan sementara — dulu untuk latar teks overlay */}
+                  {/* <div className="absolute inset-0 bg-black/50 group-hover:opacity-0 transition-opacity duration-300 z-0" /> */}
 
                   {/* Subtle highlight */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-sky/15 via-transparent to-transparent pointer-events-none z-0" />
 
-                  <span className="poster-content z-10 p-5">
+                  {/* Teks overlay dinonaktifkan sementara — judul sudah ada di dalam foto aset */}
+                  {/* <span className="poster-content z-10 p-5">
                     <span className="poster-eyebrow text-[9px] font-black uppercase text-sky tracking-widest">{item.eyebrow}</span>
                     <span className="poster-title font-black uppercase italic tracking-tight text-white mt-1 group-hover:text-sky transition-colors">{item.title}</span>
                     <span className="poster-publisher text-xs font-bold text-white/80 uppercase tracking-wider mt-1">{item.publisher}</span>
-                  </span>
+                  </span> */}
                 </button>
               ))}
           </div>
@@ -644,12 +645,12 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
           </h3>
 
           {loading ? (
-            <div className="text-center py-10 text-xs font-bold text-text-muted uppercase">
+            <div className="text-center py-10 text-xs font-bold text-white/60 uppercase">
               Memuat Ulasan...
             </div>
           ) : reviews.length === 0 ? (
-            <div className="bg-white/50 p-8 text-center rounded-[20px] border border-sky-border shadow-sky-soft">
-              <p className="text-xs font-bold text-text-muted uppercase tracking-wider">
+            <div className="bg-white/[0.06] p-8 text-center rounded-[20px] border border-white/10">
+              <p className="text-xs font-bold text-white/70 uppercase tracking-wider">
                 Belum ada ulasan terverifikasi. Jadilah yang pertama memberikan kritik & saran!
               </p>
             </div>

@@ -173,7 +173,7 @@ export default function RootLayout({
       </head>
       <body className={`${montserrat.variable} ${poppins.variable} min-h-screen antialiased font-body`}>
         <PWARegister />
-        <div className="relative min-h-screen flex flex-col bg-[#28657E]">
+        <div className="relative min-h-screen flex flex-col bg-[#181818]">
           {/* Custom Grid Background Pattern (CSS-Only) */}
           <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden flex items-center justify-center">
             <div 
