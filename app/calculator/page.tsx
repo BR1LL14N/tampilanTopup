@@ -212,7 +212,7 @@ export default function CalculatorPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip text-text-primary">
+    <div className="min-h-screen flex flex-col relative overflow-x-clip text-white">
 
       {/* Background decorative elements */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky/5 rounded-full blur-3xl pointer-events-none" />
@@ -239,29 +239,29 @@ export default function CalculatorPage() {
 
         {isLoading ? (
           <div className="grid md:grid-cols-12 gap-8 items-start">
-            <div className="md:col-span-5 bg-white/60 p-6 md:p-8 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
-              <Skeleton className="h-6 w-40 rounded-lg bg-sky/10" />
+            <div className="md:col-span-5 bg-[#183644]/90 backdrop-blur-md/60 p-6 md:p-8 rounded-2xl border border-sky/30 shadow-sky-soft space-y-6">
+              <Skeleton className="h-6 w-40 rounded-lg bg-sky/20 border border-sky/30" />
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Skeleton className="h-4 w-28 rounded bg-sky/10" />
-                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                  <Skeleton className="h-4 w-28 rounded bg-sky/20 border border-sky/30" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/20 border border-sky/30" />
                 </div>
                 <div className="space-y-2">
-                  <Skeleton className="h-4 w-36 rounded bg-sky/10" />
-                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                  <Skeleton className="h-4 w-36 rounded bg-sky/20 border border-sky/30" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/20 border border-sky/30" />
                 </div>
                 <div className="space-y-2">
-                  <Skeleton className="h-4 w-28 rounded bg-sky/10" />
-                  <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+                  <Skeleton className="h-4 w-28 rounded bg-sky/20 border border-sky/30" />
+                  <Skeleton className="h-10 w-full rounded-xl bg-sky/20 border border-sky/30" />
                 </div>
               </div>
-              <Skeleton className="h-10 w-full rounded-xl bg-sky/10" />
+              <Skeleton className="h-10 w-full rounded-xl bg-sky/20 border border-sky/30" />
             </div>
-            <div className="md:col-span-7 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
-              <Skeleton className="h-6 w-32 rounded-lg bg-sky/10" />
+            <div className="md:col-span-7 bg-[#183644]/90 backdrop-blur-md p-6 rounded-2xl border border-sky/30 shadow-sky-soft space-y-6">
+              <Skeleton className="h-6 w-32 rounded-lg bg-sky/20 border border-sky/30" />
               <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                <Skeleton className="h-12 w-12 rounded-xl bg-sky/10" />
-                <Skeleton className="h-4 w-48 rounded bg-sky/10" />
+                <Skeleton className="h-12 w-12 rounded-xl bg-sky/20 border border-sky/30" />
+                <Skeleton className="h-4 w-48 rounded bg-sky/20 border border-sky/30" />
               </div>
             </div>
           </div>
@@ -269,8 +269,8 @@ export default function CalculatorPage() {
           <div className="grid md:grid-cols-12 gap-8 items-start">
 
             {/* Left Column: Form Input */}
-            <div className="md:col-span-5 glass-sky p-6 md:p-8 rounded-2xl border-sky-border shadow-sky-soft relative overflow-hidden">
-              <h2 className="text-lg font-black uppercase tracking-wide text-text-primary mb-6 border-b border-sky-border/50 pb-2 flex items-center gap-2">
+            <div className="md:col-span-5 glass-sky p-6 md:p-8 rounded-2xl border-sky/30 shadow-sky-soft relative overflow-hidden">
+              <h2 className="text-lg font-black uppercase tracking-wide text-white mb-6 border-b border-sky/30/50 pb-2 flex items-center gap-2">
                 <Flame className="h-4 w-4 text-sky animate-pulse" />
                 Parameter Optimasi
               </h2>
@@ -279,16 +279,16 @@ export default function CalculatorPage() {
 
                 {/* Select Game */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
+                  <label className="text-xs font-bold uppercase tracking-wider text-white/80 block">
                     Pilih Game Favorit
                   </label>
                   <select
                     value={selectedGameId}
                     onChange={(e) => setSelectedGameId(e.target.value)}
-                    className="w-full bg-white border border-sky-border rounded-xl px-4 py-3 outline-none text-sm text-text-primary hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
+                    className="w-full bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-xl px-4 py-3 outline-none text-sm text-white hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
                   >
                     {games.map((g) => (
-                      <option key={g.id} value={g.id} className="bg-white text-text-primary">
+                      <option key={g.id} value={g.id} className="bg-[#183644]/90 backdrop-blur-md text-white">
                         {g.name}
                       </option>
                     ))}
@@ -297,7 +297,7 @@ export default function CalculatorPage() {
 
                 {/* Target Currency Input */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
+                  <label className="text-xs font-bold uppercase tracking-wider text-white/80 block">
                     Target Jumlah {gameCurrencyName}
                   </label>
                   <input
@@ -306,28 +306,28 @@ export default function CalculatorPage() {
                     max="15000"
                     value={targetQty}
                     onChange={(e) => setTargetQty(parseInt(e.target.value) || 0)}
-                    className="w-full bg-white border border-sky-border rounded-xl px-4 py-3 outline-none text-sm text-text-primary font-mono hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
+                    className="w-full bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-xl px-4 py-3 outline-none text-sm text-white font-mono hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
                     required
                   />
-                  <span className="text-[10px] text-text-muted block">
+                  <span className="text-[10px] text-white/60 block">
                     Masukkan nominal yang Anda butuhkan (contoh: 250 atau 1000).
                   </span>
                 </div>
 
                 {/* Payment Method */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
+                  <label className="text-xs font-bold uppercase tracking-wider text-white/80 block">
                     Metode Pembayaran
                   </label>
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full bg-white border border-sky-border rounded-xl px-4 py-3 outline-none text-sm text-text-primary hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
+                    className="w-full bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-xl px-4 py-3 outline-none text-sm text-white hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all"
                   >
-                    <option value="qris" className="bg-white text-text-primary">QRIS (Potongan 2%)</option>
-                    <option value="gopay" className="bg-white text-text-primary">GoPay (Biaya Rp 500)</option>
-                    <option value="shopeepay" className="bg-white text-text-primary">ShopeePay (Biaya Rp 500)</option>
-                    <option value="bca" className="bg-white text-text-primary">BCA Virtual Account (Biaya Rp 1.000)</option>
+                    <option value="qris" className="bg-[#183644]/90 backdrop-blur-md text-white">QRIS (Potongan 2%)</option>
+                    <option value="gopay" className="bg-[#183644]/90 backdrop-blur-md text-white">GoPay (Biaya Rp 500)</option>
+                    <option value="shopeepay" className="bg-[#183644]/90 backdrop-blur-md text-white">ShopeePay (Biaya Rp 500)</option>
+                    <option value="bca" className="bg-[#183644]/90 backdrop-blur-md text-white">BCA Virtual Account (Biaya Rp 1.000)</option>
                   </select>
                 </div>
 
@@ -352,20 +352,20 @@ export default function CalculatorPage() {
                     {optimizationResult.error}
                   </div>
                 ) : (
-                  <div className="glass-sky p-6 md:p-8 rounded-2xl border-sky-border shadow-sky-glow relative overflow-hidden animate-fadeIn bg-white/80">
+                  <div className="glass-sky p-6 md:p-8 rounded-2xl border-sky/30 shadow-sky-glow relative overflow-hidden animate-fadeIn bg-[#183644]/90 backdrop-blur-md/80">
 
                     {/* Header Summary */}
-                    <div className="flex justify-between items-start border-b border-sky-border pb-4 mb-6">
+                    <div className="flex justify-between items-start border-b border-sky/30 pb-4 mb-6">
                       <div>
-                        <span className="text-[10px] font-black uppercase tracking-wider text-sky bg-sky/10 px-2.5 py-1 rounded-full border border-sky/20">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-sky bg-sky/20 border border-sky/30 px-2.5 py-1 rounded-full border border-sky/20">
                           Optimasi Berhasil
                         </span>
-                        <h3 className="text-xl font-extrabold uppercase mt-2 text-text-primary">
+                        <h3 className="text-xl font-extrabold uppercase mt-2 text-white">
                           Rekomendasi Paket
                         </h3>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] text-text-secondary font-bold uppercase block">Estimasi Biaya</span>
+                        <span className="text-[10px] text-white/80 font-bold uppercase block">Estimasi Biaya</span>
                         <span className="text-2xl font-black text-sky">
                           Rp {optimizationResult.finalPrice.toLocaleString("id-ID")}
                         </span>
@@ -374,12 +374,12 @@ export default function CalculatorPage() {
 
                     {/* Combinations List */}
                     <div className="space-y-3 mb-6">
-                      <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Item yang Harus Dibeli:</p>
+                      <p className="text-xs font-bold text-white/80 uppercase tracking-wider mb-2">Item yang Harus Dibeli:</p>
 
                       {optimizationResult.items.map((item: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center bg-ice p-4 rounded-xl border border-sky-border/50 hover:border-sky/20 transition-all duration-300 group">
+                        <div key={idx} className="flex justify-between items-center bg-ice p-4 rounded-xl border border-sky/30/50 hover:border-sky/20 transition-all duration-300 group">
                           <div className="flex items-center gap-3">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5 border border-sky-border/30">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#183644]/90 backdrop-blur-md p-1.5 border border-sky/30/30">
                               <img
                                 src={getItemAssetForProduct(item.name, item.sku, item.gameName)}
                                 alt=""
@@ -387,19 +387,19 @@ export default function CalculatorPage() {
                               />
                             </span>
                             <div>
-                              <span className="text-[10px] font-bold text-sky bg-sky/10 px-2 py-0.5 rounded">
+                              <span className="text-[10px] font-bold text-sky bg-sky/20 border border-sky/30 px-2 py-0.5 rounded">
                                 {item.qty} Qty per Item
                               </span>
-                              <p className="font-extrabold text-text-primary mt-1 group-hover:text-sky transition-colors">
+                              <p className="font-extrabold text-white mt-1 group-hover:text-sky transition-colors">
                                 {item.name}
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <span className="font-mono text-sky font-bold text-sm bg-sky/10 px-2.5 py-1 rounded mr-3">
+                            <span className="font-mono text-sky font-bold text-sm bg-sky/20 border border-sky/30 px-2.5 py-1 rounded mr-3">
                               x{item.count} Paket
                             </span>
-                            <span className="font-extrabold text-text-primary text-sm">
+                            <span className="font-extrabold text-white text-sm">
                               Rp {(item.price * item.count).toLocaleString("id-ID")}
                             </span>
                           </div>
@@ -408,13 +408,13 @@ export default function CalculatorPage() {
                     </div>
 
                     {/* Optimization Specs */}
-                    <div className="grid grid-cols-2 gap-4 bg-ice p-5 rounded-xl border border-sky-border/50 mb-6 text-xs">
+                    <div className="grid grid-cols-2 gap-4 bg-ice p-5 rounded-xl border border-sky/30/50 mb-6 text-xs">
                       <div>
-                        <span className="text-text-secondary block font-medium mb-0.5">Mata Uang Target</span>
-                        <span className="text-text-primary font-bold">{targetQty} {gameCurrencyName}</span>
+                        <span className="text-white/80 block font-medium mb-0.5">Mata Uang Target</span>
+                        <span className="text-white font-bold">{targetQty} {gameCurrencyName}</span>
                       </div>
                       <div>
-                        <span className="text-text-secondary block font-medium mb-0.5">Dihasilkan Paket</span>
+                        <span className="text-white/80 block font-medium mb-0.5">Dihasilkan Paket</span>
                         <span className="text-emerald-500 font-bold flex items-center gap-1">
                           {optimizationResult.totalQty} {gameCurrencyName}
                           {optimizationResult.totalQty > targetQty && (
@@ -424,12 +424,12 @@ export default function CalculatorPage() {
                           )}
                         </span>
                       </div>
-                      <div className="border-t border-sky-border/50 pt-2 mt-2">
-                        <span className="text-text-secondary block font-medium mb-0.5">Subtotal Belanja</span>
-                        <span className="text-text-primary font-bold">Rp {optimizationResult.totalPrice.toLocaleString("id-ID")}</span>
+                      <div className="border-t border-sky/30/50 pt-2 mt-2">
+                        <span className="text-white/80 block font-medium mb-0.5">Subtotal Belanja</span>
+                        <span className="text-white font-bold">Rp {optimizationResult.totalPrice.toLocaleString("id-ID")}</span>
                       </div>
-                      <div className="border-t border-sky-border/50 pt-2 mt-2">
-                        <span className="text-text-secondary block font-medium mb-0.5">Potongan Promo QRIS</span>
+                      <div className="border-t border-sky/30/50 pt-2 mt-2">
+                        <span className="text-white/80 block font-medium mb-0.5">Potongan Promo QRIS</span>
                         <span className="text-emerald-500 font-bold">
                           {optimizationResult.discount > 0 ? `-Rp ${optimizationResult.discount.toLocaleString("id-ID")}` : "Rp 0"}
                         </span>
@@ -443,8 +443,8 @@ export default function CalculatorPage() {
                           <Award className="h-4.5 w-4.5" />
                         </span>
                         <div>
-                          <p className="font-extrabold text-sm text-text-primary">Loyalty Reward Points</p>
-                          <p className="text-[10px] text-text-secondary font-semibold">Bisa ditukarkan dengan diskon topup berikutnya</p>
+                          <p className="font-extrabold text-sm text-white">Loyalty Reward Points</p>
+                          <p className="text-[10px] text-white/80 font-semibold">Bisa ditukarkan dengan diskon topup berikutnya</p>
                         </div>
                       </div>
                       <span className="text-lg font-black text-sky font-mono">
@@ -468,10 +468,10 @@ export default function CalculatorPage() {
                   </div>
                 )
               ) : (
-                <div className="glass-sky p-8 rounded-2xl border-sky-border text-center flex flex-col items-center justify-center min-h-[350px] bg-white/80">
-                  <Calculator className="h-12 w-12 text-text-muted mb-4 animate-pulse" />
-                  <h3 className="text-base font-extrabold uppercase text-text-primary mb-2">Optimalisasi Belanja</h3>
-                  <p className="text-xs text-text-secondary max-w-sm">
+                <div className="glass-sky p-8 rounded-2xl border-sky/30 text-center flex flex-col items-center justify-center min-h-[350px] bg-[#183644]/90 backdrop-blur-md/80">
+                  <Calculator className="h-12 w-12 text-white/60 mb-4 animate-pulse" />
+                  <h3 className="text-base font-extrabold uppercase text-white mb-2">Optimalisasi Belanja</h3>
+                  <p className="text-xs text-white/80 max-w-sm">
                     Isi target nominal mata uang game yang Anda butuhkan di sebelah kiri, kemudian klik tombol kalkulasi untuk melihat kombinasi paket harga paling hemat.
                   </p>
                 </div>

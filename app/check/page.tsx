@@ -62,7 +62,7 @@ export default function CheckTransactionPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip text-text-primary">
+    <div className="min-h-screen flex flex-col relative overflow-x-clip text-white">
 
       <Header />
 
@@ -81,18 +81,18 @@ export default function CheckTransactionPage() {
           </div>
 
           {/* Glass Card Container */}
-          <div className="w-full glass-sky rounded-2xl shadow-sky-glow border-sky-border backdrop-blur-md p-6 md:p-8 relative bg-white/80">
+          <div className="w-full glass-sky rounded-2xl shadow-sky-glow border-sky/30 backdrop-blur-md p-6 md:p-8 relative bg-[#183644]/90 backdrop-blur-md/80">
             {/* Corner ambient glows */}
-            <div className="absolute top-0 left-0 w-20 h-20 bg-sky/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute top-0 left-0 w-20 h-20 bg-sky/20 border border-sky/30 rounded-full blur-2xl pointer-events-none" />
             <div className="absolute bottom-0 right-0 w-20 h-20 bg-diamond/10 rounded-full blur-2xl pointer-events-none" />
 
             <form onSubmit={handleCheck} className="space-y-6">
               <div className="space-y-2">
-                <label htmlFor="invoice" className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
+                <label htmlFor="invoice" className="text-xs font-bold uppercase tracking-wider text-white/80 block">
                   Nomor Invoice <span className="text-sky">*</span>
                 </label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-4 text-text-muted">
+                  <span className="absolute left-4 text-white/60">
                     <Search className="h-4 w-4" />
                   </span>
                   <input
@@ -101,7 +101,7 @@ export default function CheckTransactionPage() {
                     placeholder="Contoh: INV-20260525-0001"
                     value={invoice}
                     onChange={(e) => setInvoice(e.target.value)}
-                    className="w-full bg-white border border-sky-border pl-11 pr-4 py-3 text-text-primary placeholder-text-muted outline-none text-sm transition-all duration-300 rounded-xl hover:border-sky/40 focus:border-sky focus:ring-2 focus:ring-sky/20"
+                    className="w-full bg-black/30 border border-white/15 pl-11 pr-4 py-3 text-white placeholder:text-white/40 outline-none text-sm transition-all duration-300 rounded-xl hover:border-sky/50 focus:border-sky focus:ring-2 focus:ring-sky/20 font-bold"
                     required
                   />
                 </div>
@@ -134,9 +134,9 @@ export default function CheckTransactionPage() {
 
             {/* Transaction Result Panel */}
             {result && (
-              <div className="mt-8 border border-sky-border rounded-xl bg-ice overflow-hidden relative">
+              <div className="mt-8 border border-sky/30 rounded-xl bg-ice overflow-hidden relative">
                 {/* Visual Status Header bar */}
-                <div className={`p-4 flex items-center justify-between border-b border-sky-border ${
+                <div className={`p-4 flex items-center justify-between border-b border-sky/30 ${
                   result.status === 'success' ? 'bg-emerald-50' :
                   result.status === 'processing' ? 'bg-amber-50' :
                   result.status === 'pending' ? 'bg-blue-50' :
@@ -150,7 +150,7 @@ export default function CheckTransactionPage() {
                     ) : (
                       <AlertTriangle className="h-5 w-5 text-red-500" />
                     )}
-                    <span className="text-xs font-bold uppercase tracking-wider text-text-primary">
+                    <span className="text-xs font-bold uppercase tracking-wider text-white">
                       Status Topup
                     </span>
                   </div>
@@ -167,28 +167,28 @@ export default function CheckTransactionPage() {
                 </div>
 
                 <div className="p-5 space-y-4 text-xs">
-                  <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                    <span className="text-text-secondary font-medium">Nomor Invoice</span>
+                  <div className="flex justify-between items-center border-b border-sky/30/50 pb-2">
+                    <span className="text-white/80 font-medium">Nomor Invoice</span>
                     <span className="font-mono text-sky font-bold">{result.invoice}</span>
                   </div>
-                  <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                    <span className="text-text-secondary font-medium">Game</span>
-                    <span className="font-bold text-text-primary uppercase">{result.game}</span>
+                  <div className="flex justify-between items-center border-b border-sky/30/50 pb-2">
+                    <span className="text-white/80 font-medium">Game</span>
+                    <span className="font-bold text-white uppercase">{result.game}</span>
                   </div>
-                  <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                    <span className="text-text-secondary font-medium">Item Produk</span>
-                    <span className="font-bold text-text-primary">{result.product}</span>
+                  <div className="flex justify-between items-center border-b border-sky/30/50 pb-2">
+                    <span className="text-white/80 font-medium">Item Produk</span>
+                    <span className="font-bold text-white">{result.product}</span>
                   </div>
-                  <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                    <span className="text-text-secondary font-medium">User ID Tujuan</span>
-                    <span className="font-mono bg-white px-2.5 py-1 rounded text-text-primary font-semibold border border-sky-border/30">{result.target_id}</span>
+                  <div className="flex justify-between items-center border-b border-sky/30/50 pb-2">
+                    <span className="text-white/80 font-medium">User ID Tujuan</span>
+                    <span className="font-mono bg-[#183644]/90 backdrop-blur-md px-2.5 py-1 rounded text-white font-semibold border border-sky/30/30">{result.target_id}</span>
                   </div>
-                  <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                    <span className="text-text-secondary font-medium">Metode Pembayaran</span>
-                    <span className="font-bold text-text-primary uppercase">{result.payment_method || "-"}</span>
+                  <div className="flex justify-between items-center border-b border-sky/30/50 pb-2">
+                    <span className="text-white/80 font-medium">Metode Pembayaran</span>
+                    <span className="font-bold text-white uppercase">{result.payment_method || "-"}</span>
                   </div>
-                  <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                    <span className="text-text-secondary font-medium">Status Pembayaran</span>
+                  <div className="flex justify-between items-center border-b border-sky/30/50 pb-2">
+                    <span className="text-white/80 font-medium">Status Pembayaran</span>
                     <span className={`font-semibold capitalize ${
                       result.payment_status === 'paid' ? 'text-emerald-500' :
                       result.payment_status === 'failed' ? 'text-red-500' :
@@ -196,7 +196,7 @@ export default function CheckTransactionPage() {
                     }`}>{result.payment_status || "Pending"}</span>
                   </div>
                   <div className="flex justify-between items-center pt-1">
-                    <span className="text-text-secondary font-medium">Total Pembayaran</span>
+                    <span className="text-white/80 font-medium">Total Pembayaran</span>
                     <span className="text-lg font-black text-sky">Rp {result.amount.toLocaleString("id-ID")}</span>
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export default function CheckTransactionPage() {
             )}
 
             <div className="mt-8 flex justify-center">
-              <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-text-secondary hover:text-sky transition duration-300 uppercase tracking-widest hover:translate-x-[-2px]">
+              <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-white/80 hover:text-sky transition duration-300 uppercase tracking-widest hover:translate-x-[-2px]">
                 <ArrowLeft className="h-4 w-4 text-sky" />
                 Kembali ke Beranda
               </Link>

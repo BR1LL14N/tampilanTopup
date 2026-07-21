@@ -180,11 +180,11 @@ export default function LeaderboardPage() {
   const getLevelBadgeClass = (level: string) => {
     switch (level) {
       case "Platinum":
-        return "text-sky bg-sky/10 border-sky/20"
+        return "text-sky bg-sky/20 border border-sky/30 border-sky/20"
       case "Gold":
         return "text-amber-500 bg-amber-50 border-amber-500/20"
       case "Silver":
-        return "text-text-secondary bg-ice border-sky-border/30"
+        return "text-white/80 bg-ice border-sky/30/30"
       case "Bronze":
       default:
         return "text-amber-600 bg-amber-50 border-amber-600/20"
@@ -194,7 +194,7 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-clip">
       {/* Background decorative elements */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky/20 border border-sky/30 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/3 -right-40 w-96 h-96 bg-sky/5 rounded-full blur-3xl pointer-events-none" />
 
       <Header user={currentUser} />
@@ -206,7 +206,7 @@ export default function LeaderboardPage() {
           {/* Header Title Section */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
-              <Link href="/" className="p-2 rounded-lg bg-ice border border-sky-border text-text-secondary hover:text-sky hover:border-sky transition-all duration-200 hover:scale-105 active:scale-95">
+              <Link href="/" className="p-2 rounded-lg bg-ice border border-sky/30 text-white/80 hover:text-sky hover:border-sky transition-all duration-200 hover:scale-105 active:scale-95">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
               <div>
@@ -216,10 +216,10 @@ export default function LeaderboardPage() {
             </div>
 
             {/* Realtime Countdown clock */}
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white border border-sky-border backdrop-blur shadow-sky-soft">
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[#183644]/90 backdrop-blur-md border border-sky/30 backdrop-blur shadow-sky-soft">
               <Clock className="h-4 w-4 text-sky animate-pulse" />
-              <span className="text-xs text-text-secondary font-semibold">Diperbarui dalam</span>
-              <div className="flex items-center gap-1 font-mono text-sm font-bold text-text-primary">
+              <span className="text-xs text-white/80 font-semibold">Diperbarui dalam</span>
+              <div className="flex items-center gap-1 font-mono text-sm font-bold text-white">
                 <span className="bg-ice px-1.5 py-0.5 rounded">{formatTime(timeLeft.hours)}</span>
                 <span className="text-sky">:</span>
                 <span className="bg-ice px-1.5 py-0.5 rounded">{formatTime(timeLeft.minutes)}</span>
@@ -231,7 +231,7 @@ export default function LeaderboardPage() {
 
           {/* Alert notification if "Show Me" clicked */}
           {showNotification && (
-            <div className="mb-6 p-4 rounded-xl border border-sky/20 bg-sky/10 text-text-primary flex items-center justify-between animate-fadeIn">
+            <div className="mb-6 p-4 rounded-xl border border-sky/20 bg-sky/20 border border-sky/30 text-white flex items-center justify-between animate-fadeIn">
               <div className="flex items-center gap-2">
                 <Award className="h-5 w-5 text-sky" />
                 <span>
@@ -249,13 +249,13 @@ export default function LeaderboardPage() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
 
             {/* Sorting Tabs: Total Belanja / Transaksi / Poin Loyalty */}
-            <div className="flex bg-white border border-sky-border p-1 rounded-xl w-fit shadow-sky-soft">
+            <div className="flex bg-[#183644]/90 backdrop-blur-md border border-sky/30 p-1 rounded-xl w-fit shadow-sky-soft">
               <button
                 onClick={() => setSortBy("spent")}
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   sortBy === "spent"
                     ? "bg-sky text-white shadow-lg shadow-sky/20 scale-[1.02]"
-                    : "text-text-secondary hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
+                    : "text-white/80 hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
                 }`}
               >
                 Total Belanja
@@ -265,7 +265,7 @@ export default function LeaderboardPage() {
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   sortBy === "transactions"
                     ? "bg-sky text-white shadow-lg shadow-sky/20 scale-[1.02]"
-                    : "text-text-secondary hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
+                    : "text-white/80 hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
                 }`}
               >
                 Transaksi
@@ -275,7 +275,7 @@ export default function LeaderboardPage() {
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   sortBy === "points"
                     ? "bg-sky text-white shadow-lg shadow-sky/20 scale-[1.02]"
-                    : "text-text-secondary hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
+                    : "text-white/80 hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
                 }`}
               >
                 Poin Loyalty
@@ -284,15 +284,15 @@ export default function LeaderboardPage() {
 
             {/* Right filters: Time Periods & "Show me" Button */}
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex bg-white border border-sky-border p-1 rounded-xl shadow-sky-soft">
+              <div className="flex bg-[#183644]/90 backdrop-blur-md border border-sky/30 p-1 rounded-xl shadow-sky-soft">
                 {(["24h", "7d", "30d", "seasonal"] as const).map((period) => (
                   <button
                     key={period}
                     onClick={() => setTimeFilter(period)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
                       timeFilter === period
-                        ? "bg-sky/10 text-sky border border-sky/20"
-                        : "text-text-secondary hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
+                        ? "bg-sky/20 border border-sky/30 text-sky border border-sky/20"
+                        : "text-white/80 hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
                     }`}
                   >
                     {period === "24h" ? "Hari Ini" : period === "7d" ? "7 H" : period === "30d" ? "30 H" : "Seasonal"}
@@ -316,9 +316,9 @@ export default function LeaderboardPage() {
             {/* Podium Rank 2 (Silver) */}
             {secondPlace && (
               <div className="order-1 transition-all duration-300 hover:-translate-y-2">
-                <Card className="glass-sky shimmer-hover relative overflow-hidden border-sky-border bg-white hover:border-sky hover:shadow-lg hover:shadow-sky/10 transition-all duration-300 rounded-[20px]">
+                <Card className="glass-sky shimmer-hover relative overflow-hidden border-sky/30 bg-[#183644]/90 backdrop-blur-md hover:border-sky hover:shadow-lg hover:shadow-sky/10 transition-all duration-300 rounded-[20px]">
                   {/* Decorative corner tag */}
-                  <div className="absolute top-2 right-2 md:top-3 md:right-3 flex h-5 w-5 md:h-8 md:w-8 text-[10px] md:text-sm items-center justify-center rounded-full bg-ice border border-sky-border text-text-secondary font-bold">
+                  <div className="absolute top-2 right-2 md:top-3 md:right-3 flex h-5 w-5 md:h-8 md:w-8 text-[10px] md:text-sm items-center justify-center rounded-full bg-ice border border-sky/30 text-white/80 font-bold">
                     2
                   </div>
                   <CardContent className="p-2 sm:p-4 md:p-6 text-center">
@@ -329,9 +329,9 @@ export default function LeaderboardPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-[10px] md:text-xl font-extrabold text-text-primary mb-1 flex items-center justify-center gap-1 truncate w-full">
+                    <h3 className="text-[10px] md:text-xl font-extrabold text-white mb-1 flex items-center justify-center gap-1 truncate w-full">
                       {secondPlace.nickname}
-                      <Trophy className="h-3 w-3 md:h-4 md:w-4 text-text-secondary shrink-0" />
+                      <Trophy className="h-3 w-3 md:h-4 md:w-4 text-white/80 shrink-0" />
                     </h3>
                     <span className={`hidden md:inline-block text-[10px] px-2.5 py-0.5 rounded-full border font-bold ${getLevelBadgeClass(secondPlace.level)}`}>
                       {secondPlace.level} Member
@@ -342,17 +342,17 @@ export default function LeaderboardPage() {
                       {sortBy === "spent" ? formatCurrency(secondPlace.totalSpent) : sortBy === "transactions" ? `${secondPlace.transactions} Trx` : `${secondPlace.points} Pts`}
                     </p>
 
-                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border/50">
+                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky/30/50">
                       <div>
-                        <p className="text-[10px] text-text-muted uppercase font-semibold">Total Belanja</p>
-                        <p className="text-xs font-bold text-text-secondary">{formatCurrency(secondPlace.totalSpent)}</p>
+                        <p className="text-[10px] text-white/60 uppercase font-semibold">Total Belanja</p>
+                        <p className="text-xs font-bold text-white/80">{formatCurrency(secondPlace.totalSpent)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-text-muted uppercase font-semibold">Transaksi</p>
-                        <p className="text-xs font-bold text-text-secondary">{secondPlace.transactions}</p>
+                        <p className="text-[10px] text-white/60 uppercase font-semibold">Transaksi</p>
+                        <p className="text-xs font-bold text-white/80">{secondPlace.transactions}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-text-muted uppercase font-semibold">Poin</p>
+                        <p className="text-[10px] text-white/60 uppercase font-semibold">Poin</p>
                         <p className="text-xs font-bold text-sky">{secondPlace.points}</p>
                       </div>
                     </div>
@@ -374,14 +374,14 @@ export default function LeaderboardPage() {
                   </div>
 
                   <CardContent className="p-2 sm:p-4 md:p-6 text-center">
-                    <div className="relative mx-auto mb-2 md:mb-4 w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-sky bg-sky/10 p-1 flex items-center justify-center shadow-lg shadow-sky/10">
+                    <div className="relative mx-auto mb-2 md:mb-4 w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-sky bg-sky/20 border border-sky/30 p-1 flex items-center justify-center shadow-lg shadow-sky/10">
                       <img src={firstPlace.avatar} alt={firstPlace.nickname} className="w-full h-full object-cover rounded-full" />
                       <div className="absolute -bottom-1 -right-1 flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-sky text-white shadow text-[10px] font-extrabold">
                         👑
                       </div>
                     </div>
 
-                    <h3 className="text-xs md:text-2xl font-black text-text-primary mb-1 flex items-center justify-center gap-1 md:gap-1.5 truncate w-full">
+                    <h3 className="text-xs md:text-2xl font-black text-white mb-1 flex items-center justify-center gap-1 md:gap-1.5 truncate w-full">
                       {firstPlace.nickname}
                       <Trophy className="h-4 w-4 md:h-5 md:w-5 text-sky animate-bounce shrink-0" />
                     </h3>
@@ -394,17 +394,17 @@ export default function LeaderboardPage() {
                       {sortBy === "spent" ? formatCurrency(firstPlace.totalSpent) : sortBy === "transactions" ? `${firstPlace.transactions} Trx` : `${firstPlace.points} Pts`}
                     </p>
 
-                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border">
+                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky/30">
                       <div>
-                        <p className="text-[10px] text-text-secondary uppercase font-semibold">Total Belanja</p>
-                        <p className="text-xs font-black text-text-primary">{formatCurrency(firstPlace.totalSpent)}</p>
+                        <p className="text-[10px] text-white/80 uppercase font-semibold">Total Belanja</p>
+                        <p className="text-xs font-black text-white">{formatCurrency(firstPlace.totalSpent)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-text-secondary uppercase font-semibold">Transaksi</p>
-                        <p className="text-xs font-black text-text-primary">{firstPlace.transactions}</p>
+                        <p className="text-[10px] text-white/80 uppercase font-semibold">Transaksi</p>
+                        <p className="text-xs font-black text-white">{firstPlace.transactions}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-text-secondary uppercase font-semibold">Poin</p>
+                        <p className="text-[10px] text-white/80 uppercase font-semibold">Poin</p>
                         <p className="text-xs font-black text-sky">{firstPlace.points}</p>
                       </div>
                     </div>
@@ -416,7 +416,7 @@ export default function LeaderboardPage() {
             {/* Podium Rank 3 (Bronze) */}
             {thirdPlace && (
               <div className="order-3 transition-all duration-300 hover:-translate-y-2">
-                <Card className="glass-sky shimmer-hover relative overflow-hidden border-amber-600/40 bg-white hover:border-amber-500/50 hover:shadow-lg hover:shadow-sky/10 transition-all duration-300 rounded-[20px]">
+                <Card className="glass-sky shimmer-hover relative overflow-hidden border-amber-600/40 bg-[#183644]/90 backdrop-blur-md hover:border-amber-500/50 hover:shadow-lg hover:shadow-sky/10 transition-all duration-300 rounded-[20px]">
                   {/* Decorative corner tag */}
                   <div className="absolute top-2 right-2 md:top-3 md:right-3 flex h-5 w-5 md:h-8 md:w-8 text-[10px] md:text-sm items-center justify-center rounded-full bg-amber-50 border border-amber-600/30 text-amber-600 font-bold">
                     3
@@ -429,7 +429,7 @@ export default function LeaderboardPage() {
                       </div>
                     </div>
 
-                    <h3 className="text-[10px] md:text-xl font-extrabold text-text-primary mb-1 flex items-center justify-center gap-1 truncate w-full">
+                    <h3 className="text-[10px] md:text-xl font-extrabold text-white mb-1 flex items-center justify-center gap-1 truncate w-full">
                       {thirdPlace.nickname}
                       <Trophy className="h-3 w-3 md:h-4 md:w-4 text-amber-600 shrink-0" />
                     </h3>
@@ -442,17 +442,17 @@ export default function LeaderboardPage() {
                       {sortBy === "spent" ? formatCurrency(thirdPlace.totalSpent) : sortBy === "transactions" ? `${thirdPlace.transactions} Trx` : `${thirdPlace.points} Pts`}
                     </p>
 
-                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky-border/50">
+                    <div className="hidden md:grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-sky/30/50">
                       <div>
-                        <p className="text-[10px] text-text-muted uppercase font-semibold">Total Belanja</p>
-                        <p className="text-xs font-bold text-text-secondary">{formatCurrency(thirdPlace.totalSpent)}</p>
+                        <p className="text-[10px] text-white/60 uppercase font-semibold">Total Belanja</p>
+                        <p className="text-xs font-bold text-white/80">{formatCurrency(thirdPlace.totalSpent)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-text-muted uppercase font-semibold">Transaksi</p>
-                        <p className="text-xs font-bold text-text-secondary">{thirdPlace.transactions}</p>
+                        <p className="text-[10px] text-white/60 uppercase font-semibold">Transaksi</p>
+                        <p className="text-xs font-bold text-white/80">{thirdPlace.transactions}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-text-muted uppercase font-semibold">Poin</p>
+                        <p className="text-[10px] text-white/60 uppercase font-semibold">Poin</p>
                         <p className="text-xs font-bold text-sky">{thirdPlace.points}</p>
                       </div>
                     </div>
@@ -464,28 +464,28 @@ export default function LeaderboardPage() {
 
           {/* Search Box */}
           <div className="relative max-w-md mb-6 transition-all duration-300 focus-within:scale-[1.01]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
             <Input
               placeholder="Cari nama pengguna..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white border-sky-border rounded-xl focus:border-sky focus:ring-sky/20 text-text-primary transition-all duration-200"
+              className="pl-10 bg-[#183644]/90 backdrop-blur-md border-sky/30 rounded-xl focus:border-sky focus:ring-sky/20 text-white transition-all duration-200"
             />
           </div>
 
           {/* Leaders List Table */}
-          <Card className="glass-sky overflow-hidden border-sky-border bg-white/80 rounded-[20px]">
+          <Card className="glass-sky overflow-hidden border-sky/30 bg-[#183644]/90 backdrop-blur-md/80 rounded-[20px]">
             <CardContent className="p-0">
               <Table>
-                <TableHeader className="bg-ice border-b border-sky-border">
-                  <TableRow className="hover:bg-transparent border-b border-sky-border">
-                    <TableHead className="text-text-secondary font-bold w-12 md:w-20">RANK</TableHead>
-                    <TableHead className="text-text-secondary font-bold">PENGGUNA</TableHead>
-                    <TableHead className="hidden md:table-cell text-text-secondary font-bold">LEVEL</TableHead>
-                    <TableHead className="hidden lg:table-cell text-text-secondary font-bold">TRANSAKSI</TableHead>
-                    <TableHead className="hidden lg:table-cell text-text-secondary font-bold">POIN</TableHead>
-                    <TableHead className="text-right sm:text-left text-text-secondary font-bold">TOTAL BELANJA</TableHead>
-                    <TableHead className="hidden md:table-cell text-text-secondary font-bold">RATA-RATA</TableHead>
+                <TableHeader className="bg-ice border-b border-sky/30">
+                  <TableRow className="hover:bg-transparent border-b border-sky/30">
+                    <TableHead className="text-white/80 font-bold w-12 md:w-20">RANK</TableHead>
+                    <TableHead className="text-white/80 font-bold">PENGGUNA</TableHead>
+                    <TableHead className="hidden md:table-cell text-white/80 font-bold">LEVEL</TableHead>
+                    <TableHead className="hidden lg:table-cell text-white/80 font-bold">TRANSAKSI</TableHead>
+                    <TableHead className="hidden lg:table-cell text-white/80 font-bold">POIN</TableHead>
+                    <TableHead className="text-right sm:text-left text-white/80 font-bold">TOTAL BELANJA</TableHead>
+                    <TableHead className="hidden md:table-cell text-white/80 font-bold">RATA-RATA</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -494,8 +494,8 @@ export default function LeaderboardPage() {
                       const actualRankIndex = players.findIndex(p => p.nickname === player.nickname) + 1
 
                       return (
-                        <TableRow key={player.nickname} className="border-b border-sky-border/50 hover:bg-sky/5 hover:text-sky transition-all duration-200">
-                          <TableCell className="font-mono text-sm font-bold text-text-secondary">
+                        <TableRow key={player.nickname} className="border-b border-sky/30/50 hover:bg-sky/5 hover:text-sky transition-all duration-200">
+                          <TableCell className="font-mono text-sm font-bold text-white/80">
                             #{actualRankIndex}
                           </TableCell>
                           <TableCell>
@@ -503,7 +503,7 @@ export default function LeaderboardPage() {
                               <div className="w-8 h-8 rounded-full bg-ice p-0.5 overflow-hidden transition-transform duration-300 hover:scale-110">
                                 <img src={player.avatar} alt={player.nickname} className="w-full h-full object-cover rounded-full" />
                               </div>
-                              <span className="font-semibold text-text-primary">{player.nickname}</span>
+                              <span className="font-semibold text-white">{player.nickname}</span>
                               {player.nickname === "GhostViper" && (
                                 <Star className="h-3 w-3 fill-amber-500 text-amber-500 animate-spin" style={{ animationDuration: '4s' }} />
                               )}
@@ -514,9 +514,9 @@ export default function LeaderboardPage() {
                               {player.level}
                             </span>
                           </TableCell>
-                          <TableCell className="hidden lg:table-cell font-medium text-text-secondary">{player.transactions}</TableCell>
-                          <TableCell className="hidden lg:table-cell text-text-secondary">{new Intl.NumberFormat("id-ID").format(player.points)}</TableCell>
-                          <TableCell className="font-bold text-text-secondary text-right sm:text-left whitespace-nowrap">
+                          <TableCell className="hidden lg:table-cell font-medium text-white/80">{player.transactions}</TableCell>
+                          <TableCell className="hidden lg:table-cell text-white/80">{new Intl.NumberFormat("id-ID").format(player.points)}</TableCell>
+                          <TableCell className="font-bold text-white/80 text-right sm:text-left whitespace-nowrap">
                             {formatCurrency(player.totalSpent)}
                           </TableCell>
                           <TableCell className="hidden md:table-cell text-sky font-semibold">
@@ -532,7 +532,7 @@ export default function LeaderboardPage() {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-text-muted">
+                      <TableCell colSpan={7} className="text-center py-8 text-white/60">
                         Tidak ada pengguna ditemukan dengan nama "{searchQuery}"
                       </TableCell>
                     </TableRow>
@@ -545,8 +545,8 @@ export default function LeaderboardPage() {
         </main>
 
         {/* Footer copyright matches other pages */}
-        <footer className="border-t border-sky-border bg-white py-6 mt-12 relative z-10">
-          <div className="mx-auto max-w-7xl px-4 text-center text-xs text-text-muted sm:px-6 lg:px-8">
+        <footer className="border-t border-sky/30 bg-[#183644]/90 backdrop-blur-md py-6 mt-12 relative z-10">
+          <div className="mx-auto max-w-7xl px-4 text-center text-xs text-white/60 sm:px-6 lg:px-8">
             © 2026 Mitsuru. All rights reserved.
           </div>
         </footer>

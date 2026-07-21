@@ -79,7 +79,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative mt-16 border-t border-sky/20 navbar-dark-stripes py-12 shadow-2xl text-white">
+    <footer className="relative mt-16 border-t border-sky/20 footer-stripes-teal py-14 shadow-2xl text-white">
       {/* Cloud decoration - removed or made subtle for dark theme */}
       <div className="absolute bottom-0 left-0 w-full h-16 opacity-5 pointer-events-none overflow-hidden">
         <div className="absolute bottom-0 left-1/4 w-32 h-16 bg-white rounded-full blur-xl" />

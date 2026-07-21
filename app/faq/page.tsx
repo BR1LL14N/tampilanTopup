@@ -31,30 +31,30 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
+    <div className="min-h-screen dark-stripes-teal text-white flex flex-col justify-between">
       <Header />
       
       <SidebarContentWrapper>
         <main className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 w-full flex-grow">
           
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-text-primary mb-3">
+            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white mb-3">
               Frequently Asked Questions (FAQ)
             </h1>
-            <p className="text-xs font-bold text-text-secondary uppercase tracking-widest max-w-md mx-auto leading-relaxed">
+            <p className="text-xs font-bold text-white/80 uppercase tracking-widest max-w-md mx-auto leading-relaxed">
               Temukan jawaban cepat untuk pertanyaan yang paling sering diajukan pelanggan
             </p>
           </div>
 
           <div className="space-y-6">
             {faqs.map((faq, idx) => (
-              <Card key={idx} className="rounded-[24px] border-sky-border shadow-sky-soft bg-white">
+              <Card key={idx} className="rounded-[24px] border-sky/30 shadow-sky-soft bg-[#183644]/90 backdrop-blur-md">
                 <CardContent className="p-6 space-y-3">
                   <div className="flex gap-3">
                     <HelpCircle className="h-5 w-5 text-sky shrink-0 mt-0.5" />
-                    <h3 className="font-extrabold text-sm text-text-primary leading-snug">{faq.q}</h3>
+                    <h3 className="font-extrabold text-sm text-white leading-snug">{faq.q}</h3>
                   </div>
-                  <p className="text-xs text-text-secondary pl-8 leading-relaxed">
+                  <p className="text-xs text-white/80 pl-8 leading-relaxed">
                     {faq.a}
                   </p>
                 </CardContent>

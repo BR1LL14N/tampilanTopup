@@ -95,7 +95,8 @@ const config: Config = {
       },
       boxShadow: {
         neon: "0 10px 30px rgba(15, 23, 42, .26)",
-        "neon-cyan": "0 0 20px rgba(139, 184, 194, 0.4), 0 0 40px rgba(139, 184, 194, 0.2)",
+        "neon-cyan":
+          "0 0 20px rgba(139, 184, 194, 0.4), 0 0 40px rgba(139, 184, 194, 0.2)",
         // Sky Fantasy shadows
         "sky-soft": "0 8px 20px rgba(92,184,255,.12)",
         "sky-medium": "0 12px 30px rgba(92,184,255,.18)",

@@ -162,7 +162,7 @@ export function slugFromGameName(name?: string | null) {
 export function getGameAsset(slug?: string | null) {
   if (!slug) return null;
   const resolvedSlug = slugFromGameName(slug);
-  const asset = gameAssets[resolvedSlug] || gameAssets[slug as GameAssetSlug];
+  const asset = (gameAssets as Record<string, any>)[resolvedSlug] || (gameAssets as Record<string, any>)[slug];
   if (asset) return asset;
   return {
     icon: "/assets/games/mobile-legends/icon.png",
