@@ -239,6 +239,12 @@
     linear-gradient(135deg, #24373f 0%, #17262c 100%);
 }
 
+.navbar-dark-stripes {
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.04) 0 40px, transparent 40px 80px),
+    linear-gradient(135deg, #1c3038 0%, #122127 100%);
+}
+
 /* Soft Panel */
 .soft-panel {
   @apply bg-white rounded-xl p-6 border border-card-border transition-all duration-300;

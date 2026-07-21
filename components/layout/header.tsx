@@ -324,8 +324,8 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <>
-      {/* Top Navbar - Dark Glassmorphism */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#121417]/95 backdrop-blur-xl shadow-lg shadow-black/40">
+      {/* Top Navbar - Dark Glassmorphism with Teal Stripes */}
+      <header className="sticky top-0 z-50 w-full border-b border-sky/20 navbar-dark-stripes backdrop-blur-xl shadow-lg shadow-black/40">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
 
           {/* Left: Logo */}

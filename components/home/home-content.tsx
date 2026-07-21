@@ -416,8 +416,8 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                       />
                     </div>
                     <div className="min-w-0 w-full mt-1 sm:mt-0">
-                      <p className="text-[8px] sm:text-[9px] font-bold text-white uppercase tracking-wider truncate">{gameName}</p>
-                      <h4 className="mt-0.5 font-black text-white text-[10px] sm:text-xs group-hover:text-diamond transition-colors uppercase tracking-tight truncate sm:pr-6">{name}</h4>
+                      <p className="text-[10px] sm:text-[11px] font-black text-white uppercase tracking-wider truncate">{gameName}</p>
+                      <h4 className="mt-0.5 font-black text-white text-[11px] sm:text-xs group-hover:text-diamond transition-colors uppercase tracking-tight truncate sm:pr-6">{name}</h4>
                     </div>
                   </div>
 
