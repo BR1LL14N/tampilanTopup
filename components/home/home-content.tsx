@@ -531,26 +531,26 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
         {/* Dynamic Trust and Support Panels - Sky Fantasy */}
         <div className="mt-16 grid gap-6 md:grid-cols-2">
 
-          <div className="bg-white p-6 flex items-center gap-5 h-full rounded-[20px] border border-sky-border shadow-sky-soft">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-sky text-white shadow-sky-soft font-mono font-black text-lg">
+          <div className="bg-[#183644]/90 backdrop-blur-md p-6 flex items-center gap-5 h-full rounded-[20px] border border-sky/30 shadow-2xl">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-sky text-white font-mono font-black text-lg shadow-sky-glow">
               5.0
             </span>
             <div>
               <div className="text-yellow-400 text-lg leading-none mb-1">★★★★★</div>
-              <p className="text-xs font-bold text-text-muted uppercase tracking-wide">Berdasarkan total ulasan pengguna terverifikasi</p>
+              <p className="text-xs font-bold text-white/70 uppercase tracking-wide">Berdasarkan total ulasan pengguna terverifikasi</p>
             </div>
           </div>
 
           <div
             onClick={() => router.push("https://wa.me/6281234567890")}
-            className="bg-white flex items-center gap-5 p-6 cursor-pointer group h-full rounded-[20px] border border-sky-border hover:border-sky/40 shadow-sky-soft hover:shadow-sky-medium transition-all duration-300"
+            className="bg-[#183644]/90 backdrop-blur-md flex items-center gap-5 p-6 cursor-pointer group h-full rounded-[20px] border border-sky/30 hover:border-sky/60 shadow-2xl transition-all duration-300"
           >
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-sky/10 text-sky group-hover:bg-sky group-hover:text-white transition-all duration-300">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-sky/20 text-sky group-hover:bg-sky group-hover:text-white transition-all duration-300 border border-sky/30">
               <Headphones className="h-6 w-6" />
             </span>
             <div>
-              <p className="font-black text-text-primary uppercase group-hover:text-sky transition-colors">Butuh Bantuan?</p>
-              <p className="text-xs font-bold text-text-muted uppercase tracking-wide">Hubungi layanan Customer Service 24/7 kami.</p>
+              <p className="font-black text-white uppercase group-hover:text-sky transition-colors tracking-wide">Butuh Bantuan?</p>
+              <p className="text-xs font-bold text-white/70 uppercase tracking-wide">Hubungi layanan Customer Service 24/7 kami.</p>
             </div>
           </div>
 
