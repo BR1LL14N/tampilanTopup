@@ -66,18 +66,32 @@ export default function AdminTransactionsPage() {
   const [isDirectTopupOpen, setIsDirectTopupOpen] = useState(false)
   const [productsList, setProductsList] = useState<any[]>([])
   const [loadingProducts, setLoadingProducts] = useState(false)
+  const [productSearch, setProductSearch] = useState("")
   const [directForm, setDirectForm] = useState({
     product_id: "",
     target_id: "",
-    login_method: "",
-    password: "",
+    server_id: "",
     request_notes: "",
     process_digiflazz: true,
   })
   const [submittingDirect, setSubmittingDirect] = useState(false)
 
+  const selectedProductObj = productsList.find(p => p.id === directForm.product_id)
+  const selectedGameSlug = selectedProductObj?.game_slug || selectedProductObj?.game_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || ""
+  const isMobileLegends = selectedGameSlug.includes("mobile-legend") || selectedGameSlug.includes("mlbb")
+
+  const filteredProductsForSelect = productsList.filter(p => {
+    if (!productSearch.trim()) return true
+    const q = productSearch.toLowerCase()
+    const pName = (p.name || "").toLowerCase()
+    const gName = (p.game_name || "").toLowerCase()
+    const sku = (p.provider_sku || "").toLowerCase()
+    return pName.includes(q) || gName.includes(q) || sku.includes(q)
+  })
+
   const openDirectTopupModal = async () => {
     setIsDirectTopupOpen(true)
+    setProductSearch("")
     if (productsList.length === 0) {
       setLoadingProducts(true)
       try {
@@ -102,10 +116,19 @@ export default function AdminTransactionsPage() {
     }
     setSubmittingDirect(true)
     try {
+      const fullTargetId = isMobileLegends && directForm.server_id
+        ? `${directForm.target_id.trim()} (${directForm.server_id.trim()})`
+        : directForm.target_id.trim()
+
       const res = await fetch("/api/admin/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(directForm),
+        body: JSON.stringify({
+          product_id: directForm.product_id,
+          target_id: fullTargetId,
+          request_notes: directForm.request_notes,
+          process_digiflazz: directForm.process_digiflazz
+        }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
@@ -115,8 +138,7 @@ export default function AdminTransactionsPage() {
       setDirectForm({
         product_id: "",
         target_id: "",
-        login_method: "",
-        password: "",
+        server_id: "",
         request_notes: "",
         process_digiflazz: true,
       })
@@ -639,57 +661,59 @@ export default function AdminTransactionsPage() {
               {loadingProducts ? (
                 <div className="h-10 bg-white/10 rounded-lg animate-pulse" />
               ) : (
-                <select
+                <div className="space-y-2">
+                  <Input
+                    placeholder="🔍 Ketik nama game/produk atau SKU untuk mencari..."
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    className="bg-black/40 border-sky/30 text-white placeholder:text-white/40 text-xs"
+                  />
+                  <select
+                    required
+                    value={directForm.product_id}
+                    onChange={(e) => setDirectForm(prev => ({ ...prev, product_id: e.target.value }))}
+                    className="w-full h-10 px-3 rounded-lg bg-black/30 border border-sky/30 text-white text-xs focus:outline-none focus:border-sky"
+                  >
+                    <option value="" className="bg-[#183644]">-- Pilih Produk Topup ({filteredProductsForSelect.length} Produk) --</option>
+                    {filteredProductsForSelect.map((p) => (
+                      <option key={p.id} value={p.id} className="bg-[#183644]">
+                        {p.game_name ? `${p.game_name} - ` : ''}{p.name} (SKU: {p.provider_sku || '-'}) - Rp {Number(p.price).toLocaleString("id-ID")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Target ID / Server ID inputs */}
+            <div className={isMobileLegends ? "grid grid-cols-2 gap-3" : ""}>
+              <div>
+                <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">User ID / ID Target *</label>
+                <Input
                   required
-                  value={directForm.product_id}
-                  onChange={(e) => setDirectForm(prev => ({ ...prev, product_id: e.target.value }))}
-                  className="w-full h-10 px-3 rounded-lg bg-black/30 border border-sky/30 text-white text-xs focus:outline-none focus:border-sky"
-                >
-                  <option value="" className="bg-[#183644]">-- Pilih Produk Topup --</option>
-                  {productsList.map((p) => (
-                    <option key={p.id} value={p.id} className="bg-[#183644]">
-                      {p.game_name ? `${p.game_name} - ` : ''}{p.name} (SKU: {p.provider_sku || '-'}) - Rp {Number(p.price).toLocaleString("id-ID")}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Contoh: 12345678"
+                  value={directForm.target_id}
+                  onChange={(e) => setDirectForm(prev => ({ ...prev, target_id: e.target.value }))}
+                  className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
+                />
+              </div>
+
+              {isMobileLegends && (
+                <div>
+                  <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Server ID (Zone ID) *</label>
+                  <Input
+                    required
+                    placeholder="Contoh: 1234"
+                    value={directForm.server_id}
+                    onChange={(e) => setDirectForm(prev => ({ ...prev, server_id: e.target.value }))}
+                    className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
+                  />
+                </div>
               )}
             </div>
 
             <div>
-              <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">User ID / ID Target *</label>
-              <Input
-                required
-                placeholder="Contoh: 12345678 (1234)"
-                value={directForm.target_id}
-                onChange={(e) => setDirectForm(prev => ({ ...prev, target_id: e.target.value }))}
-                className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Metode Login (Joki)</label>
-                <Input
-                  placeholder="Moonton / VK / FB"
-                  value={directForm.login_method}
-                  onChange={(e) => setDirectForm(prev => ({ ...prev, login_method: e.target.value }))}
-                  className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Password (Opsional)</label>
-                <Input
-                  type="password"
-                  placeholder="Password jika joki"
-                  value={directForm.password}
-                  onChange={(e) => setDirectForm(prev => ({ ...prev, password: e.target.value }))}
-                  className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Catatan / Keterangan</label>
+              <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Catatan / Keterangan (Opsional)</label>
               <Input
                 placeholder="Contoh: Gift Pemenang Tournament / Bonus"
                 value={directForm.request_notes}
