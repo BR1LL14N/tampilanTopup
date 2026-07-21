@@ -29,7 +29,7 @@ export default function HowItWorksPage() {
               
               {/* Step 1 */}
               <Card className="rounded-[24px] border-sky/30 shadow-sky-soft bg-[#183644]/90 backdrop-blur-md text-center p-6 relative">
-                <div className="absolute top-4 right-4 text-3xl font-black text-sky/15">01</div>
+                <div className="absolute top-4 right-4 text-3xl font-black text-white/50">01</div>
                 <CardContent className="pt-4 flex flex-col items-center">
                   <div className="h-12 w-12 rounded-2xl bg-sky/20 border border-sky/30 text-sky grid place-items-center mb-4">
                     <ShoppingBag className="h-6 w-6" />
@@ -43,7 +43,7 @@ export default function HowItWorksPage() {
 
               {/* Step 2 */}
               <Card className="rounded-[24px] border-sky/30 shadow-sky-soft bg-[#183644]/90 backdrop-blur-md text-center p-6 relative">
-                <div className="absolute top-4 right-4 text-3xl font-black text-sky/15">02</div>
+                <div className="absolute top-4 right-4 text-3xl font-black text-white/50">02</div>
                 <CardContent className="pt-4 flex flex-col items-center">
                   <div className="h-12 w-12 rounded-2xl bg-sky/20 border border-sky/30 text-sky grid place-items-center mb-4">
                     <CreditCard className="h-6 w-6" />
@@ -57,7 +57,7 @@ export default function HowItWorksPage() {
 
               {/* Step 3 */}
               <Card className="rounded-[24px] border-sky/30 shadow-sky-soft bg-[#183644]/90 backdrop-blur-md text-center p-6 relative">
-                <div className="absolute top-4 right-4 text-3xl font-black text-sky/15">03</div>
+                <div className="absolute top-4 right-4 text-3xl font-black text-white/50">03</div>
                 <CardContent className="pt-4 flex flex-col items-center">
                   <div className="h-12 w-12 rounded-2xl bg-sky/20 border border-sky/30 text-sky grid place-items-center mb-4">
                     <QrCode className="h-6 w-6" />
@@ -71,7 +71,7 @@ export default function HowItWorksPage() {
 
               {/* Step 4 */}
               <Card className="rounded-[24px] border-sky/30 shadow-sky-soft bg-[#183644]/90 backdrop-blur-md text-center p-6 relative">
-                <div className="absolute top-4 right-4 text-3xl font-black text-sky/15">04</div>
+                <div className="absolute top-4 right-4 text-3xl font-black text-white/50">04</div>
                 <CardContent className="pt-4 flex flex-col items-center">
                   <div className="h-12 w-12 rounded-2xl bg-sky/20 border border-sky/30 text-sky grid place-items-center mb-4">
                     <CheckCircle2 className="h-6 w-6" />
