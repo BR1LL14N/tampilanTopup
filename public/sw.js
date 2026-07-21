@@ -1,9 +1,9 @@
-const CACHE_NAME = 'mitsuru-topup-v1';
+const CACHE_NAME = 'mitsuru-topup-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/android-chrome-192x192.png',
+  '/android-chrome-512x512.png',
   '/logo.png',
   '/mitsuru.png'
 ];

@@ -21,40 +21,54 @@ import {
   Search,
   Clock,
   User,
-  Star,
-  Zap,
-  TrendingUp,
   Award,
   ChevronUp,
-  Coins,
-  ShoppingBag,
 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 
-// Spender Leaderboard initial data matching top-up app theme
-const initialPlayers = [
-  { nickname: "ApexDominate", level: "Platinum", transactions: 165, points: 3950, totalSpent: 16500000, average: 100000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=ApexDominate" },
-  { nickname: "Flywithme", level: "Platinum", transactions: 158, points: 3840, totalSpent: 15800000, average: 100000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Flywithme" },
-  { nickname: "Bigbob007", level: "Gold", transactions: 145, points: 3520, totalSpent: 14500000, average: 100000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Bigbob" },
-  { nickname: "GhostViper", level: "Gold", transactions: 128, points: 3420, totalSpent: 12800000, average: 100000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=GhostViper" },
-  { nickname: "NovaStrike", level: "Silver", transactions: 117, points: 3189, totalSpent: 11700000, average: 100000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=NovaStrike" },
-  { nickname: "AlphaKiller", level: "Silver", transactions: 110, points: 3031, totalSpent: 8800000, average: 80000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=AlphaKiller" },
-  { nickname: "Sn1peD0wn", level: "Silver", transactions: 108, points: 2988, totalSpent: 7560000, average: 70000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Sn1peD0wn" },
-  { nickname: "Valkyra", level: "Bronze", transactions: 102, points: 2757, totalSpent: 5100000, average: 50000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Valkyra" },
-  { nickname: "FrostByte", level: "Bronze", transactions: 96, points: 2698, totalSpent: 4800000, average: 50000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=FrostByte" },
-  { nickname: "ReaperZ", level: "Bronze", transactions: 91, points: 2543, totalSpent: 2730000, average: 30000, avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=ReaperZ" },
-]
+interface Player {
+  nickname: string
+  level: string
+  transactions: number
+  points: number
+  totalSpent: number
+  average: number
+  avatar: string
+}
 
 export default function LeaderboardPage() {
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [sortBy, setSortBy] = useState<"spent" | "transactions" | "points">("spent")
   const [timeFilter, setTimeFilter] = useState<"24h" | "7d" | "30d" | "seasonal">("seasonal")
   const [searchQuery, setSearchQuery] = useState("")
-  const [timeLeft, setTimeLeft] = useState({ hours: 1, minutes: 44, seconds: 5 })
-  const [players, setPlayers] = useState(initialPlayers)
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 5, seconds: 0 })
+  const [players, setPlayers] = useState<Player[]>([])
+  const [loading, setLoading] = useState(true)
+  const [currentUserRank, setCurrentUserRank] = useState<{ rank: number; totalSpent: number } | null>(null)
   const [showNotification, setShowNotification] = useState(false)
 
-  // Countdown timer effect
+  // Fetch real leaderboard data from the database
+  const fetchLeaderboard = async () => {
+    try {
+      const res = await fetch(`/api/leaderboard?period=${timeFilter}`)
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      setPlayers(data.players || [])
+      setCurrentUserRank(data.currentUserRank || null)
+    } catch (e) {
+      console.error("Failed to load leaderboard:", e)
+    } finally {
+      setLoading(false)
+      setTimeLeft({ hours: 0, minutes: 5, seconds: 0 })
+    }
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    fetchLeaderboard()
+  }, [timeFilter])
+
+  // Countdown timer that triggers a real data refresh every 5 minutes
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -65,12 +79,13 @@ export default function LeaderboardPage() {
         } else if (prev.hours > 0) {
           return { hours: prev.hours - 1, minutes: 59, seconds: 59 }
         } else {
-          return { hours: 2, minutes: 0, seconds: 0 }
+          fetchLeaderboard()
+          return { hours: 0, minutes: 5, seconds: 0 }
         }
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [])
+  }, [timeFilter])
 
   // Check session
   useEffect(() => {
@@ -92,85 +107,38 @@ export default function LeaderboardPage() {
     checkUser()
   }, [])
 
-  // Handle dynamic sorting based on Total Belanja/Transaksi/Poin Loyalty selections
-  useEffect(() => {
-    let sorted = [...initialPlayers]
-    if (sortBy === "spent") {
-      sorted.sort((a, b) => b.totalSpent - a.totalSpent)
-    } else if (sortBy === "transactions") {
-      sorted.sort((a, b) => b.transactions - a.transactions)
-    } else if (sortBy === "points") {
-      sorted.sort((a, b) => b.points - a.points)
-    }
-
-    // Apply simple mock filters for time periods to simulate data updates
-    if (timeFilter === "24h") {
-      sorted = sorted.map(p => {
-        const transactions = Math.round(p.transactions * 0.1) || 1
-        const totalSpent = Math.round(p.totalSpent * 0.08)
-        return {
-          ...p,
-          transactions,
-          points: Math.round(p.points * 0.1),
-          totalSpent,
-          average: transactions > 0 ? Math.round(totalSpent / transactions) : 0
-        }
-      })
-    } else if (timeFilter === "7d") {
-      sorted = sorted.map(p => {
-        const transactions = Math.round(p.transactions * 0.35) || 2
-        const totalSpent = Math.round(p.totalSpent * 0.3)
-        return {
-          ...p,
-          transactions,
-          points: Math.round(p.points * 0.35),
-          totalSpent,
-          average: transactions > 0 ? Math.round(totalSpent / transactions) : 0
-        }
-      })
-    } else if (timeFilter === "30d") {
-      sorted = sorted.map(p => {
-        const transactions = Math.round(p.transactions * 0.75) || 5
-        const totalSpent = Math.round(p.totalSpent * 0.7)
-        return {
-          ...p,
-          transactions,
-          points: Math.round(p.points * 0.75),
-          totalSpent,
-          average: transactions > 0 ? Math.round(totalSpent / transactions) : 0
-        }
-      })
-    } else {
-      sorted = sorted.map(p => ({
-        ...p,
-        average: p.transactions > 0 ? Math.round(p.totalSpent / p.transactions) : 0
-      }))
-    }
-
-    setPlayers(sorted)
-  }, [sortBy, timeFilter])
+  // Sort the fetched players client-side based on the selected metric, then
+  // stamp each entry with its rank in that order (used as a stable key/label
+  // instead of relying on nickname, which can collide after masking).
+  const sortedPlayers = [...players]
+    .sort((a, b) => {
+      if (sortBy === "spent") return b.totalSpent - a.totalSpent
+      if (sortBy === "transactions") return b.transactions - a.transactions
+      return b.points - a.points
+    })
+    .map((p, i) => ({ ...p, rank: i + 1 }))
 
   // Filter players by search query
-  const filteredPlayers = players.filter(p =>
+  const filteredPlayers = sortedPlayers.filter(p =>
     p.nickname.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   // Top 3 players
-  const firstPlace = players[0]
-  const secondPlace = players[1]
-  const thirdPlace = players[2]
+  const firstPlace = sortedPlayers[0]
+  const secondPlace = sortedPlayers[1]
+  const thirdPlace = sortedPlayers[2]
 
   // Ranks 4+ for the table.
   // If there is an active search query, show all matching results in the table.
   // Otherwise, skip the top 3 since they are already displayed in the podium cards.
   const tablePlayers = searchQuery ? filteredPlayers : filteredPlayers.slice(3)
 
-  // Show dynamic notification for the user position check
+  // Show the logged-in user's real rank/position based on database data
   const handleShowMe = () => {
     setShowNotification(true)
     setTimeout(() => {
       setShowNotification(false)
-    }, 4000)
+    }, 5000)
   }
 
   // Format countdown string
@@ -235,10 +203,12 @@ export default function LeaderboardPage() {
               <div className="flex items-center gap-2">
                 <Award className="h-5 w-5 text-sky" />
                 <span>
-                  {currentUser ? (
-                    <>Halo <strong>{currentUser.name}</strong>, total akumulasi belanja Anda saat ini berada di peringkat <strong>#12</strong> dengan total belanja <strong>Rp350.000</strong>. Tingkatkan transaksi untuk masuk 10 besar!</>
-                  ) : (
+                  {!currentUser ? (
                     <>Silakan login terlebih dahulu untuk melihat posisi peringkat belanja Anda.</>
+                  ) : currentUserRank ? (
+                    <>Halo <strong>{currentUser.name}</strong>, total akumulasi belanja Anda saat ini berada di peringkat <strong>#{currentUserRank.rank}</strong> dengan total belanja <strong>{formatCurrency(currentUserRank.totalSpent)}</strong>.</>
+                  ) : (
+                    <>Halo <strong>{currentUser.name}</strong>, Anda belum memiliki transaksi sukses. Yuk top up sekarang untuk mulai naik peringkat!</>
                   )}
                 </span>
               </div>
@@ -489,14 +459,17 @@ export default function LeaderboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tablePlayers.length > 0 ? (
-                    tablePlayers.map((player, index) => {
-                      const actualRankIndex = players.findIndex(p => p.nickname === player.nickname) + 1
-
-                      return (
-                        <TableRow key={player.nickname} className="border-b border-sky/30/50 hover:bg-sky/5 hover:text-sky transition-all duration-200">
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8 text-white/60">
+                        Memuat data leaderboard...
+                      </TableCell>
+                    </TableRow>
+                  ) : tablePlayers.length > 0 ? (
+                    tablePlayers.map((player) => (
+                      <TableRow key={player.rank} className="border-b border-sky/30/50 hover:bg-sky/5 hover:text-sky transition-all duration-200">
                           <TableCell className="font-mono text-sm font-bold text-white/80">
-                            #{actualRankIndex}
+                            #{player.rank}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-3">
@@ -504,9 +477,6 @@ export default function LeaderboardPage() {
                                 <img src={player.avatar} alt={player.nickname} className="w-full h-full object-cover rounded-full" />
                               </div>
                               <span className="font-semibold text-white">{player.nickname}</span>
-                              {player.nickname === "GhostViper" && (
-                                <Star className="h-3 w-3 fill-amber-500 text-amber-500 animate-spin" style={{ animationDuration: '4s' }} />
-                              )}
                             </div>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
@@ -528,12 +498,13 @@ export default function LeaderboardPage() {
                             </div>
                           </TableCell>
                         </TableRow>
-                      )
-                    })
+                    ))
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-8 text-white/60">
-                        Tidak ada pengguna ditemukan dengan nama "{searchQuery}"
+                        {searchQuery
+                          ? `Tidak ada pengguna ditemukan dengan nama "${searchQuery}"`
+                          : "Belum ada transaksi sukses yang tercatat untuk periode ini."}
                       </TableCell>
                     </TableRow>
                   )}
