@@ -237,9 +237,9 @@ export async function POST(req: NextRequest) {
         try {
           await executeQuery(
             `UPDATE products 
-             SET game_id = $1, name = $2, price = $3, sell_price = $4, status = $5, provider = $6, updated_at = CURRENT_TIMESTAMP 
-             WHERE id = $7`,
-            [matchingGame.id, name, price, newSellPrice, isActive ? 1 : 0, 'digiflazz', existingProduct.id]
+             SET game_id = $1, name = $2, price = $3, sell_price = $4, status = $5, provider = $6, provider_sku = $7, updated_at = CURRENT_TIMESTAMP 
+             WHERE id = $8`,
+            [matchingGame.id, name, price, newSellPrice, isActive ? 1 : 0, 'digiflazz', sku, existingProduct.id]
           );
           updateCount++;
           syncedItemsLog.push({
