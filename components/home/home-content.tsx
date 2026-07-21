@@ -218,6 +218,31 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
     startCarousel()
   }
 
+  // Touch swipe states for mobile banner navigation
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  const minSwipeDistance = 40
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    if (distance > minSwipeDistance) {
+      handleNextSlide()
+    } else if (distance < -minSwipeDistance) {
+      handlePrevSlide()
+    }
+  }
+
   const handleDotClick = (index: number) => {
     stopCarousel()
     setActiveSlide(index)
@@ -244,8 +269,13 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
       <SidebarContentWrapper isAuthenticated={!!user}>
         <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {/* Hero Carousel - Sky Fantasy */}
-        <div className="hero-carousel mb-10 overflow-hidden relative rounded-[24px] border border-sky-border shadow-sky-medium">
+        {/* Hero Carousel - Sky Fantasy with Touch Swipe Support */}
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="hero-carousel mb-10 overflow-hidden relative rounded-[24px] border border-sky/30 shadow-2xl select-none"
+        >
           <div
             className="carousel-track flex transition-transform duration-500"
             style={{ transform: `translateX(-${activeSlide * 100}%)` }}
@@ -300,21 +330,22 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             ))}
           </div>
 
+          {/* Desktop Only Navigation Arrows */}
           <button
             onClick={handlePrevSlide}
-            className="carousel-nav left-5 absolute top-1/2 -translate-y-1/2 hidden sm:grid h-12 w-12 place-items-center rounded-xl text-text-secondary transition-all hover:scale-105 active:scale-95 z-20"
+            className="left-4 absolute top-1/2 -translate-y-1/2 hidden md:grid h-11 w-11 place-items-center rounded-2xl bg-black/40 hover:bg-sky text-white border border-white/20 hover:border-sky/50 backdrop-blur-md shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 z-20 cursor-pointer"
             type="button"
             aria-label="Slide sebelumnya"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-6 w-6 text-white stroke-[2.5]" />
           </button>
           <button
             onClick={handleNextSlide}
-            className="carousel-nav right-5 absolute top-1/2 -translate-y-1/2 hidden sm:grid h-12 w-12 place-items-center rounded-xl text-text-secondary transition-all hover:scale-105 active:scale-95 z-20"
+            className="right-4 absolute top-1/2 -translate-y-1/2 hidden md:grid h-11 w-11 place-items-center rounded-2xl bg-black/40 hover:bg-sky text-white border border-white/20 hover:border-sky/50 backdrop-blur-md shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 z-20 cursor-pointer"
             type="button"
             aria-label="Slide berikutnya"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-6 w-6 text-white stroke-[2.5]" />
           </button>
           <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2.5">
             {slides.map((_, idx) => (
