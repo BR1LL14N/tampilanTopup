@@ -261,7 +261,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
   }
 
   return (
-    <div className="min-h-screen text-text-primary antialiased relative">
+    <div className="min-h-screen text-text-primary antialiased relative overflow-x-clip">
       <Header user={user} />
 
       <SidebarContentWrapper isAuthenticated={!!user}>

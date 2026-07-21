@@ -60,6 +60,7 @@ export default function AdminTransactionsPage() {
   const [selectedTx, setSelectedTx] = useState<any | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [updatingStatus, setUpdatingStatus] = useState(false)
+  const [showAdminPassword, setShowAdminPassword] = useState(false) // untuk toggle visibility password di detail dialog
 
   const handleUpdateStatus = async (txId: string, paymentStatus: string | undefined, topupStatus: string) => {
     setUpdatingStatus(true)

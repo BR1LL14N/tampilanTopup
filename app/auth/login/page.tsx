@@ -173,14 +173,14 @@ function LoginForm() {
               <label className="text-xs font-bold uppercase tracking-wider text-white/90 block">
                 Email Kamu <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-sky transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="email"
                   type="email"
                   placeholder="nama@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="autofill-dark w-full bg-white/10 px-4 py-2.5 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
+                  className="autofill-dark w-full bg-black/30 px-4 py-2.5 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-black/40 transition-colors"
                   style={inputBevelStyle}
                   required
                 />
@@ -192,7 +192,7 @@ function LoginForm() {
               <label className="text-xs font-bold uppercase tracking-wider text-white/90 block">
                 Password Kamu <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-sky transition-colors duration-200" style={inputBevelStyle}>
                 <div className="relative">
                   <input
                     id="password"
@@ -200,7 +200,7 @@ function LoginForm() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="autofill-dark w-full bg-white/10 pl-4 pr-12 py-2.5 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
+                    className="autofill-dark w-full bg-black/30 pl-4 pr-12 py-2.5 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-black/40 transition-colors"
                     style={inputBevelStyle}
                     required
                   />

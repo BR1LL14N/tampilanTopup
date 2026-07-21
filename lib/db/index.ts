@@ -39,7 +39,9 @@ export async function executeQuery<T = any>(sql: string, params: any[] = []): Pr
         password: process.env.MYSQL_PASSWORD || '',
         database: process.env.MYSQL_DATABASE || 'freelance_topup',
         waitForConnections: true,
-        connectionLimit: 10,
+        connectionLimit: 25,   // naik dari 10 → 25 untuk handle traffic lebih tinggi
+        queueLimit: 0,         // tidak batasi antrian koneksi
+        connectTimeout: 30000, // 30 detik timeout bukan default 10 detik
       });
     }
     const [rows] = await globalThis.mysqlPool.execute(formattedSql, formattedParams);

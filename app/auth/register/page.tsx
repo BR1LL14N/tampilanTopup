@@ -167,14 +167,14 @@ export default function RegisterPage() {
               <label className="text-[10px] font-bold uppercase tracking-wider text-white/90 block">
                 Nama Lengkap <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-sky transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="name"
                   type="text"
                   placeholder="Nama lengkap kamu"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="autofill-dark w-full bg-white/10 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
+                  className="autofill-dark w-full bg-black/30 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-black/40 transition-colors"
                   style={inputBevelStyle}
                   required
                 />
@@ -186,14 +186,14 @@ export default function RegisterPage() {
               <label className="text-[10px] font-bold uppercase tracking-wider text-white/90 block">
                 Alamat Email <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-sky transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="email"
                   type="email"
                   placeholder="nama@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="autofill-dark w-full bg-white/10 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
+                  className="autofill-dark w-full bg-black/30 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-black/40 transition-colors"
                   style={inputBevelStyle}
                   required
                 />
@@ -205,7 +205,7 @@ export default function RegisterPage() {
               <label className="text-[10px] font-bold uppercase tracking-wider text-white/90 block">
                 Password <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-sky transition-colors duration-200" style={inputBevelStyle}>
                 <div className="relative">
                   <input
                     id="password"
@@ -213,7 +213,7 @@ export default function RegisterPage() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="autofill-dark w-full bg-white/10 pl-4 pr-12 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
+                    className="autofill-dark w-full bg-black/30 pl-4 pr-12 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-black/40 transition-colors"
                     style={inputBevelStyle}
                     required
                   />
@@ -248,14 +248,14 @@ export default function RegisterPage() {
               <label className="text-[10px] font-bold uppercase tracking-wider text-white/90 block">
                 Konfirmasi Password <span className="text-diamond">*</span>
               </label>
-              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
+              <div className="relative p-[1.5px] bg-white/20 focus-within:bg-sky transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="confirmPassword"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="autofill-dark w-full bg-white/10 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
+                  className="autofill-dark w-full bg-black/30 px-4 py-2 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-black/40 transition-colors"
                   style={inputBevelStyle}
                   required
                 />
