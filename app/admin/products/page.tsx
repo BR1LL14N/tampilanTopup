@@ -791,8 +791,10 @@ export default function AdminProductsPage() {
                 <Input
                   id="prod-price"
                   type="number"
-                  value={editForm.price}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, price: Number(e.target.value) || 0 }))}
+                  value={editForm.price === 0 ? "" : editForm.price}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, price: e.target.value === "" ? 0 : Number(e.target.value) || 0 }))}
+                  placeholder="0"
                   className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
                   required
                 />
@@ -802,8 +804,10 @@ export default function AdminProductsPage() {
                 <Input
                   id="prod-sell"
                   type="number"
-                  value={editForm.sell_price}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, sell_price: Number(e.target.value) || 0 }))}
+                  value={editForm.sell_price === 0 ? "" : editForm.sell_price}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, sell_price: e.target.value === "" ? 0 : Number(e.target.value) || 0 }))}
+                  placeholder="0"
                   className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
                   required
                 />
@@ -829,8 +833,10 @@ export default function AdminProductsPage() {
                 <Input
                   id="prod-sort"
                   type="number"
-                  value={editForm.sort_order}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, sort_order: Number(e.target.value) || 0 }))}
+                  value={editForm.sort_order === 0 ? "" : editForm.sort_order}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, sort_order: e.target.value === "" ? 0 : Number(e.target.value) || 0 }))}
+                  placeholder="0"
                   className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
                 />
               </div>
