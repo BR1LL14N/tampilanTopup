@@ -519,17 +519,23 @@ export default function AdminTransactionsPage() {
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" className="hover:bg-sky/20 hover:text-white">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => { setSelectedTx(tx); setIsDetailOpen(true); setShowAdminPassword(false); }}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              Detail & Kelola
+                          <DropdownMenuContent align="end" className="bg-[#183644] border-sky/30 text-white shadow-2xl">
+                            <DropdownMenuItem 
+                              onClick={() => { setSelectedTx(tx); setIsDetailOpen(true); setShowAdminPassword(false); }}
+                              className="focus:bg-sky/20 focus:text-white cursor-pointer font-bold text-xs"
+                            >
+                              <Eye className="h-4 w-4 mr-2 text-sky" />
+                              Detail &amp; Kelola
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.push(`/history/${tx.invoice}`)}>
-                              <Eye className="h-4 w-4 mr-2" />
+                            <DropdownMenuItem 
+                              onClick={() => router.push(`/history/${tx.invoice}`)}
+                              className="focus:bg-sky/20 focus:text-white cursor-pointer font-bold text-xs"
+                            >
+                              <Eye className="h-4 w-4 mr-2 text-sky" />
                               Lihat Invoice
                             </DropdownMenuItem>
                           </DropdownMenuContent>
