@@ -336,22 +336,31 @@ export default function AdminGamesPage() {
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
+                              <Button variant="ghost" size="icon" className="hover:bg-sky/20 hover:text-white rounded-lg">
+                                <MoreHorizontal className="h-4 w-4 text-white/80" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => router.push("/games/" + game.slug)}>
-                                <Eye className="h-4 w-4 mr-2" />
+                            <DropdownMenuContent align="end" className="bg-[#183644] border-sky/30 text-white rounded-xl shadow-2xl">
+                              <DropdownMenuItem 
+                                onClick={() => router.push("/games/" + game.slug)}
+                                className="focus:bg-sky/20 focus:text-white cursor-pointer font-bold text-xs"
+                              >
+                                <Eye className="h-4 w-4 mr-2 text-sky" />
                                 Lihat Catalog
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleOpenEdit(game)}>
-                                <Edit className="h-4 w-4 mr-2" />
+                              <DropdownMenuItem 
+                                onClick={() => handleOpenEdit(game)}
+                                className="focus:bg-sky/20 focus:text-white cursor-pointer font-bold text-xs"
+                              >
+                                <Edit className="h-4 w-4 mr-2 text-sky" />
                                 Edit Game
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-500" onClick={() => handleDeleteGame(game.id)}>
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Hapus
+                              <DropdownMenuItem 
+                                className="text-red-400 focus:bg-red-500/20 focus:text-red-400 cursor-pointer font-bold text-xs" 
+                                onClick={() => handleDeleteGame(game.id)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2 text-red-400" />
+                                Hapus Game
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
