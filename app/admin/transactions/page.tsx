@@ -585,7 +585,7 @@ export default function AdminTransactionsPage() {
               {(selectedTx.provider_ref || selectedTx.provider_response) && (
                 <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl space-y-2 text-left">
                   <div className="flex justify-between items-center border-b border-red-500/20 pb-2">
-                    <span className="text-red-400 font-bold uppercase tracking-wider text-[10px]">Respons Provider (Digiflazz)</span>
+                    <span className="text-red-400 font-bold uppercase tracking-wider text-[10px]">Detail Respon Provider (Digiflazz)</span>
                     <span className="font-mono text-[10px] text-white/70 font-semibold">SN/Ref: {selectedTx.provider_ref || "-"}</span>
                   </div>
                   {(() => {
@@ -600,14 +600,15 @@ export default function AdminTransactionsPage() {
                     const rc = dataObj?.rc;
 
                     return (
-                      <div className="space-y-1 font-mono text-[11px] text-white/90">
+                      <div className="space-y-2 font-mono text-[11px] text-white/90">
                         {rc && <p><span className="text-red-300 font-bold">Response Code (RC):</span> {rc}</p>}
-                        {message && <p><span className="text-red-300 font-bold">Pesan Error:</span> {message}</p>}
-                        {!rc && !message && (
-                          <pre className="text-[10px] text-white/70 overflow-x-auto whitespace-pre-wrap max-h-32 p-2 bg-black/30 rounded">
+                        {message && <p><span className="text-red-300 font-bold">Keterangan Error:</span> {message}</p>}
+                        <div className="mt-2 pt-2 border-t border-red-500/10">
+                          <span className="text-[10px] text-white/50 block mb-1">Payload JSON Lengkap:</span>
+                          <pre className="text-[10px] text-emerald-400 overflow-x-auto whitespace-pre-wrap max-h-40 p-2.5 bg-black/50 rounded-lg border border-white/10 font-mono">
                             {JSON.stringify(parsed, null, 2)}
                           </pre>
-                        )}
+                        </div>
                       </div>
                     );
                   })()}
