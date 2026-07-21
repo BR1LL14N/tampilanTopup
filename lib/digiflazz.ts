@@ -186,19 +186,24 @@ export async function createTopup(
   const { username } = getDigiflazzCredentials();
   const sign = generateDigiflazzSignature(refId);
 
+  const requestBody: any = {
+    username,
+    buyer_sku_code: sku,
+    customer_no: customerNo,
+    ref_id: refId,
+    sign,
+  };
+
+  if (testing) {
+    requestBody.testing = true;
+  }
+
   const response = await fetch('https://api.digiflazz.com/v1/transaction', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      username,
-      buyer_sku_code: sku,
-      customer_no: customerNo,
-      ref_id: refId,
-      sign,
-      testing,
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   return response.json();
