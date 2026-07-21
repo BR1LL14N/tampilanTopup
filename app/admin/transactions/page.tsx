@@ -418,8 +418,8 @@ export default function AdminTransactionsPage() {
                   <div className="flex items-center justify-between mb-2">
                     <stat.icon className={`h-5 w-5 ${stat.color}`} />
                   </div>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-sm text-white/60">{stat.label}</p>
+                  <p className="text-2xl font-black text-white">{stat.value}</p>
+                  <p className="text-xs font-bold text-white uppercase tracking-wider">{stat.label}</p>
                 </CardContent>
               </Card>
             ))}
@@ -439,13 +439,13 @@ export default function AdminTransactionsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-sky/30 bg-mist backdrop-blur-md text-sm"
+              className="px-4 py-2 rounded-lg border border-sky/30 bg-[#183644] text-white text-xs font-bold focus:outline-none focus:border-sky cursor-pointer"
             >
-              <option value="all">Semua Status</option>
-              <option value="success">Berhasil</option>
-              <option value="processing">Diproses</option>
-              <option value="pending">Pending</option>
-              <option value="failed">Gagal</option>
+              <option value="all" className="bg-[#183644] text-white">Semua Status</option>
+              <option value="success" className="bg-[#183644] text-white">Berhasil</option>
+              <option value="processing" className="bg-[#183644] text-white">Diproses</option>
+              <option value="pending" className="bg-[#183644] text-white">Pending</option>
+              <option value="failed" className="bg-[#183644] text-white">Gagal</option>
             </select>
           </div>
 
