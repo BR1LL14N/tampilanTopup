@@ -186,7 +186,7 @@ export default function RootLayout({
       >
         <PWARegister />
         <DynamicFavicon />
-        <div className="relative min-h-screen flex flex-col bg-[#181818]">
+        <div className="relative min-h-screen flex flex-col bg-[#28657E]">
           {/* Custom Grid Background Pattern (CSS-Only) */}
           <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden flex items-center justify-center">
             <div

@@ -44,7 +44,7 @@
     backdrop-filter: blur(12px);
   }
   .bg-sky {
-    background-color: #181818;
+    background-color: #245c72;
   }
   .bg-sky\/5 {
     background-color: rgba(40, 101, 126, 0.05);
@@ -115,7 +115,7 @@
 
 @layer base {
   :root {
-    /* ===== DEEP TEAL THEME (#181818) - Light Mode ===== */
+    /* ===== DEEP TEAL THEME (#245C72) - Light Mode ===== */
     /* Background */
     --background: 204 33% 96%; /* #F4F7F9 */
     --foreground: 197 34% 15%; /* #1A2B35 */
@@ -126,7 +126,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 197 34% 15%;
     /* Primary */
-    --primary: 197 52% 33%; /* #181818 */
+    --primary: 197 52% 33%; /* #245C72 */
     --primary-foreground: 0 0% 100%; /* White */
     /* Secondary */
     --secondary: 188 39% 49%; /* #4CA1AF */
@@ -143,17 +143,17 @@
     /* Border */
     --border: 197 27% 69%; /* #9DB8C4 */
     --input: 197 27% 69%;
-    --ring: 197 52% 33%; /* #181818 */
+    --ring: 197 52% 33%; /* #245C72 */
     --radius: 0.75rem;
     /* Sidebar */
     --sidebar-bg: 204 33% 96%;
     --sidebar-border: 197 27% 69%;
     /* Custom Theme tokens */
-    --sky: 197 52% 33%; /* #181818 */
+    --sky: 197 52% 33%; /* #245C72 */
     --sky-soft: 188 39% 49%; /* #4CA1AF */
     --sky-light: 197 40% 93%; /* #E8F1F5 */
     --diamond: 188 39% 49%; /* #4CA1AF */
-    --fantasy: 197 52% 33%; /* #181818 */
+    --fantasy: 197 52% 33%; /* #245C72 */
     --glow: 25 74% 57%; /* #E28743 */
     --mist: 204 33% 96%; /* #F4F7F9 */
     --ice: 206 100% 95%; /* #EEF8FF */
@@ -180,7 +180,7 @@
       "rlig" 1,
       "calt" 1;
     color: hsl(210 40% 18%); /* #1B3A57 */
-    /* Background: solid dark #181818 overlay di atas wallpaper */
+    /* Background: solid dark #245C72 overlay di atas wallpaper */
     background:
       linear-gradient(
         180deg,
@@ -335,7 +335,7 @@
     linear-gradient(135deg, #26292e 0%, #1b1e21 100%);
 }
 
-/* Varian teal - charcoal di-blend dengan deep teal sistem (#181818) */
+/* Varian teal - charcoal di-blend dengan deep teal sistem (#245C72) */
 .dark-stripes-teal {
   background:
     repeating-linear-gradient(
