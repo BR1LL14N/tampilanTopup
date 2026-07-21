@@ -5,10 +5,14 @@ if (dns.setDefaultResultOrder) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compress: true, // Enable Gzip/Brotli compression
+  swcMinify: true, // Enable fast SWC JS minifier
+  reactStrictMode: true,
   eslint: {
-    ignoreDuringBuilds: true, // ← tambahkan ini
+    ignoreDuringBuilds: true,
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -17,6 +21,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '*.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
       },
     ],
   },
