@@ -90,7 +90,7 @@ export default function AdminFeedbacksPage() {
   const totalVisible = reviews.filter((r) => r.status === 1 || r.status === true).length
 
   return (
-    <div className="relative min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
+    <div className="relative min-h-screen text-text-primary antialiased flex flex-col justify-between overflow-x-clip">
       <Header />
       
       <SidebarContentWrapper isAuthenticated={true}>
@@ -165,7 +165,7 @@ export default function AdminFeedbacksPage() {
                       {reviews.map((rev) => {
                         const isVisible = rev.status === 1 || rev.status === true
                         return (
-                          <tr key={rev.id} className="hover:bg-slate-50/50 transition-colors">
+                          <tr key={rev.id} className="hover:bg-white/5 transition-colors">
                             <td className="py-4 pl-2 font-mono text-white/60">
                               {new Date(rev.created_at).toLocaleDateString("id-ID", {
                                 day: "numeric",
@@ -174,7 +174,7 @@ export default function AdminFeedbacksPage() {
                               })}
                             </td>
                             <td className="py-4">
-                              <p className="text-white uppercase">{rev.user_name}</p>
+                              <p className="text-white uppercase font-bold">{rev.user_name}</p>
                               <p className="text-[10px] text-white/60 font-normal lowercase">{rev.user_email}</p>
                             </td>
                             <td className="py-4">
@@ -182,7 +182,7 @@ export default function AdminFeedbacksPage() {
                                 {"★".repeat(rev.rating) + "☆".repeat(5 - rev.rating)}
                               </div>
                             </td>
-                            <td className="py-4 max-w-xs truncate" title={rev.comment}>
+                            <td className="py-4 max-w-xs truncate text-white/80" title={rev.comment}>
                               "{rev.comment}"
                             </td>
                             <td className="py-4 text-center">
@@ -190,8 +190,8 @@ export default function AdminFeedbacksPage() {
                                 onClick={() => handleToggleVisibility(rev.id, isVisible ? 1 : 0)}
                                 className={`p-1.5 rounded-lg border transition ${
                                   isVisible
-                                    ? "bg-emerald-50 text-emerald-500 border-emerald-500/20 hover:bg-emerald-100"
-                                    : "bg-red-50 text-red-500 border-red-500/20 hover:bg-red-100"
+                                    ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30"
+                                    : "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30"
                                 }`}
                                 title={isVisible ? "Sembunyikan dari Beranda" : "Tampilkan di Beranda"}
                               >
@@ -208,7 +208,7 @@ export default function AdminFeedbacksPage() {
                               </Link>
                               <button
                                 onClick={() => handleDeleteReview(rev.id)}
-                                className="inline-flex items-center p-1.5 bg-red-50 hover:bg-red-100 text-red-500 border border-red-500/10 rounded-lg transition"
+                                className="inline-flex items-center p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg transition"
                                 title="Hapus Ulasan"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
