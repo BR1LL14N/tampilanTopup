@@ -118,7 +118,7 @@ export async function createTopup(
   refId: string,
   testing: boolean = false
 ): Promise<any> {
-  const { mode } = DIGIFLAZZ_CONFIG;
+  const { mode } = getDigiflazzCredentials();
 
   if (mode === 'simulation') {
     // Simulasi berdasarkan Test Case Resmi Digiflazz
