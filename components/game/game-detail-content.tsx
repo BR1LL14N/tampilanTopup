@@ -109,7 +109,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     }
 
     // Redirect to dynamic checkout/invoice route
-    const target = serverId ? `${gameId} (${serverId})` : gameId
+    const target = serverId ? `${gameId.trim()}${serverId.trim()}` : gameId.trim()
     
     const queryParams = new URLSearchParams({
       target,
