@@ -308,7 +308,7 @@ export function Header({ user }: HeaderProps) {
   const navLinks = [
     { href: "/", label: t.topup, icon: Zap },
     { href: "/check", label: t.check, icon: Search },
-    { href: "/leaderboard", label: t.leaderboard, icon: Award },
+    // { href: "/leaderboard", label: t.leaderboard, icon: Award }, // hidden sementara
     { href: "/calculator", label: t.calculator, icon: Calculator },
   ]
 
