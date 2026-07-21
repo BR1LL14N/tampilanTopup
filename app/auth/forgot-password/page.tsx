@@ -15,7 +15,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip">
+    <div className="min-h-screen flex flex-col relative ">
       {/* Background accents */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-diamond/10 rounded-full blur-3xl pointer-events-none" />

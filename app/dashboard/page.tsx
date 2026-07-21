@@ -151,7 +151,7 @@ export default function DashboardPage() {
     if (spent >= 5000000) return { title: "Mythic Legend", color: "text-purple-400 border-purple-400/40 bg-purple-400/10" }
     if (spent >= 1500000) return { title: "Diamond Veteran", color: "text-sky border-sky/40 bg-sky/10" }
     if (spent >= 500000)  return { title: "Gold Captain",    color: "text-amber-400 border-amber-400/40 bg-amber-400/10" }
-    if (spent >= 100000)  return { title: "Silver Elite",    color: "text-white/70 border-white/20 bg-white/5" }
+    if (spent >= 100000)  return { title: "Silver Elite",    color: "text-white/70 border-white/20 bg-mist backdrop-blur-md" }
     return { title: "Bronze Recruit", color: "text-amber-500 border-amber-500/40 bg-amber-500/10" }
   }
 
@@ -169,26 +169,26 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col relative overflow-x-clip">
+      <div className="min-h-screen flex flex-col relative ">
         <Header />
         <SidebarContentWrapper isAuthenticated={!!currentUser}>
           <main className="flex-1 relative z-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-10">
               <div className="h-44 w-full dark-stripes-teal p-6 md:p-8 rounded-2xl border border-sky/30 shadow-sky-soft flex flex-col justify-between">
                 <div className="space-y-3">
-                  <Skeleton className="h-8 w-1/3 rounded-xl bg-white/10" />
-                  <Skeleton className="h-4 w-1/2 rounded-lg bg-white/10" />
+                  <Skeleton className="h-8 w-1/3 rounded-xl bg-mist backdrop-blur-md" />
+                  <Skeleton className="h-4 w-1/2 rounded-lg bg-mist backdrop-blur-md" />
                 </div>
-                <Skeleton className="h-10 w-44 rounded-xl bg-white/10" />
+                <Skeleton className="h-10 w-44 rounded-xl bg-mist backdrop-blur-md" />
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="dark-stripes-teal p-6 rounded-2xl border border-sky/30 shadow-sky-soft space-y-3">
                     <div className="flex justify-between items-center">
-                      <Skeleton className="h-4 w-20 rounded-md bg-white/10" />
-                      <Skeleton className="h-8 w-8 rounded-xl bg-white/10" />
+                      <Skeleton className="h-4 w-20 rounded-md bg-mist backdrop-blur-md" />
+                      <Skeleton className="h-8 w-8 rounded-xl bg-mist backdrop-blur-md" />
                     </div>
-                    <Skeleton className="h-8 w-16 rounded-lg bg-white/10" />
+                    <Skeleton className="h-8 w-16 rounded-lg bg-mist backdrop-blur-md" />
                   </div>
                 ))}
               </div>
@@ -196,29 +196,29 @@ export default function DashboardPage() {
                 <div className="md:col-span-4 space-y-8">
                   <div className="dark-stripes-teal p-6 rounded-2xl border border-sky/30 shadow-sky-soft space-y-6">
                     <div className="flex flex-col items-center text-center space-y-3">
-                      <Skeleton className="h-20 w-20 rounded-full bg-white/10" />
-                      <Skeleton className="h-5 w-32 rounded-lg bg-white/10" />
-                      <Skeleton className="h-4 w-24 rounded-md bg-white/10" />
+                      <Skeleton className="h-20 w-20 rounded-full bg-mist backdrop-blur-md" />
+                      <Skeleton className="h-5 w-32 rounded-lg bg-mist backdrop-blur-md" />
+                      <Skeleton className="h-4 w-24 rounded-md bg-mist backdrop-blur-md" />
                     </div>
                     <div className="space-y-3 pt-4 border-t border-sky/20">
-                      <Skeleton className="h-4 w-full rounded-md bg-white/10" />
-                      <Skeleton className="h-4 w-3/4 rounded-md bg-white/10" />
+                      <Skeleton className="h-4 w-full rounded-md bg-mist backdrop-blur-md" />
+                      <Skeleton className="h-4 w-3/4 rounded-md bg-mist backdrop-blur-md" />
                     </div>
                   </div>
                 </div>
                 <div className="md:col-span-8 dark-stripes-teal p-6 rounded-2xl border border-sky/30 shadow-sky-soft space-y-6">
                   <div className="flex justify-between items-center">
-                    <Skeleton className="h-6 w-48 rounded-lg bg-white/10" />
-                    <Skeleton className="h-4 w-20 rounded-md bg-white/10" />
+                    <Skeleton className="h-6 w-48 rounded-lg bg-mist backdrop-blur-md" />
+                    <Skeleton className="h-4 w-20 rounded-md bg-mist backdrop-blur-md" />
                   </div>
                   <div className="space-y-4">
                     {[1, 2, 3, 4].map((i) => (
                       <div key={i} className="flex justify-between items-center p-4 border border-sky/20 rounded-xl">
                         <div className="space-y-2">
-                          <Skeleton className="h-4 w-32 rounded-md bg-white/10" />
-                          <Skeleton className="h-3 w-24 rounded-sm bg-white/10" />
+                          <Skeleton className="h-4 w-32 rounded-md bg-mist backdrop-blur-md" />
+                          <Skeleton className="h-3 w-24 rounded-sm bg-mist backdrop-blur-md" />
                         </div>
-                        <Skeleton className="h-6 w-20 rounded-lg bg-white/10" />
+                        <Skeleton className="h-6 w-20 rounded-lg bg-mist backdrop-blur-md" />
                       </div>
                     ))}
                   </div>
@@ -233,7 +233,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip">
+    <div className="min-h-screen flex flex-col relative ">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-diamond/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -308,7 +308,7 @@ export default function DashboardPage() {
                         className={`px-5 py-3.5 text-xs font-black uppercase tracking-wider border-r border-sky/20 transition-all flex items-center gap-2 ${
                           activeTab === "transactions"
                             ? "bg-sky text-white"
-                            : "text-white/50 hover:text-white hover:bg-white/5"
+                            : "text-white/50 hover:text-white hover:bg-mist backdrop-blur-md"
                         }`}
                       >
                         <History className="h-4 w-4" />
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                         className={`px-5 py-3.5 text-xs font-black uppercase tracking-wider border-r border-sky/20 transition-all flex items-center gap-2 relative ${
                           activeTab === "notifications"
                             ? "bg-sky text-white"
-                            : "text-white/50 hover:text-white hover:bg-white/5"
+                            : "text-white/50 hover:text-white hover:bg-mist backdrop-blur-md"
                         }`}
                       >
                         <Bell className="h-4 w-4" />
@@ -332,7 +332,7 @@ export default function DashboardPage() {
 
                     {activeTab === "transactions" ? (
                       <Link href="/history" className="mr-4">
-                        <button className="bg-white/10 hover:bg-white/15 border border-white/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white/70 hover:text-white transition-colors flex items-center gap-1.5 rounded-lg">
+                        <button className="bg-mist backdrop-blur-md hover:bg-mist backdrop-blur-md border border-white/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white/70 hover:text-white transition-colors flex items-center gap-1.5 rounded-lg">
                           Lihat Semua
                           <ArrowRight className="h-3 w-3 text-sky" />
                         </button>
@@ -416,7 +416,7 @@ export default function DashboardPage() {
                                     : "bg-black/20 border-sky/10 hover:border-sky/20"
                                 }`}
                               >
-                                <div className={`p-2 rounded-lg ${isUnread ? "bg-sky/20 text-sky animate-pulse" : "bg-white/5 text-white/30"}`}>
+                                <div className={`p-2 rounded-lg ${isUnread ? "bg-sky/20 text-sky animate-pulse" : "bg-mist backdrop-blur-md text-white/30"}`}>
                                   {isFeedback ? <MessageSquare className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
                                 </div>
                                 <div className="flex-grow">
@@ -504,7 +504,7 @@ export default function DashboardPage() {
                       </button>
                     </Link>
                     <Link href="/calculator" className="block">
-                      <button className="w-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-sky/30 text-white/70 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shimmer-hover rounded-xl">
+                      <button className="w-full bg-mist backdrop-blur-md hover:bg-mist backdrop-blur-md border border-white/10 hover:border-sky/30 text-white/70 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shimmer-hover rounded-xl">
                         <Award className="h-4 w-4 text-sky" />
                         Buka Topup Optimizer
                       </button>

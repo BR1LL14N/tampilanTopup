@@ -98,46 +98,46 @@ export default function AdminFeedbacksPage() {
           
           {/* Header Area */}
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-text-primary flex items-center gap-2">
+            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-white flex items-center gap-2">
               <Shield className="h-6 w-6 text-red-500" />
               Kelola Kritik, Saran &amp; Ulasan (Admin)
             </h1>
-            <p className="text-xs font-bold text-text-secondary uppercase tracking-widest mt-1">
+            <p className="text-xs font-bold text-white/80 uppercase tracking-widest mt-1">
               Moderasi ulasan pelanggan, kelola visibilitas testimoni halaman depan, dan balas masukan
             </p>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-            <Card className="rounded-[20px] border-sky-border shadow-sky-soft bg-white">
+            <Card className="rounded-[20px] border-sky/30 shadow-sky-soft bg-mist backdrop-blur-md">
               <CardContent className="p-6">
-                <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Total Tiket Masuk</p>
-                <p className="text-3xl font-black text-text-primary font-mono">{reviews.length}</p>
+                <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-2">Total Tiket Masuk</p>
+                <p className="text-3xl font-black text-white font-mono">{reviews.length}</p>
               </CardContent>
             </Card>
 
-            <Card className="rounded-[20px] border-sky-border shadow-sky-soft bg-white">
+            <Card className="rounded-[20px] border-sky/30 shadow-sky-soft bg-mist backdrop-blur-md">
               <CardContent className="p-6">
-                <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Rata-Rata Rating</p>
+                <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-2">Rata-Rata Rating</p>
                 <p className="text-3xl font-black text-yellow-500 font-mono flex items-center gap-2">
                   {averageRating} <Star className="h-6 w-6 fill-current text-yellow-500" />
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="rounded-[20px] border-sky-border shadow-sky-soft bg-white">
+            <Card className="rounded-[20px] border-sky/30 shadow-sky-soft bg-mist backdrop-blur-md">
               <CardContent className="p-6">
-                <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Ditampilkan di Beranda</p>
+                <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider mb-2">Ditampilkan di Beranda</p>
                 <p className="text-3xl font-black text-sky font-mono">{totalVisible}</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Reviews Table Card */}
-          <Card className="rounded-[20px] border-sky-border shadow-sky-soft bg-white overflow-hidden">
+          <Card className="rounded-[20px] border-sky/30 shadow-sky-soft bg-mist backdrop-blur-md overflow-hidden">
             <CardContent className="p-6">
               {loading ? (
-                <div className="text-center py-10 text-xs font-black uppercase tracking-widest text-text-muted">
+                <div className="text-center py-10 text-xs font-black uppercase tracking-widest text-white/60">
                   Memuat Daftar Ulasan...
                 </div>
               ) : error ? (
@@ -145,14 +145,14 @@ export default function AdminFeedbacksPage() {
                   {error}
                 </div>
               ) : reviews.length === 0 ? (
-                <div className="text-center py-10 text-xs font-bold text-text-muted uppercase">
+                <div className="text-center py-10 text-xs font-bold text-white/60 uppercase">
                   Belum ada kritik &amp; saran yang masuk.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs font-bold text-text-secondary">
+                  <table className="w-full text-left border-collapse text-xs font-bold text-white/80">
                     <thead>
-                      <tr className="border-b border-sky-border/60 text-[9px] text-text-muted uppercase tracking-widest">
+                      <tr className="border-b border-sky/30 text-[9px] text-white/60 uppercase tracking-widest">
                         <th className="pb-3 pl-2">Tanggal</th>
                         <th className="pb-3">Nama Pelanggan</th>
                         <th className="pb-3">Rating</th>
@@ -166,7 +166,7 @@ export default function AdminFeedbacksPage() {
                         const isVisible = rev.status === 1 || rev.status === true
                         return (
                           <tr key={rev.id} className="hover:bg-slate-50/50 transition-colors">
-                            <td className="py-4 pl-2 font-mono text-text-muted">
+                            <td className="py-4 pl-2 font-mono text-white/60">
                               {new Date(rev.created_at).toLocaleDateString("id-ID", {
                                 day: "numeric",
                                 month: "short",
@@ -174,8 +174,8 @@ export default function AdminFeedbacksPage() {
                               })}
                             </td>
                             <td className="py-4">
-                              <p className="text-text-primary uppercase">{rev.user_name}</p>
-                              <p className="text-[10px] text-text-muted font-normal lowercase">{rev.user_email}</p>
+                              <p className="text-white uppercase">{rev.user_name}</p>
+                              <p className="text-[10px] text-white/60 font-normal lowercase">{rev.user_email}</p>
                             </td>
                             <td className="py-4">
                               <div className="text-yellow-400 font-mono text-[11px]">

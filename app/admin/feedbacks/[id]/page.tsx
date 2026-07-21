@@ -123,14 +123,14 @@ export default function AdminReviewChatPage() {
           {/* Back Button */}
           <Link
             href="/admin/feedbacks"
-            className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-text-muted hover:text-sky tracking-wider mb-6 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-white/60 hover:text-sky tracking-wider mb-6 transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
             Kembali ke Daftar Ulasan
           </Link>
 
           {loading ? (
-            <div className="text-center py-20 text-xs font-black uppercase tracking-widest text-text-muted">
+            <div className="text-center py-20 text-xs font-black uppercase tracking-widest text-white/60">
               Memuat Ruang Diskusi Admin...
             </div>
           ) : error ? (
@@ -149,32 +149,32 @@ export default function AdminReviewChatPage() {
             <div className="grid gap-6 md:grid-cols-3">
               {/* Left Column: Admin Ticket Panel */}
               <div className="md:col-span-1 space-y-6">
-                <Card className="rounded-[20px] border-sky-border shadow-sky-soft overflow-hidden bg-white">
+                <Card className="rounded-[20px] border-sky/30 shadow-sky-soft overflow-hidden bg-mist backdrop-blur-md">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 grid place-items-center">
                         <Shield className="h-5 w-5" />
                       </div>
                       <div>
-                        <h2 className="text-sm font-black text-text-primary uppercase leading-tight">
+                        <h2 className="text-sm font-black text-white uppercase leading-tight">
                           Modul Admin
                         </h2>
-                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                        <p className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
                           Kontrol Ulasan
                         </p>
                       </div>
                     </div>
 
-                    <div className="space-y-4 border-t border-sky-border pt-4 text-xs font-bold text-text-secondary">
+                    <div className="space-y-4 border-t border-sky/30 pt-4 text-xs font-bold text-white/80">
                       <div>
-                        <p className="text-[9px] font-bold text-text-muted uppercase tracking-wide">
+                        <p className="text-[9px] font-bold text-white/60 uppercase tracking-wide">
                           Pengirim
                         </p>
-                        <p className="text-text-primary uppercase">{review.user_name}</p>
+                        <p className="text-white uppercase">{review.user_name}</p>
                       </div>
 
                       <div>
-                        <p className="text-[9px] font-bold text-text-muted uppercase tracking-wide">
+                        <p className="text-[9px] font-bold text-white/60 uppercase tracking-wide">
                           Rating Bintang
                         </p>
                         <div className="text-yellow-400 text-sm mt-0.5">
@@ -183,7 +183,7 @@ export default function AdminReviewChatPage() {
                       </div>
 
                       <div>
-                        <p className="text-[9px] font-bold text-text-muted uppercase tracking-wide">
+                        <p className="text-[9px] font-bold text-white/60 uppercase tracking-wide">
                           Visibilitas Beranda
                         </p>
                         <span className={`inline-block px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded mt-1 ${
@@ -198,7 +198,7 @@ export default function AdminReviewChatPage() {
                       <div className="pt-2">
                         <button
                           onClick={handleToggleVisibility}
-                          className="w-full bg-slate-100 hover:bg-slate-200/80 text-text-primary text-[10px] font-black uppercase tracking-widest py-2.5 px-4 rounded-xl border border-sky-border/40 transition flex items-center justify-center gap-1.5"
+                          className="w-full bg-sky/10 hover:bg-slate-200/80 text-white text-[10px] font-black uppercase tracking-widest py-2.5 px-4 rounded-xl border border-sky/30 transition flex items-center justify-center gap-1.5"
                         >
                           {review.status === 1 || review.status === true ? (
                             <>
@@ -219,12 +219,12 @@ export default function AdminReviewChatPage() {
               </div>
 
               {/* Right Column: Admin Chat Interface */}
-              <div className="md:col-span-2 flex flex-col h-[550px] bg-white rounded-[20px] border border-sky-border shadow-sky-soft overflow-hidden">
+              <div className="md:col-span-2 flex flex-col h-[550px] bg-mist backdrop-blur-md rounded-[20px] border border-sky/30 shadow-sky-soft overflow-hidden">
                 {/* Chat Header */}
-                <div className="bg-slate-50/80 px-6 py-4 border-b border-sky-border flex items-center justify-between">
+                <div className="bg-slate-50/80 px-6 py-4 border-b border-sky/30 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-red-500" />
-                    <p className="text-xs font-black uppercase tracking-wider text-text-primary">
+                    <p className="text-xs font-black uppercase tracking-wider text-white">
                       Membalas Kritik/Saran: {review.user_name}
                     </p>
                   </div>
@@ -246,13 +246,13 @@ export default function AdminReviewChatPage() {
                           className={`max-w-[75%] p-4 rounded-2xl shadow-sky-soft text-xs font-bold leading-relaxed ${
                             isAdmin
                               ? "bg-sky text-white rounded-tr-none"
-                              : "bg-white border border-sky-border text-text-primary rounded-tl-none"
+                              : "bg-mist backdrop-blur-md border border-sky/30 text-white rounded-tl-none"
                           }`}
                         >
                           <p className="break-words">{msg.message}</p>
                           <p
                             className={`text-[8px] mt-1 text-right leading-none ${
-                              isAdmin ? "text-sky-light/80" : "text-text-muted"
+                              isAdmin ? "text-sky-light/80" : "text-white/60"
                             }`}
                           >
                             {new Date(msg.created_at).toLocaleTimeString("id-ID", {
@@ -270,7 +270,7 @@ export default function AdminReviewChatPage() {
                 {/* Message Form input area */}
                 <form
                   onSubmit={handleSendMessage}
-                  className="p-4 border-t border-sky-border bg-white flex gap-2 items-center"
+                  className="p-4 border-t border-sky/30 bg-mist backdrop-blur-md flex gap-2 items-center"
                 >
                   <input
                     type="text"
@@ -278,7 +278,7 @@ export default function AdminReviewChatPage() {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Ketik balasan Anda untuk pelanggan di sini..."
-                    className="flex-grow text-xs font-bold text-text-primary placeholder:text-text-muted/60 p-3 bg-slate-50 rounded-xl border border-sky-border focus:border-sky/40 focus:bg-white focus:outline-none transition-all duration-300"
+                    className="flex-grow text-xs font-bold text-white placeholder:text-white/60/60 p-3 bg-slate-50 rounded-xl border border-sky/30 focus:border-sky/40 focus:bg-mist backdrop-blur-md focus:outline-none transition-all duration-300"
                   />
                   <button
                     type="submit"

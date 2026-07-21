@@ -144,7 +144,7 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col ">
         <Header user={currentUser} />
         <SidebarContentWrapper isAuthenticated={!!currentUser}>
           <main className="flex-1 py-8">
@@ -160,17 +160,17 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col ">
       <Header user={currentUser} />
       <SidebarContentWrapper isAuthenticated={!!currentUser}>
         <main className="flex-1 py-8">
           <div className="container space-y-8 max-w-4xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-black uppercase tracking-tight text-text-primary">
+                <h1 className="text-2xl font-black uppercase tracking-tight text-white">
                   Pengaturan Situs
                 </h1>
-                <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mt-1">
+                <p className="text-xs font-semibold text-white/60 uppercase tracking-wide mt-1">
                   Identitas bisnis, logo, favicon, dan tautan media sosial
                 </p>
               </div>
@@ -185,13 +185,13 @@ export default function AdminSettingsPage() {
             </div>
 
             {/* Business Identity */}
-            <Card className="rounded-[20px] border-sky-border shadow-sky-soft bg-white">
+            <Card className="rounded-[20px] border-sky/30 shadow-sky-soft bg-mist backdrop-blur-md">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase text-text-primary">
+                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase text-white">
                   <Building2 className="h-5 w-5 text-sky" />
                   Identitas Bisnis
                 </CardTitle>
-                <p className="text-[11px] text-text-muted font-medium leading-relaxed">
+                <p className="text-[11px] text-white/60 font-medium leading-relaxed">
                   Digunakan untuk kelengkapan legal di halaman Tentang/Kontak dan pengajuan payment gateway. Data ini hanya untuk kelengkapan situs — pastikan sesuai dengan identitas yang terdaftar di akun pembayaran Anda.
                 </p>
               </CardHeader>
@@ -225,7 +225,7 @@ export default function AdminSettingsPage() {
                     value={form.businessAddress}
                     onChange={(e) => handleChange("businessAddress", e.target.value)}
                     rows={3}
-                    className="flex w-full rounded-xl border border-sky-border bg-white px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-sky focus:outline-none focus:ring-2 focus:ring-sky/20 transition-all duration-300"
+                    className="flex w-full rounded-xl border border-sky/30 bg-mist backdrop-blur-md px-4 py-3 text-sm text-white placeholder:text-white/60 focus:border-sky focus:outline-none focus:ring-2 focus:ring-sky/20 transition-all duration-300"
                   />
                 </div>
 
@@ -238,7 +238,7 @@ export default function AdminSettingsPage() {
                       value={form.businessNpwp}
                       onChange={(e) => handleChange("businessNpwp", e.target.value)}
                     />
-                    <p className="text-[10px] text-text-muted">Disimpan untuk arsip internal saja, tidak ikut tampil di halaman publik.</p>
+                    <p className="text-[10px] text-white/60">Disimpan untuk arsip internal saja, tidak ikut tampil di halaman publik.</p>
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="waAdminNumber">Nomor WhatsApp Resmi</Label>
@@ -275,9 +275,9 @@ export default function AdminSettingsPage() {
             </Card>
 
             {/* Logo & Favicon */}
-            <Card className="rounded-[20px] border-sky-border shadow-sky-soft bg-white">
+            <Card className="rounded-[20px] border-sky/30 shadow-sky-soft bg-mist backdrop-blur-md">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase text-text-primary">
+                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase text-white">
                   <ImageIcon className="h-5 w-5 text-sky" />
                   Logo &amp; Favicon
                 </CardTitle>
@@ -286,11 +286,11 @@ export default function AdminSettingsPage() {
                 <div className="space-y-2">
                   <Label>Logo Situs</Label>
                   <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-xl border border-sky-border bg-ice overflow-hidden shrink-0 grid place-items-center">
+                    <div className="h-16 w-16 rounded-xl border border-sky/30 bg-sky/20 overflow-hidden shrink-0 grid place-items-center">
                       {form.logoUrl ? (
                         <img src={form.logoUrl} alt="Logo preview" className="h-full w-full object-cover" />
                       ) : (
-                        <ImageIcon className="h-6 w-6 text-text-muted" />
+                        <ImageIcon className="h-6 w-6 text-white/60" />
                       )}
                     </div>
                     <div className="space-y-2">
@@ -314,7 +314,7 @@ export default function AdminSettingsPage() {
                         {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
                         Unggah Logo
                       </Button>
-                      <p className="text-[10px] text-text-muted">PNG/JPG/WEBP/SVG, maks 3MB</p>
+                      <p className="text-[10px] text-white/60">PNG/JPG/WEBP/SVG, maks 3MB</p>
                     </div>
                   </div>
                 </div>
@@ -322,11 +322,11 @@ export default function AdminSettingsPage() {
                 <div className="space-y-2">
                   <Label>Favicon</Label>
                   <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-xl border border-sky-border bg-ice overflow-hidden shrink-0 grid place-items-center">
+                    <div className="h-16 w-16 rounded-xl border border-sky/30 bg-sky/20 overflow-hidden shrink-0 grid place-items-center">
                       {form.faviconUrl ? (
                         <img src={form.faviconUrl} alt="Favicon preview" className="h-8 w-8 object-cover" />
                       ) : (
-                        <ImageIcon className="h-6 w-6 text-text-muted" />
+                        <ImageIcon className="h-6 w-6 text-white/60" />
                       )}
                     </div>
                     <div className="space-y-2">
@@ -350,7 +350,7 @@ export default function AdminSettingsPage() {
                         {uploadingFavicon ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
                         Unggah Favicon
                       </Button>
-                      <p className="text-[10px] text-text-muted">PNG/ICO persegi, maks 3MB</p>
+                      <p className="text-[10px] text-white/60">PNG/ICO persegi, maks 3MB</p>
                     </div>
                   </div>
                 </div>
@@ -358,9 +358,9 @@ export default function AdminSettingsPage() {
             </Card>
 
             {/* Social Media */}
-            <Card className="rounded-[20px] border-sky-border shadow-sky-soft bg-white">
+            <Card className="rounded-[20px] border-sky/30 shadow-sky-soft bg-mist backdrop-blur-md">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase text-text-primary">
+                <CardTitle className="flex items-center gap-2 text-sm font-black uppercase text-white">
                   <Share2 className="h-5 w-5 text-sky" />
                   Media Sosial
                 </CardTitle>

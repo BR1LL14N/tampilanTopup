@@ -340,8 +340,8 @@ export function Header({ user }: HeaderProps) {
           </Link>
 
           {/* Center: Search input with real-time live preview */}
-          <div ref={searchContainerRef} className="relative flex-1 max-w-md mx-2 md:mx-6">
-            <div className="relative flex items-center">
+          <div ref={searchContainerRef} className="relative flex-1 max-w-md mx-2 md:mx-6 min-w-0">
+            <div className="relative flex items-center min-w-0 w-full">
               <span className="absolute left-4 text-white/40 pointer-events-none">
                 <Search className="h-4 w-4" />
               </span>
@@ -351,7 +351,7 @@ export function Header({ user }: HeaderProps) {
                 value={searchQuery}
                 onFocus={() => setSearchFocused(true)}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#1e2227] border border-white/10 rounded-full pl-11 pr-10 py-2 text-xs font-semibold text-white placeholder:text-white/40 outline-none transition-all duration-300 hover:border-sky/50 focus:border-sky focus:ring-2 focus:ring-sky/25 focus:bg-[#252a31]"
+                className="w-full min-w-0 bg-[#1e2227] border border-white/10 rounded-full pl-11 pr-10 py-2 text-xs font-semibold text-white placeholder:text-white/40 outline-none transition-all duration-300 hover:border-sky/50 focus:border-sky focus:ring-2 focus:ring-sky/25 focus:bg-[#252a31]"
               />
               {searchQuery && (
                 <button
@@ -465,25 +465,25 @@ export function Header({ user }: HeaderProps) {
 
         {/* Mobile menu expanded overlay drawer */}
         {mobileMenuOpen && (
-          <div className="border-t border-sky-border px-4 pb-6 pt-3 lg:hidden bg-white/95 backdrop-blur-xl animate-fadeIn relative z-40">
+          <div className="border-t border-sky/20 px-4 pb-6 pt-3 lg:hidden bg-[#182024] animate-fadeIn relative z-40 shadow-sky-medium">
             <div className="grid grid-cols-2 gap-2.5">
 
               {/* If Authenticated: show user panel links */}
               {currentUser && (
                 <>
-                  <div className="col-span-2 p-3 bg-ice border border-sky-border rounded-xl flex items-center gap-3 mb-2">
+                  <div className="col-span-2 p-3 bg-black/20 border border-sky/20 rounded-xl flex items-center gap-3 mb-2">
                     <span className="grid h-8 w-8 place-items-center rounded-full bg-sky/10 text-sky">
                       <User className="h-4 w-4" />
                     </span>
                     <div>
-                      <p className="text-xs font-extrabold text-text-primary uppercase tracking-tight">{currentUser.name}</p>
-                      <p className="text-[9px] font-bold text-text-muted uppercase tracking-widest leading-none">{currentUser.role === 'admin' ? 'Administrator' : 'Gamer Member'}</p>
+                      <p className="text-xs font-extrabold text-white uppercase tracking-tight">{currentUser.name}</p>
+                      <p className="text-[9px] font-bold text-white/60 uppercase tracking-widest leading-none">{currentUser.role === 'admin' ? 'Administrator' : 'Gamer Member'}</p>
                     </div>
                   </div>
                   <Link
                     href="/dashboard"
                     className={cn(
-                      "col-span-2 nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-left text-text-secondary flex items-center gap-2",
+                      "col-span-2 nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-left text-white/70 hover:text-white flex items-center gap-2",
                       pathname === "/dashboard" && "nav-active bg-sky/10 text-sky"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -500,7 +500,7 @@ export function Header({ user }: HeaderProps) {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                    "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
                     isActive(link.href) && "nav-active bg-sky/10 text-sky"
                   )}
                   onClick={() => setMobileMenuOpen(false)}
@@ -513,13 +513,13 @@ export function Header({ user }: HeaderProps) {
               {/* If authenticated & is admin: show admin links */}
               {currentUser && currentUser.role === "admin" && (
                 <>
-                  <div className="col-span-2 border-t border-sky-border my-2 pt-2">
-                    <p className="text-[9px] font-black text-text-muted uppercase tracking-widest px-1">Admin Panel Control</p>
+                  <div className="col-span-2 border-t border-sky/20 my-2 pt-2">
+                    <p className="text-[9px] font-black text-white/60 uppercase tracking-widest px-1">Admin Panel Control</p>
                   </div>
                   <Link
                     href="/admin"
                     className={cn(
-                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
                       pathname === "/admin" && "nav-active bg-sky/10 text-sky"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -530,7 +530,7 @@ export function Header({ user }: HeaderProps) {
                   <Link
                     href="/admin/games"
                     className={cn(
-                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
                       pathname === "/admin/games" && "nav-active bg-sky/10 text-sky"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -540,7 +540,7 @@ export function Header({ user }: HeaderProps) {
                   <Link
                     href="/admin/products"
                     className={cn(
-                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
                       pathname === "/admin/products" && "nav-active bg-sky/10 text-sky"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -550,7 +550,7 @@ export function Header({ user }: HeaderProps) {
                   <Link
                     href="/admin/transactions"
                     className={cn(
-                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
                       pathname === "/admin/transactions" && "nav-active bg-sky/10 text-sky"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -560,7 +560,7 @@ export function Header({ user }: HeaderProps) {
                   <Link
                     href="/admin/promos"
                     className={cn(
-                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
                       pathname === "/admin/promos" && "nav-active bg-sky/10 text-sky"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -571,7 +571,7 @@ export function Header({ user }: HeaderProps) {
                   <Link
                     href="/admin/feedbacks"
                     className={cn(
-                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
                       pathname === "/admin/feedbacks" && "nav-active bg-sky/10 text-sky"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -582,7 +582,7 @@ export function Header({ user }: HeaderProps) {
                   <Link
                     href="/admin/settings"
                     className={cn(
-                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
                       pathname === "/admin/settings" && "nav-active bg-sky/10 text-sky"
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -600,7 +600,7 @@ export function Header({ user }: HeaderProps) {
                     setMobileMenuOpen(false)
                     setShowLogoutConfirm(true)
                   }}
-                  className="col-span-2 rounded-xl border border-red-200 bg-red-50 py-3 text-xs font-black uppercase tracking-widest text-red-500 text-center transition hover:bg-red-100 mt-4"
+                  className="col-span-2 rounded-xl border border-red-500/30 bg-red-500/10 py-3 text-xs font-black uppercase tracking-widest text-red-400 text-center transition hover:bg-red-500/20 mt-4"
                 >
                   {t.logout}
                 </button>
@@ -626,19 +626,19 @@ export function Header({ user }: HeaderProps) {
       {/* Persistent Left Sidebar Navigation for Logged-In User on Desktop - Sky Fantasy */}
       {mounted && currentUser && (
         <aside className={cn(
-          "fixed top-[65px] left-0 bottom-0 bg-white/90 border-r border-sky-border z-40 p-4 flex flex-col justify-between hidden lg:flex backdrop-blur-md transition-all duration-300 ease-in-out shadow-sky-soft",
+          "fixed top-[65px] left-0 bottom-0 bg-[#182024] border-r border-sky/20 z-40 p-4 flex flex-col justify-between hidden lg:flex transition-all duration-300 ease-in-out shadow-sky-medium",
           isSidebarCollapsed ? "w-20" : "w-64"
         )}>
-          <div className="space-y-6">
+          <div className="space-y-6 flex-1 overflow-y-auto min-h-0 pb-4 pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20">
 
             {/* Collapse Toggle Button */}
             <div className={cn("flex items-center", isSidebarCollapsed ? "justify-center" : "justify-between px-1")}>
               {!isSidebarCollapsed && (
-                <span className="text-[10px] font-black text-text-muted uppercase tracking-widest animate-fadeIn">Pusat Navigasi</span>
+                <span className="text-[10px] font-black text-white/60 uppercase tracking-widest animate-fadeIn">Pusat Navigasi</span>
               )}
               <button
                 onClick={toggleSidebar}
-                className="p-1.5 rounded-lg border border-sky-border hover:border-sky/30 text-text-muted hover:text-sky hover:bg-ice transition-all"
+                className="p-1.5 rounded-lg border border-sky/20 hover:border-sky/40 text-white/60 hover:text-sky hover:bg-black/20 transition-all"
                 title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
               >
                 {isSidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -647,7 +647,7 @@ export function Header({ user }: HeaderProps) {
 
             {/* User Profile Info Card inside Sidebar */}
             <div className={cn(
-              "p-3 bg-ice border border-sky-border rounded-xl flex items-center transition-all duration-300",
+              "p-3 bg-black/20 border border-sky/20 rounded-xl flex items-center transition-all duration-300",
               isSidebarCollapsed ? "justify-center" : "gap-3"
             )}>
               <span className="grid h-9 w-9 place-items-center rounded-full bg-sky/10 text-sky border border-sky/20 shrink-0">
@@ -655,8 +655,8 @@ export function Header({ user }: HeaderProps) {
               </span>
               {!isSidebarCollapsed && (
                 <div className="overflow-hidden animate-fadeIn">
-                  <p className="text-xs font-extrabold text-text-primary uppercase tracking-tight truncate">{currentUser.name}</p>
-                  <p className="text-[9px] font-bold text-text-muted uppercase tracking-widest mt-0.5">{currentUser.role === 'admin' ? 'Administrator' : 'Gamer Member'}</p>
+                  <p className="text-xs font-extrabold text-white uppercase tracking-tight truncate">{currentUser.name}</p>
+                  <p className="text-[9px] font-bold text-white/60 uppercase tracking-widest mt-0.5">{currentUser.role === 'admin' ? 'Administrator' : 'Gamer Member'}</p>
                 </div>
               )}
             </div>
@@ -664,7 +664,7 @@ export function Header({ user }: HeaderProps) {
             {/* Sidebar Navigation Links */}
             <div className="space-y-1">
               {!isSidebarCollapsed ? (
-                <p className="text-[9px] font-black text-text-muted uppercase tracking-widest px-3 mb-2 animate-fadeIn">Menu Utama</p>
+                <p className="text-[9px] font-black text-white/60 uppercase tracking-widest px-3 mb-2 animate-fadeIn">Menu Utama</p>
               ) : (
                 <div className="h-2" />
               )}
@@ -672,7 +672,7 @@ export function Header({ user }: HeaderProps) {
               <Link
                 href="/dashboard"
                 className={cn(
-                  "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                  "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                   isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                   pathname === "/dashboard" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                 )}
@@ -687,7 +687,7 @@ export function Header({ user }: HeaderProps) {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                     isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     isActive(link.href) && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                   )}
@@ -701,7 +701,7 @@ export function Header({ user }: HeaderProps) {
               <Link
                 href="/history"
                 className={cn(
-                  "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                  "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                   isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                   pathname === "/history" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                 )}
@@ -714,9 +714,9 @@ export function Header({ user }: HeaderProps) {
 
             {/* Admin Specific Links */}
             {currentUser.role === "admin" && (
-              <div className="space-y-1 border-t border-sky-border pt-4">
+              <div className="space-y-1 border-t border-sky/20 pt-4">
                 {!isSidebarCollapsed ? (
-                  <p className="text-[9px] font-black text-text-muted uppercase tracking-widest px-3 mb-2 animate-fadeIn">Admin Panel</p>
+                  <p className="text-[9px] font-black text-white/60 uppercase tracking-widest px-3 mb-2 animate-fadeIn">Admin Panel</p>
                 ) : (
                   <div className="h-2" />
                 )}
@@ -724,7 +724,7 @@ export function Header({ user }: HeaderProps) {
                 <Link
                   href="/admin"
                   className={cn(
-                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                     isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                   )}
@@ -737,7 +737,7 @@ export function Header({ user }: HeaderProps) {
                 <Link
                   href="/admin/games"
                   className={cn(
-                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                     isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/games" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                   )}
@@ -750,7 +750,7 @@ export function Header({ user }: HeaderProps) {
                 <Link
                   href="/admin/products"
                   className={cn(
-                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                     isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/products" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                   )}
@@ -763,7 +763,7 @@ export function Header({ user }: HeaderProps) {
                 <Link
                   href="/admin/transactions"
                   className={cn(
-                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                     isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/transactions" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                   )}
@@ -775,7 +775,7 @@ export function Header({ user }: HeaderProps) {
                 <Link
                   href="/admin/promos"
                   className={cn(
-                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                     isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/promos" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                   )}
@@ -787,7 +787,7 @@ export function Header({ user }: HeaderProps) {
                 <Link
                   href="/admin/feedbacks"
                   className={cn(
-                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                     isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/feedbacks" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                   )}
@@ -799,7 +799,7 @@ export function Header({ user }: HeaderProps) {
                 <Link
                   href="/admin/settings"
                   className={cn(
-                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
                     isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
                     pathname === "/admin/settings" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
                   )}
@@ -814,11 +814,11 @@ export function Header({ user }: HeaderProps) {
           </div>
 
           {/* Sidebar Bottom: Logout Button */}
-          <div className="border-t border-sky-border pt-4">
+          <div className="border-t border-sky/20 pt-4 shrink-0 mt-2">
             <button
               onClick={() => setShowLogoutConfirm(true)}
               className={cn(
-                "flex items-center w-full rounded-lg text-xs font-black uppercase tracking-wider text-red-500 hover:bg-red-50 hover:text-red-400 transition-all border border-transparent",
+                "flex items-center w-full rounded-lg text-xs font-black uppercase tracking-wider text-red-500 hover:bg-red-500/10 hover:text-red-400 transition-all border border-transparent",
                 isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               )}
               title={isSidebarCollapsed ? t.logout : undefined}
@@ -833,7 +833,7 @@ export function Header({ user }: HeaderProps) {
       {/* Language & Location Setting Modal - Sky Fantasy */}
       {showLangModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white p-6 md:p-8 rounded-[24px] border border-sky-border shadow-sky-medium relative animate-fadeIn">
+          <div className="w-full max-w-md bg-[#182024] p-6 md:p-8 rounded-[24px] border border-sky/20 shadow-sky-medium relative animate-fadeIn">
 
             <button
               onClick={() => setShowLangModal(false)}
@@ -852,7 +852,7 @@ export function Header({ user }: HeaderProps) {
 
               {/* Location Select (Currency) */}
               <div className="space-y-2.5">
-                <label className="text-xs font-black uppercase tracking-wider text-text-secondary block">
+                <label className="text-xs font-black uppercase tracking-wider text-white/70 hover:text-white block">
                   Lokasi &amp; Mata Uang
                 </label>
 
@@ -861,8 +861,8 @@ export function Header({ user }: HeaderProps) {
                   onClick={() => setSelectedLocation("id")}
                   className={`w-full flex items-center justify-between p-4 border rounded-xl transition duration-300 ${
                     selectedLocation === "id"
-                      ? "border-sky/40 bg-sky/5 text-text-primary font-bold"
-                      : "border-sky-border bg-white text-text-secondary hover:border-sky/30 hover:bg-ice"
+                      ? "border-sky/40 bg-sky/10 text-white font-bold"
+                      : "border-sky/20 bg-black/20 text-white/70 hover:border-sky/30 hover:bg-black/40"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -877,8 +877,8 @@ export function Header({ user }: HeaderProps) {
                   onClick={() => setSelectedLocation("us")}
                   className={`w-full flex items-center justify-between p-4 border rounded-xl transition duration-300 ${
                     selectedLocation === "us"
-                      ? "border-sky/40 bg-sky/5 text-text-primary font-bold"
-                      : "border-sky-border bg-white text-text-secondary hover:border-sky/30 hover:bg-ice"
+                      ? "border-sky/40 bg-sky/10 text-white font-bold"
+                      : "border-sky/20 bg-black/20 text-white/70 hover:border-sky/30 hover:bg-black/40"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -891,7 +891,7 @@ export function Header({ user }: HeaderProps) {
 
               {/* Language Selection */}
               <div className="space-y-2.5">
-                <label className="text-xs font-black uppercase tracking-wider text-text-secondary block">
+                <label className="text-xs font-black uppercase tracking-wider text-white/70 hover:text-white block">
                   Bahasa (Language)
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -901,8 +901,8 @@ export function Header({ user }: HeaderProps) {
                     onClick={() => setSelectedLang("id")}
                     className={`flex items-center justify-center gap-2 p-3 border rounded-xl transition duration-300 ${
                       selectedLang === "id"
-                        ? "border-sky/40 bg-sky/5 text-text-primary font-bold"
-                        : "border-sky-border bg-white text-text-secondary hover:border-sky/30 hover:bg-ice"
+                        ? "border-sky/40 bg-sky/10 text-white font-bold"
+                        : "border-sky/20 bg-black/20 text-white/70 hover:border-sky/30 hover:bg-black/40"
                     }`}
                   >
                     <IndonesiaFlag />
@@ -914,8 +914,8 @@ export function Header({ user }: HeaderProps) {
                     onClick={() => setSelectedLang("en")}
                     className={`flex items-center justify-center gap-2 p-3 border rounded-xl transition duration-300 ${
                       selectedLang === "en"
-                        ? "border-sky/40 bg-sky/5 text-text-primary font-bold"
-                        : "border-sky-border bg-white text-text-secondary hover:border-sky/30 hover:bg-ice"
+                        ? "border-sky/40 bg-sky/10 text-white font-bold"
+                        : "border-sky/20 bg-black/20 text-white/70 hover:border-sky/30 hover:bg-black/40"
                     }`}
                   >
                     <USFlag />
@@ -951,7 +951,7 @@ export function Header({ user }: HeaderProps) {
       {/* Logout Confirmation Modal Dialog - Sky Fantasy */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-sm bg-white p-6 md:p-8 rounded-[24px] border border-sky-border shadow-sky-medium relative animate-fadeIn">
+          <div className="w-full max-w-sm bg-[#182024] p-6 md:p-8 rounded-[24px] border border-sky/20 shadow-sky-medium relative animate-fadeIn">
 
             <button
               onClick={() => setShowLogoutConfirm(false)}
@@ -1077,9 +1077,9 @@ function HeaderNotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-sky-border rounded-[20px] shadow-sky-medium overflow-hidden z-50 p-2 space-y-1 animate-fadeIn">
-          <div className="px-4 py-3 border-b border-sky-border flex items-center justify-between">
-            <p className="text-[10px] font-black text-text-primary uppercase tracking-widest">
+        <div className="absolute right-0 mt-2 w-80 bg-[#182024] border border-sky/20 rounded-[20px] shadow-sky-medium overflow-hidden z-50 p-2 space-y-1 animate-fadeIn">
+          <div className="px-4 py-3 border-b border-sky/20 flex items-center justify-between">
+            <p className="text-[10px] font-black text-white uppercase tracking-widest">
               Notifikasi Baru ({unreadCount})
             </p>
             {unreadCount > 0 && (
@@ -1092,7 +1092,7 @@ function HeaderNotificationBell() {
             )}
           </div>
 
-          <div className="max-h-64 overflow-y-auto divide-y divide-sky-border/40">
+          <div className="max-h-64 overflow-y-auto divide-y divide-sky/20">
             {notifications.length > 0 ? (
               notifications.slice(0, 5).map((notif) => {
                 const isUnread = !notif.is_read
@@ -1102,22 +1102,22 @@ function HeaderNotificationBell() {
                     key={notif.id}
                     onClick={() => handleMarkAsRead(notif.id, notif.link)}
                     className={`p-3 text-[11px] flex gap-3 cursor-pointer transition-colors ${
-                      isUnread ? "bg-sky/5 text-text-primary" : "bg-white hover:bg-slate-50 text-text-secondary"
+                      isUnread ? "bg-sky/10 text-white" : "bg-black/20 hover:bg-black/40 text-white/70"
                     }`}
                   >
-                    <div className={`p-1.5 rounded-lg shrink-0 h-fit ${isUnread ? "bg-sky/10 text-sky" : "bg-slate-100 text-slate-400"}`}>
+                    <div className={`p-1.5 rounded-lg shrink-0 h-fit ${isUnread ? "bg-sky/20 text-sky" : "bg-white/5 text-white/40"}`}>
                       {isFeedback ? <MessageSquare className="h-3.5 w-3.5" /> : <Bell className="h-3.5 w-3.5" />}
                     </div>
                     <div className="flex-grow min-w-0">
                       <div className="flex justify-between items-start gap-1">
-                        <p className={`font-black truncate ${isUnread ? "text-text-primary" : "text-text-secondary"}`}>
+                        <p className={`font-black truncate ${isUnread ? "text-white" : "text-white/70"}`}>
                           {notif.title}
                         </p>
                         <span className="text-[7.5px] font-bold text-text-muted uppercase shrink-0">
                           {new Date(notif.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       </div>
-                      <p className="text-[10px] text-text-secondary mt-0.5 line-clamp-2 leading-relaxed">
+                      <p className="text-[10px] text-white/60 mt-0.5 line-clamp-2 leading-relaxed">
                         {notif.message}
                       </p>
                     </div>
@@ -1125,17 +1125,17 @@ function HeaderNotificationBell() {
                 )
               })
             ) : (
-              <div className="p-8 text-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
+              <div className="p-8 text-center text-white/50 text-[10px] font-bold uppercase tracking-wider">
                 Kotak masuk kosong
               </div>
             )}
           </div>
 
-          <div className="p-2 border-t border-sky-border flex justify-center">
+          <div className="p-2 border-t border-sky/20 flex justify-center">
             <Link
               href="/dashboard"
               onClick={() => setIsOpen(false)}
-              className="w-full text-center py-2 text-[9px] font-black uppercase text-sky hover:text-sky-dark tracking-widest bg-sky/5 rounded-xl border border-sky-border/40 transition"
+              className="w-full text-center py-2 text-[9px] font-black uppercase text-sky hover:text-white tracking-widest bg-sky/10 rounded-xl border border-sky/20 transition"
             >
               Buka Semua Notifikasi
             </Link>

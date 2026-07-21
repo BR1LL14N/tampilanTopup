@@ -118,10 +118,10 @@ export default function HistoryPage() {
         <div className="container">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-text-primary">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-white">
               Riwayat Transaksi
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-white/60">
               Lihat semua transaksi top up kamu
             </p>
           </div>
@@ -129,7 +129,7 @@ export default function HistoryPage() {
           {/* Search and Filter */}
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
               <Input
                 placeholder="Cari invoice atau ID player..."
                 value={searchQuery}
@@ -147,7 +147,7 @@ export default function HistoryPage() {
           {isLoading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white p-5 rounded-[20px] border border-sky-border shadow-sky-soft space-y-4">
+                <div key={i} className="bg-mist backdrop-blur-md p-5 rounded-[20px] border border-sky/30 shadow-sky-soft space-y-4">
                   <div className="flex items-center gap-3">
                     <Skeleton className="h-10 w-10 rounded-lg bg-sky/10" />
                     <div className="space-y-2 flex-1">
@@ -155,7 +155,7 @@ export default function HistoryPage() {
                       <Skeleton className="h-3.5 w-32 rounded bg-sky/10" />
                     </div>
                   </div>
-                  <div className="space-y-2 pt-3 border-t border-sky-border/50">
+                  <div className="space-y-2 pt-3 border-t border-sky/30">
                     <div className="flex justify-between">
                       <Skeleton className="h-3.5 w-16 rounded bg-sky/10" />
                       <Skeleton className="h-3.5 w-24 rounded bg-sky/10" />
@@ -178,13 +178,13 @@ export default function HistoryPage() {
               ))}
             </div>
           ) : (
-            <Card className="p-12 text-center bg-white rounded-[20px] border border-sky-border shadow-sky-soft">
+            <Card className="p-12 text-center bg-mist backdrop-blur-md rounded-[20px] border border-sky/30 shadow-sky-soft">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-ice flex items-center justify-center">
-                  <Search className="h-8 w-8 text-muted-foreground" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sky/20 flex items-center justify-center">
+                  <Search className="h-8 w-8 text-white/60" />
                 </div>
-                <h3 className="font-semibold mb-2 text-text-primary">Tidak ada transaksi</h3>
-                <p className="text-muted-foreground mb-6">
+                <h3 className="font-semibold mb-2 text-white">Tidak ada transaksi</h3>
+                <p className="text-white/60 mb-6">
                   {searchQuery
                     ? "Transaksi tidak ditemukan"
                     : "Kamu belum memiliki transaksi"}

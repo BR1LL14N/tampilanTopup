@@ -189,7 +189,7 @@ export default function AdminPromosPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col ">
         <Header user={currentUser} />
         <SidebarContentWrapper isAuthenticated={!!currentUser}>
           <main className="flex-1 py-8">
@@ -204,11 +204,11 @@ export default function AdminPromosPage() {
               </div>
 
               {/* Table Card */}
-              <div className="bg-white rounded-[20px] border border-sky-border shadow-sky-soft p-6 space-y-6">
+              <div className="bg-mist backdrop-blur-md rounded-[20px] border border-sky/30 shadow-sky-soft p-6 space-y-6">
                 <Skeleton className="h-10 w-72 rounded-xl bg-sky/10" />
                 <div className="space-y-3">
                   {/* Header row */}
-                  <div className="grid grid-cols-5 gap-4 py-2 border-b border-sky-border/50">
+                  <div className="grid grid-cols-5 gap-4 py-2 border-b border-sky/30">
                     <Skeleton className="h-4 w-20 rounded bg-sky/10" />
                     <Skeleton className="h-4 w-16 rounded bg-sky/10" />
                     <Skeleton className="h-4 w-24 rounded bg-sky/10" />
@@ -217,7 +217,7 @@ export default function AdminPromosPage() {
                   </div>
                   {/* Data rows */}
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="grid grid-cols-5 gap-4 py-4 items-center border-b border-sky-border/30">
+                    <div key={i} className="grid grid-cols-5 gap-4 py-4 items-center border-b border-sky/30">
                       <div className="flex items-center gap-3">
                         <Skeleton className="h-8 w-8 rounded-lg shrink-0 bg-sky/10" />
                         <Skeleton className="h-4 w-28 rounded-md bg-sky/10" />
@@ -242,7 +242,7 @@ export default function AdminPromosPage() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col ">
       <Header user={currentUser} />
 
       <SidebarContentWrapper isAuthenticated={!!currentUser}>
@@ -252,7 +252,7 @@ export default function AdminPromosPage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold mb-2">Kelola Promo</h1>
-                <p className="text-muted-foreground">
+                <p className="text-white/60">
                   Kelola kode voucher dan diskon referral pelanggan
                 </p>
               </div>
@@ -266,13 +266,13 @@ export default function AdminPromosPage() {
             <div className="grid grid-cols-3 gap-4 mb-8">
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground text-sm">Total Voucher</p>
+                  <p className="text-white/60 text-sm">Total Voucher</p>
                   <p className="text-2xl font-bold">{promosList.length}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground text-sm">Aktif</p>
+                  <p className="text-white/60 text-sm">Aktif</p>
                   <p className="text-2xl font-bold text-green-500">
                     {promosList.filter((p) => p.status).length}
                   </p>
@@ -280,7 +280,7 @@ export default function AdminPromosPage() {
               </Card>
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground text-sm">Total Penggunaan</p>
+                  <p className="text-white/60 text-sm">Total Penggunaan</p>
                   <p className="text-2xl font-bold text-sky">
                     {promosList.reduce((sum, p) => sum + (Number(p.uses_count) || 0), 0)}x
                   </p>
@@ -291,7 +291,7 @@ export default function AdminPromosPage() {
             {/* Search */}
             <div className="mb-6">
               <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
                 <Input
                   placeholder="Cari kode promo..."
                   value={searchQuery}
@@ -320,7 +320,7 @@ export default function AdminPromosPage() {
                       <TableRow key={promo.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-ice text-sky">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky/20 text-sky">
                               <Ticket className="h-4 w-4" />
                             </span>
                             <span className="font-bold tracking-wider font-mono text-sm">{promo.code}</span>
@@ -337,7 +337,7 @@ export default function AdminPromosPage() {
                             </span>
                           )}
                         </TableCell>
-                        <TableCell className="font-semibold text-text-primary">
+                        <TableCell className="font-semibold text-white">
                           {Number(promo.discount_percent) > 0 ? (
                             `${promo.discount_percent}%`
                           ) : (
@@ -346,7 +346,7 @@ export default function AdminPromosPage() {
                         </TableCell>
                         <TableCell>
                           <span className="font-mono">{promo.uses_count}</span>
-                          <span className="text-text-muted"> / {promo.max_uses}</span>
+                          <span className="text-white/60"> / {promo.max_uses}</span>
                         </TableCell>
                         <TableCell>
                           <span
@@ -388,19 +388,19 @@ export default function AdminPromosPage() {
 
       {/* Edit/Add Promo Dialog Modal */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md bg-white border border-sky-border rounded-[24px] p-6 shadow-sky-medium">
+        <DialogContent className="max-w-md bg-mist backdrop-blur-md border border-sky/30 rounded-[24px] p-6 shadow-sky-medium">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-text-primary uppercase tracking-wide">
+            <DialogTitle className="text-xl font-black text-white uppercase tracking-wide">
               {selectedPromo ? "Edit Promo" : "Tambah Promo Baru"}
             </DialogTitle>
-            <DialogDescription className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+            <DialogDescription className="text-xs font-semibold text-white/60 uppercase tracking-wider">
               {selectedPromo ? "Ubah detail parameter diskon di bawah ini." : "Masukkan parameter voucher kode promo baru."}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSavePromo} className="space-y-4 my-2">
             <div className="space-y-1.5">
-              <Label htmlFor="promo_code" className="text-xs font-bold text-text-secondary uppercase">Kode Promo</Label>
+              <Label htmlFor="promo_code" className="text-xs font-bold text-white/80 uppercase">Kode Promo</Label>
               <Input
                 id="promo_code"
                 value={editForm.code}
@@ -412,7 +412,7 @@ export default function AdminPromosPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="discount_type" className="text-xs font-bold text-text-secondary uppercase">Tipe Diskon</Label>
+                <Label htmlFor="discount_type" className="text-xs font-bold text-white/80 uppercase">Tipe Diskon</Label>
                 <select
                   id="discount_type"
                   value={discountType}
@@ -426,7 +426,7 @@ export default function AdminPromosPage() {
 
               {discountType === "flat" ? (
                 <div className="space-y-1.5">
-                  <Label htmlFor="discount_amount" className="text-xs font-bold text-text-secondary uppercase">Nominal Potongan (Rp)</Label>
+                  <Label htmlFor="discount_amount" className="text-xs font-bold text-white/80 uppercase">Nominal Potongan (Rp)</Label>
                   <Input
                     id="discount_amount"
                     type="number"
@@ -438,7 +438,7 @@ export default function AdminPromosPage() {
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <Label htmlFor="discount_percent" className="text-xs font-bold text-text-secondary uppercase">Persen Potongan (%)</Label>
+                  <Label htmlFor="discount_percent" className="text-xs font-bold text-white/80 uppercase">Persen Potongan (%)</Label>
                   <Input
                     id="discount_percent"
                     type="number"
@@ -455,7 +455,7 @@ export default function AdminPromosPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="max_uses" className="text-xs font-bold text-text-secondary uppercase">Batas Pemakaian (Max Uses)</Label>
+                <Label htmlFor="max_uses" className="text-xs font-bold text-white/80 uppercase">Batas Pemakaian (Max Uses)</Label>
                 <Input
                   id="max_uses"
                   type="number"
@@ -466,7 +466,7 @@ export default function AdminPromosPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="uses_count" className="text-xs font-bold text-text-secondary uppercase">Jumlah Terpakai</Label>
+                <Label htmlFor="uses_count" className="text-xs font-bold text-white/80 uppercase">Jumlah Terpakai</Label>
                 <Input
                   id="uses_count"
                   type="number"
@@ -486,7 +486,7 @@ export default function AdminPromosPage() {
                 onChange={(e) => setEditForm({ ...editForm, status: e.target.checked })}
                 className="h-4 w-4 rounded border-gray-300 text-sky focus:ring-sky cursor-pointer"
               />
-              <Label htmlFor="promo_status" className="text-xs font-bold text-text-secondary uppercase cursor-pointer select-none">
+              <Label htmlFor="promo_status" className="text-xs font-bold text-white/80 uppercase cursor-pointer select-none">
                 Promo Aktif
               </Label>
             </div>

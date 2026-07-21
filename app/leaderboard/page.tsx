@@ -152,7 +152,7 @@ export default function LeaderboardPage() {
       case "Gold":
         return "text-amber-500 bg-amber-50 border-amber-500/20"
       case "Silver":
-        return "text-white/80 bg-ice border-sky/30/30"
+        return "text-white/80 bg-sky/20 border-sky/30/30"
       case "Bronze":
       default:
         return "text-amber-600 bg-amber-50 border-amber-600/20"
@@ -160,7 +160,7 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip">
+    <div className="min-h-screen flex flex-col relative ">
       {/* Background decorative elements */}
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-sky/20 border border-sky/30 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/3 -right-40 w-96 h-96 bg-sky/5 rounded-full blur-3xl pointer-events-none" />
@@ -174,7 +174,7 @@ export default function LeaderboardPage() {
           {/* Header Title Section */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
-              <Link href="/" className="p-2 rounded-lg bg-ice border border-sky/30 text-white/80 hover:text-sky hover:border-sky transition-all duration-200 hover:scale-105 active:scale-95">
+              <Link href="/" className="p-2 rounded-lg bg-sky/20 border border-sky/30 text-white/80 hover:text-sky hover:border-sky transition-all duration-200 hover:scale-105 active:scale-95">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
               <div>
@@ -188,11 +188,11 @@ export default function LeaderboardPage() {
               <Clock className="h-4 w-4 text-sky animate-pulse" />
               <span className="text-xs text-white/80 font-semibold">Diperbarui dalam</span>
               <div className="flex items-center gap-1 font-mono text-sm font-bold text-white">
-                <span className="bg-ice px-1.5 py-0.5 rounded">{formatTime(timeLeft.hours)}</span>
+                <span className="bg-sky/20 px-1.5 py-0.5 rounded">{formatTime(timeLeft.hours)}</span>
                 <span className="text-sky">:</span>
-                <span className="bg-ice px-1.5 py-0.5 rounded">{formatTime(timeLeft.minutes)}</span>
+                <span className="bg-sky/20 px-1.5 py-0.5 rounded">{formatTime(timeLeft.minutes)}</span>
                 <span className="text-sky">:</span>
-                <span className="bg-ice px-1.5 py-0.5 rounded">{formatTime(timeLeft.seconds)}</span>
+                <span className="bg-sky/20 px-1.5 py-0.5 rounded">{formatTime(timeLeft.seconds)}</span>
               </div>
             </div>
           </div>
@@ -225,7 +225,7 @@ export default function LeaderboardPage() {
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   sortBy === "spent"
                     ? "bg-sky text-white shadow-lg shadow-sky/20 scale-[1.02]"
-                    : "text-white/80 hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
+                    : "text-white/80 hover:text-sky hover:bg-sky/20 hover:scale-[1.02] active:scale-[0.98]"
                 }`}
               >
                 Total Belanja
@@ -235,7 +235,7 @@ export default function LeaderboardPage() {
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   sortBy === "transactions"
                     ? "bg-sky text-white shadow-lg shadow-sky/20 scale-[1.02]"
-                    : "text-white/80 hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
+                    : "text-white/80 hover:text-sky hover:bg-sky/20 hover:scale-[1.02] active:scale-[0.98]"
                 }`}
               >
                 Transaksi
@@ -245,7 +245,7 @@ export default function LeaderboardPage() {
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   sortBy === "points"
                     ? "bg-sky text-white shadow-lg shadow-sky/20 scale-[1.02]"
-                    : "text-white/80 hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
+                    : "text-white/80 hover:text-sky hover:bg-sky/20 hover:scale-[1.02] active:scale-[0.98]"
                 }`}
               >
                 Poin Loyalty
@@ -262,7 +262,7 @@ export default function LeaderboardPage() {
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
                       timeFilter === period
                         ? "bg-sky/20 border border-sky/30 text-sky border border-sky/20"
-                        : "text-white/80 hover:text-sky hover:bg-ice hover:scale-[1.02] active:scale-[0.98]"
+                        : "text-white/80 hover:text-sky hover:bg-sky/20 hover:scale-[1.02] active:scale-[0.98]"
                     }`}
                   >
                     {period === "24h" ? "Hari Ini" : period === "7d" ? "7 H" : period === "30d" ? "30 H" : "Seasonal"}
@@ -288,11 +288,11 @@ export default function LeaderboardPage() {
               <div className="order-1 transition-all duration-300 hover:-translate-y-2">
                 <Card className="glass-sky shimmer-hover relative overflow-hidden border-sky/30 bg-[#183644]/90 backdrop-blur-md hover:border-sky hover:shadow-lg hover:shadow-sky/10 transition-all duration-300 rounded-[20px]">
                   {/* Decorative corner tag */}
-                  <div className="absolute top-2 right-2 md:top-3 md:right-3 flex h-5 w-5 md:h-8 md:w-8 text-[10px] md:text-sm items-center justify-center rounded-full bg-ice border border-sky/30 text-white/80 font-bold">
+                  <div className="absolute top-2 right-2 md:top-3 md:right-3 flex h-5 w-5 md:h-8 md:w-8 text-[10px] md:text-sm items-center justify-center rounded-full bg-sky/20 border border-sky/30 text-white/80 font-bold">
                     2
                   </div>
                   <CardContent className="p-2 sm:p-4 md:p-6 text-center">
-                    <div className="relative mx-auto mb-2 md:mb-4 w-12 h-12 md:w-20 md:h-20 rounded-full border-2 border-text-secondary bg-ice p-0.5 md:p-1 flex items-center justify-center">
+                    <div className="relative mx-auto mb-2 md:mb-4 w-12 h-12 md:w-20 md:h-20 rounded-full border-2 border-text-secondary bg-sky/20 p-0.5 md:p-1 flex items-center justify-center">
                       <img src={secondPlace.avatar} alt={secondPlace.nickname} className="w-full h-full object-cover rounded-full" />
                       <div className="absolute -bottom-1 -right-1 flex h-4 w-4 md:h-6 md:w-6 items-center justify-center rounded-full bg-text-secondary text-white shadow text-[8px] md:text-[10px] font-extrabold">
                         🥈
@@ -447,7 +447,7 @@ export default function LeaderboardPage() {
           <Card className="glass-sky overflow-hidden border-sky/30 bg-[#183644]/90 backdrop-blur-md/80 rounded-[20px]">
             <CardContent className="p-0">
               <Table>
-                <TableHeader className="bg-ice border-b border-sky/30">
+                <TableHeader className="bg-sky/20 border-b border-sky/30">
                   <TableRow className="hover:bg-transparent border-b border-sky/30">
                     <TableHead className="text-white/80 font-bold w-12 md:w-20">RANK</TableHead>
                     <TableHead className="text-white/80 font-bold">PENGGUNA</TableHead>
@@ -473,7 +473,7 @@ export default function LeaderboardPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-ice p-0.5 overflow-hidden transition-transform duration-300 hover:scale-110">
+                              <div className="w-8 h-8 rounded-full bg-sky/20 p-0.5 overflow-hidden transition-transform duration-300 hover:scale-110">
                                 <img src={player.avatar} alt={player.nickname} className="w-full h-full object-cover rounded-full" />
                               </div>
                               <span className="font-semibold text-white">{player.nickname}</span>

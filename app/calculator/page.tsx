@@ -212,7 +212,7 @@ export default function CalculatorPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip text-white">
+    <div className="min-h-screen flex flex-col relative  text-white">
 
       {/* Background decorative elements */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky/5 rounded-full blur-3xl pointer-events-none" />
@@ -377,7 +377,7 @@ export default function CalculatorPage() {
                       <p className="text-xs font-bold text-white/80 uppercase tracking-wider mb-2">Item yang Harus Dibeli:</p>
 
                       {optimizationResult.items.map((item: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center bg-ice p-4 rounded-xl border border-sky/30/50 hover:border-sky/20 transition-all duration-300 group">
+                        <div key={idx} className="flex justify-between items-center bg-sky/20 p-4 rounded-xl border border-sky/30/50 hover:border-sky/20 transition-all duration-300 group">
                           <div className="flex items-center gap-3">
                             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#183644]/90 backdrop-blur-md p-1.5 border border-sky/30/30">
                               <img
@@ -408,7 +408,7 @@ export default function CalculatorPage() {
                     </div>
 
                     {/* Optimization Specs */}
-                    <div className="grid grid-cols-2 gap-4 bg-ice p-5 rounded-xl border border-sky/30/50 mb-6 text-xs">
+                    <div className="grid grid-cols-2 gap-4 bg-sky/20 p-5 rounded-xl border border-sky/30/50 mb-6 text-xs">
                       <div>
                         <span className="text-white/80 block font-medium mb-0.5">Mata Uang Target</span>
                         <span className="text-white font-bold">{targetQty} {gameCurrencyName}</span>

@@ -62,7 +62,7 @@ export default function CheckTransactionPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip text-white">
+    <div className="min-h-screen flex flex-col relative  text-white">
 
       <Header />
 
@@ -134,7 +134,7 @@ export default function CheckTransactionPage() {
 
             {/* Transaction Result Panel */}
             {result && (
-              <div className="mt-8 border border-sky/30 rounded-xl bg-ice overflow-hidden relative">
+              <div className="mt-8 border border-sky/30 rounded-xl bg-sky/20 overflow-hidden relative">
                 {/* Visual Status Header bar */}
                 <div className={`p-4 flex items-center justify-between border-b border-sky/30 ${
                   result.status === 'success' ? 'bg-emerald-50' :

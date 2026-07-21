@@ -265,7 +265,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
       <Header user={user} />
 
       <SidebarContentWrapper isAuthenticated={!!user}>
-        <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 w-full overflow-hidden">
 
         {/* Hero Carousel - Sky Fantasy with Touch Swipe Support */}
         <div
@@ -289,17 +289,17 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
 
                 <div className="relative z-10 flex min-h-[440px] items-center p-6 sm:py-10 sm:px-24 lg:py-16 lg:px-28">
                   {/* Glassmorphism content panel to completely separate text from busy backgrounds */}
-                  <div className="max-w-2xl bg-[#12313E]/30 backdrop-blur-[12px] p-6 sm:p-8 md:p-10 rounded-[20px] border border-white/10 shadow-2xl relative overflow-hidden group/panel transition-all duration-300 hover:bg-[#12313E]/45 hover:border-white/20">
+                  <div className="w-full min-w-0 max-w-2xl bg-[#12313E]/30 backdrop-blur-[12px] p-6 sm:p-8 md:p-10 rounded-[20px] border border-white/10 shadow-2xl relative overflow-hidden group/panel transition-all duration-300 hover:bg-[#12313E]/45 hover:border-white/20">
                     {/* Subtle corner hover glow effect */}
                     <div className="absolute -top-10 -left-10 w-24 h-24 bg-sky/20 rounded-full blur-2xl pointer-events-none transition-all duration-500 group-hover/panel:bg-diamond/30 group-hover/panel:scale-150" />
                     
                     <span className="inline-block rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-white">
                       {slide.tag}
                     </span>
-                    <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-black uppercase leading-tight text-white tracking-tight" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+                    <h2 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-black uppercase leading-tight text-white tracking-tight break-words whitespace-normal" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                       {slide.title}
                     </h2>
-                    <p className="mt-4 max-w-xl text-xs sm:text-sm font-medium text-white/80 leading-relaxed">
+                    <p className="mt-4 max-w-xl text-xs sm:text-sm font-medium text-white/80 leading-relaxed break-words whitespace-normal">
                       {slide.desc}
                     </p>
 
@@ -367,15 +367,15 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               <span className="flex h-12 w-12 place-items-center justify-center rounded-xl bg-sky/15 border border-sky/30 text-sky animate-pulse shadow-lg shadow-sky/10">
                 <Zap className="h-6 w-6 fill-sky/20" />
               </span>
-              <div>
-                <h2 className="text-2xl font-black tracking-wide text-white uppercase">FLASH SALE HARI INI</h2>
-                <p className="text-xs font-semibold text-white/60 uppercase tracking-wide">Promo terbatas dengan harga miring untuk game favoritmu.</p>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-xl sm:text-2xl font-black tracking-wide text-white uppercase break-words whitespace-normal">FLASH SALE HARI INI</h2>
+                <p className="text-[10px] sm:text-xs font-semibold text-white/60 uppercase tracking-wide mt-1 break-words whitespace-normal">Promo terbatas dengan harga miring untuk game favoritmu.</p>
               </div>
             </div>
             {/* Timer */}
-            <div className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-2.5">
+            <div className="flex flex-wrap items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-4 py-2.5">
               <span className="text-[10px] font-black text-diamond uppercase tracking-widest mr-2">Berakhir dalam</span>
-              <div className="flex gap-1.5">
+              <div className="flex flex-wrap gap-1.5">
                 {[
                   { value: timeLeft.hours, label: "H" },
                   { value: timeLeft.minutes, label: "M" },
@@ -427,7 +427,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                 <button
                   key={idx}
                   onClick={() => router.push(`/games/${slug}`)}
-                  className="w-full relative overflow-hidden dark-stripes-teal border border-sky/30 hover:border-diamond/60 text-left group flex flex-col justify-between h-full min-h-[140px] sm:min-h-[160px] shimmer-hover rounded-[16px] sm:rounded-[20px] p-3 sm:p-4 shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
+                  className="w-full min-w-0 relative overflow-hidden dark-stripes-teal border border-sky/30 hover:border-diamond/60 text-left group flex flex-col justify-between h-full min-h-[140px] sm:min-h-[160px] shimmer-hover rounded-[16px] sm:rounded-[20px] p-3 sm:p-4 shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
                   type="button"
                 >
                   {/* Discount Badge */}
@@ -564,9 +564,9 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-sky text-white font-mono font-black text-lg shadow-sky-glow">
               5.0
             </span>
-            <div>
+            <div className="flex-1 min-w-0">
               <div className="text-yellow-400 text-lg leading-none mb-1">★★★★★</div>
-              <p className="text-xs font-bold text-white/70 uppercase tracking-wide">Berdasarkan total ulasan pengguna terverifikasi</p>
+              <p className="text-xs font-bold text-white/70 uppercase tracking-wide break-words whitespace-normal">Berdasarkan total ulasan pengguna terverifikasi</p>
             </div>
           </div>
 
@@ -577,9 +577,9 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-sky/20 text-sky group-hover:bg-sky group-hover:text-white transition-all duration-300 border border-sky/30">
               <Headphones className="h-6 w-6" />
             </span>
-            <div>
-              <p className="font-black text-white uppercase group-hover:text-sky transition-colors tracking-wide">Butuh Bantuan?</p>
-              <p className="text-xs font-bold text-white/70 uppercase tracking-wide">Hubungi layanan Customer Service 24/7 kami.</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-black text-white uppercase group-hover:text-sky transition-colors tracking-wide break-words whitespace-normal">Butuh Bantuan?</p>
+              <p className="text-xs font-bold text-white/70 uppercase tracking-wide break-words whitespace-normal">Hubungi layanan Customer Service 24/7 kami.</p>
             </div>
           </div>
 

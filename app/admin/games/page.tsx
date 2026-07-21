@@ -200,7 +200,7 @@ export default function AdminGamesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col ">
         <Header user={currentUser} />
         <SidebarContentWrapper isAuthenticated={!!currentUser}>
           <main className="flex-1 py-8">
@@ -215,11 +215,11 @@ export default function AdminGamesPage() {
               </div>
 
               {/* Table Card */}
-              <div className="bg-white rounded-[20px] border border-sky-border shadow-sky-soft p-6 space-y-6">
+              <div className="bg-mist backdrop-blur-md rounded-[20px] border border-sky/30 shadow-sky-soft p-6 space-y-6">
                 <Skeleton className="h-10 w-72 rounded-xl bg-sky/10" />
                 <div className="space-y-3">
                   {/* Header row */}
-                  <div className="grid grid-cols-5 gap-4 py-2 border-b border-sky-border/50">
+                  <div className="grid grid-cols-5 gap-4 py-2 border-b border-sky/30">
                     <Skeleton className="h-4 w-20 rounded bg-sky/10" />
                     <Skeleton className="h-4 w-16 rounded bg-sky/10" />
                     <Skeleton className="h-4 w-24 rounded bg-sky/10" />
@@ -228,7 +228,7 @@ export default function AdminGamesPage() {
                   </div>
                   {/* Data rows */}
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="grid grid-cols-5 gap-4 py-4 items-center border-b border-sky-border/30">
+                    <div key={i} className="grid grid-cols-5 gap-4 py-4 items-center border-b border-sky/30">
                       <div className="flex items-center gap-3">
                         <Skeleton className="h-8 w-8 rounded-lg shrink-0 bg-sky/10" />
                         <Skeleton className="h-4 w-28 rounded-md bg-sky/10" />
@@ -253,7 +253,7 @@ export default function AdminGamesPage() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col ">
       <Header user={currentUser} />
 
       <SidebarContentWrapper isAuthenticated={!!currentUser}>
@@ -263,7 +263,7 @@ export default function AdminGamesPage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold mb-2">Kelola Game</h1>
-                <p className="text-muted-foreground">
+                <p className="text-white/60">
                   Kelola daftar game yang tersedia
                 </p>
               </div>
@@ -276,7 +276,7 @@ export default function AdminGamesPage() {
             {/* Search */}
             <div className="mb-6">
               <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
                 <Input
                   placeholder="Cari game..."
                   value={searchQuery}
@@ -304,7 +304,7 @@ export default function AdminGamesPage() {
                       <TableRow key={game.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-ice shrink-0">
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-sky/20 shrink-0">
                               <img
                                 src={game.image}
                                 alt={game.name}
@@ -316,7 +316,7 @@ export default function AdminGamesPage() {
                                 <span className="text-base">{game.icon}</span>
                                 {game.name}
                               </p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-white/60">
                                 /{game.slug}
                               </p>
                             </div>
@@ -368,12 +368,12 @@ export default function AdminGamesPage() {
 
       {/* Edit/Add Game Dialog Modal */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md bg-white border border-sky-border rounded-[24px] p-6 shadow-sky-medium">
+        <DialogContent className="max-w-md bg-mist backdrop-blur-md border border-sky/30 rounded-[24px] p-6 shadow-sky-medium">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-text-primary uppercase tracking-wide">
+            <DialogTitle className="text-xl font-black text-white uppercase tracking-wide">
               {selectedGame ? "Edit Game" : "Tambah Game Baru"}
             </DialogTitle>
-            <DialogDescription className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+            <DialogDescription className="text-xs font-semibold text-white/60 uppercase tracking-wider">
               {selectedGame ? "Ubah detail parameter game di bawah ini." : "Masukkan data game baru yang ingin ditampilkan."}
             </DialogDescription>
           </DialogHeader>
@@ -381,7 +381,7 @@ export default function AdminGamesPage() {
           <form onSubmit={handleSaveGame} className="space-y-4 my-2">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="game_name" className="text-xs font-bold text-text-secondary uppercase">Nama Game</Label>
+                <Label htmlFor="game_name" className="text-xs font-bold text-white/80 uppercase">Nama Game</Label>
                 <Input
                   id="game_name"
                   value={editForm.name}
@@ -391,7 +391,7 @@ export default function AdminGamesPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="game_slug" className="text-xs font-bold text-text-secondary uppercase">Slug URL</Label>
+                <Label htmlFor="game_slug" className="text-xs font-bold text-white/80 uppercase">Slug URL</Label>
                 <Input
                   id="game_slug"
                   value={editForm.slug}
@@ -404,7 +404,7 @@ export default function AdminGamesPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="game_publisher" className="text-xs font-bold text-text-secondary uppercase">Publisher</Label>
+                <Label htmlFor="game_publisher" className="text-xs font-bold text-white/80 uppercase">Publisher</Label>
                 <Input
                   id="game_publisher"
                   value={editForm.publisher}
@@ -413,7 +413,7 @@ export default function AdminGamesPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="game_category" className="text-xs font-bold text-text-secondary uppercase">Kategori</Label>
+                <Label htmlFor="game_category" className="text-xs font-bold text-white/80 uppercase">Kategori</Label>
                 <Input
                   id="game_category"
                   value={editForm.category}
@@ -424,19 +424,19 @@ export default function AdminGamesPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="game_desc" className="text-xs font-bold text-text-secondary uppercase">Deskripsi</Label>
+              <Label htmlFor="game_desc" className="text-xs font-bold text-white/80 uppercase">Deskripsi</Label>
               <textarea
                 id="game_desc"
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full min-h-[60px] rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="w-full min-h-[60px] rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-white/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 placeholder="Deskripsi game..."
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="game_icon" className="text-xs font-bold text-text-secondary uppercase">Icon Emoji</Label>
+                <Label htmlFor="game_icon" className="text-xs font-bold text-white/80 uppercase">Icon Emoji</Label>
                 <Input
                   id="game_icon"
                   value={editForm.icon}
@@ -445,7 +445,7 @@ export default function AdminGamesPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="game_sort" className="text-xs font-bold text-text-secondary uppercase">Sort Order</Label>
+                <Label htmlFor="game_sort" className="text-xs font-bold text-white/80 uppercase">Sort Order</Label>
                 <Input
                   id="game_sort"
                   type="number"
@@ -457,7 +457,7 @@ export default function AdminGamesPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="game_image" className="text-xs font-bold text-text-secondary uppercase">Image Banner URL (Opsional)</Label>
+              <Label htmlFor="game_image" className="text-xs font-bold text-white/80 uppercase">Image Banner URL (Opsional)</Label>
               <Input
                 id="game_image"
                 value={editForm.image}
@@ -474,7 +474,7 @@ export default function AdminGamesPage() {
                 onChange={(e) => setEditForm({ ...editForm, status: e.target.checked })}
                 className="h-4 w-4 rounded border-gray-300 text-sky focus:ring-sky cursor-pointer"
               />
-              <Label htmlFor="game_status" className="text-xs font-bold text-text-secondary uppercase cursor-pointer select-none">
+              <Label htmlFor="game_status" className="text-xs font-bold text-white/80 uppercase cursor-pointer select-none">
                 Game Aktif (Tampil di Catalog Web)
               </Label>
             </div>

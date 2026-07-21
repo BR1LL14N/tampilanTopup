@@ -163,7 +163,7 @@ export default function InvoiceDetailPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-clip text-text-primary">
+    <div className="min-h-screen flex flex-col relative  text-white">
 
       <Header />
 
@@ -173,7 +173,7 @@ export default function InvoiceDetailPage() {
 
             {/* Section Title */}
             <div className="text-center mb-8">
-              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-text-primary mb-2 flex items-center justify-center gap-2">
+              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-white mb-2 flex items-center justify-center gap-2">
                 <Receipt className="h-6 w-6 text-sky" />
                 Detail Transaksi
               </h1>
@@ -183,14 +183,14 @@ export default function InvoiceDetailPage() {
             </div>
 
             {/* Glass Card Container */}
-            <div className="w-full glass-sky rounded-2xl shadow-sky-glow border-sky-border backdrop-blur-md p-6 md:p-8 relative bg-white/80">
+            <div className="w-full glass-sky rounded-2xl shadow-sky-glow border-sky/30 backdrop-blur-md p-6 md:p-8 relative bg-mist backdrop-blur-md">
               <div className="absolute top-0 left-0 w-20 h-20 bg-sky/10 rounded-full blur-2xl pointer-events-none" />
               <div className="absolute bottom-0 right-0 w-20 h-20 bg-diamond/10 rounded-full blur-2xl pointer-events-none" />
 
               {isLoading ? (
                 <div className="space-y-6">
                   {/* Visual Status Header bar Skeleton */}
-                  <div className="p-4 rounded-xl flex items-center justify-between border bg-slate-50/50 border-sky-border/50">
+                  <div className="p-4 rounded-xl flex items-center justify-between border bg-sky/5/50 border-sky/30">
                     <div className="flex items-center gap-2">
                       <Skeleton className="h-5 w-5 rounded-full bg-sky/10" />
                       <Skeleton className="h-4 w-28 rounded bg-sky/10" />
@@ -199,9 +199,9 @@ export default function InvoiceDetailPage() {
                   </div>
 
                   {/* Details Table Skeleton */}
-                  <div className="border border-sky-border rounded-xl bg-ice/40 p-5 space-y-4">
+                  <div className="border border-sky/30 rounded-xl bg-sky/20/40 p-5 space-y-4">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <div key={i} className="flex justify-between items-center border-b border-sky-border/30 pb-2">
+                      <div key={i} className="flex justify-between items-center border-b border-sky/30 pb-2">
                         <Skeleton className="h-4 w-24 rounded bg-sky/10" />
                         <Skeleton className="h-4 w-32 rounded bg-sky/10" />
                       </div>
@@ -220,7 +220,7 @@ export default function InvoiceDetailPage() {
                     <span>{error}</span>
                   </div>
                   <div className="flex justify-center">
-                    <Link href="/history" className="inline-flex items-center gap-2 text-xs font-bold text-text-secondary hover:text-sky transition duration-300 uppercase tracking-widest">
+                    <Link href="/history" className="inline-flex items-center gap-2 text-xs font-bold text-white/80 hover:text-sky transition duration-300 uppercase tracking-widest">
                       <ArrowLeft className="h-4 w-4" />
                       Kembali ke Riwayat
                     </Link>
@@ -244,7 +244,7 @@ export default function InvoiceDetailPage() {
                       ) : (
                         <AlertTriangle className="h-5 w-5 text-red-500" />
                       )}
-                      <span className="text-xs font-bold uppercase tracking-wider text-text-primary">
+                      <span className="text-xs font-bold uppercase tracking-wider text-white">
                         Status Topup
                       </span>
                     </div>
@@ -261,18 +261,18 @@ export default function InvoiceDetailPage() {
                   </div>
 
                   {/* Details Table */}
-                  <div className="border border-sky-border rounded-xl bg-ice p-5 space-y-4 text-xs">
-                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                      <span className="text-text-secondary font-medium">Nomor Invoice</span>
+                  <div className="border border-sky/30 rounded-xl bg-sky/20 p-5 space-y-4 text-xs">
+                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
+                      <span className="text-white/80 font-medium">Nomor Invoice</span>
                       <span className="font-mono text-sky font-bold">{result.invoice}</span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                      <span className="text-text-secondary font-medium">Tanggal Transaksi</span>
-                      <span className="text-text-primary font-semibold">{formatDate(result.date)}</span>
+                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
+                      <span className="text-white/80 font-medium">Tanggal Transaksi</span>
+                      <span className="text-white font-semibold">{formatDate(result.date)}</span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                      <span className="text-text-secondary font-medium">Game</span>
-                      <span className="flex items-center gap-2 font-bold text-text-primary uppercase">
+                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
+                      <span className="text-white/80 font-medium">Game</span>
+                      <span className="flex items-center gap-2 font-bold text-white uppercase">
                         <img
                           src={getGameAssetByName(result.game)?.icon}
                           alt=""
@@ -281,10 +281,10 @@ export default function InvoiceDetailPage() {
                         {result.game}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                      <span className="text-text-secondary font-medium">Item Produk</span>
-                      <span className="flex items-center gap-2 font-bold text-text-primary">
-                        <span className="flex h-7 w-7 items-center justify-center rounded bg-white p-1 border border-sky-border/30">
+                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
+                      <span className="text-white/80 font-medium">Item Produk</span>
+                      <span className="flex items-center gap-2 font-bold text-white">
+                        <span className="flex h-7 w-7 items-center justify-center rounded bg-mist backdrop-blur-md p-1 border border-sky/30">
                           <img
                             src={getItemAssetForProduct(result.product, undefined, result.game)}
                             alt=""
@@ -294,29 +294,29 @@ export default function InvoiceDetailPage() {
                         {result.product}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                      <span className="text-text-secondary font-medium">User ID Tujuan</span>
-                      <span className="font-mono bg-ice px-2.5 py-1 rounded text-text-primary font-semibold border border-sky-border/30">{result.target_id}</span>
+                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
+                      <span className="text-white/80 font-medium">User ID Tujuan</span>
+                      <span className="font-mono bg-sky/20 px-2.5 py-1 rounded text-white font-semibold border border-sky/30">{result.target_id}</span>
                     </div>
                     {result.request_notes && (
-                      <div className="flex flex-col gap-1 border-b border-sky-border/50 pb-2 text-left">
-                        <span className="text-text-secondary font-medium">Catatan Khusus Admin</span>
-                        <span className="text-text-primary bg-white/60 p-2 rounded border border-sky-border/30 font-medium whitespace-pre-wrap leading-relaxed">{result.request_notes}</span>
+                      <div className="flex flex-col gap-1 border-b border-sky/30 pb-2 text-left">
+                        <span className="text-white/80 font-medium">Catatan Khusus Admin</span>
+                        <span className="text-white bg-mist backdrop-blur-md p-2 rounded border border-sky/30 font-medium whitespace-pre-wrap leading-relaxed">{result.request_notes}</span>
                       </div>
                     )}
-                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                      <span className="text-text-secondary font-medium">Metode Pembayaran</span>
-                      <span className="flex items-center gap-2 font-bold text-text-primary uppercase">
+                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
+                      <span className="text-white/80 font-medium">Metode Pembayaran</span>
+                      <span className="flex items-center gap-2 font-bold text-white uppercase">
                         {String(result.payment_method || "").toLowerCase().includes("qris") && (
-                          <span className="flex h-6 w-10 items-center justify-center rounded bg-white p-1 border border-sky-border/30">
+                          <span className="flex h-6 w-10 items-center justify-center rounded bg-mist backdrop-blur-md p-1 border border-sky/30">
                             <img src={paymentAssets.qris} alt="" className="max-h-full max-w-full object-contain" />
                           </span>
                         )}
                         {result.payment_method || "-"}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky-border/50 pb-2">
-                      <span className="text-text-secondary font-medium">Status Pembayaran</span>
+                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
+                      <span className="text-white/80 font-medium">Status Pembayaran</span>
                       <span className={`font-semibold capitalize ${
                         result.payment_status === 'paid' ? 'text-emerald-500' :
                         result.payment_status === 'failed' ? 'text-red-500' :
@@ -324,13 +324,13 @@ export default function InvoiceDetailPage() {
                       }`}>{result.payment_status || "Pending"}</span>
                     </div>
                     <div className="flex justify-between items-center pt-1">
-                      <span className="text-text-secondary font-medium">Total Pembayaran</span>
+                      <span className="text-white/80 font-medium">Total Pembayaran</span>
                       <span className="text-lg font-black text-sky">{formatCurrency(result.amount)}</span>
                     </div>
                   </div>
 
                   {/* WhatsApp Support Button */}
-                  <div className="pt-6 border-t border-sky-border/40">
+                  <div className="pt-6 border-t border-sky/30">
                     <a
                       href={`https://wa.me/${waAdminNumber.replace(/[^0-9]/g, "")}?text=Halo%20Admin%20Mitsuru,%20saya%20butuh%20bantuan%20mengenai%20transaksi%20Invoice%20${result.invoice}`}
                       target="_blank"
@@ -344,7 +344,7 @@ export default function InvoiceDetailPage() {
 
                   {/* Back Link */}
                   <div className="flex justify-center pt-4">
-                    <Link href="/history" className="inline-flex items-center gap-2 text-xs font-bold text-text-secondary hover:text-sky transition duration-300 uppercase tracking-widest hover:translate-x-[-2px]">
+                    <Link href="/history" className="inline-flex items-center gap-2 text-xs font-bold text-white/80 hover:text-sky transition duration-300 uppercase tracking-widest hover:translate-x-[-2px]">
                       <ArrowLeft className="h-4 w-4 text-sky" />
                       Kembali ke Riwayat
                     </Link>

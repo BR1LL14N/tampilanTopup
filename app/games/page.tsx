@@ -66,7 +66,7 @@ export default async function GamesPage() {
               <h1 className="text-3xl md:text-4xl font-bold mb-2">
                 Semua Game
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-white/60">
                 Pilih game favorit kamu dan mulai top up
               </p>
             </div>
@@ -94,13 +94,13 @@ export default async function GamesPage() {
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h3 className="text-xl font-bold mb-1">{game.name}</h3>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-white/60">
                             {game.description}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-white/60">
                           {game.products} produk
                         </span>
                         <Button variant="ghost" size="sm" className="gap-2">

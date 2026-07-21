@@ -393,7 +393,7 @@ export default function AdminDashboardPage() {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-3">
+                  <div key={i} className="bg-mist backdrop-blur-md p-6 rounded-2xl border border-sky/30 shadow-sky-soft space-y-3">
                     <div className="flex justify-between items-center">
                       <Skeleton className="h-4 w-24 rounded-md bg-sky/10" />
                       <Skeleton className="h-8 w-8 rounded-xl bg-sky/10" />
@@ -406,11 +406,11 @@ export default function AdminDashboardPage() {
               {/* Two columns */}
               <div className="grid lg:grid-cols-12 gap-8">
                 {/* Left Column: Transaksi Terbaru */}
-                <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+                <div className="lg:col-span-8 bg-mist backdrop-blur-md p-6 rounded-2xl border border-sky/30 shadow-sky-soft space-y-6">
                   <Skeleton className="h-6 w-40 rounded-lg bg-sky/10" />
                   <div className="space-y-4">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="flex justify-between items-center p-4 border border-sky-border/50 rounded-xl">
+                      <div key={i} className="flex justify-between items-center p-4 border border-sky/30 rounded-xl">
                         <div className="space-y-2 flex-1 mr-4">
                           <Skeleton className="h-4 w-28 rounded-md bg-sky/10" />
                           <Skeleton className="h-3 w-40 rounded-sm bg-sky/10" />
@@ -422,11 +422,11 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Right Column: Produk Terlaris */}
-                <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-sky-border shadow-sky-soft space-y-6">
+                <div className="lg:col-span-4 bg-mist backdrop-blur-md p-6 rounded-2xl border border-sky/30 shadow-sky-soft space-y-6">
                   <Skeleton className="h-6 w-40 rounded-lg bg-sky/10" />
                   <div className="space-y-4">
                     {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="flex items-center gap-4 p-3 border border-sky-border/30 rounded-xl">
+                      <div key={i} className="flex items-center gap-4 p-3 border border-sky/30 rounded-xl">
                         <Skeleton className="h-10 w-10 rounded-lg shrink-0 bg-sky/10" />
                         <div className="flex-1 space-y-2">
                           <Skeleton className="h-4 w-24 rounded-md bg-sky/10" />
@@ -462,20 +462,20 @@ export default function AdminDashboardPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
           {/* Admin HUD Header */}
-        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/60 p-6 md:p-8 rounded-2xl border border-sky-border relative overflow-hidden shadow-sky-soft">
+        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-mist backdrop-blur-md p-6 md:p-8 rounded-2xl border border-sky/30 relative overflow-hidden shadow-sky-soft">
           <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
 
           <div className="flex items-center gap-5">
             <div className="relative p-[1px] bg-gradient-to-tr from-sky/40 to-diamond/40 rounded-full">
-              <span className="grid h-16 w-16 place-items-center bg-white rounded-full text-sky">
+              <span className="grid h-16 w-16 place-items-center bg-mist backdrop-blur-md rounded-full text-sky">
                 <Shield className="h-8 w-8" />
               </span>
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-black uppercase text-text-primary tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-black uppercase text-white tracking-tight">
                 Admin Control Room
               </h1>
-              <p className="text-xs font-bold text-text-muted uppercase tracking-widest mt-1">
+              <p className="text-xs font-bold text-white/60 uppercase tracking-widest mt-1">
                 Overview &amp; Manajemen Data Penjualan Mitsuru
               </p>
             </div>
@@ -484,14 +484,14 @@ export default function AdminDashboardPage() {
           <div className="flex gap-3">
             <Link href="/admin/games">
               <div className="relative p-[1px] bg-sky-border hover:bg-sky/30 transition-all duration-300" style={inputBevelStyle}>
-                <button className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors" style={inputBevelStyle}>
+                <button className="bg-mist backdrop-blur-md px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/80 hover:text-white transition-colors" style={inputBevelStyle}>
                   Kelola Game
                 </button>
               </div>
             </Link>
             <Link href="/admin/transactions">
               <div className="relative p-[1px] bg-sky/40 hover:bg-sky transition-all duration-300" style={inputBevelStyle}>
-                <button className="bg-white/90 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors shimmer-hover" style={inputBevelStyle}>
+                <button className="bg-mist backdrop-blur-md px-4 py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors shimmer-hover" style={inputBevelStyle}>
                   Daftar Transaksi
                 </button>
               </div>
@@ -503,17 +503,17 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
           {stats.map((stat, index) => (
             <div key={index} className="relative p-[1px] bg-gradient-to-r from-sky/20 to-sky/10 hover:from-sky/30 hover:to-sky/20 transition-all duration-300" style={bevelStyle}>
-              <div className="bg-white p-6 flex flex-col justify-between" style={bevelStyle}>
+              <div className="bg-mist backdrop-blur-md p-6 flex flex-col justify-between" style={bevelStyle}>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold text-text-muted uppercase tracking-wider">{stat.title}</span>
+                  <span className="text-xs font-bold text-white/60 uppercase tracking-wider">{stat.title}</span>
                   <span className={`p-2 rounded border ${stat.color.split(" ")[1]} ${stat.color.split(" ")[2]}`}>
                     <stat.icon className={`h-4.5 w-4.5 ${stat.color.split(" ")[0]}`} />
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between">
-                  <p className="text-2xl font-black text-text-primary font-mono leading-none">{stat.value}</p>
+                  <p className="text-2xl font-black text-white font-mono leading-none">{stat.value}</p>
                   <span className={`text-[10px] font-bold flex items-center gap-0.5 ${
-                    stat.trend === "up" ? "text-green-500" : "text-text-muted"
+                    stat.trend === "up" ? "text-green-500" : "text-white/60"
                   }`}>
                     {stat.trend === "up" && <ArrowUpRight className="h-3 w-3" />}
                     {stat.change}
@@ -529,23 +529,23 @@ export default function AdminDashboardPage() {
 
           {/* Recent Transactions Panel -> Web Activity Panel */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="bg-white rounded-2xl border-sky-border shadow-sky-soft relative overflow-hidden">
-              <div className="p-6 border-b border-sky-border flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
+            <div className="bg-mist backdrop-blur-md rounded-2xl border-sky/30 shadow-sky-soft relative overflow-hidden">
+              <div className="p-6 border-b border-sky/30 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
                   <ShoppingBag className="h-4 w-4 text-sky" />
                   Aktivitas Web Mitsuru
                 </h3>
                 
                 {/* Tabs selection */}
-                <div className="flex flex-wrap gap-1.5 bg-slate-100 p-1 rounded-xl">
+                <div className="flex flex-wrap gap-1.5 bg-sky/10 p-1 rounded-xl">
                   {(["checkout", "pembayaran", "failed", "sync", "feedback"] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
                       className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-lg transition-all ${
                         activeTab === tab
-                          ? "bg-white text-sky shadow-sm border border-sky-border/30"
-                          : "text-text-muted hover:text-text-primary"
+                          ? "bg-mist backdrop-blur-md text-sky shadow-sm border border-sky/30"
+                          : "text-white/60 hover:text-white"
                       }`}
                     >
                       {tab === "checkout" && "Checkout"}
@@ -566,22 +566,22 @@ export default function AdminDashboardPage() {
                       activities.checkouts.map((tx, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between p-4 bg-ice border border-sky-border/50 hover:border-sky/20 rounded-xl transition-all duration-300 group"
+                          className="flex items-center justify-between p-4 bg-sky/20 border border-sky/30 hover:border-sky/20 rounded-xl transition-all duration-300 group"
                         >
                           <div>
-                            <p className="flex items-center gap-2 font-bold text-text-primary group-hover:text-sky transition-colors text-sm uppercase tracking-tight">
-                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1">
+                            <p className="flex items-center gap-2 font-bold text-white group-hover:text-sky transition-colors text-sm uppercase tracking-tight">
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1">
                                 <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
                               </span>
                               {tx.product_name}
                             </p>
-                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
                               <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                              {tx.game_name} • <span className="font-mono text-text-secondary">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
+                              {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-black text-text-primary font-mono text-sm">
+                            <p className="font-black text-white font-mono text-sm">
                               Rp {Number(tx.amount).toLocaleString("id-ID")}
                             </p>
                             <span className="inline-block mt-1 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded bg-amber-50 text-amber-500 border border-amber-500/20">
@@ -591,7 +591,7 @@ export default function AdminDashboardPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada aktivitas checkout</p>
+                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada aktivitas checkout</p>
                     )}
                   </div>
                 )}
@@ -606,15 +606,15 @@ export default function AdminDashboardPage() {
                           className="flex items-center justify-between p-4 bg-green-50/20 border border-green-500/10 hover:border-green-500/30 rounded-xl transition-all duration-300 group"
                         >
                           <div>
-                            <p className="flex items-center gap-2 font-bold text-text-primary group-hover:text-green-500 transition-colors text-sm uppercase tracking-tight">
-                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1">
+                            <p className="flex items-center gap-2 font-bold text-white group-hover:text-green-500 transition-colors text-sm uppercase tracking-tight">
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1">
                                 <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
                               </span>
                               {tx.product_name}
                             </p>
-                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
                               <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                              {tx.game_name} • <span className="font-mono text-text-secondary">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
+                              {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
                             </p>
                           </div>
                           <div className="text-right">
@@ -628,7 +628,7 @@ export default function AdminDashboardPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada aktivitas pembayaran</p>
+                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada aktivitas pembayaran</p>
                     )}
                   </div>
                 )}
@@ -661,15 +661,15 @@ export default function AdminDashboardPage() {
                           >
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="flex items-center gap-2 font-bold text-text-primary text-sm uppercase tracking-tight">
-                                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white p-1 border border-sky-border/30">
+                                <p className="flex items-center gap-2 font-bold text-white text-sm uppercase tracking-tight">
+                                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1 border border-sky/30">
                                     <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
                                   </span>
                                   {tx.product_name}
                                 </p>
-                                <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                                <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
                                   <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                                  {tx.game_name} • <span className="font-mono text-text-secondary">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
+                                  {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
                                 </p>
                               </div>
                               <div className="text-right">
@@ -690,7 +690,7 @@ export default function AdminDashboardPage() {
                         )
                       })
                     ) : (
-                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada aktivitas transaksi gagal</p>
+                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada aktivitas transaksi gagal</p>
                     )}
                   </div>
                 )}
@@ -705,26 +705,26 @@ export default function AdminDashboardPage() {
                           className="flex items-center justify-between p-4 bg-sky/5 border border-sky/10 hover:border-sky/30 rounded-xl transition-all duration-300"
                         >
                           <div>
-                            <p className="font-bold text-text-primary text-sm uppercase tracking-tight">
+                            <p className="font-bold text-white text-sm uppercase tracking-tight">
                               {prod.product_name}
                             </p>
-                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
                               <img src={getGameAssetByName(prod.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                              {prod.game_name} • SKU: <span className="font-mono text-text-secondary">{prod.sku}</span>
+                              {prod.game_name} • SKU: <span className="font-mono text-white/80">{prod.sku}</span>
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-text-primary text-xs font-mono">
+                            <p className="font-bold text-white text-xs font-mono">
                               Harga: Rp {Number(prod.sell_price).toLocaleString("id-ID")}
                             </p>
-                            <span className="inline-block mt-1 text-[8px] font-medium text-text-muted">
+                            <span className="inline-block mt-1 text-[8px] font-medium text-white/60">
                               Sync: {prod.updated_at ? new Date(prod.updated_at).toLocaleString("id-ID") : ""}
                             </span>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada sinkronisasi Digiflazz</p>
+                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada sinkronisasi Digiflazz</p>
                     )}
                   </div>
                 )}
@@ -739,8 +739,8 @@ export default function AdminDashboardPage() {
                           className="p-4 bg-purple-50/20 border border-purple-500/10 hover:border-purple-500/30 rounded-xl transition-all duration-300"
                         >
                           <div className="flex items-center justify-between mb-2">
-                            <p className="font-bold text-text-primary text-xs uppercase tracking-tight">
-                              {fb.user_name} <span className="text-[10px] text-text-muted lowercase flex items-center">({fb.user_email})</span>
+                            <p className="font-bold text-white text-xs uppercase tracking-tight">
+                              {fb.user_name} <span className="text-[10px] text-white/60 lowercase flex items-center">({fb.user_email})</span>
                             </p>
                             <div className="flex items-center gap-0.5">
                               {Array.from({ length: fb.rating }).map((_, rIdx) => (
@@ -748,11 +748,11 @@ export default function AdminDashboardPage() {
                               ))}
                             </div>
                           </div>
-                          <p className="text-xs text-text-secondary leading-relaxed bg-white/50 p-2.5 rounded-lg border border-sky-border/40 font-medium">
+                          <p className="text-xs text-white/80 leading-relaxed bg-mist backdrop-blur-md p-2.5 rounded-lg border border-sky/30 font-medium">
                             "{fb.comment}"
                           </p>
                           <div className="flex justify-between items-center mt-2.5">
-                            <span className="text-[8px] font-bold text-text-muted">
+                            <span className="text-[8px] font-bold text-white/60">
                               Dikirim: {fb.created_at ? new Date(fb.created_at).toLocaleString("id-ID") : ""}
                             </span>
                             <Link href={`/admin/feedbacks`}>
@@ -764,7 +764,7 @@ export default function AdminDashboardPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-center py-10 text-xs text-text-muted font-bold uppercase tracking-wider">Belum ada kritik &amp; saran</p>
+                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada kritik &amp; saran</p>
                     )}
                   </div>
                 )}
@@ -775,10 +775,10 @@ export default function AdminDashboardPage() {
           {/* Right Column: Sync & Top Products */}
           <div className="lg:col-span-4 space-y-8">
             {/* Sync Settings Card */}
-            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft relative overflow-hidden">
+            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
               <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
-              <div className="p-6 border-b border-sky-border flex items-center justify-between">
-                <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
+              <div className="p-6 border-b border-sky/30 flex items-center justify-between">
+                <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
                   <Settings className="h-4 w-4 text-sky" />
                   Auto-Sync Control
                 </h3>
@@ -797,11 +797,11 @@ export default function AdminDashboardPage() {
                 {/* Active Toggle */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                       <Power className="h-3.5 w-3.5 text-sky" />
                       Status Sinkronisasi
                     </label>
-                    <p className="text-[10px] text-text-muted">Aktifkan sinkronisasi otomatis harga.</p>
+                    <p className="text-[10px] text-white/60">Aktifkan sinkronisasi otomatis harga.</p>
                   </div>
                   <button
                     type="button"
@@ -811,7 +811,7 @@ export default function AdminDashboardPage() {
                     }`}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-mist backdrop-blur-md shadow ring-0 transition duration-200 ease-in-out ${
                         isSyncActive ? "translate-x-5" : "translate-x-0"
                       }`}
                     />
@@ -820,49 +820,49 @@ export default function AdminDashboardPage() {
 
                 {/* Interval Input */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <Clock className="h-3.5 w-3.5 text-sky" />
                     Interval Sinkronisasi
                   </label>
                   <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
-                    <div className="flex items-center bg-white" style={inputBevelStyle}>
+                    <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
                       <input
                         type="number"
                         min="1"
                         max="168"
                         value={syncInterval}
                         onChange={(e) => setSyncInterval(Math.max(1, parseInt(e.target.value) || 1))}
-                        className="w-full px-3 py-2 text-xs font-semibold font-mono text-text-primary focus:outline-none bg-transparent"
+                        className="w-full px-3 py-2 text-xs font-semibold font-mono text-white focus:outline-none bg-transparent"
                       />
-                      <span className="pr-3 text-[10px] font-black uppercase text-text-muted tracking-wider shrink-0 select-none">
+                      <span className="pr-3 text-[10px] font-black uppercase text-white/60 tracking-wider shrink-0 select-none">
                         Jam Sekali
                       </span>
                     </div>
                   </div>
-                  <p className="text-[10px] text-text-muted leading-relaxed">
+                  <p className="text-[10px] text-white/60 leading-relaxed">
                     Sistem akan menyinkronkan katalog harga modal Digiflazz setiap {syncInterval} jam.
                   </p>
                 </div>
 
                 {/* Midtrans Mode Input */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <Wallet className="h-3.5 w-3.5 text-sky" />
                     Mode Pembayaran Midtrans
                   </label>
                   <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
-                    <div className="flex items-center bg-white" style={inputBevelStyle}>
+                    <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
                       <select
                         value={midtransMode}
                         onChange={(e) => setMidtransMode(e.target.value)}
-                        className="w-full px-3 py-2 text-xs font-bold text-text-primary focus:outline-none bg-transparent"
+                        className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
                       >
                         <option value="sandbox">SANDBOX (Testing)</option>
                         <option value="production">PRODUCTION (Live)</option>
                       </select>
                     </div>
                   </div>
-                  <p className="text-[10px] text-text-muted leading-relaxed">
+                  <p className="text-[10px] text-white/60 leading-relaxed">
                     Pilih lingkungan pembayaran Midtrans yang aktif untuk transaksi.
                   </p>
                 </div>
@@ -873,7 +873,7 @@ export default function AdminDashboardPage() {
                     <button
                       type="submit"
                       disabled={saveLoading}
-                      className="w-full bg-white/95 py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors disabled:opacity-50"
+                      className="w-full bg-mist backdrop-blur-md py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors disabled:opacity-50"
                       style={inputBevelStyle}
                     >
                       {saveLoading ? "Menyimpan..." : "Simpan Pengaturan"}
@@ -885,7 +885,7 @@ export default function AdminDashboardPage() {
                       type="button"
                       onClick={handleManualSync}
                       disabled={isSyncing}
-                      className="bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                      className="bg-mist backdrop-blur-md px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/80 hover:text-white transition-colors disabled:opacity-50 flex items-center gap-1.5"
                       style={inputBevelStyle}
                     >
                       <RefreshCw className={`h-3 w-3 text-sky ${isSyncing ? "animate-spin" : ""}`} />
@@ -918,31 +918,31 @@ export default function AdminDashboardPage() {
                 )}
 
                 {/* Metadata details */}
-                <div className="pt-3 border-t border-sky-border/50 space-y-1.5 text-[10px] text-text-muted font-medium">
+                <div className="pt-3 border-t border-sky/30 space-y-1.5 text-[10px] text-white/60 font-medium">
                   <div className="flex justify-between">
                     <span>Terakhir Sinkron:</span>
-                    <span className="font-mono text-text-secondary">{lastSyncTime ? new Date(lastSyncTime).toLocaleString("id-ID") : "-"}</span>
+                    <span className="font-mono text-white/80">{lastSyncTime ? new Date(lastSyncTime).toLocaleString("id-ID") : "-"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Waktu Relatif:</span>
-                    <span className="font-semibold text-text-secondary">{lastSyncTime ? formatDateRelative(lastSyncTime) : "-"}</span>
+                    <span className="font-semibold text-white/80">{lastSyncTime ? formatDateRelative(lastSyncTime) : "-"}</span>
                   </div>
                 </div>
               </form>
             </div>
 
             {/* WhatsApp Integration Card */}
-            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft relative overflow-hidden">
+            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
               <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
-              <div className="p-6 border-b border-sky-border flex items-center justify-between">
-                <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
+              <div className="p-6 border-b border-sky/30 flex items-center justify-between">
+                <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-sky" />
                   WhatsApp Integration
                 </h3>
                 <span className={`inline-block px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded ${
                   waStatus === "enabled"
                     ? "bg-green-50 text-green-500 border border-green-500/20"
-                    : "bg-gray-50 text-text-muted border border-gray-200"
+                    : "bg-gray-50 text-white/60 border border-gray-200"
                 }`} style={tagBevelStyle}>
                   {waStatus === "enabled" ? "Aktif" : "Nonaktif"}
                 </span>
@@ -952,11 +952,11 @@ export default function AdminDashboardPage() {
                 {/* Status Toggle */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                       <Power className="h-3.5 w-3.5 text-sky" />
                       Status Notifikasi
                     </label>
-                    <p className="text-[10px] text-text-muted font-medium">Aktifkan notifikasi otomatis ke WhatsApp.</p>
+                    <p className="text-[10px] text-white/60 font-medium">Aktifkan notifikasi otomatis ke WhatsApp.</p>
                   </div>
                   <button
                     type="button"
@@ -966,7 +966,7 @@ export default function AdminDashboardPage() {
                     }`}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-mist backdrop-blur-md shadow ring-0 transition duration-200 ease-in-out ${
                         waStatus === "enabled" ? "translate-x-5" : "translate-x-0"
                       }`}
                     />
@@ -975,16 +975,16 @@ export default function AdminDashboardPage() {
 
                 {/* Gateway Method Dropdown */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <Smartphone className="h-3.5 w-3.5 text-sky" />
                     Metode Gateway
                   </label>
                   <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
-                    <div className="flex items-center bg-white" style={inputBevelStyle}>
+                    <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
                       <select
                         value={waMethod}
                         onChange={(e) => setWaMethod(e.target.value)}
-                        className="w-full px-3 py-2 text-xs font-bold text-text-primary focus:outline-none bg-transparent"
+                        className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
                       >
                         <option value="baileys">Baileys (Lokal / VPS)</option>
                         <option value="fonnte">Fonnte API Gateway</option>
@@ -995,7 +995,7 @@ export default function AdminDashboardPage() {
 
                 {/* Endpoint API */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <ExternalLink className="h-3.5 w-3.5 text-sky" />
                     API Endpoint URL
                   </label>
@@ -1004,7 +1004,7 @@ export default function AdminDashboardPage() {
                       type="text"
                       value={waEndpoint}
                       onChange={(e) => setWaEndpoint(e.target.value)}
-                      className="w-full px-3 py-2 text-xs font-semibold text-text-primary focus:outline-none bg-transparent"
+                      className="w-full px-3 py-2 text-xs font-semibold text-white focus:outline-none bg-transparent"
                       placeholder="e.g. http://localhost:5000/send"
                       style={inputBevelStyle}
                     />
@@ -1013,7 +1013,7 @@ export default function AdminDashboardPage() {
 
                 {/* API Token / Auth Key */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <Shield className="h-3.5 w-3.5 text-sky" />
                     API Token / Authorization Key
                   </label>
@@ -1022,7 +1022,7 @@ export default function AdminDashboardPage() {
                       type="password"
                       value={waToken}
                       onChange={(e) => setWaToken(e.target.value)}
-                      className="w-full px-3 py-2 text-xs font-semibold text-text-primary focus:outline-none bg-transparent"
+                      className="w-full px-3 py-2 text-xs font-semibold text-white focus:outline-none bg-transparent"
                       placeholder="Masukkan Token Rahasia (jika ada)"
                       style={inputBevelStyle}
                     />
@@ -1031,7 +1031,7 @@ export default function AdminDashboardPage() {
 
                 {/* Admin WA Number */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <Smartphone className="h-3.5 w-3.5 text-sky" />
                     Nomor WhatsApp Admin (Notif Order)
                   </label>
@@ -1040,7 +1040,7 @@ export default function AdminDashboardPage() {
                       type="text"
                       value={waAdminNumber}
                       onChange={(e) => setWaAdminNumber(e.target.value)}
-                      className="w-full px-3 py-2 text-xs font-semibold text-text-primary focus:outline-none bg-transparent"
+                      className="w-full px-3 py-2 text-xs font-semibold text-white focus:outline-none bg-transparent"
                       placeholder="e.g. 6281234567890"
                       style={inputBevelStyle}
                     />
@@ -1050,10 +1050,10 @@ export default function AdminDashboardPage() {
                 {/* Customer Notif Toggle */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+                    <label className="text-xs font-bold text-white/80 uppercase tracking-wider">
                       Notifikasi Pelanggan
                     </label>
-                    <p className="text-[10px] text-text-muted font-medium">Kirim tagihan &amp; status pesanan ke WA pembeli.</p>
+                    <p className="text-[10px] text-white/60 font-medium">Kirim tagihan &amp; status pesanan ke WA pembeli.</p>
                   </div>
                   <button
                     type="button"
@@ -1063,7 +1063,7 @@ export default function AdminDashboardPage() {
                     }`}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-mist backdrop-blur-md shadow ring-0 transition duration-200 ease-in-out ${
                         waCustomerNotif ? "translate-x-5" : "translate-x-0"
                       }`}
                     />
@@ -1075,7 +1075,7 @@ export default function AdminDashboardPage() {
                   <button
                     type="submit"
                     disabled={saveLoading}
-                    className="w-full bg-white py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors disabled:opacity-50"
+                    className="w-full bg-mist backdrop-blur-md py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors disabled:opacity-50"
                     style={inputBevelStyle}
                   >
                     {saveLoading ? "Menyimpan..." : "Simpan Pengaturan WhatsApp"}
@@ -1084,20 +1084,20 @@ export default function AdminDashboardPage() {
 
                 {/* Baileys QR Code / Connection HUD */}
                 {waStatus === "enabled" && waMethod === "baileys" && (
-                  <div className="pt-4 border-t border-sky-border/50 space-y-4">
-                    <span className="font-bold text-text-primary uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                  <div className="pt-4 border-t border-sky/30 space-y-4">
+                    <span className="font-bold text-white uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                       <QrCode className="h-3.5 w-3.5 text-sky" />
                       Status Koneksi WhatsApp (Baileys)
                     </span>
 
-                    <div className="flex flex-col items-center justify-center p-4 border border-sky-border/40 bg-ice/40 rounded-xl space-y-3">
+                    <div className="flex flex-col items-center justify-center p-4 border border-sky/30 bg-sky/20/40 rounded-xl space-y-3">
                       {baileysStatus === "connected" ? (
                         <div className="text-center space-y-2 w-full">
                           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 border border-green-500/20 text-green-600 rounded-full text-[10px] font-black uppercase tracking-wider">
                             <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                             Connected / Terhubung
                           </div>
-                          <p className="text-[10px] text-text-muted">
+                          <p className="text-[10px] text-white/60">
                             Siap mengirimkan notifikasi transaksi ke WhatsApp pelanggan &amp; admin.
                           </p>
                           <button
@@ -1115,10 +1115,10 @@ export default function AdminDashboardPage() {
                             <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                             Menunggu Scan QR
                           </div>
-                          <div className="bg-white p-2 border border-sky-border/60 rounded-xl inline-block shadow-sm">
+                          <div className="bg-mist backdrop-blur-md p-2 border border-sky/30 rounded-xl inline-block shadow-sm">
                             <img src={baileysQr} alt="WhatsApp Web QR Code" className="h-40 w-40 object-contain animate-fade-in" />
                           </div>
-                          <p className="text-[9px] text-text-muted leading-relaxed max-w-[200px] mx-auto">
+                          <p className="text-[9px] text-white/60 leading-relaxed max-w-[200px] mx-auto">
                             Buka WhatsApp di HP Anda &gt; Perangkat Tertaut &gt; Tautkan Perangkat, lalu scan QR code di atas.
                           </p>
                         </div>
@@ -1128,7 +1128,7 @@ export default function AdminDashboardPage() {
                             <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                             Connecting / Memulai...
                           </div>
-                          <p className="text-[9px] text-text-muted max-w-[200px] mx-auto leading-relaxed">
+                          <p className="text-[9px] text-white/60 max-w-[200px] mx-auto leading-relaxed">
                             Sedang memuat koneksi server lokal Baileys. Harap tunggu...
                           </p>
                         </div>
@@ -1138,7 +1138,7 @@ export default function AdminDashboardPage() {
                             <span className="h-2 w-2 rounded-full bg-red-500" />
                             Offline / Terputus
                           </div>
-                          <p className="text-[9px] text-text-muted max-w-[220px] mx-auto leading-relaxed">
+                          <p className="text-[9px] text-white/60 max-w-[220px] mx-auto leading-relaxed">
                             Gagal terhubung ke microservice gateway WhatsApp. Pastikan service gateway Baileys/Fonnte sudah aktif di URL Endpoint Anda (port 5000).
                           </p>
                         </div>
@@ -1149,15 +1149,15 @@ export default function AdminDashboardPage() {
 
                 {/* Connection Test Section */}
                 {waStatus === "enabled" && (
-                  <div className="pt-4 border-t border-sky-border/50 space-y-3">
-                    <span className="font-bold text-text-primary uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                  <div className="pt-4 border-t border-sky/30 space-y-3">
+                    <span className="font-bold text-white uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                       <ExternalLink className="h-3.5 w-3.5 text-sky" />
                       Uji Coba Kirim Notifikasi WhatsApp
                     </span>
 
-                    <div className="p-4 border border-sky-border/40 bg-slate-50 rounded-xl space-y-3">
+                    <div className="p-4 border border-sky/30 bg-slate-50 rounded-xl space-y-3">
                       <div className="space-y-1.5">
-                        <label className="text-[9px] font-bold text-text-secondary uppercase tracking-wider text-left block">
+                        <label className="text-[9px] font-bold text-white/80 uppercase tracking-wider text-left block">
                           Nomor HP Tujuan Tes
                         </label>
                         <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
@@ -1166,14 +1166,14 @@ export default function AdminDashboardPage() {
                             value={testPhone}
                             onChange={(e) => setTestPhone(e.target.value)}
                             placeholder="e.g. 628123456789"
-                            className="w-full px-3 py-1.5 text-xs font-semibold text-text-primary focus:outline-none bg-white"
+                            className="w-full px-3 py-1.5 text-xs font-semibold text-white focus:outline-none bg-mist backdrop-blur-md"
                             style={inputBevelStyle}
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[9px] font-bold text-text-secondary uppercase tracking-wider text-left block">
+                        <label className="text-[9px] font-bold text-white/80 uppercase tracking-wider text-left block">
                           Isi Pesan Tes
                         </label>
                         <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
@@ -1181,7 +1181,7 @@ export default function AdminDashboardPage() {
                             value={testMessage}
                             onChange={(e) => setTestMessage(e.target.value)}
                             rows={2}
-                            className="w-full px-3 py-1.5 text-xs font-semibold text-text-primary focus:outline-none bg-white"
+                            className="w-full px-3 py-1.5 text-xs font-semibold text-white focus:outline-none bg-mist backdrop-blur-md"
                             style={inputBevelStyle}
                           />
                         </div>
@@ -1219,40 +1219,40 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Rekomendasi Produksi (Cron Job Tips) Card */}
-            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft relative overflow-hidden">
+            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
               <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
-              <div className="p-6 border-b border-sky-border">
-                <h3 className="text-base font-black uppercase tracking-wide text-text-primary flex items-center gap-2">
+              <div className="p-6 border-b border-sky/30">
+                <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
                   <Code className="h-4 w-4 text-sky" />
                   Rekomendasi Produksi (Cron)
                 </h3>
               </div>
-              <div className="p-6 space-y-4 text-xs text-text-secondary leading-relaxed">
+              <div className="p-6 space-y-4 text-xs text-white/80 leading-relaxed">
                 <p>
                   Untuk memastikan harga modal &amp; jual selalu up-to-date, pasang penjadwal tugas otomatis (Cron Job / Task Scheduler) untuk memicu API di bawah:
                 </p>
 
                 <div className="space-y-1">
-                  <span className="font-bold text-text-primary uppercase tracking-wider text-[9px]">Langkah 1: Setup Kunci Keamanan</span>
-                  <p className="text-[10px] text-text-muted">
-                    Definisikan token rahasia di file <code className="bg-ice px-1 py-0.5 rounded text-sky font-mono font-bold text-[9px]">.env.local</code> Anda:
+                  <span className="font-bold text-white uppercase tracking-wider text-[9px]">Langkah 1: Setup Kunci Keamanan</span>
+                  <p className="text-[10px] text-white/60">
+                    Definisikan token rahasia di file <code className="bg-sky/20 px-1 py-0.5 rounded text-sky font-mono font-bold text-[9px]">.env.local</code> Anda:
                   </p>
-                  <pre className="bg-ice p-2.5 rounded-lg border border-sky-border/50 text-[10px] font-mono text-sky font-bold overflow-x-auto select-all">
+                  <pre className="bg-sky/20 p-2.5 rounded-lg border border-sky/30 text-[10px] font-mono text-sky font-bold overflow-x-auto select-all">
                     DIGIFLAZZ_WEBHOOK_SECRET=mitsurusecurewebhooksecret99f3a1b7c8d2e6a0a
                   </pre>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="font-bold text-text-primary uppercase tracking-wider text-[9px]">Langkah 2: Konfigurasi Penjadwal</span>
-                  <p className="text-[10px] text-text-muted">
+                  <span className="font-bold text-white uppercase tracking-wider text-[9px]">Langkah 2: Konfigurasi Penjadwal</span>
+                  <p className="text-[10px] text-white/60">
                     Tambahkan perintah berikut di Linux Crontab (<code className="font-mono text-[9px]">crontab -e</code>) untuk berjalan otomatis setiap malam (00:00):
                   </p>
-                  <pre className="bg-ice p-2.5 rounded-lg border border-sky-border/50 text-[9px] font-mono text-text-primary overflow-x-auto select-all whitespace-pre-wrap break-all">
+                  <pre className="bg-sky/20 p-2.5 rounded-lg border border-sky/30 text-[9px] font-mono text-white overflow-x-auto select-all whitespace-pre-wrap break-all">
                     0 0 * * * curl -s "https://yourdomain.com/api/admin/sync/trigger?key=mitsurusecurewebhooksecret99f3a1b7c8d2e6a0a" &gt;/dev/null 2&gt;&amp;1
                   </pre>
                 </div>
 
-                <div className="bg-amber-50/50 border border-amber-500/10 p-3 rounded-xl space-y-1 text-[10px] text-text-muted">
+                <div className="bg-amber-50/50 border border-amber-500/10 p-3 rounded-xl space-y-1 text-[10px] text-white/60">
                   <span className="font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1">
                     <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                     Catatan
@@ -1265,22 +1265,22 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Top Products Panel */}
-            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft relative overflow-hidden">
-              <div className="p-6 border-b border-sky-border">
-                <h3 className="text-base font-black uppercase tracking-wide text-text-primary">
+            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
+              <div className="p-6 border-b border-sky/30">
+                <h3 className="text-base font-black uppercase tracking-wide text-white">
                   Produk Terlaris
                 </h3>
               </div>
               <div className="p-6 space-y-4">
                 {topProducts.map((p, idx) => (
-                  <div key={idx} className="flex justify-between items-center bg-ice p-4 rounded-xl border border-sky-border/50 hover:border-sky/10 transition-all duration-300">
+                  <div key={idx} className="flex justify-between items-center bg-sky/20 p-4 rounded-xl border border-sky/30 hover:border-sky/10 transition-all duration-300">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mist backdrop-blur-md p-1.5">
                         <img src={getItemAssetForProduct(p.name, p.sku, p.game)} alt="" className="max-h-full max-w-full object-contain" />
                       </span>
                       <div>
-                      <p className="font-extrabold text-text-primary text-xs uppercase tracking-tight">{p.name}</p>
-                      <p className="mt-0.5 flex items-center gap-1.5 text-[9px] font-bold text-text-muted uppercase tracking-wider">
+                      <p className="font-extrabold text-white text-xs uppercase tracking-tight">{p.name}</p>
+                      <p className="mt-0.5 flex items-center gap-1.5 text-[9px] font-bold text-white/60 uppercase tracking-wider">
                         <img src={getGameAssetByName(p.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
                         {p.game} • {p.sold} terjual
                       </p>

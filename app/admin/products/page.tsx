@@ -295,7 +295,7 @@ export default function AdminProductsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col ">
         <Header user={currentUser} />
         <SidebarContentWrapper isAuthenticated={!!currentUser}>
           <main className="flex-1 py-8">
@@ -312,10 +312,10 @@ export default function AdminProductsPage() {
                 <Skeleton className="h-9 w-24 rounded-lg bg-sky/10" />
                 <Skeleton className="h-9 w-24 rounded-lg bg-sky/10" />
               </div>
-              <div className="bg-white rounded-[20px] border border-sky-border shadow-sky-soft p-6 space-y-6">
+              <div className="bg-mist backdrop-blur-md rounded-[20px] border border-sky/30 shadow-sky-soft p-6 space-y-6">
                 <Skeleton className="h-10 w-80 rounded-xl bg-sky/10" />
                 <div className="space-y-3">
-                  <div className="grid grid-cols-6 gap-4 py-2 border-b border-sky-border/50">
+                  <div className="grid grid-cols-6 gap-4 py-2 border-b border-sky/30">
                     <Skeleton className="h-4 w-24 rounded bg-sky/10" />
                     <Skeleton className="h-4 w-16 rounded bg-sky/10" />
                     <Skeleton className="h-4 w-20 rounded bg-sky/10" />
@@ -324,7 +324,7 @@ export default function AdminProductsPage() {
                     <Skeleton className="h-4 w-8 justify-self-end rounded bg-sky/10" />
                   </div>
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="grid grid-cols-6 gap-4 py-4 items-center border-b border-sky-border/30">
+                    <div key={i} className="grid grid-cols-6 gap-4 py-4 items-center border-b border-sky/30">
                       <Skeleton className="h-4 w-32 rounded-md bg-sky/10" />
                       <Skeleton className="h-4 w-24 rounded-md bg-sky/10" />
                       <Skeleton className="h-4.5 w-16 rounded-md bg-sky/10" />
@@ -364,7 +364,7 @@ export default function AdminProductsPage() {
   })
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col ">
       <Header user={currentUser} />
 
       <SidebarContentWrapper isAuthenticated={!!currentUser}>
@@ -373,14 +373,14 @@ export default function AdminProductsPage() {
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
               <div>
-                <h1 className="text-3xl font-black uppercase tracking-tight text-text-primary">Kelola Produk</h1>
-                <p className="text-sm font-bold text-text-muted uppercase tracking-widest mt-1">
+                <h1 className="text-3xl font-black uppercase tracking-tight text-white">Kelola Produk</h1>
+                <p className="text-sm font-bold text-white/60 uppercase tracking-widest mt-1">
                   Pengaturan Katalog Voucher &amp; Nominal Top-Up
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-sky-border shadow-sm">
-                  <span className="text-xs font-semibold text-text-secondary whitespace-nowrap">Markup:</span>
+                <div className="flex items-center gap-2 bg-mist backdrop-blur-md px-3 py-1.5 rounded-xl border border-sky/30 shadow-sm">
+                  <span className="text-xs font-semibold text-white/80 whitespace-nowrap">Markup:</span>
                   <Input
                     type="number"
                     value={markupPercent}
@@ -389,7 +389,7 @@ export default function AdminProductsPage() {
                     min="0"
                     max="100"
                   />
-                  <span className="text-xs font-semibold text-text-secondary">%</span>
+                  <span className="text-xs font-semibold text-white/80">%</span>
                 </div>
                 
                 <Button 
@@ -433,22 +433,22 @@ export default function AdminProductsPage() {
             {/* Stats Overview */}
             <div className="grid grid-cols-3 gap-6 mb-8">
               <div className="relative p-[1px] bg-sky-border" style={bevelStyle}>
-                <div className="bg-white p-6" style={bevelStyle}>
-                  <p className="text-text-muted text-[10px] font-black uppercase tracking-wider">Total Produk</p>
-                  <p className="text-3xl font-black font-mono text-text-primary mt-1">{productsList.length}</p>
+                <div className="bg-mist backdrop-blur-md p-6" style={bevelStyle}>
+                  <p className="text-white/60 text-[10px] font-black uppercase tracking-wider">Total Produk</p>
+                  <p className="text-3xl font-black font-mono text-white mt-1">{productsList.length}</p>
                 </div>
               </div>
               <div className="relative p-[1px] bg-sky-border" style={bevelStyle}>
-                <div className="bg-white p-6" style={bevelStyle}>
-                  <p className="text-text-muted text-[10px] font-black uppercase tracking-wider">Aktif</p>
+                <div className="bg-mist backdrop-blur-md p-6" style={bevelStyle}>
+                  <p className="text-white/60 text-[10px] font-black uppercase tracking-wider">Aktif</p>
                   <p className="text-3xl font-black font-mono text-green-500 mt-1">
                     {productsList.filter((p) => p.status === 1 || p.status === true).length}
                   </p>
                 </div>
               </div>
               <div className="relative p-[1px] bg-sky-border" style={bevelStyle}>
-                <div className="bg-white p-6" style={bevelStyle}>
-                  <p className="text-text-muted text-[10px] font-black uppercase tracking-wider">Flash Sale</p>
+                <div className="bg-mist backdrop-blur-md p-6" style={bevelStyle}>
+                  <p className="text-white/60 text-[10px] font-black uppercase tracking-wider">Flash Sale</p>
                   <p className="text-3xl font-black font-mono text-sky mt-1">
                     {productsList.filter((p) => p.is_flash_sale === 1 || p.is_flash_sale === true).length}
                   </p>
@@ -459,16 +459,16 @@ export default function AdminProductsPage() {
             {/* Search and Filters */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
                 <Input
                   placeholder="Cari nama, game, atau SKU..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 rounded-xl border-sky-border text-xs font-semibold focus-visible:ring-sky"
+                  className="pl-10 rounded-xl border-sky/30 text-xs font-semibold focus-visible:ring-sky"
                 />
               </div>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="bg-ice border border-sky-border p-1 rounded-xl">
+                <TabsList className="bg-sky/20 border border-sky/30 p-1 rounded-xl">
                   <TabsTrigger value="all" className="rounded-lg text-xs font-bold uppercase tracking-wider">Semua</TabsTrigger>
                   <TabsTrigger value="active" className="rounded-lg text-xs font-bold uppercase tracking-wider">Aktif</TabsTrigger>
                   <TabsTrigger value="inactive" className="rounded-lg text-xs font-bold uppercase tracking-wider">Nonaktif</TabsTrigger>
@@ -478,17 +478,17 @@ export default function AdminProductsPage() {
             </div>
 
             {/* Products Table Card */}
-            <div className="bg-white rounded-2xl border border-sky-border shadow-sky-soft overflow-hidden">
+            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft overflow-hidden">
               <Table>
-                <TableHeader className="bg-ice/50">
+                <TableHeader className="bg-sky/20/50">
                   <TableRow>
-                    <TableHead className="text-xs font-black uppercase text-text-secondary tracking-wider">Produk</TableHead>
-                    <TableHead className="text-xs font-black uppercase text-text-secondary tracking-wider">SKU</TableHead>
-                    <TableHead className="text-xs font-black uppercase text-text-secondary tracking-wider">Harga Modal</TableHead>
-                    <TableHead className="text-xs font-black uppercase text-text-secondary tracking-wider">Harga Jual</TableHead>
-                    <TableHead className="text-xs font-black uppercase text-text-secondary tracking-wider">Profit</TableHead>
-                    <TableHead className="text-xs font-black uppercase text-text-secondary tracking-wider">Status</TableHead>
-                    <TableHead className="text-xs font-black uppercase text-text-secondary tracking-wider text-right">Aksi</TableHead>
+                    <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">Produk</TableHead>
+                    <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">SKU</TableHead>
+                    <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">Harga Modal</TableHead>
+                    <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">Harga Jual</TableHead>
+                    <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">Profit</TableHead>
+                    <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">Status</TableHead>
+                    <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider text-right">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -498,10 +498,10 @@ export default function AdminProductsPage() {
                     const isFlash = product.is_flash_sale === 1 || product.is_flash_sale === true
 
                     return (
-                      <TableRow key={product.id} className="hover:bg-ice/20 border-b border-sky-border/30">
+                      <TableRow key={product.id} className="hover:bg-sky/20/20 border-b border-sky/30">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5 border border-sky-border/50">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mist backdrop-blur-md p-1.5 border border-sky/30">
                               <img
                                 src={getItemAssetForProduct(product.name, product.provider_sku, gameName)}
                                 alt=""
@@ -509,7 +509,7 @@ export default function AdminProductsPage() {
                               />
                             </span>
                             <div>
-                              <p className="font-extrabold text-sm text-text-primary uppercase tracking-tight flex items-center gap-1.5 flex-wrap">
+                              <p className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-1.5 flex-wrap">
                                 {product.name}
                                 {isFlash && (
                                   <span className="inline-block bg-amber-50 text-amber-500 border border-amber-500/20 text-[8px] font-black uppercase px-1.5 py-0.5 rounded">
@@ -524,7 +524,7 @@ export default function AdminProductsPage() {
                                   {product.provider === 'digiflazz' ? 'Digiflazz' : 'Manual'}
                                 </span>
                               </p>
-                              <p className="flex items-center gap-1.5 text-[10px] font-bold text-text-muted uppercase tracking-wider mt-0.5">
+                              <p className="flex items-center gap-1.5 text-[10px] font-bold text-white/60 uppercase tracking-wider mt-0.5">
                                 <img
                                   src={getGameAssetByName(gameName)?.icon}
                                   alt=""
@@ -535,13 +535,13 @@ export default function AdminProductsPage() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="font-mono text-xs text-text-secondary font-semibold">
+                        <TableCell className="font-mono text-xs text-white/80 font-semibold">
                           {product.provider_sku}
                         </TableCell>
-                        <TableCell className="font-mono font-bold text-xs text-text-primary">
+                        <TableCell className="font-mono font-bold text-xs text-white">
                           {formatCurrency(product.price)}
                         </TableCell>
-                        <TableCell className="font-mono font-bold text-xs text-text-primary">
+                        <TableCell className="font-mono font-bold text-xs text-white">
                           {formatCurrency(product.sell_price)}
                         </TableCell>
                         <TableCell className={`font-mono font-bold text-xs ${profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
@@ -561,11 +561,11 @@ export default function AdminProductsPage() {
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="hover:bg-ice rounded-lg">
-                                <MoreHorizontal className="h-4 w-4 text-text-secondary" />
+                              <Button variant="ghost" size="icon" className="hover:bg-sky/20 rounded-lg">
+                                <MoreHorizontal className="h-4 w-4 text-white/80" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="border-sky-border rounded-xl">
+                            <DropdownMenuContent align="end" className="border-sky/30 rounded-xl">
                               <DropdownMenuItem 
                                 onClick={() => handleOpenEdit(product)}
                                 className="text-xs font-bold uppercase tracking-wider cursor-pointer"
@@ -599,7 +599,7 @@ export default function AdminProductsPage() {
                   {filteredProducts.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-10">
-                        <p className="text-xs text-text-muted uppercase tracking-widest font-black">Tidak ada produk ditemukan</p>
+                        <p className="text-xs text-white/60 uppercase tracking-widest font-black">Tidak ada produk ditemukan</p>
                       </TableCell>
                     </TableRow>
                   )}
@@ -612,24 +612,24 @@ export default function AdminProductsPage() {
 
       {/* Quick Edit Price Dialog */}
       <Dialog open={!!editingProduct} onOpenChange={(open) => { if (!open) setEditingProduct(null); }}>
-        <DialogContent className="sm:max-w-[425px] rounded-2xl border-sky-border">
+        <DialogContent className="sm:max-w-[425px] rounded-2xl border-sky/30">
           <DialogHeader>
-            <DialogTitle className="text-base font-black uppercase tracking-tight text-text-primary">Edit Harga Jual</DialogTitle>
-            <DialogDescription className="text-[11px] font-medium text-text-muted">
+            <DialogTitle className="text-base font-black uppercase tracking-tight text-white">Edit Harga Jual</DialogTitle>
+            <DialogDescription className="text-[11px] font-medium text-white/60">
               Ubah harga jual nominal voucher <strong>{editingProduct?.name}</strong> secara instan.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <span className="text-right text-xs font-bold text-text-secondary uppercase tracking-wider">
+              <span className="text-right text-xs font-bold text-white/80 uppercase tracking-wider">
                 Harga Modal
               </span>
-              <div className="col-span-3 font-mono text-xs font-bold text-text-primary">
+              <div className="col-span-3 font-mono text-xs font-bold text-white">
                 {editingProduct ? formatCurrency(editingProduct.price) : "-"}
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="sell-price" className="text-right text-xs font-bold text-text-secondary uppercase tracking-wider">
+              <label htmlFor="sell-price" className="text-right text-xs font-bold text-white/80 uppercase tracking-wider">
                 Harga Jual
               </label>
               <Input
@@ -637,14 +637,14 @@ export default function AdminProductsPage() {
                 type="number"
                 value={editedSellPrice}
                 onChange={(e) => { setEditedSellPrice(e.target.value); setWarnBelowCost(false); }}
-                className="col-span-3 rounded-xl border-sky-border text-xs font-semibold font-mono"
+                className="col-span-3 rounded-xl border-sky/30 text-xs font-semibold font-mono"
               />
             </div>
             {editingProduct && parseInt(editedSellPrice) > 0 && (() => {
               const profit = parseInt(editedSellPrice) - editingProduct.price;
               return (
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <span className="text-right text-xs font-bold text-text-secondary uppercase tracking-wider">Profit</span>
+                  <span className="text-right text-xs font-bold text-white/80 uppercase tracking-wider">Profit</span>
                   <span className={`col-span-3 text-xs font-black font-mono ${profit >= 0 ? "text-green-500" : "text-red-500"}`}>
                     {profit >= 0 ? "+" : ""}{formatCurrency(profit)}
                   </span>
@@ -691,12 +691,12 @@ export default function AdminProductsPage() {
 
       {/* Full Product Add/Edit Dialog Form */}
       <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-2xl border-sky-border overflow-y-auto max-h-[90vh]">
+        <DialogContent className="sm:max-w-[500px] rounded-2xl border-sky/30 overflow-y-auto max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle className="text-base font-black uppercase tracking-tight text-text-primary">
+            <DialogTitle className="text-base font-black uppercase tracking-tight text-white">
               {selectedProduct ? "Edit Detail Produk" : "Tambah Produk Baru"}
             </DialogTitle>
-            <DialogDescription className="text-[11px] font-medium text-text-muted">
+            <DialogDescription className="text-[11px] font-medium text-white/60">
               Isi data detail item katalog produk di bawah ini secara lengkap.
             </DialogDescription>
           </DialogHeader>
@@ -704,12 +704,12 @@ export default function AdminProductsPage() {
             {/* Game Selector (only for adding) */}
             {!selectedProduct && (
               <div className="space-y-1.5">
-                <Label htmlFor="game-select" className="text-xs font-bold text-text-secondary uppercase tracking-wider">Game Kategori</Label>
+                <Label htmlFor="game-select" className="text-xs font-bold text-white/80 uppercase tracking-wider">Game Kategori</Label>
                 <select
                   id="game-select"
                   value={editForm.game_id}
                   onChange={(e) => setEditForm(prev => ({ ...prev, game_id: e.target.value }))}
-                  className="w-full bg-white border border-sky-border rounded-xl px-3 py-2 text-xs font-semibold text-text-primary focus:outline-none focus:ring-1 focus:ring-sky h-9"
+                  className="w-full bg-mist backdrop-blur-md border border-sky/30 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-sky h-9"
                   required
                 >
                   <option value="" disabled>Pilih Game...</option>
@@ -722,26 +722,26 @@ export default function AdminProductsPage() {
 
             {/* Product Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="prod-name" className="text-xs font-bold text-text-secondary uppercase tracking-wider">Nama Produk (Voucher)</Label>
+              <Label htmlFor="prod-name" className="text-xs font-bold text-white/80 uppercase tracking-wider">Nama Produk (Voucher)</Label>
               <Input
                 id="prod-name"
                 value={editForm.name}
                 onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Contoh: 86 Diamonds, Weekly Diamond Pass"
-                className="rounded-xl border-sky-border text-xs font-semibold"
+                className="rounded-xl border-sky/30 text-xs font-semibold"
                 required
               />
             </div>
 
             {/* SKU Code */}
             <div className="space-y-1.5">
-              <Label htmlFor="prod-sku" className="text-xs font-bold text-text-secondary uppercase tracking-wider">Provider SKU / Kode Item</Label>
+              <Label htmlFor="prod-sku" className="text-xs font-bold text-white/80 uppercase tracking-wider">Provider SKU / Kode Item</Label>
               <Input
                 id="prod-sku"
                 value={editForm.provider_sku}
                 onChange={(e) => setEditForm(prev => ({ ...prev, provider_sku: e.target.value }))}
                 placeholder="Contoh: mlbb-86, wdp-weekly"
-                className="rounded-xl border-sky-border text-xs font-semibold font-mono"
+                className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
                 required
               />
             </div>
@@ -749,24 +749,24 @@ export default function AdminProductsPage() {
             {/* Cost and Sell Prices */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="prod-price" className="text-xs font-bold text-text-secondary uppercase tracking-wider">Harga Modal (Rp)</Label>
+                <Label htmlFor="prod-price" className="text-xs font-bold text-white/80 uppercase tracking-wider">Harga Modal (Rp)</Label>
                 <Input
                   id="prod-price"
                   type="number"
                   value={editForm.price}
                   onChange={(e) => setEditForm(prev => ({ ...prev, price: Number(e.target.value) || 0 }))}
-                  className="rounded-xl border-sky-border text-xs font-semibold font-mono"
+                  className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
                   required
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="prod-sell" className="text-xs font-bold text-text-secondary uppercase tracking-wider">Harga Jual (Rp)</Label>
+                <Label htmlFor="prod-sell" className="text-xs font-bold text-white/80 uppercase tracking-wider">Harga Jual (Rp)</Label>
                 <Input
                   id="prod-sell"
                   type="number"
                   value={editForm.sell_price}
                   onChange={(e) => setEditForm(prev => ({ ...prev, sell_price: Number(e.target.value) || 0 }))}
-                  className="rounded-xl border-sky-border text-xs font-semibold font-mono"
+                  className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
                   required
                 />
               </div>
@@ -775,25 +775,25 @@ export default function AdminProductsPage() {
             {/* Status and Sort Order */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="prod-status" className="text-xs font-bold text-text-secondary uppercase tracking-wider block">Status</Label>
+                <Label htmlFor="prod-status" className="text-xs font-bold text-white/80 uppercase tracking-wider block">Status</Label>
                 <select
                   id="prod-status"
                   value={editForm.status ? "active" : "inactive"}
                   onChange={(e) => setEditForm(prev => ({ ...prev, status: e.target.value === "active" }))}
-                  className="w-full bg-white border border-sky-border rounded-xl px-3 py-2 text-xs font-semibold text-text-primary focus:outline-none focus:ring-1 focus:ring-sky h-9"
+                  className="w-full bg-mist backdrop-blur-md border border-sky/30 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-sky h-9"
                 >
                   <option value="active">Aktif</option>
                   <option value="inactive">Nonaktif</option>
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="prod-sort" className="text-xs font-bold text-text-secondary uppercase tracking-wider">No. Urut (Sort)</Label>
+                <Label htmlFor="prod-sort" className="text-xs font-bold text-white/80 uppercase tracking-wider">No. Urut (Sort)</Label>
                 <Input
                   id="prod-sort"
                   type="number"
                   value={editForm.sort_order}
                   onChange={(e) => setEditForm(prev => ({ ...prev, sort_order: Number(e.target.value) || 0 }))}
-                  className="rounded-xl border-sky-border text-xs font-semibold font-mono"
+                  className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
                 />
               </div>
             </div>
@@ -803,14 +803,14 @@ export default function AdminProductsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="prod-flash" className="text-xs font-black text-amber-700 uppercase tracking-wider block">Set Event Flash Sale</Label>
-                  <span className="text-[10px] text-text-muted">Masukkan produk ke dalam listing promo flash sale di beranda.</span>
+                  <span className="text-[10px] text-white/60">Masukkan produk ke dalam listing promo flash sale di beranda.</span>
                 </div>
                 <input
                   id="prod-flash"
                   type="checkbox"
                   checked={editForm.is_flash_sale}
                   onChange={(e) => setEditForm(prev => ({ ...prev, is_flash_sale: e.target.checked }))}
-                  className="h-4.5 w-4.5 rounded border-sky-border text-sky focus:ring-sky cursor-pointer"
+                  className="h-4.5 w-4.5 rounded border-sky/30 text-sky focus:ring-sky cursor-pointer"
                 />
               </div>
 
@@ -823,7 +823,7 @@ export default function AdminProductsPage() {
                       type="number"
                       value={editForm.flash_sale_price}
                       onChange={(e) => setEditForm(prev => ({ ...prev, flash_sale_price: Number(e.target.value) || 0 }))}
-                      className="rounded-xl border-amber-300 text-xs font-semibold font-mono focus-visible:ring-amber-500 bg-white"
+                      className="rounded-xl border-amber-300 text-xs font-semibold font-mono focus-visible:ring-amber-500 bg-mist backdrop-blur-md"
                       required={editForm.is_flash_sale}
                     />
                   </div>
@@ -834,7 +834,7 @@ export default function AdminProductsPage() {
                       type="number"
                       value={editForm.flash_sale_stock}
                       onChange={(e) => setEditForm(prev => ({ ...prev, flash_sale_stock: Number(e.target.value) || 0 }))}
-                      className="rounded-xl border-amber-300 text-xs font-semibold font-mono focus-visible:ring-amber-500 bg-white"
+                      className="rounded-xl border-amber-300 text-xs font-semibold font-mono focus-visible:ring-amber-500 bg-mist backdrop-blur-md"
                       required={editForm.is_flash_sale}
                     />
                   </div>

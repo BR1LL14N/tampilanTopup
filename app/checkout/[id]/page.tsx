@@ -419,7 +419,7 @@ export default function CheckoutPage() {
 
   if (loadingProduct || !product) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col ">
         <Header />
         <SidebarContentWrapper>
           <main className="flex-1 py-8">
@@ -522,7 +522,7 @@ export default function CheckoutPage() {
                             ? "bg-green-500 text-white ring-4 ring-green-100"
                             : isActive
                             ? "bg-primary text-white ring-4 ring-primary/20 scale-105"
-                            : "bg-ice text-muted-foreground border border-sky-border/60"
+                            : "bg-ice text-white/60 border border-sky-border/60"
                         )}
                       >
                         {isCompleted ? (
@@ -589,14 +589,14 @@ export default function CheckoutPage() {
                         />
                       </span>
                       <p className="font-semibold">{product.game.name}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-white/60">
                         {product.name}
                       </p>
                     </div>
                   </div>
                   <div className="border-t border-sky-border pt-4">
                     <div className="flex justify-between mb-2">
-                      <span className="text-muted-foreground">Harga</span>
+                      <span className="text-white/60">Harga</span>
                       <span>{formatCurrency(basePrice)}</span>
                     </div>
                     {discount > 0 && (
@@ -633,7 +633,7 @@ export default function CheckoutPage() {
                         }
                         required
                       />
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-white/60">
                         Contoh: 12345678 (1234)
                       </p>
                     </div>
@@ -657,7 +657,7 @@ export default function CheckoutPage() {
                           id="request_notes"
                           value={formData.request_notes}
                           disabled
-                          className="bg-slate-50 text-muted-foreground"
+                          className="bg-slate-50 text-white/60"
                         />
                       </div>
                     )}
@@ -736,7 +736,7 @@ export default function CheckoutPage() {
                           </span>
                           <div className="text-left flex-1">
                             <p className="font-medium">{method.name}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-white/60">
                               {method.description}
                             </p>
                           </div>
@@ -758,11 +758,11 @@ export default function CheckoutPage() {
                 <CardContent className="space-y-6">
                   <div className="space-y-4 pb-4 border-b border-sky-border/40">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-sm">Produk</span>
+                      <span className="text-white/60 text-sm">Produk</span>
                       <span className="font-semibold text-sm">{product.name} (x{qtyFromUrl})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-sm">Target</span>
+                      <span className="text-white/60 text-sm">Target</span>
                       <span className="font-semibold text-sm">{formData.target_id}</span>
                     </div>
                   </div>
@@ -859,11 +859,11 @@ export default function CheckoutPage() {
                       className="h-48 w-48 object-contain"
                     />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-white/60 mb-4">
                     Scan QRIS di atas menggunakan aplikasi E-Wallet atau Mobile
                     Banking kamu
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-white/60">
                     Kadaluarsa: 15 menit
                   </p>
                 </CardContent>
@@ -877,15 +877,15 @@ export default function CheckoutPage() {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Invoice</span>
+                      <span className="text-white/60">Invoice</span>
                       <span className="font-mono">{transactionData.invoice}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Produk</span>
+                      <span className="text-white/60">Produk</span>
                       <span>{product.name} (x{qtyFromUrl})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Target</span>
+                      <span className="text-white/60">Target</span>
                       <span>{formData.target_id}</span>
                     </div>
                     <div className="border-t border-sky-border pt-4 flex justify-between font-semibold text-lg">
@@ -913,7 +913,7 @@ export default function CheckoutPage() {
                     )}
                   </Button>
 
-                  <p className="text-xs text-muted-foreground text-center mt-4">
+                  <p className="text-xs text-white/60 text-center mt-4">
                     Jangan tutup halaman ini sampai pembayaran selesai
                   </p>
 

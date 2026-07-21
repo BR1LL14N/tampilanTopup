@@ -28,10 +28,10 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
       <Card className="p-4 hover:border-sky/50 transition-all duration-300">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-white/80">
               {formatDate(transaction.created_at)}
             </p>
-            <p className="font-semibold text-text-primary">{transaction.invoice}</p>
+            <p className="font-semibold text-white">{transaction.invoice}</p>
           </div>
           <span
             className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
@@ -44,8 +44,8 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
         </div>
 
         {transaction.product && (
-          <div className="flex items-center gap-3 p-3 bg-ice rounded-lg mb-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white border border-sky-border p-1.5">
+          <div className="flex items-center gap-3 p-3 bg-sky/20 rounded-lg mb-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-mist backdrop-blur-md border border-sky/30 p-1.5">
               <img
                 src={getItemAssetForProduct(
                   transaction.product.name,
@@ -67,10 +67,10 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
                   {transaction.product.game.name}
                 </p>
               )}
-              <p className="font-bold text-text-primary text-sm mt-1">
+              <p className="font-bold text-white text-sm mt-1">
                 {transaction.product.name}
               </p>
-              <p className="text-xs text-text-secondary mt-0.5 font-medium">
+              <p className="text-xs text-white/80 mt-0.5 font-medium">
                 ID: {transaction.target_id}
               </p>
             </div>
@@ -79,12 +79,12 @@ export function TransactionCard({ transaction }: TransactionCardProps) {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-text-secondary">Total</p>
-            <p className="text-lg font-bold text-text-primary">
+            <p className="text-xs text-white/80">Total</p>
+            <p className="text-lg font-bold text-white">
               {formatCurrency(transaction.amount)}
             </p>
           </div>
-          <ArrowRight className="h-5 w-5 text-text-secondary" />
+          <ArrowRight className="h-5 w-5 text-white/80" />
         </div>
       </Card>
     </Link>
@@ -100,23 +100,23 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-sky-border">
-            <th className="text-left py-3 px-4 text-sm font-medium text-text-secondary">
+          <tr className="border-b border-sky/30">
+            <th className="text-left py-3 px-4 text-sm font-medium text-white/80">
               Invoice
             </th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-text-secondary">
+            <th className="text-left py-3 px-4 text-sm font-medium text-white/80">
               Produk
             </th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-text-secondary">
+            <th className="text-left py-3 px-4 text-sm font-medium text-white/80">
               Target
             </th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-text-secondary">
+            <th className="text-left py-3 px-4 text-sm font-medium text-white/80">
               Jumlah
             </th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-text-secondary">
+            <th className="text-left py-3 px-4 text-sm font-medium text-white/80">
               Status
             </th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-text-secondary">
+            <th className="text-left py-3 px-4 text-sm font-medium text-white/80">
               Tanggal
             </th>
           </tr>
@@ -125,15 +125,15 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
           {transactions.map((tx) => (
             <tr
               key={tx.id}
-              className="border-b border-sky-border/50 hover:bg-ice transition-colors"
+              className="border-b border-sky/30 hover:bg-sky/20 transition-colors"
             >
               <td className="py-3 px-4">
-                <span className="font-mono text-sm text-text-primary">{tx.invoice}</span>
+                <span className="font-mono text-sm text-white">{tx.invoice}</span>
               </td>
               <td className="py-3 px-4">
                 <div className="flex items-center gap-2">
                   {tx.product && (
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white border border-sky-border p-1">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md border border-sky/30 p-1">
                       <img
                         src={getItemAssetForProduct(tx.product.name, tx.product.provider_sku, tx.product.game?.name)}
                         alt=""
@@ -141,11 +141,11 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                       />
                     </span>
                   )}
-                  <span className="text-text-primary">{tx.product?.name || "N/A"}</span>
+                  <span className="text-white">{tx.product?.name || "N/A"}</span>
                 </div>
               </td>
-              <td className="py-3 px-4 text-text-primary">{tx.target_id}</td>
-              <td className="py-3 px-4 font-semibold text-text-primary">
+              <td className="py-3 px-4 text-white">{tx.target_id}</td>
+              <td className="py-3 px-4 font-semibold text-white">
                 {formatCurrency(tx.amount)}
               </td>
               <td className="py-3 px-4">
@@ -157,7 +157,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                   {tx.topup_status}
                 </span>
               </td>
-              <td className="py-3 px-4 text-sm text-text-secondary">
+              <td className="py-3 px-4 text-sm text-white/80">
                 {formatDate(tx.created_at)}
               </td>
             </tr>

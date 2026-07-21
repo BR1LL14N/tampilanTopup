@@ -199,7 +199,7 @@ export default function AdminTransactionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col ">
         <Header user={currentUser} />
         <SidebarContentWrapper isAuthenticated={!!currentUser}>
           <main className="flex-1 py-8">
@@ -215,7 +215,7 @@ export default function AdminTransactionsPage() {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="bg-white p-4 rounded-xl border border-sky-border shadow-sky-soft space-y-2">
+                  <div key={i} className="bg-mist backdrop-blur-md p-4 rounded-xl border border-sky/30 shadow-sky-soft space-y-2">
                     <Skeleton className="h-3.5 w-24 rounded bg-sky/10" />
                     <Skeleton className="h-7 w-16 rounded-md bg-sky/10" />
                   </div>
@@ -223,14 +223,14 @@ export default function AdminTransactionsPage() {
               </div>
 
               {/* Table Card */}
-              <div className="bg-white rounded-[20px] border border-sky-border shadow-sky-soft p-6 space-y-6">
+              <div className="bg-mist backdrop-blur-md rounded-[20px] border border-sky/30 shadow-sky-soft p-6 space-y-6">
                 <div className="flex gap-4 flex-wrap">
                   <Skeleton className="h-10 w-72 rounded-xl bg-sky/10" />
                   <Skeleton className="h-10 w-36 rounded-xl bg-sky/10" />
                 </div>
                 <div className="space-y-3">
                   {/* Header row */}
-                  <div className="grid grid-cols-7 gap-4 py-2 border-b border-sky-border/50">
+                  <div className="grid grid-cols-7 gap-4 py-2 border-b border-sky/30">
                     <Skeleton className="h-4 w-16 rounded bg-sky/10" />
                     <Skeleton className="h-4 w-20 rounded bg-sky/10" />
                     <Skeleton className="h-4 w-24 rounded bg-sky/10" />
@@ -241,7 +241,7 @@ export default function AdminTransactionsPage() {
                   </div>
                   {/* Data rows */}
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="grid grid-cols-7 gap-4 py-4 items-center border-b border-sky-border/30">
+                    <div key={i} className="grid grid-cols-7 gap-4 py-4 items-center border-b border-sky/30">
                       <Skeleton className="h-4 w-20 rounded-md font-mono bg-sky/10" />
                       <Skeleton className="h-4 w-28 rounded-md bg-sky/10" />
                       <Skeleton className="h-4 w-32 rounded-md bg-sky/10" />
@@ -294,7 +294,7 @@ export default function AdminTransactionsPage() {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col ">
       <Header user={currentUser} />
 
       <SidebarContentWrapper isAuthenticated={!!currentUser}>
@@ -304,7 +304,7 @@ export default function AdminTransactionsPage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold mb-2">Transaksi</h1>
-              <p className="text-muted-foreground">
+              <p className="text-white/60">
                 Monitoring semua transaksi top up
               </p>
             </div>
@@ -323,7 +323,7 @@ export default function AdminTransactionsPage() {
                     <stat.icon className={`h-5 w-5 ${stat.color}`} />
                   </div>
                   <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-sm text-white/60">{stat.label}</p>
                 </CardContent>
               </Card>
             ))}
@@ -332,7 +332,7 @@ export default function AdminTransactionsPage() {
           {/* Search and Filter */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
               <Input
                 placeholder="Cari invoice, email, atau ID player..."
                 value={searchQuery}
@@ -343,7 +343,7 @@ export default function AdminTransactionsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-sky-border bg-white text-sm"
+              className="px-4 py-2 rounded-lg border border-sky/30 bg-mist backdrop-blur-md text-sm"
             >
               <option value="all">Semua Status</option>
               <option value="success">Berhasil</option>
@@ -378,7 +378,7 @@ export default function AdminTransactionsPage() {
                       <TableCell>{tx.user}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ice p-1.5">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky/20 p-1.5">
                             <img
                               src={getItemAssetForProduct(tx.product, undefined, tx.game)}
                               alt=""
@@ -387,7 +387,7 @@ export default function AdminTransactionsPage() {
                           </span>
                           <div>
                             <p className="font-medium">{tx.product}</p>
-                            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <p className="flex items-center gap-1.5 text-xs text-white/60">
                               <img
                                 src={getGameAssetByName(tx.game)?.icon}
                                 alt=""
@@ -417,7 +417,7 @@ export default function AdminTransactionsPage() {
                             : "Gagal"}
                         </span>
                       </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
+                      <TableCell className="text-white/60 text-sm">
                         {formatDate(tx.created_at)}
                       </TableCell>
                       <TableCell className="text-right">
@@ -451,12 +451,12 @@ export default function AdminTransactionsPage() {
 
       {/* Detail & Status Management Dialog */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-md bg-white border border-sky-border shadow-sky-medium rounded-[24px] overflow-hidden p-6 text-text-primary">
+        <DialogContent className="max-w-md bg-mist backdrop-blur-md border border-sky/30 shadow-sky-medium rounded-[24px] overflow-hidden p-6 text-white">
           <DialogHeader className="mb-4">
-            <DialogTitle className="text-base font-black uppercase text-text-primary">
+            <DialogTitle className="text-base font-black uppercase text-white">
               Detail Transaksi
             </DialogTitle>
-            <DialogDescription className="text-xs text-text-muted font-bold tracking-wider font-mono">
+            <DialogDescription className="text-xs text-white/60 font-bold tracking-wider font-mono">
               Invoice: {selectedTx?.invoice}
             </DialogDescription>
           </DialogHeader>
@@ -464,21 +464,21 @@ export default function AdminTransactionsPage() {
           {selectedTx && (
             <div className="space-y-5 text-xs">
               {/* Product and general info */}
-              <div className="border border-sky-border rounded-xl bg-ice/40 p-4 space-y-2.5">
+              <div className="border border-sky/30 rounded-xl bg-sky/20/40 p-4 space-y-2.5">
                 <div className="flex justify-between items-center">
-                  <span className="text-text-secondary font-medium">Game / Produk</span>
-                  <span className="font-bold text-text-primary">{selectedTx.game} - {selectedTx.product}</span>
+                  <span className="text-white/80 font-medium">Game / Produk</span>
+                  <span className="font-bold text-white">{selectedTx.game} - {selectedTx.product}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-text-secondary font-medium">Target ID / No. Tujuan</span>
-                  <span className="font-mono font-bold text-text-primary bg-white px-2 py-0.5 rounded border border-sky-border/20">{selectedTx.target_id}</span>
+                  <span className="text-white/80 font-medium">Target ID / No. Tujuan</span>
+                  <span className="font-mono font-bold text-white bg-mist backdrop-blur-md px-2 py-0.5 rounded border border-sky/30">{selectedTx.target_id}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-text-secondary font-medium">Total Pembayaran</span>
+                  <span className="text-white/80 font-medium">Total Pembayaran</span>
                   <span className="font-black text-sky text-sm">{formatCurrency(selectedTx.amount)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-text-secondary font-medium">Status Saat Ini</span>
+                  <span className="text-white/80 font-medium">Status Saat Ini</span>
                   <span className={`px-2 py-0.5 rounded-full font-bold uppercase text-[9px] ${getStatusBgColor(selectedTx.topup_status)}`}>
                     {selectedTx.topup_status === "success" ? "Berhasil" : selectedTx.topup_status === "processing" ? "Diproses" : selectedTx.topup_status === "pending" ? "Pending" : "Gagal"}
                   </span>
@@ -486,17 +486,17 @@ export default function AdminTransactionsPage() {
               </div>
 
               {selectedTx.request_notes && (
-                <div className="bg-ice border border-sky-border/60 p-4 rounded-xl">
+                <div className="bg-sky/20 border border-sky/30 p-4 rounded-xl">
                   <div className="flex flex-col gap-1 text-xs text-left">
-                    <span className="text-text-secondary font-semibold">Catatan Khusus Pelanggan:</span>
-                    <p className="bg-white p-2.5 rounded-lg border border-sky-border/20 font-medium text-text-primary whitespace-pre-wrap leading-relaxed">{selectedTx.request_notes}</p>
+                    <span className="text-white/80 font-semibold">Catatan Khusus Pelanggan:</span>
+                    <p className="bg-mist backdrop-blur-md p-2.5 rounded-lg border border-sky/30 font-medium text-white whitespace-pre-wrap leading-relaxed">{selectedTx.request_notes}</p>
                   </div>
                 </div>
               )}
 
               {/* Action Buttons to edit topup status */}
-              <div className="space-y-2 pt-2 border-t border-sky-border/40">
-                <span className="text-text-secondary font-black uppercase tracking-wider text-[10px] block">Kelola Status Pesanan</span>
+              <div className="space-y-2 pt-2 border-t border-sky/30">
+                <span className="text-white/80 font-black uppercase tracking-wider text-[10px] block">Kelola Status Pesanan</span>
                 <div className="grid grid-cols-3 gap-2">
                   <Button
                     disabled={updatingStatus || selectedTx.topup_status === "processing"}
@@ -525,14 +525,14 @@ export default function AdminTransactionsPage() {
               </div>
 
               {/* Special Actions for failed or problem transactions */}
-              <div className="space-y-2 pt-2 border-t border-sky-border/40">
-                <span className="text-text-secondary font-black uppercase tracking-wider text-[10px] block">Tindakan Penyelesaian (Gagal/Error)</span>
+              <div className="space-y-2 pt-2 border-t border-sky/30">
+                <span className="text-white/80 font-black uppercase tracking-wider text-[10px] block">Tindakan Penyelesaian (Gagal/Error)</span>
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     disabled={updatingStatus}
                     onClick={() => handleRetry(selectedTx.id)}
                     variant="outline"
-                    className="h-9 text-[10px] font-black uppercase tracking-wider border-sky-border hover:bg-sky-border/20 text-sky shrink-0"
+                    className="h-9 text-[10px] font-black uppercase tracking-wider border-sky/30 hover:bg-sky-border/20 text-sky shrink-0"
                   >
                     Proses Ulang (API)
                   </Button>
