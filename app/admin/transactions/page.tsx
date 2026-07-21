@@ -261,6 +261,8 @@ export default function AdminTransactionsPage() {
           target_id: tx.target_id,
           amount: Number(tx.amount) || 0,
           topup_status: tx.topup_status,
+          provider_ref: tx.provider_ref,
+          provider_response: tx.provider_response,
           created_at: tx.created_at,
           login_method: tx.login_method,
           password: tx.password,
@@ -578,6 +580,39 @@ export default function AdminTransactionsPage() {
                   </span>
                 </div>
               </div>
+
+              {/* Digiflazz Response / Error Details Box */}
+              {(selectedTx.provider_ref || selectedTx.provider_response) && (
+                <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl space-y-2 text-left">
+                  <div className="flex justify-between items-center border-b border-red-500/20 pb-2">
+                    <span className="text-red-400 font-bold uppercase tracking-wider text-[10px]">Respons Provider (Digiflazz)</span>
+                    <span className="font-mono text-[10px] text-white/70 font-semibold">SN/Ref: {selectedTx.provider_ref || "-"}</span>
+                  </div>
+                  {(() => {
+                    let parsed: any = null;
+                    try {
+                      parsed = typeof selectedTx.provider_response === "string" ? JSON.parse(selectedTx.provider_response) : selectedTx.provider_response;
+                    } catch (e) {
+                      parsed = selectedTx.provider_response;
+                    }
+                    const dataObj = parsed?.data || parsed;
+                    const message = dataObj?.message || dataObj?.error || (typeof dataObj === "string" ? dataObj : null);
+                    const rc = dataObj?.rc;
+
+                    return (
+                      <div className="space-y-1 font-mono text-[11px] text-white/90">
+                        {rc && <p><span className="text-red-300 font-bold">Response Code (RC):</span> {rc}</p>}
+                        {message && <p><span className="text-red-300 font-bold">Pesan Error:</span> {message}</p>}
+                        {!rc && !message && (
+                          <pre className="text-[10px] text-white/70 overflow-x-auto whitespace-pre-wrap max-h-32 p-2 bg-black/30 rounded">
+                            {JSON.stringify(parsed, null, 2)}
+                          </pre>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
 
               {selectedTx.request_notes && (
                 <div className="bg-sky/20 border border-sky/30 p-4 rounded-xl">
