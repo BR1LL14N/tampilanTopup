@@ -46,7 +46,7 @@ const slides = [
   },
   {
     tag: "Voucher Digital",
-    title: "Roblox, Steam, dan live app.",
+    title: "Roblox, Steam, dan lainnya.",
     desc: "Katalog bisa dipisah per kategori agar user cepat menemukan produk yang mereka cari.",
     bg: gameAssets.roblox.banner,
     btn1: "Buka Katalog",
@@ -57,7 +57,6 @@ const slides = [
 const diagonalCards = [
   { name: "Free Fire", publisher: "Garena", image: gameAssets["free-fire"].icon, slug: "free-fire" },
   { name: "Mobile Legends", publisher: "Moonton", image: gameAssets["mobile-legends"].icon, slug: "mobile-legends" },
-  { name: "Joki Rank", publisher: "Mitsuru", image: gameAssets["mobile-legends"].poster, slug: "mobile-legends" },
   { name: "ROBLOX - Voucher", publisher: "Roblox Corporation", image: gameAssets.roblox.icon, slug: "roblox" },
   { name: "Honor Of Kings", publisher: "Tencent Games", image: gameAssets["honor-of-kings"].icon, slug: "honor-of-kings" },
   { name: "Valorant", publisher: "Riot Games", image: gameAssets.valorant.icon, slug: "valorant" },
@@ -66,7 +65,6 @@ const diagonalCards = [
 const catalogItems = [
   { title: "FREE FIRE", eyebrow: "TOP UP GAME", publisher: "Garena", bg: gameAssets["free-fire"].poster, tab: "all", slug: "free-fire" },
   { title: "MOBILE LEGENDS", eyebrow: "TOP UP GAME", publisher: "Moonton", bg: gameAssets["mobile-legends"].poster, tab: "all", slug: "mobile-legends" },
-  { title: "JOKI RANK", eyebrow: "JOKI MOBILE LEGENDS", publisher: "Mitsuru", bg: gameAssets["mobile-legends"].poster, tab: "all", slug: "mobile-legends" },
   { title: "MAGIC CHESS", eyebrow: "TOP UP GAME", publisher: "Moonton", bg: gameAssets["mobile-legends"].poster, tab: "all", slug: "mobile-legends" },
   { title: "DELTA FORCE", eyebrow: "TOP UP GAME", publisher: "Level Infinite", bg: gameAssets["pubg-mobile"].poster, tab: "all", slug: "pubg-mobile" },
   { title: "PUBG MOBILE", eyebrow: "TOP UP GAME", publisher: "Tencent Games", bg: gameAssets["pubg-mobile"].poster, tab: "all", slug: "pubg-mobile" },
@@ -489,7 +487,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               <button
                 key={idx}
                 onClick={() => router.push(`/games/${card.slug}`)}
-                className="w-full flex flex-col sm:flex-row min-h-24 sm:min-h-28 items-center sm:items-center gap-3 sm:gap-5 dark-stripes-teal border border-sky/30 hover:border-diamond/60 p-3 sm:p-4 text-center sm:text-left group shimmer-hover rounded-[16px] sm:rounded-[20px] shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
+                className="w-full flex flex-col sm:flex-row min-h-24 sm:min-h-28 items-center sm:items-center gap-3 sm:gap-5 dark-stripes-teal-pop border border-sky/30 hover:border-diamond/60 p-3 sm:p-4 text-center sm:text-left group shimmer-hover rounded-[16px] sm:rounded-[20px] shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="relative h-14 w-14 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl border border-white/15 group-hover:border-diamond/50 transition-colors">
                   <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />

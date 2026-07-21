@@ -136,7 +136,7 @@ export function SidebarContentWrapper({
 
   return (
     <div
-      className={`sidebar-content-wrapper ${
+      className={`sidebar-content-wrapper flex flex-col flex-1 min-h-0 ${
         isTransitionReady ? "transition-all duration-300 ease-in-out" : ""
       } ${
         isAuth

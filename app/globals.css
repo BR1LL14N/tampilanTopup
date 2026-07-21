@@ -113,6 +113,16 @@
   }
 }
 
+/* Prevent browser autofill from forcing a white input background on dark forms */
+.autofill-dark:-webkit-autofill,
+.autofill-dark:-webkit-autofill:hover,
+.autofill-dark:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(18, 49, 62, 0.95) inset;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 @layer base {
   :root {
     /* ===== DEEP TEAL THEME (#245C72) - Light Mode ===== */
@@ -301,15 +311,6 @@
   -webkit-backdrop-filter: blur(20px);
 }
 
-/* Sky Fantasy Glass Variant */
-.glass-sky {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid hsl(207 60% 90% / 0.6);
-  box-shadow: 0 8px 24px rgba(92, 184, 255, 0.1);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
 /* Dark glass (kept for admin/settings if needed) */
 .glass-dark {
   background: linear-gradient(
@@ -344,6 +345,17 @@
       transparent 40px 80px
     ),
     linear-gradient(135deg, #24373f 0%, #17262c 100%);
+}
+
+/* Slightly more teal variant - for Populer Sekarang cards */
+.dark-stripes-teal-pop {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.04) 0 40px,
+      transparent 40px 80px
+    ),
+    linear-gradient(135deg, #1e4a52 0%, #163540 100%);
 }
 
 .navbar-dark-stripes {

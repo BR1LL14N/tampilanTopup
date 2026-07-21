@@ -59,7 +59,6 @@ export default function AdminTransactionsPage() {
   // Detail Dialog states
   const [selectedTx, setSelectedTx] = useState<any | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
-  const [showAdminPassword, setShowAdminPassword] = useState(false)
   const [updatingStatus, setUpdatingStatus] = useState(false)
 
   const handleUpdateStatus = async (txId: string, paymentStatus: string | undefined, topupStatus: string) => {
@@ -485,40 +484,12 @@ export default function AdminTransactionsPage() {
                 </div>
               </div>
 
-              {/* Joki credentials if present */}
-              {selectedTx.login_method && (
-                <div className="bg-ice border border-sky-border/60 p-4 rounded-xl space-y-3">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-sky">Kredensial Akun Joki</h4>
-                  
-                  <div className="flex justify-between text-xs items-center">
-                    <span className="text-text-secondary font-medium">Metode Login:</span>
-                    <strong className="text-text-primary bg-white px-2.5 py-1 border border-sky-border/20 rounded-lg">{selectedTx.login_method}</strong>
+              {selectedTx.request_notes && (
+                <div className="bg-ice border border-sky-border/60 p-4 rounded-xl">
+                  <div className="flex flex-col gap-1 text-xs text-left">
+                    <span className="text-text-secondary font-semibold">Catatan Khusus Pelanggan:</span>
+                    <p className="bg-white p-2.5 rounded-lg border border-sky-border/20 font-medium text-text-primary whitespace-pre-wrap leading-relaxed">{selectedTx.request_notes}</p>
                   </div>
-                  
-                  {selectedTx.password && (
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-text-secondary font-medium">Password Akun:</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono bg-white px-2.5 py-1 border border-sky-border/20 rounded-lg font-semibold text-text-primary">
-                          {showAdminPassword ? selectedTx.password : "••••••••"}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setShowAdminPassword(!showAdminPassword)}
-                          className="text-[10px] text-sky font-black uppercase hover:underline"
-                        >
-                          {showAdminPassword ? "Sembunyikan" : "Tampilkan"}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {selectedTx.request_notes && (
-                    <div className="flex flex-col gap-1 text-xs text-left pt-1 border-t border-sky-border/30">
-                      <span className="text-text-secondary font-semibold">Catatan Khusus Pelanggan:</span>
-                      <p className="bg-white p-2.5 rounded-lg border border-sky-border/20 font-medium text-text-primary whitespace-pre-wrap leading-relaxed">{selectedTx.request_notes}</p>
-                    </div>
-                  )}
                 </div>
               )}
 

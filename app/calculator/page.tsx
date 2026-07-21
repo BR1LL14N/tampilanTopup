@@ -269,7 +269,7 @@ export default function CalculatorPage() {
           <div className="grid md:grid-cols-12 gap-8 items-start">
 
             {/* Left Column: Form Input */}
-            <div className="md:col-span-5 glass-sky p-6 md:p-8 rounded-2xl border-sky/30 shadow-sky-soft relative overflow-hidden">
+            <div className="md:col-span-5 bg-[#183644]/90 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
               <h2 className="text-lg font-black uppercase tracking-wide text-white mb-6 border-b border-sky/30/50 pb-2 flex items-center gap-2">
                 <Flame className="h-4 w-4 text-sky animate-pulse" />
                 Parameter Optimasi

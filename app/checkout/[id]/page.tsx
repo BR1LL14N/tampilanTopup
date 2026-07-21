@@ -53,8 +53,6 @@ export default function CheckoutPage() {
   const targetFromUrl = searchParams.get("target") || ""
   const qtyFromUrl = parseInt(searchParams.get("qty") || "1", 10)
   const paymentFromUrl = searchParams.get("payment") || ""
-  const loginMethodFromUrl = searchParams.get("login_method") || ""
-  const passwordFromUrl = searchParams.get("password") || ""
   const notesFromUrl = searchParams.get("notes") || ""
   const whatsappFromUrl = searchParams.get("whatsapp") || ""
 
@@ -65,8 +63,6 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState({
     target_id: "",
     target_name: "",
-    login_method: "",
-    password: "",
     request_notes: "",
     customer_phone: "",
   })
@@ -170,16 +166,14 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (targetFromUrl) {
-      setFormData((prev) => ({ 
-        ...prev, 
+      setFormData((prev) => ({
+        ...prev,
         target_id: targetFromUrl,
-        login_method: loginMethodFromUrl,
-        password: passwordFromUrl,
         request_notes: notesFromUrl,
         customer_phone: whatsappFromUrl
       }))
     }
-  }, [targetFromUrl, loginMethodFromUrl, passwordFromUrl, notesFromUrl, whatsappFromUrl])
+  }, [targetFromUrl, notesFromUrl, whatsappFromUrl])
 
   useEffect(() => {
     if (targetFromUrl && whatsappFromUrl && id !== "mock") {
@@ -253,8 +247,6 @@ export default function CheckoutPage() {
                 payment_method: matchedMethod.id,
                 quantity: qtyFromUrl,
                 promo_code: activePromo,
-                login_method: loginMethodFromUrl || null,
-                password: passwordFromUrl || null,
                 request_notes: notesFromUrl || null,
                 customer_phone: whatsappFromUrl || null,
               }),
@@ -288,7 +280,7 @@ export default function CheckoutPage() {
         setTimeout(autoSubmit, 500)
       }
     }
-  }, [id, loadingProduct, product, autoSubmitted, searchParams, qtyFromUrl, loginMethodFromUrl, passwordFromUrl, notesFromUrl, whatsappFromUrl])
+  }, [id, loadingProduct, product, autoSubmitted, searchParams, qtyFromUrl, notesFromUrl, whatsappFromUrl])
 
   const handleApplyPromo = async () => {
     if (!promoInput.trim() || !product) return
@@ -347,8 +339,6 @@ export default function CheckoutPage() {
           payment_method: selectedPayment,
           quantity: qtyFromUrl,
           promo_code: promoApplied ? promoInput : null,
-          login_method: formData.login_method || null,
-          password: formData.password || null,
           request_notes: formData.request_notes || null,
           customer_phone: formData.customer_phone || null,
         }),
@@ -659,31 +649,6 @@ export default function CheckoutPage() {
                         }
                       />
                     </div>
-
-                    {formData.login_method && (
-                      <div className="space-y-2">
-                        <Label htmlFor="login_method">Metode Login</Label>
-                        <Input
-                          id="login_method"
-                          value={formData.login_method}
-                          disabled
-                          className="bg-slate-50 text-muted-foreground"
-                        />
-                      </div>
-                    )}
-
-                    {formData.password && (
-                      <div className="space-y-2">
-                        <Label htmlFor="password">Password Akun</Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={formData.password}
-                          disabled
-                          className="bg-slate-50 text-muted-foreground"
-                        />
-                      </div>
-                    )}
 
                     {formData.request_notes && (
                       <div className="space-y-2">

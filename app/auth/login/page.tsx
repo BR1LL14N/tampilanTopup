@@ -117,7 +117,7 @@ function LoginForm() {
               className="px-6 py-2 bg-white text-sky font-black text-xs uppercase tracking-wider shimmer-hover"
               style={tabBevelStyle}
             >
-              Sign in
+              Masuk
             </button>
           </div>
           <Link href="/auth/register">
@@ -126,7 +126,7 @@ function LoginForm() {
                 className="px-6 py-2 bg-white/10 text-white/80 hover:text-sky font-black text-xs uppercase tracking-wider transition duration-300 shimmer-hover hover:bg-white"
                 style={tabBevelStyle}
               >
-                Register
+                Daftar
               </button>
             </div>
           </Link>
@@ -148,10 +148,10 @@ function LoginForm() {
         <div className="flex-1 p-8 md:p-12 pt-16 md:pt-20">
           <div className="mb-8">
             <h2 className="text-3xl font-black tracking-tight text-white mb-2 uppercase">
-              Welcome Back!
+              Selamat Datang Kembali
             </h2>
             <p className="text-xs tracking-wider text-white/70 font-semibold uppercase">
-              Ready to top up your favorite games?
+              Siap top up game favoritmu?
             </p>
           </div>
 
@@ -171,16 +171,16 @@ function LoginForm() {
             {/* Email field */}
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-white/90 block">
-                Your email <span className="text-diamond">*</span>
+                Email Kamu <span className="text-diamond">*</span>
               </label>
               <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
                 <input
                   id="email"
                   type="email"
-                  placeholder="name@email.com"
+                  placeholder="nama@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-white/10 px-4 py-2.5 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
+                  className="autofill-dark w-full bg-white/10 px-4 py-2.5 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
                   style={inputBevelStyle}
                   required
                 />
@@ -190,7 +190,7 @@ function LoginForm() {
             {/* Password field */}
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-white/90 block">
-                Your password <span className="text-diamond">*</span>
+                Password Kamu <span className="text-diamond">*</span>
               </label>
               <div className="relative p-[1.5px] bg-white/20 focus-within:bg-white transition-colors duration-200" style={inputBevelStyle}>
                 <div className="relative">
@@ -200,7 +200,7 @@ function LoginForm() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full bg-white/10 pl-4 pr-12 py-2.5 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
+                    className="autofill-dark w-full bg-white/10 pl-4 pr-12 py-2.5 text-white placeholder-white/40 outline-none border-none text-sm focus:bg-white/20 transition-colors"
                     style={inputBevelStyle}
                     required
                   />
@@ -222,10 +222,10 @@ function LoginForm() {
                   type="checkbox"
                   className="rounded border-white/30 bg-white/10 text-white focus:ring-0 focus:ring-offset-0 cursor-pointer"
                 />
-                Remember me
+                Ingat saya
               </label>
               <Link href="/auth/forgot-password" className="text-white hover:text-diamond transition">
-                I forgot my password
+                Lupa password?
               </Link>
             </div>
 
@@ -240,10 +240,10 @@ function LoginForm() {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Signing in...
+                    Masuk...
                   </>
                 ) : (
-                  "Sign in and access dashboard"
+                  "Masuk dan Akses Dashboard"
                 )}
               </button>
             </div>
@@ -254,7 +254,7 @@ function LoginForm() {
         <div className="flex items-center justify-center md:flex-col py-4 md:py-0 px-8 md:px-0">
           <div className="h-[1px] md:h-24 w-full md:w-[1px] bg-white/20" />
           <span className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white/50 bg-transparent select-none">
-            Or
+            Atau
           </span>
           <div className="h-[1px] md:h-24 w-full md:w-[1px] bg-white/20" />
         </div>
@@ -272,7 +272,7 @@ function LoginForm() {
               type="button"
               onClick={() => handleOAuth("google")}
               disabled={oauthLoading === "google"}
-              className="w-full bg-white hover:bg-slate-50 py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white hover:bg-slate-50 py-3 px-4 text-xs font-bold uppercase tracking-wider text-slate-700 transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
               style={bevelStyle}
             >
               {oauthLoading === "google" ? (
@@ -285,7 +285,7 @@ function LoginForm() {
                   <path fill="#4285F4" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                 </svg>
               )}
-              <span>{oauthLoading === "google" ? "Menghubungkan..." : "Sign in with Google"}</span>
+              <span>{oauthLoading === "google" ? "Menghubungkan..." : "Masuk dengan Google"}</span>
             </button>
           </div>
  
@@ -295,7 +295,7 @@ function LoginForm() {
               type="button"
               onClick={() => handleOAuth("discord")}
               disabled={oauthLoading === "discord"}
-              className="w-full bg-white hover:bg-slate-50 py-3 px-4 text-xs font-bold uppercase tracking-wider text-text-primary transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white hover:bg-slate-50 py-3 px-4 text-xs font-bold uppercase tracking-wider text-slate-700 transition flex items-center gap-4 hover:scale-[1.01] shimmer-hover disabled:opacity-60 disabled:cursor-not-allowed"
               style={bevelStyle}
             >
               {oauthLoading === "discord" ? (
@@ -305,7 +305,7 @@ function LoginForm() {
                   <path d="M20.3 4.4C18.7 3.6 17.1 3 15.4 2.7c-.2.4-.4.8-.6 1.2-1.8-.3-3.7-.3-5.5 0-.2-.4-.4-.8-.6-1.2-1.7.3-3.3.9-4.9 1.7C.6 9 .1 13.5.3 17.9c2.4 1.8 4.7 2.9 7 3.6.6-.8 1-1.6 1.4-2.5-.8-.3-1.6-.7-2.4-1.2.2-.1.4-.3.6-.5 4.5 2.1 9.4 2.1 13.9 0 .2.2.4.3.6.5-.8.5-1.6.9-2.4 1.2.4.9.8 1.7 1.4 2.5 2.3-.7 4.6-1.8 7-3.6.3-5 .4-9.5-2.9-13.5zM8.9 15.1c-1.4 0-2.5-1.3-2.5-2.8 0-1.5 1.1-2.8 2.5-2.8s2.5 1.3 2.5 2.8c.1 1.5-1 2.8-2.5 2.8zm6.2 0c-1.4 0-2.5-1.3-2.5-2.8 0-1.5 1.1-2.8 2.5-2.8s2.5 1.3 2.5 2.8c0 1.5-1.1 2.8-2.5 2.8z" />
                 </svg>
               )}
-              <span>{oauthLoading === "discord" ? "Menghubungkan..." : "Sign in with Discord"}</span>
+              <span>{oauthLoading === "discord" ? "Menghubungkan..." : "Masuk dengan Discord"}</span>
             </button>
           </div>
 

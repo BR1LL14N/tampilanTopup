@@ -81,7 +81,7 @@ export default function CheckTransactionPage() {
           </div>
 
           {/* Glass Card Container */}
-          <div className="w-full glass-sky rounded-2xl shadow-sky-glow border-sky/30 backdrop-blur-md p-6 md:p-8 relative bg-[#183644]/90 backdrop-blur-md/80">
+          <div className="w-full bg-[#183644]/90 backdrop-blur-md rounded-2xl shadow-sky-glow border border-sky/30 p-6 md:p-8 relative">
             {/* Corner ambient glows */}
             <div className="absolute top-0 left-0 w-20 h-20 bg-sky/20 border border-sky/30 rounded-full blur-2xl pointer-events-none" />
             <div className="absolute bottom-0 right-0 w-20 h-20 bg-diamond/10 rounded-full blur-2xl pointer-events-none" />

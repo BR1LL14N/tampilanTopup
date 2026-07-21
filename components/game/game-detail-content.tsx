@@ -87,9 +87,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
   const [gameId, setGameId] = useState("")
   const [serverId, setServerId] = useState("")
   const [email, setEmail] = useState("")
-  const [loginMethod, setLoginMethod] = useState("Pilih Login")
   const [requestNotes, setRequestNotes] = useState("")
-  const [password, setPassword] = useState("")
 
   // Selection states
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(game.products[0] || null)
@@ -119,12 +117,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
       qty: String(quantity),
     })
 
-    if (loginMethod && loginMethod !== "Pilih Login") {
-      queryParams.set("login_method", loginMethod)
-    }
-    if (password) {
-      queryParams.set("password", password)
-    }
     if (requestNotes) {
       queryParams.set("notes", requestNotes)
     }
@@ -267,7 +259,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
               {activeTab === "transaksi" ? (
                 <>
                   {/* Step 1: Input Akun */}
-                  <div className="bg-[#182024] border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden">
+                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden">
                     <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
                       <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">1</span>
                       <h3 className="text-xs font-black uppercase tracking-widest text-white">Masukkan Data Akun</h3>
@@ -333,7 +325,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                   </div>
 
                   {/* Step 2: Pilih Nominal */}
-                  <div className="bg-[#182024] border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
+                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
                     <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
                       <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">2</span>
                       <h3 className="text-xs font-black uppercase tracking-widest text-white">Pilih Nominal Top Up</h3>
@@ -385,7 +377,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                   </div>
 
                   {/* Step 3: Jumlah Pembelian */}
-                  <div className="bg-[#182024] border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
+                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
                     <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
                       <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">3</span>
                       <h3 className="text-xs font-black uppercase tracking-widest text-white">Tentukan Jumlah Pembelian</h3>
@@ -435,7 +427,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                   <ol className="mt-4 list-decimal space-y-3 pl-5 text-xs text-text-muted font-medium">
                     <li>Harap teliti kembali nominal produk dan target ID akun Anda. Transaksi yang salah diinput di luar tanggung jawab pihak Mitsuru.</li>
                     <li>Proses distribusi top up diselesaikan secara otomatis dalam 10-60 detik segera setelah dana masuk.</li>
-                    <li>Untuk transaksi Joki Rank ML, mohon jangan membuka akun game selama proses pengerjaan oleh penjoki untuk menghindari kegagalan pengerjaan.</li>
                   </ol>
                 </div>
               )}
@@ -445,7 +436,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
             <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
 
               {/* Reviews Card */}
-              <div className="bg-[#182024] p-5 rounded-2xl border border-sky/30 relative overflow-hidden shadow-sky-medium">
+              <div className="bg-[#183644]/90 backdrop-blur-md p-5 rounded-2xl border border-sky/30 relative overflow-hidden shadow-sky-medium">
                 <h2 className="text-xs font-bold uppercase tracking-wider text-white/60 mb-3">Ulasan Pengguna</h2>
                 <div className="flex items-center gap-4 bg-black/20 p-3 rounded-xl border border-sky/10">
                   <span className="text-4xl font-black text-sky font-mono leading-none">4.99</span>
@@ -459,7 +450,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
               {/* CS Support Card */}
               <div
                 onClick={() => router.push("https://wa.me/6281234567890")}
-                className="bg-[#182024] p-5 rounded-2xl border border-sky/30 flex items-center gap-4 hover:border-sky/50 cursor-pointer transition-all duration-300 group shadow-sky-medium"
+                className="bg-[#183644]/90 backdrop-blur-md p-5 rounded-2xl border border-sky/30 flex items-center gap-4 hover:border-sky/50 cursor-pointer transition-all duration-300 group shadow-sky-medium"
               >
                 <span className="grid h-11 w-11 place-items-center rounded bg-sky/10 text-sky group-hover:bg-sky group-hover:text-white transition-colors">
                   <Headphones className="h-5 w-5" />
@@ -471,7 +462,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
               </div>
 
               {/* Selected Product Summary */}
-              <div className="bg-[#182024] p-6 rounded-2xl border border-sky/30 relative overflow-hidden shadow-sky-medium">
+              <div className="bg-[#183644]/90 backdrop-blur-md p-6 rounded-2xl border border-sky/30 relative overflow-hidden shadow-sky-medium">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-white border-b border-sky/30 pb-3">Ringkasan Invoice</h3>
 
                 {selectedProduct ? (
