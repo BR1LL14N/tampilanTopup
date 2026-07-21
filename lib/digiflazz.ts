@@ -1,18 +1,25 @@
 import crypto from 'crypto';
 import { DIGIFLAZZ_CONFIG } from './constants';
 
+export function getDigiflazzCredentials() {
+  const username = process.env.DIGIFLAZZ_USERNAME || DIGIFLAZZ_CONFIG.username;
+  const apiKey = process.env.DIGIFLAZZ_API_KEY || DIGIFLAZZ_CONFIG.apiKey;
+  const mode = process.env.DIGIFLAZZ_MODE || DIGIFLAZZ_CONFIG.mode;
+  return { username, apiKey, mode };
+}
+
 export function generateDigiflazzSignature(refId: string): string {
-  const { username, apiKey } = DIGIFLAZZ_CONFIG;
+  const { username, apiKey } = getDigiflazzCredentials();
   return crypto.createHash('md5').update(`${username}${apiKey}${refId}`).digest('hex');
 }
 
 export function generatePriceListSignature(): string {
-  const { username, apiKey } = DIGIFLAZZ_CONFIG;
+  const { username, apiKey } = getDigiflazzCredentials();
   return crypto.createHash('md5').update(`${username}${apiKey}pricelist`).digest('hex');
 }
 
 export function generateDepoSignature(): string {
-  const { username, apiKey } = DIGIFLAZZ_CONFIG;
+  const { username, apiKey } = getDigiflazzCredentials();
   return crypto.createHash('md5').update(`${username}${apiKey}depo`).digest('hex');
 }
 
@@ -176,6 +183,7 @@ export async function createTopup(
     }
   }
 
+  const { username } = getDigiflazzCredentials();
   const sign = generateDigiflazzSignature(refId);
 
   const response = await fetch('https://api.digiflazz.com/v1/transaction', {
@@ -184,7 +192,7 @@ export async function createTopup(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      username: DIGIFLAZZ_CONFIG.username,
+      username,
       buyer_sku_code: sku,
       customer_no: customerNo,
       ref_id: refId,
