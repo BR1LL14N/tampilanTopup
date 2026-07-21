@@ -45,39 +45,51 @@ export async function POST(req: NextRequest) {
     let gamesList: any[] = [...dbGames];
 
     // 5. Auto-create missing games from Digiflazz brands
-    const processedBrands = new Set<string>();
-
     for (const item of rawProducts) {
       const category = (item.category || '').toLowerCase();
       const brand = item.brand || '';
       if (!brand) continue;
 
-      const brandLower = brand.toLowerCase();
+      const brandLower = brand.toLowerCase().trim();
 
       if (!item.buyer_product_status || !item.seller_product_status) {
         continue;
       }
 
-      if (processedBrands.has(brandLower)) {
-        continue;
-      }
-      processedBrands.add(brandLower);
+      // Helper to find existing matching game
+      const findGameMatch = (bLower: string) => {
+        if (bLower.includes('mobile legend') || bLower.includes('mlbb')) {
+          return gamesList.find(g => g.slug === 'mobile-legends');
+        }
+        if (bLower.includes('free fire')) {
+          return gamesList.find(g => g.slug === 'free-fire');
+        }
+        if (bLower.includes('pubg')) {
+          return gamesList.find(g => g.slug === 'pubg-mobile');
+        }
+        if (bLower.includes('valorant')) {
+          return gamesList.find(g => g.slug === 'valorant');
+        }
+        if (bLower.includes('genshin')) {
+          return gamesList.find(g => g.slug === 'genshin-impact');
+        }
+        if (bLower.includes('honor of kings') || bLower.includes('hok')) {
+          return gamesList.find(g => g.slug === 'honor-of-kings');
+        }
+        
+        return gamesList.find(g => 
+          bLower === g.name.toLowerCase().trim() || 
+          g.name.toLowerCase().trim() === bLower ||
+          g.slug === bLower.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        );
+      };
 
-      // Check if this brand has a match in current games list
-      const existingGame = gamesList.find(g => {
-        const normalizedBrand = brandLower.trim();
-        if (normalizedBrand.includes('mobile legend') && g.slug === 'mobile-legends') return true;
-        if (normalizedBrand.includes('free fire') && g.slug === 'free-fire') return true;
-        if (normalizedBrand.includes('pubg') && g.slug === 'pubg-mobile') return true;
-        if (normalizedBrand.includes('valorant') && g.slug === 'valorant') return true;
-        if (normalizedBrand.includes('genshin') && g.slug === 'genshin-impact') return true;
-        if ((normalizedBrand.includes('honor of kings') || normalizedBrand.includes('hok')) && g.slug === 'honor-of-kings') return true;
-        if (normalizedBrand.includes('mlbb') && g.slug === 'mobile-legends') return true;
-        return normalizedBrand === g.name.toLowerCase() || g.name.toLowerCase().includes(normalizedBrand);
-      });
+      const existingGame = findGameMatch(brandLower);
 
       if (!existingGame) {
-        const slug = brandLower.trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        let slug = brandLower.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        if (!slug) slug = 'game-' + crypto.randomUUID().slice(0, 8);
+        
         if (gamesList.some(g => g.slug === slug)) {
           continue;
         }
@@ -116,15 +128,16 @@ export async function POST(req: NextRequest) {
           gameCategory = item.category ? (item.category.charAt(0).toUpperCase() + item.category.slice(1)) : 'Games';
         }
 
+        const formattedBrandName = brand.trim().toUpperCase();
         const newGame = {
           id: newGameId,
-          name: brand,
+          name: formattedBrandName,
           slug: slug,
           image: 'https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400',
           icon: '🎮',
           category: gameCategory,
           status: true,
-          description: `Top up ${brand} murah dan proses instan.`,
+          description: `Top up ${formattedBrandName} murah dan proses instan.`,
           publisher: 'Digiflazz'
         };
 
