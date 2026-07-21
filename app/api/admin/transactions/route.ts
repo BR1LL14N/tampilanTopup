@@ -167,7 +167,11 @@ export async function POST(req: NextRequest) {
       } catch (apiError: any) {
         console.error('Digiflazz Admin Direct Topup failed:', apiError);
         topupStatus = 'failed';
-        providerResponse = { error: apiError.message || 'API Call failed' };
+        providerResponse = { 
+          error: apiError.message || 'API Call failed',
+          debug_used_username: process.env.DIGIFLAZZ_USERNAME,
+          debug_mode: process.env.DIGIFLAZZ_MODE
+        };
       }
     }
 
