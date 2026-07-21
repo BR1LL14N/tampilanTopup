@@ -11,7 +11,7 @@ export const gameAssets = {
   },
   "pubg-mobile": {
     icon: "/assets/games/pubg-mobile/icon.png",
-    poster: "/assets/games/pubg-mobile/card.png",
+    poster: "/assets/games/pubg-mobile/poster.png",
     banner: "/assets/games/pubg-mobile/banner.png",
   },
   valorant: {
@@ -63,6 +63,36 @@ export const gameAssets = {
     icon: "/assets/games/bigo-live/icon.png",
     poster: "/assets/games/bigo-live/poster.png",
     banner: "/assets/games/bigo-live/banner.png",
+  },
+  "arena-of-valor": {
+    icon: "/assets/games/arena-of-valor/icon.png",
+    poster: "/assets/games/arena-of-valor/poster.png",
+    banner: "/assets/games/arena-of-valor/banner.png",
+  },
+  aov: {
+    icon: "/assets/games/arena-of-valor/icon.png",
+    poster: "/assets/games/arena-of-valor/poster.png",
+    banner: "/assets/games/arena-of-valor/banner.png",
+  },
+  "fc-mobile": {
+    icon: "/assets/games/fc-mobile/icon.png",
+    poster: "/assets/games/fc-mobile/poster.png",
+    banner: "/assets/games/fc-mobile/banner.png",
+  },
+  growtopia: {
+    icon: "/assets/games/growtopia/icon.png",
+    poster: "/assets/games/growtopia/poster.png",
+    banner: "/assets/games/growtopia/banner.png",
+  },
+  "honkai-star-rail": {
+    icon: "/assets/games/honkai-star-rail/icon.png",
+    poster: "/assets/games/honkai-star-rail/poster.png",
+    banner: "/assets/games/honkai-star-rail/banner.png",
+  },
+  "zenless-zone-zero": {
+    icon: "/assets/games/zenless-zone-zero/icon.png",
+    poster: "/assets/games/zenless-zone-zero/poster.png",
+    banner: "/assets/games/zenless-zone-zero/banner.png",
   },
 } as const;
 

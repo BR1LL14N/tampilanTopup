@@ -458,14 +458,14 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               <button
                 key={idx}
                 onClick={() => router.push(`/games/${card.slug}`)}
-                className="w-full flex flex-col sm:flex-row min-h-24 sm:min-h-28 items-center sm:items-center gap-3 sm:gap-5 bg-[#183644]/90 backdrop-blur-md border border-sky/30 hover:border-sky/60 p-3 sm:p-4 text-center sm:text-left group shimmer-hover rounded-[16px] sm:rounded-[20px] shadow-lg shadow-black/25 transition-all duration-300 hover:bg-[#183644] hover:-translate-y-1 relative overflow-hidden"
+                className="w-full flex flex-col sm:flex-row min-h-24 sm:min-h-28 items-center sm:items-center gap-3 sm:gap-5 dark-stripes-teal border border-sky/30 hover:border-diamond/60 p-3 sm:p-4 text-center sm:text-left group shimmer-hover rounded-[16px] sm:rounded-[20px] shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="relative h-14 w-14 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl border border-white/15 group-hover:border-sky/50 transition-colors">
+                <div className="relative h-14 w-14 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl border border-white/15 group-hover:border-diamond/50 transition-colors">
                   <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />
                 </div>
                 <span className="w-full">
-                  <strong className="block text-[11px] sm:text-lg font-black text-sky group-hover:text-white transition-colors uppercase tracking-tight leading-tight">{card.name}</strong>
-                  <span className="mt-1 block text-[9px] sm:text-xs font-bold text-white/60 uppercase tracking-wider truncate">{card.publisher}</span>
+                  <strong className="block text-[11px] sm:text-lg font-black text-white group-hover:text-diamond transition-colors uppercase tracking-tight leading-tight">{card.name}</strong>
+                  <span className="mt-1 block text-[9px] sm:text-xs font-bold text-white/50 uppercase tracking-wider truncate">{card.publisher}</span>
                 </span>
               </button>
             ))}
