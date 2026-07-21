@@ -60,6 +60,8 @@ export default function AdminDashboardPage() {
 
   // Sync Settings States
   const [isSyncActive, setIsSyncActive] = useState(true)
+  const [digiflazzMode, setDigiflazzMode] = useState("simulation")
+  const [digiflazzUsername, setDigiflazzUsername] = useState("")
   const [syncInterval, setSyncInterval] = useState(24)
   const [lastSyncTime, setLastSyncTime] = useState("")
   const [lastSyncStatus, setLastSyncStatus] = useState("idle")
@@ -114,7 +116,10 @@ export default function AdminDashboardPage() {
         const resStats = await fetch("/api/admin/stats")
         const data = await resStats.json()
 
-        if (data.error) throw new Error(data.error)
+        if (data.stats) {
+          if (data.stats.digiflazzMode) setDigiflazzMode(data.stats.digiflazzMode)
+          if (data.stats.digiflazzUsername) setDigiflazzUsername(data.stats.digiflazzUsername)
+        }
 
         setStats([
           {
@@ -472,12 +477,24 @@ export default function AdminDashboardPage() {
               </span>
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-black uppercase text-white tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-black uppercase text-white tracking-tight flex items-center gap-3">
                 Admin Control Room
               </h1>
-              <p className="text-xs font-bold text-white/60 uppercase tracking-widest mt-1">
-                Overview &amp; Manajemen Data Penjualan Mitsuru
-              </p>
+              <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+                  digiflazzMode === "production"
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                    : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                }`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${digiflazzMode === "production" ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
+                  Digiflazz: {digiflazzMode === "production" ? "Production (Live)" : "Sandbox / Simulation"}
+                </span>
+                {digiflazzUsername && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono text-white/60 bg-black/30 border border-white/10">
+                    User: {digiflazzUsername}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

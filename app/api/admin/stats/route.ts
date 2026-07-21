@@ -126,13 +126,18 @@ export async function GET(req: NextRequest) {
       LIMIT 10
     `);
 
+    const digiflazzMode = process.env.DIGIFLAZZ_MODE || 'simulation';
+    const digiflazzUsername = process.env.DIGIFLAZZ_USERNAME || 'tuwumiWXAdqg';
+
     return NextResponse.json({
       stats: {
         userCount,
         gameCount,
         totalTxCount,
         totalRevenue,
-        digiflazzBalance
+        digiflazzBalance,
+        digiflazzMode,
+        digiflazzUsername
       },
       recentTransactions: recentTxRows,
       topProducts: topProductRows,
