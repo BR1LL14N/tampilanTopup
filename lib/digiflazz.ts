@@ -187,10 +187,13 @@ export async function createTopup(
   const { username } = getDigiflazzCredentials();
   const sign = generateDigiflazzSignature(refId);
 
+  // Clean customerNo: remove spaces and parentheses (e.g. "65742688 (2116)" -> "657426882116")
+  const cleanCustomerNo = customerNo.replace(/[\s()]/g, '');
+
   const requestBody: any = {
     username,
     buyer_sku_code: sku,
-    customer_no: customerNo,
+    customer_no: cleanCustomerNo,
     ref_id: refId,
     sign,
   };
