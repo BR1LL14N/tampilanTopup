@@ -102,39 +102,47 @@ export const paymentAssets = {
 
 export type GameAssetSlug = keyof typeof gameAssets;
 
-export function getGameAsset(slug: string) {
-  const asset = gameAssets[slug as GameAssetSlug];
-  if (asset) return asset;
-  return {
-    icon: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=128&h=128&fit=crop",
-    poster: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=600&h=400&fit=crop",
-    banner: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=600&h=400&fit=crop",
-  };
-}
-
 export function slugFromGameName(name?: string | null) {
   if (!name) return "";
-  const normalized = name.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "-");
+  const normalized = name.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   const aliases: Record<string, GameAssetSlug> = {
     "mobile-legends": "mobile-legends",
+    ml: "mobile-legends",
+    mlbb: "mobile-legends",
     "free-fire": "free-fire",
+    ff: "free-fire",
     "pubg-mobile": "pubg-mobile",
+    pubg: "pubg-mobile",
     valorant: "valorant",
     "genshin-impact": "genshin-impact",
+    genshin: "genshin-impact",
     "honor-of-kings": "honor-of-kings",
+    hok: "honor-of-kings",
     roblox: "roblox",
-    "steam-wallet": "steam",
-    steam: "steam",
-    "tiktok-live": "tiktok",
-    tiktok: "tiktok",
-    "bigo-live": "bigo",
-    bigo: "bigo",
+    "steam-wallet": "steam-wallet",
+    steam: "steam-wallet",
+    "tiktok-live": "tiktok-live",
+    tiktok: "tiktok-live",
+    "bigo-live": "bigo-live",
+    bigo: "bigo-live",
   };
-  return aliases[normalized] || normalized;
+  return aliases[normalized] || (normalized as GameAssetSlug);
+}
+
+export function getGameAsset(slug?: string | null) {
+  if (!slug) return null;
+  const resolvedSlug = slugFromGameName(slug);
+  const asset = gameAssets[resolvedSlug] || gameAssets[slug as GameAssetSlug];
+  if (asset) return asset;
+  return {
+    icon: "/assets/games/mobile-legends/icon.png",
+    poster: "/assets/games/mobile-legends/poster.png",
+    banner: "/assets/games/mobile-legends/banner.png",
+  };
 }
 
 export function getGameAssetByName(name?: string | null) {
-  return getGameAsset(slugFromGameName(name));
+  return getGameAsset(name);
 }
 
 export function getItemAssetForProduct(productName?: string | null, sku?: string | null, gameName?: string | null) {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Instagram } from "lucide-react"
+import { Instagram, Facebook, Youtube } from "lucide-react"
 
 const WhatsappIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -16,24 +16,48 @@ const WhatsappIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 )
 
+const TiktokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" {...props}>
+    <path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0115.54 3h-3.09v12.4a2.592 2.592 0 01-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 004.3 1.38V7.3s-1.88.09-3.24-1.48z" />
+  </svg>
+)
+
 export function Footer() {
   const currentYear = new Date().getFullYear()
-  
+
   const [waAdminNumber, setWaAdminNumber] = useState("6281234567890")
+  const [siteInfo, setSiteInfo] = useState({
+    logoUrl: "",
+    legalName: "",
+    address: "",
+    instagram: "",
+    tiktok: "",
+    facebook: "",
+    youtube: "",
+  })
 
   useEffect(() => {
-    const fetchWaNumber = async () => {
+    const fetchPublicSettings = async () => {
       try {
         const res = await fetch("/api/settings/public")
         const data = await res.json()
         if (data.wa_admin_number) {
           setWaAdminNumber(data.wa_admin_number)
         }
+        setSiteInfo({
+          logoUrl: data.logo_url || "",
+          legalName: data.business_legal_name || "",
+          address: data.business_address || "",
+          instagram: data.social_instagram || "",
+          tiktok: data.social_tiktok || "",
+          facebook: data.social_facebook || "",
+          youtube: data.social_youtube || "",
+        })
       } catch (err) {
-        console.error("Failed to load public WA number for footer:", err)
+        console.error("Failed to load public settings for footer:", err)
       }
     }
-    fetchWaNumber()
+    fetchPublicSettings()
   }, [])
 
   const footerLinks = {
@@ -68,7 +92,7 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-4 group">
               <div className="h-10 w-10 rounded-lg overflow-hidden bg-white/5 border border-white/10 shadow-lg group-hover:border-white/30 transition-all duration-300">
-                <img src="/mitsuru.png" alt="Mitsuru Logo" className="h-full w-full object-cover" />
+                <img src={siteInfo.logoUrl || "/mitsuru.png"} alt="Mitsuru Logo" className="h-full w-full object-cover" />
               </div>
               <span>
                 <span className="block text-left text-base font-extrabold tracking-wide text-white group-hover:text-sky transition-colors">Mitsuru</span>
@@ -77,9 +101,9 @@ export function Footer() {
             <p className="text-sm text-white/60 mb-4">
               Top up game favorite kamu dengan harga terbaik dan proses otomatis 24/7.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               <a
-                href="https://www.instagram.com/mitsurushopcom"
+                href={siteInfo.instagram || "https://www.instagram.com/mitsurushopcom"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
@@ -96,6 +120,39 @@ export function Footer() {
               >
                 <WhatsappIcon className="h-4 w-4 shrink-0 fill-current" />
               </a>
+              {siteInfo.tiktok && (
+                <a
+                  href={siteInfo.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
+                  title="TikTok"
+                >
+                  <TiktokIcon className="h-4 w-4 shrink-0 fill-current" />
+                </a>
+              )}
+              {siteInfo.facebook && (
+                <a
+                  href={siteInfo.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
+                  title="Facebook"
+                >
+                  <Facebook className="h-4 w-4" />
+                </a>
+              )}
+              {siteInfo.youtube && (
+                <a
+                  href={siteInfo.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
+                  title="YouTube"
+                >
+                  <Youtube className="h-4 w-4" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -151,7 +208,13 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-white/10 text-center">
+        <div className="mt-12 pt-8 border-t border-white/10 text-center space-y-1.5">
+          {siteInfo.legalName && (
+            <p className="text-xs text-white/50 font-semibold">{siteInfo.legalName}</p>
+          )}
+          {siteInfo.address && (
+            <p className="text-[11px] text-white/35 max-w-md mx-auto leading-relaxed">{siteInfo.address}</p>
+          )}
           <p className="text-sm text-white/40">
             &copy; {currentYear} Mitsuru. All rights reserved.
           </p>

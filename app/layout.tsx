@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Montserrat, Poppins } from "next/font/google"
 import "./globals.css"
 import PWARegister from "@/components/pwa-register"
+import DynamicFavicon from "@/components/dynamic-favicon"
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -173,6 +174,7 @@ export default function RootLayout({
       </head>
       <body className={`${montserrat.variable} ${poppins.variable} min-h-screen antialiased font-body`}>
         <PWARegister />
+        <DynamicFavicon />
         <div className="relative min-h-screen flex flex-col bg-[#181818]">
           {/* Custom Grid Background Pattern (CSS-Only) */}
           <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden flex items-center justify-center">

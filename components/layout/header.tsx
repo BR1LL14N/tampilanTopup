@@ -104,12 +104,28 @@ export function Header({ user }: HeaderProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
 
+  // Dynamic site logo (admin-configurable)
+  const [logoUrl, setLogoUrl] = useState("")
+
   useEffect(() => {
     setMounted(true)
     if (typeof window !== "undefined") {
       const stored = window.localStorage.getItem("topup_sidebar_collapsed")
       setIsSidebarCollapsed(stored === "true")
     }
+  }, [])
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const res = await fetch("/api/settings/public")
+        const data = await res.json()
+        if (data.logo_url) setLogoUrl(data.logo_url)
+      } catch (err) {
+        console.error("Failed to load site logo:", err)
+      }
+    }
+    fetchLogo()
   }, [])
 
   const toggleSidebar = () => {
@@ -309,17 +325,17 @@ export function Header({ user }: HeaderProps) {
   return (
     <>
       {/* Top Navbar - Dark Glassmorphism */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#181818]/90 backdrop-blur-xl shadow-lg shadow-black/20">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#121417]/95 backdrop-blur-xl shadow-lg shadow-black/40">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
 
           {/* Left: Logo */}
           <Link href="/" className="group flex items-center gap-3 shrink-0 relative z-20">
-            <div className="h-10 w-10 rounded-lg overflow-hidden bg-white border border-white/15 group-hover:border-sky/50 transition-all duration-300">
-              <img src="/mitsuru.png" alt="Mitsuru Logo" className="h-full w-full object-cover" />
+            <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-0.5 border border-white/15 group-hover:border-sky/50 transition-all duration-300 shadow-sm flex items-center justify-center">
+              <img src={logoUrl || "/mitsuru.png"} alt="Mitsuru Logo" className="h-full w-full object-cover rounded-lg" />
             </div>
             <span className="hidden sm:block">
               <span className="block text-left text-base font-black tracking-wider uppercase text-white group-hover:text-sky transition-colors">Mitsuru</span>
-              <span className="block text-left text-[10px] font-bold text-white/50 uppercase tracking-widest leading-none">Top Up HUB</span>
+              <span className="block text-left text-[9px] font-bold text-white/50 uppercase tracking-widest leading-none">Top Up HUB</span>
             </span>
           </Link>
 
@@ -335,7 +351,7 @@ export function Header({ user }: HeaderProps) {
                 value={searchQuery}
                 onFocus={() => setSearchFocused(true)}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/[0.07] border border-white/15 rounded-full pl-11 pr-10 py-2 text-xs font-semibold text-white placeholder:text-white/40 outline-none transition-all duration-300 hover:border-sky/50 focus:border-sky focus:ring-2 focus:ring-sky/25 focus:bg-white/10"
+                className="w-full bg-[#1e2227] border border-white/10 rounded-full pl-11 pr-10 py-2 text-xs font-semibold text-white placeholder:text-white/40 outline-none transition-all duration-300 hover:border-sky/50 focus:border-sky focus:ring-2 focus:ring-sky/25 focus:bg-[#252a31]"
               />
               {searchQuery && (
                 <button
@@ -350,8 +366,8 @@ export function Header({ user }: HeaderProps) {
 
             {/* Live Search Dropdown */}
             {searchFocused && filteredGames.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-sky-border rounded-xl shadow-sky-medium overflow-hidden z-50 p-2 space-y-1 max-h-80 overflow-y-auto animate-fadeIn">
-                <p className="text-[9px] font-black text-text-muted uppercase tracking-wider px-3 py-1.5 border-b border-sky-border mb-1">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1d22] border border-white/15 rounded-xl shadow-2xl overflow-hidden z-50 p-2 space-y-1 max-h-80 overflow-y-auto animate-fadeIn">
+                <p className="text-[9px] font-black text-white/50 uppercase tracking-wider px-3 py-1.5 border-b border-white/10 mb-1">
                   Hasil Pencarian Game ({filteredGames.length})
                 </p>
                 {filteredGames.map((game) => (
@@ -362,14 +378,14 @@ export function Header({ user }: HeaderProps) {
                       setSearchQuery("")
                       setSearchFocused(false)
                     }}
-                    className="flex items-center gap-3.5 p-2 hover:bg-ice rounded-lg group transition-colors"
+                    className="flex items-center gap-3.5 p-2 hover:bg-white/10 rounded-lg group transition-colors"
                   >
-                    <div className="h-10 w-10 rounded-lg overflow-hidden shrink-0 border border-sky-border group-hover:border-sky/30 transition-colors">
+                    <div className="h-10 w-10 rounded-lg overflow-hidden shrink-0 border border-white/15 group-hover:border-sky/30 transition-colors">
                       <img src={game.image} alt={game.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     </div>
                     <div>
-                      <p className="text-xs font-extrabold text-text-primary group-hover:text-sky transition-colors uppercase tracking-tight">{game.name}</p>
-                      <p className="text-[9px] font-bold text-text-muted uppercase tracking-wider">{game.publisher}</p>
+                      <p className="text-xs font-extrabold text-white group-hover:text-sky transition-colors uppercase tracking-tight">{game.name}</p>
+                      <p className="text-[9px] font-bold text-white/50 uppercase tracking-wider">{game.publisher}</p>
                     </div>
                   </Link>
                 ))}
@@ -383,7 +399,7 @@ export function Header({ user }: HeaderProps) {
             {/* Lang / Currency selector */}
             <button
               onClick={() => setShowLangModal(true)}
-              className="flex items-center gap-1.5 px-3 py-2 border border-white/15 rounded-full bg-white/[0.07] hover:bg-white/15 text-white hover:text-sky transition duration-300 text-xs font-bold"
+              className="flex items-center gap-1.5 px-3.5 py-2 border border-white/10 rounded-full bg-[#1e2227] hover:bg-white/10 text-white transition duration-300 text-xs font-bold"
               title="Pilih Lokasi & Bahasa"
             >
               <span>{selectedLocation === "id" ? <IndonesiaFlag /> : <USFlag />}</span>
@@ -392,16 +408,16 @@ export function Header({ user }: HeaderProps) {
 
             {/* Desktop Navigation for Public (Non-authenticated User) */}
             {!currentUser && (
-              <nav className="hidden lg:flex items-center gap-1.5">
+              <nav className="hidden lg:flex items-center gap-1">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "border px-4 py-2 text-xs font-black uppercase tracking-wider rounded-full transition-all duration-300",
+                      "px-4 py-2 text-xs font-black uppercase tracking-wider rounded-full transition-all duration-300",
                       isActive(link.href)
-                        ? "border-white/15 bg-white/10 text-sky"
-                        : "border-transparent text-white/70 hover:text-sky hover:bg-white/10"
+                        ? "border border-white/15 bg-[#262b32] text-sky shadow-sm"
+                        : "border border-transparent text-white/90 hover:text-sky hover:bg-white/5"
                     )}
                   >
                     {link.label}
@@ -415,13 +431,13 @@ export function Header({ user }: HeaderProps) {
               {currentUser ? (
                 <>
                   <HeaderNotificationBell />
-                  <Link href="/dashboard" className="flex items-center gap-1.5 border border-white/15 bg-white/[0.07] text-white hover:text-sky hover:bg-white/15 px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-300">
+                  <Link href="/dashboard" className="flex items-center gap-1.5 border border-white/15 bg-[#1e2227] text-white hover:text-sky hover:bg-white/15 px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-300">
                     <User className="h-3.5 w-3.5 text-sky" />
                     {currentUser.name}
                   </Link>
                   <button
                     onClick={() => setShowLogoutConfirm(true)}
-                    className="p-2 border border-white/15 hover:border-red-400/40 rounded-full bg-white/[0.07] hover:bg-red-500/10 text-white/60 hover:text-red-400 transition duration-300 flex items-center justify-center h-[34px] w-[34px]"
+                    className="p-2 border border-white/15 hover:border-red-400/40 rounded-full bg-[#1e2227] hover:bg-red-500/10 text-white/60 hover:text-red-400 transition duration-300 flex items-center justify-center h-[34px] w-[34px]"
                     title="Keluar"
                   >
                     <LogOut className="h-4 w-4" />
@@ -562,6 +578,17 @@ export function Header({ user }: HeaderProps) {
                   >
                     <MessageSquare className="h-4 w-4 text-sky" />
                     Kelola Ulasan
+                  </Link>
+                  <Link
+                    href="/admin/settings"
+                    className={cn(
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-text-secondary flex items-center gap-2",
+                      pathname === "/admin/settings" && "nav-active bg-sky/10 text-sky"
+                    )}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Settings className="h-4 w-4 text-sky" />
+                    Pengaturan Situs
                   </Link>
                 </>
               )}
@@ -768,6 +795,18 @@ export function Header({ user }: HeaderProps) {
                 >
                   <MessageSquare className="h-4 w-4 group-hover:scale-105 transition-transform" />
                   {!isSidebarCollapsed && <span className="animate-fadeIn">Kelola Ulasan</span>}
+                </Link>
+                <Link
+                  href="/admin/settings"
+                  className={cn(
+                    "flex items-center rounded-lg text-xs font-bold text-text-secondary hover:text-sky hover:bg-ice transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+                    pathname === "/admin/settings" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
+                  )}
+                  title={isSidebarCollapsed ? "Pengaturan Situs" : undefined}
+                >
+                  <Settings className="h-4 w-4 group-hover:scale-105 transition-transform" />
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Pengaturan Situs</span>}
                 </Link>
               </div>
             )}

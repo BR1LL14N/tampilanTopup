@@ -25,6 +25,24 @@ export async function GET(req: NextRequest) {
     const waAdminNumber = await SettingService.get("wa_admin_number", "");
     const waCustomerNotif = await SettingService.get("wa_customer_notif", true);
 
+    // Business Identity Settings
+    const businessOwnerName = await SettingService.get("business_owner_name", "");
+    const businessLegalName = await SettingService.get("business_legal_name", "");
+    const businessAddress = await SettingService.get("business_address", "");
+    const businessNpwp = await SettingService.get("business_npwp", "");
+    const businessPhone = await SettingService.get("business_phone", "");
+    const businessEmail = await SettingService.get("business_email", "");
+
+    // Branding Settings
+    const logoUrl = await SettingService.get("logo_url", "");
+    const faviconUrl = await SettingService.get("favicon_url", "");
+
+    // Social Media Settings
+    const socialInstagram = await SettingService.get("social_instagram", "");
+    const socialTiktok = await SettingService.get("social_tiktok", "");
+    const socialFacebook = await SettingService.get("social_facebook", "");
+    const socialYoutube = await SettingService.get("social_youtube", "");
+
     return NextResponse.json({
       settings: {
         isSyncActive,
@@ -37,7 +55,19 @@ export async function GET(req: NextRequest) {
         waEndpoint,
         waToken,
         waAdminNumber,
-        waCustomerNotif
+        waCustomerNotif,
+        businessOwnerName,
+        businessLegalName,
+        businessAddress,
+        businessNpwp,
+        businessPhone,
+        businessEmail,
+        logoUrl,
+        faviconUrl,
+        socialInstagram,
+        socialTiktok,
+        socialFacebook,
+        socialYoutube
       }
     });
   } catch (err: any) {
@@ -52,16 +82,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const { 
-      isSyncActive, 
-      syncInterval, 
+    const {
+      isSyncActive,
+      syncInterval,
       midtransMode,
       waStatus,
       waMethod,
       waEndpoint,
       waToken,
       waAdminNumber,
-      waCustomerNotif
+      waCustomerNotif,
+      businessOwnerName,
+      businessLegalName,
+      businessAddress,
+      businessNpwp,
+      businessPhone,
+      businessEmail,
+      logoUrl,
+      faviconUrl,
+      socialInstagram,
+      socialTiktok,
+      socialFacebook,
+      socialYoutube
     } = await req.json();
 
     if (isSyncActive !== undefined) {
@@ -92,6 +134,48 @@ export async function POST(req: NextRequest) {
     }
     if (waCustomerNotif !== undefined) {
       await SettingService.set("wa_customer_notif", !!waCustomerNotif);
+    }
+
+    // Save Business Identity settings
+    if (businessOwnerName !== undefined) {
+      await SettingService.set("business_owner_name", String(businessOwnerName));
+    }
+    if (businessLegalName !== undefined) {
+      await SettingService.set("business_legal_name", String(businessLegalName));
+    }
+    if (businessAddress !== undefined) {
+      await SettingService.set("business_address", String(businessAddress));
+    }
+    if (businessNpwp !== undefined) {
+      await SettingService.set("business_npwp", String(businessNpwp));
+    }
+    if (businessPhone !== undefined) {
+      await SettingService.set("business_phone", String(businessPhone));
+    }
+    if (businessEmail !== undefined) {
+      await SettingService.set("business_email", String(businessEmail));
+    }
+
+    // Save Branding settings
+    if (logoUrl !== undefined) {
+      await SettingService.set("logo_url", String(logoUrl));
+    }
+    if (faviconUrl !== undefined) {
+      await SettingService.set("favicon_url", String(faviconUrl));
+    }
+
+    // Save Social Media settings
+    if (socialInstagram !== undefined) {
+      await SettingService.set("social_instagram", String(socialInstagram));
+    }
+    if (socialTiktok !== undefined) {
+      await SettingService.set("social_tiktok", String(socialTiktok));
+    }
+    if (socialFacebook !== undefined) {
+      await SettingService.set("social_facebook", String(socialFacebook));
+    }
+    if (socialYoutube !== undefined) {
+      await SettingService.set("social_youtube", String(socialYoutube));
     }
 
     return NextResponse.json({ success: true });

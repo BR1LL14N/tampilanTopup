@@ -1,12 +1,32 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Card, CardContent } from "@/components/ui/card"
-import { Mail, Phone, MapPin, Globe } from "lucide-react"
+import { Mail, Phone, MapPin, Building2 } from "lucide-react"
 
 export default function ContactPage() {
+  const [identity, setIdentity] = useState({ ownerName: "", legalName: "", address: "" })
+
+  useEffect(() => {
+    const fetchIdentity = async () => {
+      try {
+        const res = await fetch("/api/settings/public")
+        const data = await res.json()
+        setIdentity({
+          ownerName: data.business_owner_name || "",
+          legalName: data.business_legal_name || "",
+          address: data.business_address || "",
+        })
+      } catch (err) {
+        console.error("Failed to load business identity:", err)
+      }
+    }
+    fetchIdentity()
+  }, [])
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
       <Header />
@@ -67,15 +87,30 @@ export default function ContactPage() {
                     <MapPin className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-sm text-text-primary uppercase mb-1">Kantor Utama</h3>
+                    <h3 className="font-extrabold text-sm text-text-primary uppercase mb-1">Alamat Usaha</h3>
                     <p className="text-xs text-text-secondary leading-relaxed">
-                      Mitsuru Shop Office HQ<br />
-                      Jl. Mahasiswa Raya No. 45, Kecamatan Lowokwaru,<br />
-                      Kota Malang, Jawa Timur, Indonesia.
+                      {identity.address || "Alamat belum diatur. Admin dapat mengisinya di halaman Pengaturan Situs."}
                     </p>
                   </div>
                 </CardContent>
               </Card>
+
+              {(identity.ownerName || identity.legalName) && (
+                <Card className="rounded-[24px] border-sky-border shadow-sky-soft bg-white">
+                  <CardContent className="p-6 flex items-start gap-4">
+                    <div className="h-10 w-10 rounded-xl bg-sky/10 text-sky grid place-items-center shrink-0">
+                      <Building2 className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-sm text-text-primary uppercase mb-1">Identitas Usaha</h3>
+                      <p className="text-xs text-text-secondary leading-relaxed">
+                        {identity.legalName && <>Nama Usaha: <strong className="text-text-primary">{identity.legalName}</strong><br /></>}
+                        {identity.ownerName && <>Pemilik: <strong className="text-text-primary">{identity.ownerName}</strong></>}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Quick message card */}
