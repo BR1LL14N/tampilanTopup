@@ -649,7 +649,7 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
               Memuat Ulasan...
             </div>
           ) : reviews.length === 0 ? (
-            <div className="bg-white/[0.06] p-8 text-center rounded-[20px] border border-white/10">
+            <div className="bg-[#183644]/90 backdrop-blur-md p-8 text-center rounded-[20px] border border-sky/30 shadow-xl">
               <p className="text-xs font-bold text-white/70 uppercase tracking-wider">
                 Belum ada ulasan terverifikasi. Jadilah yang pertama memberikan kritik & saran!
               </p>
@@ -659,7 +659,7 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
               {reviews.map((rev) => (
                 <div
                   key={rev.id}
-                  className="bg-white p-5 rounded-[20px] border border-sky-border shadow-sky-soft flex flex-col justify-between hover:shadow-sky-medium hover:border-sky/30 transition-all duration-300"
+                  className="bg-[#183644]/90 backdrop-blur-md p-5 rounded-[20px] border border-sky/30 shadow-xl flex flex-col justify-between hover:border-sky/60 transition-all duration-300"
                 >
                   <div className="flex flex-col justify-between h-full">
                     <div>
@@ -672,15 +672,15 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
                               className="w-7 h-7 rounded-full border border-sky/30"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-sky/10 text-sky text-[10px] font-black grid place-items-center uppercase border border-sky-border">
+                            <div className="w-7 h-7 rounded-full bg-sky/20 text-sky text-[10px] font-black grid place-items-center uppercase border border-sky/30">
                               {rev.user_name?.substring(0, 2)}
                             </div>
                           )}
                           <div>
-                            <p className="text-xs font-black text-text-primary uppercase tracking-wide leading-tight">
+                            <p className="text-xs font-black text-white uppercase tracking-wide leading-tight">
                               {rev.user_name}
                             </p>
-                            <p className="text-[9px] font-bold text-text-muted uppercase">
+                            <p className="text-[9px] font-bold text-white/50 uppercase">
                               {new Date(rev.created_at).toLocaleDateString("id-ID", {
                                 day: "numeric",
                                 month: "short",
@@ -693,15 +693,15 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
                           {"★".repeat(rev.rating) + "☆".repeat(5 - rev.rating)}
                         </div>
                       </div>
-                      <p className="text-xs font-bold text-text-secondary leading-relaxed italic mt-1">
+                      <p className="text-xs font-bold text-white/80 leading-relaxed italic mt-1">
                         "{rev.comment}"
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-sky-border flex justify-end">
+                    <div className="mt-4 pt-3 border-t border-white/10 flex justify-end">
                       <Link
                         href={`/reviews/${rev.id}`}
-                        className="text-[10px] font-black uppercase text-sky hover:text-sky-dark tracking-wider flex items-center gap-1 group"
+                        className="text-[10px] font-black uppercase text-sky hover:text-white tracking-wider flex items-center gap-1 group transition-colors"
                       >
                         Buka Chat Diskusi 💬
                         <span className="transform group-hover:translate-x-0.5 transition-transform">→</span>
@@ -715,8 +715,8 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
         </div>
 
         {/* Feedback Form */}
-        <div className="bg-white p-6 rounded-[20px] border border-sky-border shadow-sky-soft h-fit">
-          <h3 className="text-xs font-black uppercase tracking-widest text-text-secondary mb-4">
+        <div className="bg-[#183644]/90 backdrop-blur-md p-6 rounded-[20px] border border-sky/30 shadow-2xl h-fit">
+          <h3 className="text-xs font-black uppercase tracking-widest text-white mb-4">
             Kirim Ulasan & Rating Anda
           </h3>
 
@@ -724,7 +724,7 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Rating Selector */}
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-text-muted mb-2">
+                <label className="block text-[10px] font-black uppercase tracking-wider text-white/70 mb-2">
                   Rating Bintang *
                 </label>
                 <div className="flex gap-2 items-center">
@@ -741,14 +741,14 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
                         className={
                           star <= (hoverRating ?? rating)
                             ? "text-yellow-400"
-                            : "text-slate-200"
+                            : "text-white/20"
                         }
                       >
                         ★
                       </span>
                     </button>
                   ))}
-                  <span className="text-[10px] font-black text-sky uppercase tracking-wide ml-2 bg-sky/5 px-2 py-0.5 rounded border border-sky-border">
+                  <span className="text-[10px] font-black text-sky uppercase tracking-wide ml-2 bg-white/10 px-2 py-0.5 rounded border border-white/15">
                     {rating} / 5 Bintang
                   </span>
                 </div>
@@ -756,7 +756,7 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
 
               {/* Comment Textarea */}
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-text-muted mb-2">
+                <label className="block text-[10px] font-black uppercase tracking-wider text-white/70 mb-2">
                   Kritik, Saran atau Masukan *
                 </label>
                 <textarea
@@ -765,7 +765,7 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Tulis kritik, saran, atau masukan Anda di sini. Admin akan merespons melalui chat khusus..."
                   rows={4}
-                  className="w-full text-xs font-bold text-text-primary placeholder:text-text-muted/60 p-3 bg-slate-50/50 rounded-xl border border-sky-border focus:border-sky/40 focus:bg-white focus:outline-none focus:ring-0 transition-all duration-300"
+                  className="w-full text-xs font-bold text-white placeholder:text-white/40 p-3 bg-black/20 rounded-xl border border-white/15 focus:border-sky/50 focus:outline-none transition-all duration-300"
                 />
               </div>
 
@@ -773,19 +773,19 @@ function ReviewsSection({ user, router }: { user: any; router: any }) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-sky hover:bg-sky-dark text-white text-xs font-black uppercase tracking-widest py-3 px-4 rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-sky hover:bg-diamond text-white text-xs font-black uppercase tracking-widest py-3.5 px-4 rounded-full shadow-sky-glow shimmer-hover transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {submitting ? "Mengirimkan..." : "Kirim Ulasan & Buka Chat"}
               </button>
             </form>
           ) : (
             <div className="text-center py-6">
-              <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4 leading-relaxed">
+              <p className="text-xs font-bold text-white/80 uppercase tracking-wider mb-5 leading-relaxed">
                 Anda harus masuk akun terlebih dahulu untuk mengirim kritik, saran, dan memberikan rating.
               </p>
               <button
                 onClick={() => router.push("/auth/login")}
-                className="w-full bg-sky hover:bg-sky-dark text-white text-xs font-black uppercase tracking-widest py-3 px-4 rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300"
+                className="w-full bg-sky hover:bg-diamond text-white text-xs font-black uppercase tracking-widest py-3.5 px-4 rounded-full shadow-sky-glow shimmer-hover transition-all duration-300"
               >
                 Login Akun Sekarang
               </button>
