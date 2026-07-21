@@ -578,14 +578,14 @@ export default function AdminProductsPage() {
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="hover:bg-sky/20 rounded-lg">
-                                <MoreHorizontal className="h-4 w-4 text-white/80" />
+                              <Button variant="ghost" size="icon" className="hover:bg-sky/20 rounded-lg text-white">
+                                <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="border-sky/30 rounded-xl">
+                            <DropdownMenuContent align="end" className="bg-[#183644] border-sky/30 text-white rounded-xl shadow-2xl">
                               <DropdownMenuItem 
                                 onClick={() => handleOpenEdit(product)}
-                                className="text-xs font-bold uppercase tracking-wider cursor-pointer"
+                                className="text-xs font-bold uppercase tracking-wider cursor-pointer text-white focus:bg-sky/20 focus:text-white"
                               >
                                 <Edit className="h-3.5 w-3.5 mr-2 text-sky" />
                                 Edit Detail
@@ -595,17 +595,17 @@ export default function AdminProductsPage() {
                                   setEditingProduct(product);
                                   setEditedSellPrice(product.sell_price.toString());
                                 }}
-                                className="text-xs font-bold uppercase tracking-wider cursor-pointer"
+                                className="text-xs font-bold uppercase tracking-wider cursor-pointer text-white focus:bg-sky/20 focus:text-white"
                               >
                                 <TrendingUp className="h-3.5 w-3.5 mr-2 text-sky" />
                                 Edit Harga Jual
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 onClick={() => handleDeleteProduct(product.id)}
-                                className="text-xs font-bold uppercase tracking-wider text-red-500 cursor-pointer"
+                                className="text-xs font-bold uppercase tracking-wider text-red-400 focus:bg-red-500/20 focus:text-red-400 cursor-pointer"
                               >
-                                <Trash2 className="h-3.5 w-3.5 mr-2 text-red-500" />
-                                Hapus
+                                <Trash2 className="h-3.5 w-3.5 mr-2 text-red-400" />
+                                Hapus Produk
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
