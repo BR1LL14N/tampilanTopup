@@ -29,9 +29,9 @@ interface HomeContentProps {
 
 const slides = [
   {
-    tag: "Promo Akun Aman",
-    title: "Cari akun FF dan ML?",
-    desc: "Topup, voucher, dan layanan game dengan proses cepat, aman, dan bergaransi.",
+    tag: "Top Up Game Instant",
+    title: "TOP UP MLBB & FF TERMURAH",
+    desc: "Topup diamond, voucher, dan promo game instan otomatis 24 jam dengan harga termurah.",
     bg: gameAssets["free-fire"].banner,
     btn1: "Topup Sekarang",
     btn2: "Cek Pesanan",
