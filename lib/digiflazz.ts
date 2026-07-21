@@ -2,15 +2,16 @@ import crypto from 'crypto';
 import { DIGIFLAZZ_CONFIG } from './constants';
 
 export function getDigiflazzCredentials() {
-  const username = process.env.DIGIFLAZZ_USERNAME || DIGIFLAZZ_CONFIG.username;
-  const apiKey = process.env.DIGIFLAZZ_API_KEY || DIGIFLAZZ_CONFIG.apiKey;
-  const mode = process.env.DIGIFLAZZ_MODE || DIGIFLAZZ_CONFIG.mode;
+  const username = (process.env.DIGIFLAZZ_USERNAME || DIGIFLAZZ_CONFIG.username).trim();
+  const apiKey = (process.env.DIGIFLAZZ_API_KEY || DIGIFLAZZ_CONFIG.apiKey).trim();
+  const mode = (process.env.DIGIFLAZZ_MODE || DIGIFLAZZ_CONFIG.mode).trim();
   return { username, apiKey, mode };
 }
 
 export function generateDigiflazzSignature(refId: string): string {
   const { username, apiKey } = getDigiflazzCredentials();
-  return crypto.createHash('md5').update(`${username}${apiKey}${refId}`).digest('hex');
+  const cleanRef = refId.trim();
+  return crypto.createHash('md5').update(`${username}${apiKey}${cleanRef}`).digest('hex');
 }
 
 export function generatePriceListSignature(): string {
