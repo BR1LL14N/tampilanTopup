@@ -186,13 +186,13 @@ export default function RootLayout({
       >
         <PWARegister />
         <DynamicFavicon />
-        <div className="relative min-h-screen flex flex-col bg-[#28657E]">
+        <div className="relative min-h-screen flex flex-col bg-[#1c4759]">
           {/* Custom Grid Background Pattern (CSS-Only) */}
           <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden flex items-center justify-center">
             <div
               className="absolute w-[200vw] h-[200vh] opacity-100 transform -rotate-12"
               style={{
-                backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.08) 2px, transparent 2px), linear-gradient(90deg, rgba(255, 255, 255, 0.08) 2px, transparent 2px)`,
+                backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.05) 2px, transparent 2px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 2px, transparent 2px)`,
                 backgroundSize: "40px 40px",
                 backgroundPosition: "center center",
               }}
