@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
     
     console.log('Received Digiflazz Callback payload:', payload);
 
-    const { ref_id, status, rc, sn, message } = payload;
+    const dataObj = payload.data || payload;
+    const { ref_id, status, rc, sn, message } = dataObj;
 
     if (!ref_id) {
       return NextResponse.json({ error: 'Missing ref_id' }, { status: 400 });
