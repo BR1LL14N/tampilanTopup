@@ -79,56 +79,56 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative mt-8 border-t border-sky/20 footer-stripes-teal py-6 shadow-2xl text-white">
+    <footer className="relative mt-6 border-t border-sky/20 footer-stripes-teal py-4 shadow-2xl text-white">
       {/* Cloud decoration - subtle */}
-      <div className="absolute bottom-0 left-0 w-full h-10 opacity-5 pointer-events-none overflow-hidden">
-        <div className="absolute bottom-0 left-1/4 w-32 h-10 bg-white rounded-full blur-xl" />
-        <div className="absolute bottom-0 right-1/3 w-24 h-8 bg-white rounded-full blur-lg" />
+      <div className="absolute bottom-0 left-0 w-full h-8 opacity-5 pointer-events-none overflow-hidden">
+        <div className="absolute bottom-0 left-1/4 w-32 h-8 bg-white rounded-full blur-xl" />
+        <div className="absolute bottom-0 right-1/3 w-24 h-6 bg-white rounded-full blur-lg" />
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-start">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1 space-y-2">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="h-8 w-8 rounded-lg overflow-hidden bg-white/5 border border-white/10 shadow group-hover:border-white/30 transition-all duration-300">
+          <div className="col-span-2 md:col-span-1 space-y-1.5">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="h-6 w-6 rounded-lg overflow-hidden bg-white/5 border border-white/10 shadow group-hover:border-white/30 transition-all duration-300">
                 <img src={siteInfo.logoUrl || "/mitsuru.png"} alt="Mitsuru Logo" className="h-full w-full object-cover" />
               </div>
               <span>
-                <span className="block text-left text-sm font-extrabold tracking-wide text-white group-hover:text-sky transition-colors">Mitsuru</span>
+                <span className="block text-left text-xs font-black tracking-wide text-white group-hover:text-sky transition-colors">Mitsuru</span>
               </span>
             </Link>
-            <p className="text-xs text-white/60 leading-relaxed max-w-xs">
+            <p className="text-[10px] text-white/50 leading-tight max-w-xs">
               Top up game favorite kamu dengan harga terbaik dan proses otomatis 24/7.
             </p>
-            <div className="flex gap-2 flex-wrap pt-1">
+            <div className="flex gap-1.5 flex-wrap pt-0.5">
               <a
                 href={siteInfo.instagram || "https://www.instagram.com/mitsurushopcom"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
+                className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
                 title="Instagram"
               >
-                <Instagram className="h-3.5 w-3.5" />
+                <Instagram className="h-3 w-3" />
               </a>
               <a
                 href={`https://wa.me/${waAdminNumber.replace(/[^0-9]/g, "")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
+                className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
                 title="WhatsApp Admin"
               >
-                <WhatsappIcon className="h-3.5 w-3.5 shrink-0 fill-current" />
+                <WhatsappIcon className="h-3 w-3 shrink-0 fill-current" />
               </a>
               {siteInfo.tiktok && (
                 <a
                   href={siteInfo.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
+                  className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
                   title="TikTok"
                 >
-                  <TiktokIcon className="h-3.5 w-3.5 shrink-0 fill-current" />
+                  <TiktokIcon className="h-3 w-3 shrink-0 fill-current" />
                 </a>
               )}
               {siteInfo.facebook && (
@@ -136,10 +136,10 @@ export function Footer() {
                   href={siteInfo.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
+                  className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
                   title="Facebook"
                 >
-                  <Facebook className="h-3.5 w-3.5" />
+                  <Facebook className="h-3 w-3" />
                 </a>
               )}
               {siteInfo.youtube && (
@@ -147,10 +147,10 @@ export function Footer() {
                   href={siteInfo.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
+                  className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-white/60 hover:text-white"
                   title="YouTube"
                 >
-                  <Youtube className="h-3.5 w-3.5" />
+                  <Youtube className="h-3 w-3" />
                 </a>
               )}
             </div>
@@ -158,13 +158,13 @@ export function Footer() {
 
           {/* Product */}
           <div>
-            <h4 className="text-xs font-black uppercase tracking-wider mb-2.5 text-white">Produk</h4>
-            <ul className="space-y-1.5">
+            <h4 className="text-[10px] font-black uppercase tracking-widest mb-1.5 text-white">Produk</h4>
+            <ul className="space-y-1">
               {footerLinks.product.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-xs text-white/60 hover:text-white transition-colors"
+                    className="text-[11px] text-white/60 hover:text-white transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -175,13 +175,13 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="text-xs font-black uppercase tracking-wider mb-2.5 text-white">Bantuan</h4>
-            <ul className="space-y-1.5">
+            <h4 className="text-[10px] font-black uppercase tracking-widest mb-1.5 text-white">Bantuan</h4>
+            <ul className="space-y-1">
               {footerLinks.support.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-xs text-white/60 hover:text-white transition-colors"
+                    className="text-[11px] text-white/60 hover:text-white transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -192,13 +192,13 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-xs font-black uppercase tracking-wider mb-2.5 text-white">Legal</h4>
-            <ul className="space-y-1.5">
+            <h4 className="text-[10px] font-black uppercase tracking-widest mb-1.5 text-white">Legal</h4>
+            <ul className="space-y-1">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-xs text-white/60 hover:text-white transition-colors"
+                    className="text-[11px] text-white/60 hover:text-white transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -208,14 +208,14 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-5 pt-3 border-t border-white/10 text-center space-y-1">
+        <div className="mt-3 pt-2 border-t border-white/10 text-center space-y-0.5">
           {siteInfo.legalName && (
-            <p className="text-[11px] text-white/50 font-semibold">{siteInfo.legalName}</p>
+            <p className="text-[10px] text-white/50 font-semibold">{siteInfo.legalName}</p>
           )}
           {siteInfo.address && (
-            <p className="text-[10px] text-white/35 max-w-md mx-auto leading-relaxed">{siteInfo.address}</p>
+            <p className="text-[9px] text-white/35 max-w-md mx-auto leading-tight">{siteInfo.address}</p>
           )}
-          <p className="text-xs text-white/40">
+          <p className="text-[10px] text-white/40">
             &copy; {currentYear} Mitsuru. All rights reserved.
           </p>
         </div>
