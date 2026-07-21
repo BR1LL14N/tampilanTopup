@@ -408,7 +408,7 @@ export function Header({ user }: HeaderProps) {
 
             {/* Desktop Navigation for Public (Non-authenticated User) */}
             {!currentUser && (
-              <nav className="hidden lg:flex items-center gap-1">
+              <nav className="hidden lg:flex items-center gap-1.5">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
@@ -416,8 +416,8 @@ export function Header({ user }: HeaderProps) {
                     className={cn(
                       "px-4 py-2 text-xs font-black uppercase tracking-wider rounded-full transition-all duration-300",
                       isActive(link.href)
-                        ? "border border-white/15 bg-[#262b32] text-sky shadow-sm"
-                        : "border border-transparent text-white/90 hover:text-sky hover:bg-white/5"
+                        ? "bg-gradient-to-r from-sky to-[#1d637d] text-white shadow-md shadow-sky/30 border border-white/25 scale-[1.02]"
+                        : "text-white/80 hover:text-white hover:bg-white/10 border border-transparent"
                     )}
                   >
                     {link.label}
