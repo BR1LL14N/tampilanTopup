@@ -61,6 +61,8 @@ export default function AdminProductsPage() {
   const [syncing, setSyncing] = useState(false)
   const [markupPercent, setMarkupPercent] = useState("10")
   const [syncStatus, setSyncStatus] = useState<string | null>(null)
+  const [syncLogs, setSyncLogs] = useState<any[] | null>(null)
+  const [isSyncLogOpen, setIsSyncLogOpen] = useState(false)
   
   // Edit Quick Price States
   const [editingProduct, setEditingProduct] = useState<any | null>(null)
@@ -157,6 +159,9 @@ export default function AdminProductsPage() {
           msg += ` (${skipped} produk dari Digiflazz dilewati karena nonaktif dari supplier/game).`
         }
         setSyncStatus(msg)
+        if (data.log || data.sampleItems) {
+          setSyncLogs(data.log || data.sampleItems || [])
+        }
         fetchAdminData() // Reload catalog
       } else {
         setSyncStatus(`Error: ${data.error || "Gagal melakukan sync"}`)
@@ -420,13 +425,25 @@ export default function AdminProductsPage() {
 
             {/* Sync Status Banner */}
             {syncStatus && (
-              <div className={`mb-6 p-4 rounded-xl border text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 ${
+              <div className={`mb-6 p-4 rounded-xl border text-xs font-bold uppercase tracking-wider flex items-center justify-between gap-2.5 ${
                 syncStatus.startsWith('Error') 
-                  ? 'bg-red-50 border-red-200 text-red-700' 
-                  : 'bg-green-50 border-green-200 text-green-700'
+                  ? 'bg-red-500/10 border-red-500/30 text-red-400' 
+                  : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
               }`}>
-                {syncStatus.startsWith('Error') ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
-                {syncStatus}
+                <div className="flex items-center gap-2.5">
+                  {syncStatus.startsWith('Error') ? <AlertCircle className="h-4 w-4 shrink-0" /> : <CheckCircle2 className="h-4 w-4 shrink-0" />}
+                  <span>{syncStatus}</span>
+                </div>
+                {syncLogs && syncLogs.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsSyncLogOpen(true)}
+                    className="h-7 text-[10px] font-black uppercase border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                  >
+                    Lihat History Respon Sync ({syncLogs.length})
+                  </Button>
+                )}
               </div>
             )}
 
@@ -860,6 +877,70 @@ export default function AdminProductsPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Sync Response Log Dialog */}
+      <Dialog open={isSyncLogOpen} onOpenChange={setIsSyncLogOpen}>
+        <DialogContent className="max-w-3xl bg-[#183644] text-white border-sky/30 max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-base font-black uppercase text-white flex items-center justify-between">
+              <span>History &amp; Log Respon Digiflazz Sync</span>
+              <span className="text-xs font-mono bg-sky/20 px-2 py-0.5 rounded text-sky">Total: {syncLogs?.length || 0} Data</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-white/60">
+              Menampilkan rincian data produk dan status keaktifan SKU yang dikembalikan oleh API Digiflazz saat sinkronisasi terakhir.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto pr-1 my-2 space-y-2">
+            {syncLogs && syncLogs.length > 0 ? (
+              <div className="space-y-2">
+                {syncLogs.map((logItem: any, idx: number) => (
+                  <div key={idx} className="p-3 bg-black/40 border border-sky/20 rounded-xl text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-sky text-[11px] bg-sky/10 px-1.5 py-0.5 rounded border border-sky/20">{logItem.sku}</span>
+                        <span className="font-bold text-white">{logItem.name || logItem.product_name}</span>
+                      </div>
+                      <p className="text-[10px] text-white/60 mt-1">
+                        Game/Brand: <span className="text-white font-semibold">{logItem.game || logItem.brand || "-"}</span> | Kategori: <span className="text-white font-semibold">{logItem.category || "-"}</span>
+                      </p>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      {logItem.type ? (
+                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                          logItem.type === 'NEW' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sky/20 text-sky'
+                        }`}>
+                          {logItem.type === 'NEW' ? '+ BARU' : 'DIPERBARUI'} (Rp {Number(logItem.price || logItem.new_price).toLocaleString("id-ID")})
+                        </span>
+                      ) : (
+                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                          logItem.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {logItem.active ? 'AKTIF DI SUPPLIER' : 'NONAKTIF/SKU TIDAK DITEMUK'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-white/50 text-center py-6">Tidak ada log respon sync tersedia.</p>
+            )}
+          </div>
+
+          <DialogFooter className="border-t border-sky/20 pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsSyncLogOpen(false)}
+              className="rounded-xl text-[10px] font-bold uppercase tracking-wider border-sky/30 text-sky hover:bg-sky/20"
+            >
+              Tutup Modal
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
