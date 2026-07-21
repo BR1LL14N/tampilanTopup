@@ -46,6 +46,7 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle2,
+  Eye,
 } from "lucide-react"
 
 export default function AdminProductsPage() {
@@ -414,6 +415,26 @@ export default function AdminProductsPage() {
                       Sync dari Digiflazz
                     </>
                   )}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    setIsSyncLogOpen(true)
+                    if (!syncLogs || syncLogs.length === 0) {
+                      try {
+                        const res = await fetch(`/api/admin/sync-products?markup=${markupPercent}`, { method: "POST" })
+                        const data = await res.json()
+                        if (data.log || data.sampleItems) {
+                          setSyncLogs(data.log || data.sampleItems || [])
+                        }
+                      } catch (e) {}
+                    }
+                  }}
+                  className="gap-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 rounded-xl shadow-sm h-10 text-xs font-bold uppercase tracking-wider"
+                >
+                  <Eye className="h-4 w-4" />
+                  History Respon Sync
                 </Button>
 
                 <Button onClick={handleOpenAdd} className="gap-2 rounded-xl h-10 text-xs font-bold uppercase tracking-wider shimmer-hover">
