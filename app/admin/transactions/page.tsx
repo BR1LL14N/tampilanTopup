@@ -62,6 +62,72 @@ export default function AdminTransactionsPage() {
   const [updatingStatus, setUpdatingStatus] = useState(false)
   const [showAdminPassword, setShowAdminPassword] = useState(false) // untuk toggle visibility password di detail dialog
 
+  // Direct Topup / Gift Modal states
+  const [isDirectTopupOpen, setIsDirectTopupOpen] = useState(false)
+  const [productsList, setProductsList] = useState<any[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(false)
+  const [directForm, setDirectForm] = useState({
+    product_id: "",
+    target_id: "",
+    login_method: "",
+    password: "",
+    request_notes: "",
+    process_digiflazz: true,
+  })
+  const [submittingDirect, setSubmittingDirect] = useState(false)
+
+  const openDirectTopupModal = async () => {
+    setIsDirectTopupOpen(true)
+    if (productsList.length === 0) {
+      setLoadingProducts(true)
+      try {
+        const res = await fetch("/api/admin/products")
+        const data = await res.json()
+        if (data.products) {
+          setProductsList(data.products)
+        }
+      } catch (err) {
+        console.error("Failed to load products for direct topup:", err)
+      } finally {
+        setLoadingProducts(false)
+      }
+    }
+  }
+
+  const handleDirectTopupSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!directForm.product_id || !directForm.target_id) {
+      alert("Pilih produk dan isi ID Target / User ID terlebih dahulu!")
+      return
+    }
+    setSubmittingDirect(true)
+    try {
+      const res = await fetch("/api/admin/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(directForm),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+
+      alert(`Direct Topup Berhasil! Invoice: ${data.invoice} Status: ${data.topup_status}`)
+      setIsDirectTopupOpen(false)
+      setDirectForm({
+        product_id: "",
+        target_id: "",
+        login_method: "",
+        password: "",
+        request_notes: "",
+        process_digiflazz: true,
+      })
+      fetchAdminData()
+    } catch (err: any) {
+      alert(`Gagal membuat Direct Topup: ${err.message}`)
+    } finally {
+      setSubmittingDirect(false)
+    }
+  }
+
   const handleUpdateStatus = async (txId: string, paymentStatus: string | undefined, topupStatus: string) => {
     setUpdatingStatus(true)
     try {
@@ -308,10 +374,16 @@ export default function AdminTransactionsPage() {
                 Monitoring semua transaksi top up
               </p>
             </div>
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              Export
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button onClick={openDirectTopupModal} className="bg-sky hover:bg-sky-dark text-white font-bold gap-2">
+                <Plus className="h-4 w-4" />
+                Direct Top Up / Gift
+              </Button>
+              <Button variant="outline" className="gap-2">
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+            </div>
           </div>
 
           {/* Stats */}
@@ -548,6 +620,116 @@ export default function AdminTransactionsPage() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Direct Top Up / Gift Modal */}
+      <Dialog open={isDirectTopupOpen} onOpenChange={setIsDirectTopupOpen}>
+        <DialogContent className="max-w-md bg-[#183644] text-white border-sky/30">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-black uppercase tracking-wide text-white">Direct Top Up / Gift (Admin)</DialogTitle>
+            <DialogDescription className="text-xs text-white/60">
+              Isi data untuk memproses topup / gift secara langsung tanpa melalui jalur pembayaran.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleDirectTopupSubmit} className="space-y-4 pt-2">
+            <div>
+              <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Pilih Produk *</label>
+              {loadingProducts ? (
+                <div className="h-10 bg-white/10 rounded-lg animate-pulse" />
+              ) : (
+                <select
+                  required
+                  value={directForm.product_id}
+                  onChange={(e) => setDirectForm(prev => ({ ...prev, product_id: e.target.value }))}
+                  className="w-full h-10 px-3 rounded-lg bg-black/30 border border-sky/30 text-white text-xs focus:outline-none focus:border-sky"
+                >
+                  <option value="" className="bg-[#183644]">-- Pilih Produk Topup --</option>
+                  {productsList.map((p) => (
+                    <option key={p.id} value={p.id} className="bg-[#183644]">
+                      {p.game_name ? `${p.game_name} - ` : ''}{p.name} (SKU: {p.provider_sku || '-'}) - Rp {Number(p.price).toLocaleString("id-ID")}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">User ID / ID Target *</label>
+              <Input
+                required
+                placeholder="Contoh: 12345678 (1234)"
+                value={directForm.target_id}
+                onChange={(e) => setDirectForm(prev => ({ ...prev, target_id: e.target.value }))}
+                className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Metode Login (Joki)</label>
+                <Input
+                  placeholder="Moonton / VK / FB"
+                  value={directForm.login_method}
+                  onChange={(e) => setDirectForm(prev => ({ ...prev, login_method: e.target.value }))}
+                  className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Password (Opsional)</label>
+                <Input
+                  type="password"
+                  placeholder="Password jika joki"
+                  value={directForm.password}
+                  onChange={(e) => setDirectForm(prev => ({ ...prev, password: e.target.value }))}
+                  className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Catatan / Keterangan</label>
+              <Input
+                placeholder="Contoh: Gift Pemenang Tournament / Bonus"
+                value={directForm.request_notes}
+                onChange={(e) => setDirectForm(prev => ({ ...prev, request_notes: e.target.value }))}
+                className="bg-black/30 border-sky/30 text-white placeholder:text-white/30 text-xs"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="process_digiflazz"
+                checked={directForm.process_digiflazz}
+                onChange={(e) => setDirectForm(prev => ({ ...prev, process_digiflazz: e.target.checked }))}
+                className="h-4 w-4 rounded border-sky/30 bg-black/30 text-sky focus:ring-sky"
+              />
+              <label htmlFor="process_digiflazz" className="text-xs text-white/80 font-semibold cursor-pointer">
+                Kirim transaksi otomatis ke Digiflazz (H2H)
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-sky/20">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsDirectTopupOpen(false)}
+                className="text-white/70 hover:text-white text-xs"
+              >
+                Batal
+              </Button>
+              <Button
+                type="submit"
+                disabled={submittingDirect}
+                className="bg-sky hover:bg-sky-dark text-white font-bold text-xs"
+              >
+                {submittingDirect ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                Proses Direct Top Up
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

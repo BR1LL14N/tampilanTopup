@@ -109,3 +109,102 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const isAdmin = await verifyAdmin();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const { product_id, target_id, login_method, password, request_notes, process_digiflazz } = await req.json();
+
+    if (!product_id || !target_id) {
+      return NextResponse.json({ error: "Produk dan ID Target Wajib Diisi" }, { status: 400 });
+    }
+
+    // 1. Fetch Product
+    const prodRows = await executeQuery(`SELECT * FROM products WHERE id = $1 LIMIT 1`, [product_id]);
+    if (prodRows.length === 0) {
+      return NextResponse.json({ error: "Produk tidak ditemukan" }, { status: 404 });
+    }
+    const product = prodRows[0];
+
+    // 2. Generate Admin Direct Invoice
+    const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+    const randomHex = Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0').toUpperCase();
+    const invoice = `ADM${dateStr}${randomHex}`;
+
+    let topupStatus = 'success';
+    let providerRef = 'ADMIN_MANUAL_GIFT';
+    let providerResponse = null;
+
+    // 3. Process Digiflazz if requested
+    if (process_digiflazz && product.provider_sku) {
+      const isTesting = process.env.DIGIFLAZZ_MODE !== 'production';
+      try {
+        const response = await createTopup(
+          product.provider_sku,
+          target_id,
+          invoice,
+          isTesting
+        );
+        providerResponse = response;
+        const responseData = response?.data;
+
+        if (responseData) {
+          providerRef = responseData.sn || providerRef;
+          if (responseData.rc === '00') {
+            topupStatus = 'success';
+          } else if (responseData.rc === '03' || responseData.rc === '39') {
+            topupStatus = 'processing';
+          } else {
+            topupStatus = 'failed';
+          }
+        } else {
+          topupStatus = 'failed';
+        }
+      } catch (apiError: any) {
+        console.error('Digiflazz Admin Direct Topup failed:', apiError);
+        topupStatus = 'failed';
+        providerResponse = { error: apiError.message || 'API Call failed' };
+      }
+    }
+
+    // 4. Create Transaction Record
+    const expired_at = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+    const transaction = await TransactionService.create({
+      invoice,
+      user_id: null,
+      product_id: product.id,
+      target_id,
+      target_name: 'Admin Direct Topup',
+      amount: Number(product.price) || 0,
+      payment_method: 'admin_direct',
+      payment_status: 'paid',
+      topup_status: topupStatus,
+      qr_string: null,
+      payment_url: null,
+      expired_at,
+      promo_code_id: null,
+      discount_amount: 0,
+      login_method: login_method || null,
+      password: password || null,
+      request_notes: request_notes || 'Direct Topup / Gift oleh Admin',
+      customer_phone: null,
+    });
+
+    if (providerRef || providerResponse) {
+      await TransactionService.update(transaction.id, {
+        provider_ref: providerRef,
+        provider_response: JSON.stringify(providerResponse),
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    return NextResponse.json({ success: true, transaction, invoice, topup_status: topupStatus });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
