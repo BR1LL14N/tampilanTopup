@@ -331,7 +331,7 @@ export function Header({ user }: HeaderProps) {
           {/* Left: Logo */}
           <Link href="/" className="group flex items-center gap-3 shrink-0 relative z-20">
             <div className="h-10 w-10 rounded-xl overflow-hidden bg-white p-0.5 border border-white/15 group-hover:border-sky/50 transition-all duration-300 shadow-sm flex items-center justify-center">
-              <img src={logoUrl || "/mitsuru.png"} alt="Mitsuru Logo" className="h-full w-full object-cover rounded-lg" />
+              <img src={logoUrl || "/mitsuru.png"} alt="Mitsuru Topup" className="h-full w-full object-cover rounded-lg" />
             </div>
             <span className="hidden sm:block">
               <span className="block text-left text-base font-black tracking-wider uppercase text-white group-hover:text-sky transition-colors">Mitsuru</span>

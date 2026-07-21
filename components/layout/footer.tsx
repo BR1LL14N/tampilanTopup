@@ -92,7 +92,7 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-1.5">
             <Link href="/" className="flex items-center gap-2 group">
               <div className="h-6 w-6 rounded-lg overflow-hidden bg-white/5 border border-white/10 shadow group-hover:border-white/30 transition-all duration-300">
-                <img src={siteInfo.logoUrl || "/mitsuru.png"} alt="Mitsuru Logo" className="h-full w-full object-cover" />
+                <img src={siteInfo.logoUrl || "/mitsuru.png"} alt="Mitsuru Topup" className="h-full w-full object-cover" />
               </div>
               <span>
                 <span className="block text-left text-xs font-black tracking-wide text-white group-hover:text-sky transition-colors">Mitsuru</span>
