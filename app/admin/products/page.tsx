@@ -151,10 +151,10 @@ export default function AdminProductsPage() {
       })
       const data = await res.json()
       if (data.success) {
-        const { newAdded, updated, skipped, totalFromDigiflazz } = data.summary
+        const { newAdded, updated, skipped } = data.summary
         let msg = `Berhasil menyinkronkan: ${newAdded} produk baru, ${updated} produk diperbarui.`
-        if (totalFromDigiflazz > 0 && (newAdded + updated) === 0) {
-          msg += ` (${skipped} produk dari Digiflazz dilewati karena game belum terdaftar).`
+        if (skipped > 0) {
+          msg += ` (${skipped} produk dari Digiflazz dilewati karena nonaktif dari supplier/game).`
         }
         setSyncStatus(msg)
         fetchAdminData() // Reload catalog
