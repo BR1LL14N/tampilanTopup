@@ -94,6 +94,47 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
   const [quantity, setQuantity] = useState(1)
   const [whatsapp, setWhatsapp] = useState("")
 
+  // Promo Code states
+  const [promoCode, setPromoCode] = useState("")
+  const [appliedPromoCode, setAppliedPromoCode] = useState("")
+  const [promoDiscount, setPromoDiscount] = useState(0)
+  const [promoError, setPromoError] = useState("")
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false)
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return
+    setIsApplyingPromo(true)
+    setPromoError("")
+    try {
+      const res = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoCode.trim() }),
+      })
+      const data = await res.json()
+      if (data.error) {
+        setPromoError(data.error)
+        setAppliedPromoCode("")
+        setPromoDiscount(0)
+      } else if (data.promo) {
+        setAppliedPromoCode(data.promo.code)
+        let discount = 0
+        const itemTotal = (selectedProduct?.sell_price || 0) * quantity
+        if (Number(data.promo.discount_percent) > 0) {
+          discount = Math.round(itemTotal * (Number(data.promo.discount_percent) / 100))
+        } else if (Number(data.promo.discount_amount) > 0) {
+          discount = Number(data.promo.discount_amount)
+        }
+        setPromoDiscount(discount)
+        setPromoError("")
+      }
+    } catch (err) {
+      setPromoError("Gagal memverifikasi kode promo")
+    } finally {
+      setIsApplyingPromo(false)
+    }
+  }
+
   const handleOrder = () => {
     if (!selectedProduct) {
       alert("Silakan pilih nominal terlebih dahulu.")
@@ -122,6 +163,9 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     }
     if (email) {
       queryParams.set("email", email)
+    }
+    if (appliedPromoCode) {
+      queryParams.set("promo", appliedPromoCode)
     }
 
     router.push(
@@ -407,6 +451,55 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                     </div>
                   </div>
 
+                  {/* Step 4: Kode Promo / Voucher (Opsional) */}
+                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
+                    <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
+                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">4</span>
+                      <h3 className="text-xs font-black uppercase tracking-widest text-white">Kode Promo / Voucher (Opsional)</h3>
+                    </div>
+
+                    <div className="p-6 space-y-3">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={promoCode}
+                          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                          placeholder="Masukkan kode promo (misal: DISCOUNT10)"
+                          className="flex-1 bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-xs font-bold text-white placeholder-white/40 outline-none uppercase"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleApplyPromo}
+                          disabled={isApplyingPromo || !promoCode.trim()}
+                          className="px-5 py-2.5 bg-sky hover:bg-diamond text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-sky-soft disabled:opacity-50"
+                        >
+                          {isApplyingPromo ? "Mengecek..." : "Gunakan"}
+                        </button>
+                      </div>
+
+                      {appliedPromoCode && (
+                        <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-bold flex items-center justify-between">
+                          <span>Voucher <strong>{appliedPromoCode}</strong> Berhasil Dipasang (-Rp {promoDiscount.toLocaleString("id-ID")})</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAppliedPromoCode("")
+                              setPromoCode("")
+                              setPromoDiscount(0)
+                            }}
+                            className="text-red-400 hover:underline text-[10px] uppercase font-black"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      )}
+
+                      {promoError && (
+                        <p className="text-xs text-red-400 font-bold">{promoError}</p>
+                      )}
+                    </div>
+                  </div>
+
                 </>
               ) : (
                 /* Description & Rules Tab */
@@ -490,10 +583,16 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                         <span className="font-mono text-white font-bold">{gameId} {serverId && `(${serverId})`}</span>
                       </div>
                     )}
+                    {promoDiscount > 0 && (
+                      <div className="flex justify-between items-center border-t border-sky/20 pt-3 text-emerald-400">
+                        <span className="uppercase text-[10px] tracking-wider font-bold">Diskon Promo ({appliedPromoCode})</span>
+                        <span className="font-mono font-bold">- Rp {promoDiscount.toLocaleString("id-ID")}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center border-t border-sky/30 pt-4">
                       <span className="text-white font-black uppercase text-xs">Total Tagihan</span>
                       <span className="text-lg font-black text-sky font-mono">
-                        Rp {(selectedProduct.sell_price * quantity).toLocaleString("id-ID")}
+                        Rp {Math.max(1, (selectedProduct.sell_price * quantity) - promoDiscount).toLocaleString("id-ID")}
                       </span>
                     </div>
                   </div>

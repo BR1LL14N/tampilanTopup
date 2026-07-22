@@ -97,8 +97,9 @@ self.addEventListener('fetch', (event) => {
           
           // Fallback if offline and page not cached
           if (request.headers.get('accept')?.includes('text/html')) {
-            return caches.match('/');
+            return caches.match('/').then(homeMatch => homeMatch || new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain' } }));
           }
+          return new Response('Network error', { status: 503, headers: { 'Content-Type': 'text/plain' } });
         });
       })
   );
