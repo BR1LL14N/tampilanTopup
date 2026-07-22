@@ -264,21 +264,21 @@ export default function AdminPromosPage() {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mb-8">
-              <Card>
+              <Card className="bg-[#183644]/90 border border-sky/30">
                 <CardContent className="p-6">
                   <p className="text-white/60 text-sm">Total Voucher</p>
-                  <p className="text-2xl font-bold">{promosList.length}</p>
+                  <p className="text-2xl font-bold text-white">{promosList.length}</p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="bg-[#183644]/90 border border-sky/30">
                 <CardContent className="p-6">
                   <p className="text-white/60 text-sm">Aktif</p>
-                  <p className="text-2xl font-bold text-green-500">
+                  <p className="text-2xl font-bold text-emerald-400">
                     {promosList.filter((p) => p.status).length}
                   </p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="bg-[#183644]/90 border border-sky/30">
                 <CardContent className="p-6">
                   <p className="text-white/60 text-sm">Total Penggunaan</p>
                   <p className="text-2xl font-bold text-sky">
@@ -302,37 +302,37 @@ export default function AdminPromosPage() {
             </div>
 
             {/* Promos Table */}
-            <Card>
+            <Card className="bg-[#183644]/90 border border-sky/30 overflow-hidden">
               <CardContent className="p-0">
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Kode Promo</TableHead>
-                      <TableHead>Tipe Diskon</TableHead>
-                      <TableHead>Potongan</TableHead>
-                      <TableHead>Kuota Pemakaian</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Aksi</TableHead>
+                  <TableHeader className="bg-black/20">
+                    <TableRow className="border-sky/20">
+                      <TableHead className="text-white">Kode Promo</TableHead>
+                      <TableHead className="text-white">Tipe Diskon</TableHead>
+                      <TableHead className="text-white">Potongan</TableHead>
+                      <TableHead className="text-white">Kuota Pemakaian</TableHead>
+                      <TableHead className="text-white">Status</TableHead>
+                      <TableHead className="text-right text-white">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredPromos.map((promo) => (
-                      <TableRow key={promo.id}>
+                      <TableRow key={promo.id} className="border-sky/20 hover:bg-white/5">
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky/20 text-sky">
                               <Ticket className="h-4 w-4" />
                             </span>
-                            <span className="font-bold tracking-wider font-mono text-sm">{promo.code}</span>
+                            <span className="font-bold tracking-wider font-mono text-sm text-white">{promo.code}</span>
                           </div>
                         </TableCell>
                         <TableCell>
                           {Number(promo.discount_percent) > 0 ? (
-                            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-600 text-[10px] font-bold uppercase">
+                            <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] font-bold uppercase">
                               Persentase
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded bg-green-100 text-green-600 text-[10px] font-bold uppercase">
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold uppercase">
                               Nominal Tetap
                             </span>
                           )}
@@ -344,13 +344,13 @@ export default function AdminPromosPage() {
                             formatCurrency(promo.discount_amount)
                           )}
                         </TableCell>
-                        <TableCell>
-                          <span className="font-mono">{promo.uses_count}</span>
+                        <TableCell className="text-white">
+                          <span className="font-mono text-white">{promo.uses_count}</span>
                           <span className="text-white/60"> / {promo.max_uses}</span>
                         </TableCell>
                         <TableCell>
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
+                            className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusBgColor(
                               promo.status && Number(promo.uses_count) < Number(promo.max_uses) ? "success" : "failed"
                             )}`}
                           >
@@ -360,17 +360,17 @@ export default function AdminPromosPage() {
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
+                              <Button variant="ghost" size="icon" className="hover:bg-white/10 text-white">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleOpenEdit(promo)}>
-                                <Edit className="h-4 w-4 mr-2" />
+                            <DropdownMenuContent align="end" className="bg-[#183644] border border-sky/30 text-white shadow-sky-medium z-50">
+                              <DropdownMenuItem className="hover:bg-sky/20 focus:bg-sky/20 cursor-pointer text-white flex items-center gap-2" onClick={() => handleOpenEdit(promo)}>
+                                <Edit className="h-4 w-4 text-sky" />
                                 Edit Promo
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-500" onClick={() => handleDeletePromo(promo.id)}>
-                                <Trash2 className="h-4 w-4 mr-2" />
+                              <DropdownMenuItem className="hover:bg-red-500/20 focus:bg-red-500/20 cursor-pointer text-red-400 flex items-center gap-2" onClick={() => handleDeletePromo(promo.id)}>
+                                <Trash2 className="h-4 w-4 text-red-400" />
                                 Hapus
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -388,7 +388,7 @@ export default function AdminPromosPage() {
 
       {/* Edit/Add Promo Dialog Modal */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md bg-mist backdrop-blur-md border border-sky/30 rounded-[24px] p-6 shadow-sky-medium">
+        <DialogContent className="max-w-md bg-[#183644] border border-sky/30 rounded-[24px] p-6 shadow-sky-medium text-white">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-white uppercase tracking-wide">
               {selectedPromo ? "Edit Promo" : "Tambah Promo Baru"}
@@ -407,6 +407,7 @@ export default function AdminPromosPage() {
                 onChange={(e) => setEditForm({ ...editForm, code: e.target.value.toUpperCase() })}
                 placeholder="e.g. MITSURUNEW"
                 required
+                className="bg-black/20 border-sky/30 text-white placeholder-white/40 uppercase"
               />
             </div>
 
@@ -417,10 +418,10 @@ export default function AdminPromosPage() {
                   id="discount_type"
                   value={discountType}
                   onChange={(e: any) => setDiscountType(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="w-full rounded-lg border border-sky/30 bg-black/20 px-3 py-2 text-xs font-bold text-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky"
                 >
-                  <option value="flat">Nominal Tetap (Rupiah)</option>
-                  <option value="percent">Persentase (%)</option>
+                  <option value="flat" className="bg-[#183644] text-white">Nominal Tetap (Rupiah)</option>
+                  <option value="percent" className="bg-[#183644] text-white">Persentase (%)</option>
                 </select>
               </div>
 
@@ -430,10 +431,11 @@ export default function AdminPromosPage() {
                   <Input
                     id="discount_amount"
                     type="number"
-                    value={editForm.discount_amount}
-                    onChange={(e) => setEditForm({ ...editForm, discount_amount: Number(e.target.value) || 0 })}
-                    placeholder="e.g. 5000"
+                    value={editForm.discount_amount === 0 || (editForm.discount_amount as any) === "" ? "" : editForm.discount_amount}
+                    onChange={(e) => setEditForm({ ...editForm, discount_amount: e.target.value === "" ? 0 : Number(e.target.value) })}
+                    placeholder="0"
                     required={discountType === "flat"}
+                    className="bg-black/20 border-sky/30 text-white placeholder-white/40"
                   />
                 </div>
               ) : (
@@ -444,10 +446,11 @@ export default function AdminPromosPage() {
                     type="number"
                     min="1"
                     max="100"
-                    value={editForm.discount_percent}
-                    onChange={(e) => setEditForm({ ...editForm, discount_percent: Number(e.target.value) || 0 })}
-                    placeholder="e.g. 10"
+                    value={editForm.discount_percent === 0 || (editForm.discount_percent as any) === "" ? "" : editForm.discount_percent}
+                    onChange={(e) => setEditForm({ ...editForm, discount_percent: e.target.value === "" ? 0 : Number(e.target.value) })}
+                    placeholder="0"
                     required={discountType === "percent"}
+                    className="bg-black/20 border-sky/30 text-white placeholder-white/40"
                   />
                 </div>
               )}
@@ -459,10 +462,11 @@ export default function AdminPromosPage() {
                 <Input
                   id="max_uses"
                   type="number"
-                  value={editForm.max_uses}
-                  onChange={(e) => setEditForm({ ...editForm, max_uses: Number(e.target.value) || 0 })}
+                  value={editForm.max_uses === 0 || (editForm.max_uses as any) === "" ? "" : editForm.max_uses}
+                  onChange={(e) => setEditForm({ ...editForm, max_uses: e.target.value === "" ? 0 : Number(e.target.value) })}
                   placeholder="100"
                   required
+                  className="bg-black/20 border-sky/30 text-white placeholder-white/40"
                 />
               </div>
               <div className="space-y-1.5">
@@ -470,10 +474,11 @@ export default function AdminPromosPage() {
                 <Input
                   id="uses_count"
                   type="number"
-                  value={editForm.uses_count}
-                  onChange={(e) => setEditForm({ ...editForm, uses_count: Number(e.target.value) || 0 })}
+                  value={editForm.uses_count === 0 || (editForm.uses_count as any) === "" ? "" : editForm.uses_count}
+                  onChange={(e) => setEditForm({ ...editForm, uses_count: e.target.value === "" ? 0 : Number(e.target.value) })}
                   placeholder="0"
                   required
+                  className="bg-black/20 border-sky/30 text-white placeholder-white/40"
                 />
               </div>
             </div>

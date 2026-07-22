@@ -880,8 +880,10 @@ export default function AdminProductsPage() {
                     <Input
                       id="flash-price"
                       type="number"
-                      value={editForm.flash_sale_price}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, flash_sale_price: Number(e.target.value) || 0 }))}
+                      value={editForm.flash_sale_price === 0 ? "" : editForm.flash_sale_price}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, flash_sale_price: e.target.value === "" ? 0 : Number(e.target.value) || 0 }))}
+                      placeholder="0"
                       className="rounded-xl border-amber-300 text-xs font-semibold font-mono focus-visible:ring-amber-500 bg-mist backdrop-blur-md"
                       required={editForm.is_flash_sale}
                     />
@@ -891,8 +893,10 @@ export default function AdminProductsPage() {
                     <Input
                       id="flash-stock"
                       type="number"
-                      value={editForm.flash_sale_stock}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, flash_sale_stock: Number(e.target.value) || 0 }))}
+                      value={editForm.flash_sale_stock === 0 ? "" : editForm.flash_sale_stock}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, flash_sale_stock: e.target.value === "" ? 0 : Number(e.target.value) || 0 }))}
+                      placeholder="0"
                       className="rounded-xl border-amber-300 text-xs font-semibold font-mono focus-visible:ring-amber-500 bg-mist backdrop-blur-md"
                       required={editForm.is_flash_sale}
                     />

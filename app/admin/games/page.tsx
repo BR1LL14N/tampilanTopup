@@ -458,8 +458,9 @@ export default function AdminGamesPage() {
                 <Input
                   id="game_sort"
                   type="number"
-                  value={editForm.sort_order}
-                  onChange={(e) => setEditForm({ ...editForm, sort_order: parseInt(e.target.value) || 0 })}
+                  value={editForm.sort_order === 0 ? "" : editForm.sort_order}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value === "" ? 0 : parseInt(e.target.value) || 0 })}
                   placeholder="0"
                 />
               </div>
