@@ -16,6 +16,8 @@ export async function GET(req: NextRequest) {
     const lastSyncTime = await SettingService.get("last_sync_time", "");
     const lastSyncStatus = await SettingService.get("last_sync_status", "idle");
     const midtransMode = await SettingService.get("midtrans_mode", "sandbox");
+    const digiflazzMode = await SettingService.get("digiflazz_mode", process.env.DIGIFLAZZ_MODE || "production");
+    const digiflazzUsername = await SettingService.get("digiflazz_username", process.env.DIGIFLAZZ_USERNAME || "");
 
     // Doku and Multi-Payment Gateway Settings
     const paymentGateway = await SettingService.get("payment_gateway", "midtrans");
@@ -57,6 +59,8 @@ export async function GET(req: NextRequest) {
         lastSyncTime,
         lastSyncStatus,
         midtransMode,
+        digiflazzMode,
+        digiflazzUsername,
         paymentGateway,
         paymentMethodType,
         dokuClientId,
@@ -98,6 +102,8 @@ export async function POST(req: NextRequest) {
       isSyncActive,
       syncInterval,
       midtransMode,
+      digiflazzMode,
+      digiflazzUsername,
       paymentGateway,
       paymentMethodType,
       dokuClientId,
@@ -131,6 +137,12 @@ export async function POST(req: NextRequest) {
     }
     if (midtransMode !== undefined) {
       await SettingService.set("midtrans_mode", String(midtransMode));
+    }
+    if (digiflazzMode !== undefined) {
+      await SettingService.set("digiflazz_mode", String(digiflazzMode));
+    }
+    if (digiflazzUsername !== undefined) {
+      await SettingService.set("digiflazz_username", String(digiflazzUsername));
     }
     if (paymentGateway !== undefined) {
       await SettingService.set("payment_gateway", String(paymentGateway));

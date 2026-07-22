@@ -2,9 +2,14 @@ import crypto from 'crypto';
 import { DIGIFLAZZ_CONFIG } from './constants';
 
 export function getDigiflazzCredentials() {
-  const username = (process.env.DIGIFLAZZ_USERNAME || DIGIFLAZZ_CONFIG.username).trim();
-  const apiKey = (process.env.DIGIFLAZZ_API_KEY || DIGIFLAZZ_CONFIG.apiKey).trim();
-  const mode = (process.env.DIGIFLAZZ_MODE || DIGIFLAZZ_CONFIG.mode).trim();
+  const mode = (process.env.DIGIFLAZZ_MODE || DIGIFLAZZ_CONFIG.mode || 'production').trim();
+  const username = (process.env.DIGIFLAZZ_USERNAME || DIGIFLAZZ_CONFIG.username || '').trim();
+  const apiKey = (
+    mode === 'simulation' || mode === 'sandbox'
+      ? (process.env.DIGIFLAZZ_API_KEY_DEV || process.env.DIGIFLAZZ_API_KEY_SANDBOX || process.env.DIGIFLAZZ_API_KEY || DIGIFLAZZ_CONFIG.apiKey)
+      : (process.env.DIGIFLAZZ_API_KEY_PROD || process.env.DIGIFLAZZ_API_KEY || DIGIFLAZZ_CONFIG.apiKey)
+  ).trim();
+
   return { username, apiKey, mode };
 }
 
