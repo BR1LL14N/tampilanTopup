@@ -16,9 +16,11 @@ import {
   Star,
   User,
   Shield,
-  FileText
+  FileText,
+  Tag
 } from "lucide-react"
 import { gameAssets, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
+import { formatCurrency } from "@/lib/utils"
 
 interface Product {
   id: string
@@ -164,8 +166,9 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     if (email) {
       queryParams.set("email", email)
     }
-    if (appliedPromoCode) {
-      queryParams.set("promo", appliedPromoCode)
+    const codeToUse = appliedPromoCode || promoCode.trim()
+    if (codeToUse) {
+      queryParams.set("promo", codeToUse)
     }
 
     router.push(
@@ -364,6 +367,50 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                           placeholder="Contoh: Tolong proses cepat ya admin, kirim sebagai hadiah"
                           className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
                         />
+                      </div>
+
+                      {/* Kode Referral / Kode Voucher Promo (Opsional) */}
+                      <div className="sm:col-span-2 space-y-2 pt-2 border-t border-white/10">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                            <Tag className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                            Kode Referral / Promo Voucher (Opsional)
+                          </span>
+                          {appliedPromoCode && (
+                            <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">
+                              Diskon Terpasang: -{formatCurrency(promoDiscount)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            value={promoCode}
+                            onChange={(e) => {
+                              setPromoCode(e.target.value.toUpperCase());
+                              setPromoError("");
+                            }}
+                            placeholder="Masukkan Kode Referral / Promo (Misal: MITSURU2026)"
+                            className="w-full bg-black/20 border border-amber-500/30 hover:border-amber-500/50 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all rounded-xl px-4 py-2.5 text-sm text-amber-300 font-mono tracking-wider uppercase placeholder-amber-400/40 outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleApplyPromo}
+                            disabled={isApplyingPromo || !promoCode.trim()}
+                            className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all shrink-0 shadow-sm"
+                          >
+                            {isApplyingPromo ? "Cek..." : "Gunakan"}
+                          </button>
+                        </div>
+                        {promoError && (
+                          <p className="text-[11px] font-semibold text-red-400 flex items-center gap-1 mt-1">
+                            ⚠️ {promoError}
+                          </p>
+                        )}
+                        {appliedPromoCode && (
+                          <p className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1 mt-1">
+                            ✅ Kode promo "{appliedPromoCode}" berhasil digunakan!
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

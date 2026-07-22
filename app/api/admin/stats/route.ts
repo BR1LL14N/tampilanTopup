@@ -36,8 +36,12 @@ export async function GET(req: NextRequest) {
     // 3. Fetch Transaction Stats
     let totalTxCount = 0;
     let totalRevenue = 0;
+    // 3. Fetch Transaction Stats (Filter ONLY Successful Transactions)
     try {
-      const txCountRows = await executeQuery(`SELECT COUNT(*) as count FROM transactions`);
+      const txCountRows = await executeQuery(`
+        SELECT COUNT(*) as count FROM transactions 
+        WHERE payment_status IN ('paid', 'settlement', 'success') OR topup_status = 'success'
+      `);
       totalTxCount = Number(txCountRows[0]?.count ?? txCountRows[0]?.COUNT ?? 0);
     } catch (e) {
       console.error("totalTxCount query err:", e);
@@ -47,8 +51,8 @@ export async function GET(req: NextRequest) {
       const revenueRows = await executeQuery(`
         SELECT COALESCE(SUM(amount), 0) as revenue 
         FROM transactions 
-        WHERE status = 1 OR payment_status = $1 OR topup_status = $2
-      `, ['paid', 'success']);
+        WHERE payment_status IN ('paid', 'settlement', 'success') OR topup_status = 'success'
+      `);
       totalRevenue = Number(revenueRows[0]?.revenue ?? revenueRows[0]?.REVENUE ?? 0);
     } catch (e) {
       try {
@@ -57,7 +61,7 @@ export async function GET(req: NextRequest) {
       } catch (e2) {}
     }
 
-    // 4. Fetch 5 Recent Transactions
+    // 4. Fetch 5 Recent Transactions (Newest first)
     let recentTxRows: any[] = [];
     try {
       recentTxRows = await executeQuery(`
@@ -72,7 +76,7 @@ export async function GET(req: NextRequest) {
       console.error("recentTxRows query err:", e);
     }
 
-    // 5. Fetch Top Selling Products
+    // 5. Fetch Top Selling Products (Filtered ONLY by successful transactions)
     let topProductRows: any[] = [];
     try {
       topProductRows = await executeQuery(`
@@ -84,9 +88,9 @@ export async function GET(req: NextRequest) {
           COALESCE(SUM(t.amount), 0) as revenue
         FROM products p
         JOIN games g ON p.game_id = g.id
-        LEFT JOIN transactions t ON t.product_id = p.id
+        JOIN transactions t ON t.product_id = p.id AND (t.payment_status IN ('paid', 'settlement', 'success') OR t.topup_status = 'success')
         GROUP BY p.id, p.name, p.provider_sku, g.name
-        ORDER BY revenue DESC
+        ORDER BY sold DESC, revenue DESC
         LIMIT 4
       `);
     } catch (e) {
@@ -104,7 +108,7 @@ export async function GET(req: NextRequest) {
       console.error("Failed to fetch Digiflazz balance for stats:", balErr);
     }
 
-    // Fetch checkout activities
+    // Fetch checkout activities (Newest first)
     let checkoutRows: any[] = [];
     try {
       checkoutRows = await executeQuery(`
@@ -118,6 +122,7 @@ export async function GET(req: NextRequest) {
       `);
     } catch (e) {}
 
+    // Fetch payment activities (Filtered ONLY by successful payments, Newest first)
     let paymentRows: any[] = [];
     try {
       paymentRows = await executeQuery(`
@@ -126,6 +131,7 @@ export async function GET(req: NextRequest) {
         LEFT JOIN products p ON t.product_id = p.id
         LEFT JOIN games g ON p.game_id = g.id
         LEFT JOIN ${userTable} u ON t.user_id = u.id
+        WHERE t.payment_status IN ('paid', 'settlement', 'success')
         ORDER BY t.created_at DESC
         LIMIT 10
       `);
