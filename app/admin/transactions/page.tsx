@@ -478,28 +478,29 @@ export default function AdminTransactionsPage() {
           <Card>
             <CardContent className="p-0">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Invoice</TableHead>
-                    <TableHead>Pengguna</TableHead>
-                    <TableHead>Produk</TableHead>
-                    <TableHead>Target</TableHead>
-                    <TableHead>Jumlah</TableHead>
-                    <TableHead>Status Topup</TableHead>
-                    <TableHead>Tanggal</TableHead>
-                    <TableHead className="text-right">Aksi</TableHead>
+                <TableHeader className="bg-black/20">
+                  <TableRow className="border-sky/20">
+                    <TableHead className="text-white">Invoice</TableHead>
+                    <TableHead className="text-white">Pengguna</TableHead>
+                    <TableHead className="text-white">Produk</TableHead>
+                    <TableHead className="text-white">Target</TableHead>
+                    <TableHead className="text-white">Jumlah</TableHead>
+                    <TableHead className="text-white">Status Bayar</TableHead>
+                    <TableHead className="text-white">Status Topup</TableHead>
+                    <TableHead className="text-white">Tanggal</TableHead>
+                    <TableHead className="text-right text-white">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredTransactions.map((tx) => (
-                    <TableRow key={tx.id}>
-                      <TableCell className="font-mono text-sm">
+                    <TableRow key={tx.id} className="border-sky/20 hover:bg-white/5">
+                      <TableCell className="font-mono text-sm text-sky font-bold">
                         {tx.invoice}
                       </TableCell>
-                      <TableCell>{tx.user}</TableCell>
+                      <TableCell className="text-white">{tx.user}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky/20 p-1.5">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky/20 p-1.5 border border-sky/30">
                             <img
                               src={getItemAssetForProduct(tx.product, undefined, tx.game)}
                               alt=""
@@ -507,8 +508,8 @@ export default function AdminTransactionsPage() {
                             />
                           </span>
                           <div>
-                            <p className="font-medium">{tx.product}</p>
-                            <p className="flex items-center gap-1.5 text-xs text-white/60">
+                            <p className="font-bold text-white text-xs">{tx.product}</p>
+                            <p className="flex items-center gap-1.5 text-[10px] text-white/60 font-semibold">
                               <img
                                 src={getGameAssetByName(tx.game)?.icon}
                                 alt=""
@@ -519,13 +520,30 @@ export default function AdminTransactionsPage() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{tx.target_id}</TableCell>
-                      <TableCell className="font-semibold">
+                      <TableCell className="font-mono text-white text-xs">{tx.target_id}</TableCell>
+                      <TableCell className="font-semibold text-white">
                         {formatCurrency(tx.amount)}
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                            tx.payment_status === "paid" || tx.payment_status === "settlement" || tx.payment_status === "success"
+                              ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                              : tx.payment_status === "failed" || tx.payment_status === "expire" || tx.payment_status === "cancel"
+                              ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                              : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                          }`}
+                        >
+                          {tx.payment_status === "paid" || tx.payment_status === "settlement" || tx.payment_status === "success"
+                            ? "Lunas"
+                            : tx.payment_status === "failed" || tx.payment_status === "expire" || tx.payment_status === "cancel"
+                            ? "Gagal"
+                            : "Belum Bayar"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${getStatusBgColor(
                             tx.topup_status
                           )}`}
                         >
@@ -538,7 +556,7 @@ export default function AdminTransactionsPage() {
                             : "Gagal"}
                         </span>
                       </TableCell>
-                      <TableCell className="text-white/60 text-sm">
+                      <TableCell className="text-white/60 text-xs">
                         {formatDate(tx.created_at)}
                       </TableCell>
                       <TableCell className="text-right">

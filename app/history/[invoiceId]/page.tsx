@@ -142,6 +142,7 @@ export default function InvoiceDetailPage() {
             login_method: data.login_method,
             password: data.password,
             request_notes: data.request_notes,
+            sn: data.sn || data.provider_ref,
           })
         }
       } catch (err) {
@@ -229,50 +230,81 @@ export default function InvoiceDetailPage() {
               ) : (
                 <div className="space-y-6 animate-fadeIn">
 
-                  {/* Visual Status Header bar */}
-                  <div className={`p-4 rounded-xl flex items-center justify-between border ${
-                    result.status === 'success' ? 'bg-emerald-50 border-emerald-500/20' :
-                    result.status === 'processing' ? 'bg-amber-50 border-amber-500/20' :
-                    result.status === 'pending' ? 'bg-blue-50 border-blue-500/20' :
-                    'bg-red-50 border-red-500/20'
-                  }`}>
-                    <div className="flex items-center gap-2">
-                      {result.status === 'success' ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                      ) : result.status === 'processing' || result.status === 'pending' ? (
-                        <Clock className="h-5 w-5 text-amber-500 animate-spin" />
-                      ) : (
-                        <AlertTriangle className="h-5 w-5 text-red-500" />
-                      )}
-                      <span className="text-xs font-bold uppercase tracking-wider text-white">
-                        Status Topup
+                  {/* Visual Status Header Bar with BOTH Payment & Topup status */}
+                  <div className="bg-[#183644] border border-sky/30 p-4 rounded-xl space-y-3">
+                    <div className="flex items-center justify-between border-b border-sky/20 pb-2.5">
+                      <span className="text-xs font-black uppercase tracking-wider text-white/90">
+                        Status Pembayaran
+                      </span>
+                      <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${
+                        result.payment_status === 'paid' || result.payment_status === 'settlement' || result.payment_status === 'success'
+                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                          : result.payment_status === 'failed' || result.payment_status === 'expire' || result.payment_status === 'cancel'
+                          ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                          : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                      }`}>
+                        {result.payment_status === 'paid' || result.payment_status === 'settlement' || result.payment_status === 'success'
+                          ? 'Lunas'
+                          : result.payment_status === 'failed' || result.payment_status === 'expire' || result.payment_status === 'cancel'
+                          ? 'Gagal / Expired'
+                          : 'Menunggu Pembayaran'}
                       </span>
                     </div>
-                    <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider ${
-                      result.status === 'success' ? 'bg-emerald-500 text-white' :
-                      result.status === 'processing' ? 'bg-amber-500 text-white' :
-                      result.status === 'pending' ? 'bg-blue-500 text-white' :
-                      'bg-red-500 text-white'
-                    }`} style={tagBevelStyle}>
-                      {result.status === 'success' ? 'Berhasil' :
-                       result.status === 'processing' ? 'Diproses' :
-                       result.status === 'pending' ? 'Tertunda' : 'Gagal'}
-                    </span>
+
+                    <div className="flex items-center justify-between pt-0.5">
+                      <span className="text-xs font-black uppercase tracking-wider text-white/90">
+                        Status Topup / Pengiriman
+                      </span>
+                      <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${
+                        result.status === 'success' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                        result.status === 'processing' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                        result.status === 'pending' ? 'bg-blue-500/20 text-sky border-sky/30' :
+                        'bg-red-500/20 text-red-400 border-red-500/30'
+                      }`}>
+                        {result.status === 'success' ? 'Berhasil' :
+                         result.status === 'processing' ? 'Diproses' :
+                         result.status === 'pending' ? 'Pending' : 'Gagal'}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Details Table */}
-                  <div className="border border-sky/30 rounded-xl bg-sky/20 p-5 space-y-4 text-xs">
-                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
-                      <span className="text-white/80 font-medium">Nomor Invoice</span>
-                      <span className="font-mono text-sky font-bold">{result.invoice}</span>
+                  {/* Serial Number (SN / Token PLN / Kode Voucher) Box if available */}
+                  {result.sn && (
+                    <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl space-y-2">
+                      <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">
+                        Serial Number / Kode Token / SN Voucher
+                      </span>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono text-sm font-black text-white bg-black/40 px-3 py-1.5 rounded-lg border border-emerald-500/30 select-all tracking-wider">
+                          {result.sn}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(result.sn)
+                            alert("SN / Token berhasil disalin!")
+                          }}
+                          className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold rounded-lg transition-colors uppercase shrink-0"
+                        >
+                          Salin SN
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
-                      <span className="text-white/80 font-medium">Tanggal Transaksi</span>
-                      <span className="text-white font-semibold">{formatDate(result.date)}</span>
+                  )}
+
+                  {/* Details Receipt Table */}
+                  <div className="border border-sky/30 rounded-xl bg-[#183644]/90 p-5 space-y-3.5 text-xs shadow-sky-soft">
+                    <div className="flex justify-between items-center border-b border-sky/20 pb-2.5">
+                      <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">Nomor Invoice</span>
+                      <span className="font-mono text-sky font-black text-sm">{result.invoice}</span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
-                      <span className="text-white/80 font-medium">Game</span>
-                      <span className="flex items-center gap-2 font-bold text-white uppercase">
+                    <div className="flex justify-between items-center border-b border-sky/20 pb-2.5">
+                      <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">Tanggal Transaksi</span>
+                      <span className="text-white font-extrabold">{formatDate(result.date)}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-b border-sky/20 pb-2.5">
+                      <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">Game</span>
+                      <span className="flex items-center gap-2 font-black text-white uppercase">
                         <img
                           src={getGameAssetByName(result.game)?.icon}
                           alt=""
@@ -281,10 +313,10 @@ export default function InvoiceDetailPage() {
                         {result.game}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
-                      <span className="text-white/80 font-medium">Item Produk</span>
-                      <span className="flex items-center gap-2 font-bold text-white">
-                        <span className="flex h-7 w-7 items-center justify-center rounded bg-mist backdrop-blur-md p-1 border border-sky/30">
+                    <div className="flex justify-between items-center border-b border-sky/20 pb-2.5">
+                      <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">Item Produk</span>
+                      <span className="flex items-center gap-2 font-black text-white">
+                        <span className="flex h-7 w-7 items-center justify-center rounded bg-black/40 p-1 border border-sky/30">
                           <img
                             src={getItemAssetForProduct(result.product, undefined, result.game)}
                             alt=""
@@ -294,38 +326,41 @@ export default function InvoiceDetailPage() {
                         {result.product}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
-                      <span className="text-white/80 font-medium">User ID Tujuan</span>
-                      <span className="font-mono bg-sky/20 px-2.5 py-1 rounded text-white font-semibold border border-sky/30">{result.target_id}</span>
+                    <div className="flex justify-between items-center border-b border-sky/20 pb-2.5">
+                      <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">User ID Tujuan</span>
+                      <span className="font-mono bg-black/40 px-3 py-1 rounded-lg text-white font-black border border-sky/30 text-xs">{result.target_id}</span>
                     </div>
                     {result.request_notes && (
-                      <div className="flex flex-col gap-1 border-b border-sky/30 pb-2 text-left">
-                        <span className="text-white/80 font-medium">Catatan Khusus Admin</span>
-                        <span className="text-white bg-mist backdrop-blur-md p-2 rounded border border-sky/30 font-medium whitespace-pre-wrap leading-relaxed">{result.request_notes}</span>
+                      <div className="flex flex-col gap-1 border-b border-sky/20 pb-2.5 text-left">
+                        <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">Catatan Khusus Admin</span>
+                        <span className="text-white bg-black/40 p-2.5 rounded-lg border border-sky/30 font-semibold whitespace-pre-wrap leading-relaxed">{result.request_notes}</span>
                       </div>
                     )}
-                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
-                      <span className="text-white/80 font-medium">Metode Pembayaran</span>
-                      <span className="flex items-center gap-2 font-bold text-white uppercase">
+                    <div className="flex justify-between items-center border-b border-sky/20 pb-2.5">
+                      <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">Metode Pembayaran</span>
+                      <span className="flex items-center gap-2 font-black text-white uppercase">
                         {String(result.payment_method || "").toLowerCase().includes("qris") && (
-                          <span className="flex h-6 w-10 items-center justify-center rounded bg-mist backdrop-blur-md p-1 border border-sky/30">
+                          <span className="flex h-6 w-10 items-center justify-center rounded bg-black/40 p-1 border border-sky/30">
                             <img src={paymentAssets.qris} alt="" className="max-h-full max-w-full object-contain" />
                           </span>
                         )}
                         {result.payment_method || "-"}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-sky/30 pb-2">
-                      <span className="text-white/80 font-medium">Status Pembayaran</span>
-                      <span className={`font-semibold capitalize ${
-                        result.payment_status === 'paid' ? 'text-emerald-500' :
-                        result.payment_status === 'failed' ? 'text-red-500' :
-                        'text-amber-500'
-                      }`}>{result.payment_status || "Pending"}</span>
+                    <div className="flex justify-between items-center border-b border-sky/20 pb-2.5">
+                      <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">Status Pembayaran</span>
+                      <span className={`font-black uppercase text-xs ${
+                        result.payment_status === 'paid' || result.payment_status === 'settlement' || result.payment_status === 'success' ? 'text-emerald-400' :
+                        result.payment_status === 'failed' || result.payment_status === 'expire' ? 'text-red-400' :
+                        'text-amber-400'
+                      }`}>
+                        {result.payment_status === 'paid' || result.payment_status === 'settlement' || result.payment_status === 'success' ? 'LUNAS' :
+                         result.payment_status === 'failed' || result.payment_status === 'expire' ? 'GAGAL / EXPIRED' : 'MENUNGGU PEMBAYARAN'}
+                      </span>
                     </div>
-                    <div className="flex justify-between items-center pt-1">
-                      <span className="text-white/80 font-medium">Total Pembayaran</span>
-                      <span className="text-lg font-black text-sky">{formatCurrency(result.amount)}</span>
+                    <div className="flex justify-between items-center pt-1.5">
+                      <span className="text-white/80 font-bold uppercase text-[11px] tracking-wider">Total Pembayaran</span>
+                      <span className="text-xl font-black text-sky font-mono">{formatCurrency(result.amount)}</span>
                     </div>
                   </div>
 
