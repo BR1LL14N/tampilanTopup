@@ -55,46 +55,43 @@ export async function POST(req: NextRequest) {
     const dbGames = await executeQuery("SELECT id, name, slug FROM games");
     let gamesList: any[] = [...dbGames];
 
-    // 5. Auto-create missing games from Digiflazz brands
+    // 5. Auto-create missing games from Digiflazz brands for ALL products
+    const findGameMatch = (bLower: string) => {
+      if (bLower.includes('mobile legend') || bLower.includes('mlbb')) {
+        return gamesList.find(g => g.slug === 'mobile-legends');
+      }
+      if (bLower.includes('free fire')) {
+        return gamesList.find(g => g.slug === 'free-fire');
+      }
+      if (bLower.includes('pubg')) {
+        return gamesList.find(g => g.slug === 'pubg-mobile');
+      }
+      if (bLower.includes('valorant')) {
+        return gamesList.find(g => g.slug === 'valorant');
+      }
+      if (bLower.includes('genshin')) {
+        return gamesList.find(g => g.slug === 'genshin-impact');
+      }
+      if (bLower.includes('honor of kings') || bLower.includes('hok')) {
+        return gamesList.find(g => g.slug === 'honor-of-kings');
+      }
+      
+      const slug = bLower.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      return gamesList.find(g => 
+        g.slug === slug ||
+        bLower === g.name.toLowerCase().trim() || 
+        g.name.toLowerCase().trim() === bLower ||
+        g.name.toLowerCase().trim().includes(bLower) ||
+        bLower.includes(g.name.toLowerCase().trim())
+      );
+    };
+
     for (const item of rawProducts) {
       const category = (item.category || '').toLowerCase();
       const brand = item.brand || '';
-      if (!brand) continue;
+      if (!brand || !brand.trim()) continue;
 
       const brandLower = brand.toLowerCase().trim();
-
-      if (!item.buyer_product_status || !item.seller_product_status) {
-        continue;
-      }
-
-      // Helper to find existing matching game
-      const findGameMatch = (bLower: string) => {
-        if (bLower.includes('mobile legend') || bLower.includes('mlbb')) {
-          return gamesList.find(g => g.slug === 'mobile-legends');
-        }
-        if (bLower.includes('free fire')) {
-          return gamesList.find(g => g.slug === 'free-fire');
-        }
-        if (bLower.includes('pubg')) {
-          return gamesList.find(g => g.slug === 'pubg-mobile');
-        }
-        if (bLower.includes('valorant')) {
-          return gamesList.find(g => g.slug === 'valorant');
-        }
-        if (bLower.includes('genshin')) {
-          return gamesList.find(g => g.slug === 'genshin-impact');
-        }
-        if (bLower.includes('honor of kings') || bLower.includes('hok')) {
-          return gamesList.find(g => g.slug === 'honor-of-kings');
-        }
-        
-        return gamesList.find(g => 
-          bLower === g.name.toLowerCase().trim() || 
-          g.name.toLowerCase().trim() === bLower ||
-          g.slug === bLower.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-        );
-      };
-
       const existingGame = findGameMatch(brandLower);
 
       if (!existingGame) {
@@ -179,35 +176,6 @@ export async function POST(req: NextRequest) {
     let skippedCount = 0;
     const syncedItemsLog: any[] = [];
 
-    // Helper to find the matching game based on Digiflazz brand
-    const findMatchingGame = (brand: string) => {
-      const normalizedBrand = brand.toLowerCase().trim();
-      
-      if (normalizedBrand.includes('mobile legend') || normalizedBrand.includes('mlbb')) {
-        return gamesList.find(g => g.slug === 'mobile-legends');
-      }
-      if (normalizedBrand.includes('free fire')) {
-        return gamesList.find(g => g.slug === 'free-fire');
-      }
-      if (normalizedBrand.includes('pubg')) {
-        return gamesList.find(g => g.slug === 'pubg-mobile');
-      }
-      if (normalizedBrand.includes('valorant')) {
-        return gamesList.find(g => g.slug === 'valorant');
-      }
-      if (normalizedBrand.includes('genshin')) {
-        return gamesList.find(g => g.slug === 'genshin-impact');
-      }
-      if (normalizedBrand.includes('honor of kings') || normalizedBrand.includes('hok')) {
-        return gamesList.find(g => g.slug === 'honor-of-kings');
-      }
-      
-      return gamesList.find(g => 
-        normalizedBrand === g.name.toLowerCase() || 
-        g.name.toLowerCase().includes(normalizedBrand)
-      );
-    };
-
     // 7. Sync products database-agnostically
     for (const item of rawProducts) {
       const category = (item.category || '').toLowerCase();
@@ -233,7 +201,7 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      const matchingGame = findMatchingGame(brand);
+      const matchingGame = findGameMatch(brand);
       if (!matchingGame) {
         skippedCount++;
         syncedItemsLog.push({
