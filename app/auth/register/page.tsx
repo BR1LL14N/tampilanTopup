@@ -69,22 +69,10 @@ export default function RegisterPage() {
     }
   }
 
-  const handleOAuth = async (provider: "google" | "discord") => {
+  const handleOAuth = (provider: "google" | "discord") => {
     setOauthLoading(provider)
     setError("")
-    try {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${siteUrl}/auth/callback`,
-        },
-      })
-      if (oauthError) throw oauthError
-    } catch (err: any) {
-      setError(err.message || `Registrasi dengan ${provider} gagal.`)
-      setOauthLoading(null)
-    }
+    window.location.href = `/api/auth/${provider}`
   }
 
   // Clip path polygon string for beveled corners (hexagonal style)
