@@ -949,16 +949,35 @@ export default function AdminProductsPage() {
                         <p className="text-[10px] text-white/60 mt-1">
                           Game/Brand: <span className="text-white font-semibold">{logItem.game || logItem.brand || "-"}</span> | Kategori: <span className="text-white font-semibold">{logItem.category || "-"}</span>
                         </p>
+                        {logItem.reason && (
+                          <p className="text-[9px] font-bold text-amber-300 mt-1 flex items-center gap-1">
+                            <span>Alasan:</span> {logItem.reason}
+                          </p>
+                        )}
                       </div>
 
                       <div className="text-right shrink-0">
-                        {logItem.type ? (
-                          <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                            logItem.type === 'NEW' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sky/20 text-sky'
-                          }`}>
-                            {logItem.type === 'NEW' ? '+ BARU' : 'DIPERBARUI'} (Rp {Number(logItem.price || logItem.new_price).toLocaleString("id-ID")})
+                        {logItem.type === 'NEW' && (
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            + BARU (Rp {Number(logItem.price).toLocaleString("id-ID")})
                           </span>
-                        ) : (
+                        )}
+                        {logItem.type === 'UPDATE' && (
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-sky/20 text-sky border border-sky/30">
+                            DIPERBARUI (Rp {Number(logItem.new_price).toLocaleString("id-ID")})
+                          </span>
+                        )}
+                        {logItem.type === 'SKIPPED_INACTIVE' && (
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/30">
+                            DILEWATI (NONAKTIF SUPPLIER)
+                          </span>
+                        )}
+                        {logItem.type === 'SKIPPED_NO_GAME' && (
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            DILEWATI (GAME BELUM DAFTAR)
+                          </span>
+                        )}
+                        {(!logItem.type || (logItem.type !== 'NEW' && logItem.type !== 'UPDATE' && logItem.type !== 'SKIPPED_INACTIVE' && logItem.type !== 'SKIPPED_NO_GAME')) && (
                           <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
                             logItem.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                           }`}>

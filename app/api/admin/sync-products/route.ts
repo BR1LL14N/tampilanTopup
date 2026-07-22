@@ -221,12 +221,30 @@ export async function POST(req: NextRequest) {
 
       if (!isActive) {
         skippedCount++;
+        syncedItemsLog.push({
+          sku,
+          name,
+          brand,
+          category: item.category,
+          price,
+          type: 'SKIPPED_INACTIVE',
+          reason: 'Nonaktif dari supplier / Digiflazz status OFF'
+        });
         continue;
       }
 
       const matchingGame = findMatchingGame(brand);
       if (!matchingGame) {
         skippedCount++;
+        syncedItemsLog.push({
+          sku,
+          name,
+          brand,
+          category: item.category,
+          price,
+          type: 'SKIPPED_NO_GAME',
+          reason: `Brand '${brand}' belum terdaftar di Kategori Game Database`
+        });
         continue; 
       }
 
@@ -257,6 +275,8 @@ export async function POST(req: NextRequest) {
             sku,
             name,
             game: matchingGame.name,
+            brand,
+            category: item.category,
             old_price: existingProduct.price,
             new_price: price,
             sell_price: newSellPrice,
@@ -283,6 +303,8 @@ export async function POST(req: NextRequest) {
             sku,
             name,
             game: matchingGame.name,
+            brand,
+            category: item.category,
             price: price,
             sell_price: initialSellPrice,
             type: 'NEW'
@@ -308,7 +330,7 @@ export async function POST(req: NextRequest) {
         sku: i.buyer_sku_code,
         active: i.buyer_product_status && i.seller_product_status
       })),
-      log: syncedItemsLog.slice(0, 50)
+      log: syncedItemsLog.slice(0, 200)
     });
 
   } catch (error: any) {
