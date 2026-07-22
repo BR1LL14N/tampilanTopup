@@ -758,9 +758,9 @@ export default function AdminProductsPage() {
                   className="w-full bg-mist backdrop-blur-md border border-sky/30 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-sky h-9"
                   required
                 >
-                  <option value="" disabled>Pilih Game...</option>
+                  <option value="" disabled className="bg-[#183644] text-white">Pilih Game...</option>
                   {games.map((g) => (
-                    <option key={g.id} value={g.id}>{g.name}</option>
+                    <option key={g.id} value={g.id} className="bg-[#183644] text-white py-1.5 font-bold">{g.name}</option>
                   ))}
                 </select>
               </div>
@@ -832,8 +832,8 @@ export default function AdminProductsPage() {
                   onChange={(e) => setEditForm(prev => ({ ...prev, status: e.target.value === "active" }))}
                   className="w-full bg-mist backdrop-blur-md border border-sky/30 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-sky h-9"
                 >
-                  <option value="active">Aktif</option>
-                  <option value="inactive">Nonaktif</option>
+                  <option value="active" className="bg-[#183644] text-white py-1.5 font-bold">Aktif</option>
+                  <option value="inactive" className="bg-[#183644] text-white py-1.5 font-bold">Nonaktif</option>
                 </select>
               </div>
               <div className="space-y-1.5">

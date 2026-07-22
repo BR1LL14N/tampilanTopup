@@ -1073,8 +1073,8 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setPaymentGateway(e.target.value)}
                         className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
                       >
-                        <option value="midtrans">MIDTRANS (Default)</option>
-                        <option value="doku">DOKU PAYMENT GATEWAY</option>
+                        <option value="midtrans" className="bg-[#183644] text-white py-1.5 font-bold">MIDTRANS (Default)</option>
+                        <option value="doku" className="bg-[#183644] text-white py-1.5 font-bold">DOKU PAYMENT GATEWAY</option>
                       </select>
                     </div>
                   </div>
@@ -1096,8 +1096,8 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setPaymentMethodType(e.target.value)}
                         className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
                       >
-                        <option value="checkout">CHECKOUT PAGE (Hosted Page Doku / Midtrans Snap)</option>
-                        <option value="direct">DIRECT API (Halaman Pembayaran Kustom)</option>
+                        <option value="checkout" className="bg-[#183644] text-white py-1.5 font-bold">CHECKOUT PAGE (Hosted Page Doku / Midtrans Snap)</option>
+                        <option value="direct" className="bg-[#183644] text-white py-1.5 font-bold">DIRECT API (Halaman Pembayaran Kustom)</option>
                       </select>
                     </div>
                   </div>
@@ -1148,8 +1148,8 @@ export default function AdminDashboardPage() {
                             onChange={(e) => setDokuMode(e.target.value)}
                             className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
                           >
-                            <option value="sandbox">SANDBOX (Uji Coba / Testing)</option>
-                            <option value="production">PRODUCTION (Live Bisnis)</option>
+                            <option value="sandbox" className="bg-[#183644] text-white py-1.5 font-bold">SANDBOX (Uji Coba / Testing)</option>
+                            <option value="production" className="bg-[#183644] text-white py-1.5 font-bold">PRODUCTION (Live Bisnis)</option>
                           </select>
                         </div>
                       </div>
@@ -1175,8 +1175,8 @@ export default function AdminDashboardPage() {
                             onChange={(e) => setMidtransMode(e.target.value)}
                             className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
                           >
-                            <option value="sandbox">SANDBOX (Testing)</option>
-                            <option value="production">PRODUCTION (Live)</option>
+                            <option value="sandbox" className="bg-[#183644] text-white py-1.5 font-bold">SANDBOX (Testing)</option>
+                            <option value="production" className="bg-[#183644] text-white py-1.5 font-bold">PRODUCTION (Live)</option>
                           </select>
                         </div>
                       </div>
@@ -1265,8 +1265,8 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setWaMethod(e.target.value)}
                         className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
                       >
-                        <option value="baileys">Baileys (Lokal / VPS)</option>
-                        <option value="fonnte">Fonnte API Gateway</option>
+                        <option value="baileys" className="bg-[#183644] text-white py-1.5 font-bold">Baileys (Lokal / VPS)</option>
+                        <option value="fonnte" className="bg-[#183644] text-white py-1.5 font-bold">Fonnte API Gateway</option>
                       </select>
                     </div>
                   </div>
