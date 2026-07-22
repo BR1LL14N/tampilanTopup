@@ -13,9 +13,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET;
+    const { SettingService } = await import('@/lib/services/setting-service');
+    const clientId = (await SettingService.get('google_client_id', '')) || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || '';
+    const clientSecret = (await SettingService.get('google_client_secret', '')) || process.env.GOOGLE_CLIENT_SECRET || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET || '';
     const redirectUri = `${siteUrl}/api/auth/google/callback`;
+
+    if (!clientSecret || clientSecret.includes('your_google_secret')) {
+      return NextResponse.redirect(`${siteUrl}/auth/login?error=${encodeURIComponent('Google Client Secret belum diisi di file .env server VPS.')}`);
+    }
 
     // 1. Exchange auth code for access token
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {

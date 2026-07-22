@@ -13,9 +13,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const clientId = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID;
-    const clientSecret = process.env.DISCORD_CLIENT_SECRET || process.env.NEXT_PUBLIC_DISCORD_CLIENT_SECRET;
+    const { SettingService } = await import('@/lib/services/setting-service');
+    const clientId = (await SettingService.get('discord_client_id', '')) || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID || '';
+    const clientSecret = (await SettingService.get('discord_client_secret', '')) || process.env.DISCORD_CLIENT_SECRET || process.env.NEXT_PUBLIC_DISCORD_CLIENT_SECRET || '';
     const redirectUri = `${siteUrl}/api/auth/discord/callback`;
+
+    if (!clientSecret || clientSecret.includes('your_discord_secret')) {
+      return NextResponse.redirect(`${siteUrl}/auth/login?error=${encodeURIComponent('Discord Client Secret belum diisi di file .env server VPS.')}`);
+    }
 
     // 1. Exchange auth code for access token
     const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
