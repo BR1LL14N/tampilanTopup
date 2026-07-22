@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const clientId = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || process.env.DISCORD_CLIENT_ID;
-    const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+    const clientSecret = process.env.DISCORD_CLIENT_SECRET || process.env.NEXT_PUBLIC_DISCORD_CLIENT_SECRET;
     const redirectUri = `${siteUrl}/api/auth/discord/callback`;
 
     // 1. Exchange auth code for access token
