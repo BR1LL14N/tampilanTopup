@@ -8,7 +8,7 @@ import { PiggyBank, BadgePercent, ShieldAlert } from "lucide-react"
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen dark-stripes-teal text-white flex flex-col justify-between">
+    <div className="min-h-screen text-text-primary antialiased relative flex flex-col justify-between">
       <Header />
       
       <SidebarContentWrapper>

@@ -8,7 +8,7 @@ import { RefreshCw } from "lucide-react"
 
 export default function RefundPage() {
   return (
-    <div className="min-h-screen dark-stripes-teal text-white flex flex-col justify-between">
+    <div className="min-h-screen text-text-primary antialiased relative flex flex-col justify-between">
       <Header />
       
       <SidebarContentWrapper>
