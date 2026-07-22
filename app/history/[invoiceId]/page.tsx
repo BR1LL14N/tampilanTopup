@@ -217,7 +217,7 @@ export default function InvoiceDetailPage() {
               ) : error ? (
                 <div className="space-y-6">
                   <div className="p-4 rounded-xl bg-red-50 border border-red-500/20 text-red-500 text-xs font-semibold flex items-center gap-3 animate-fadeIn">
-                    <ShieldAlert className="h-5 w-5 text-red-500 shrink-0" />
+                    <AlertTriangle className="h-5 w-5 text-red-500 shrink-0" />
                     <span>{error}</span>
                   </div>
                   <div className="flex justify-center">
@@ -227,70 +227,83 @@ export default function InvoiceDetailPage() {
                     </Link>
                   </div>
                 </div>
-              ) : (
+              ) : result ? (
                 <div className="space-y-6 animate-fadeIn">
 
-                  {/* Visual Status Header Bar with BOTH Payment & Topup status */}
-                  <div className="bg-[#183644] border border-sky/30 p-4 rounded-xl space-y-3">
-                    <div className="flex items-center justify-between border-b border-sky/20 pb-2.5">
-                      <span className="text-xs font-black uppercase tracking-wider text-white/90">
-                        Status Pembayaran
-                      </span>
-                      <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${
-                        result.payment_status === 'paid' || result.payment_status === 'settlement' || result.payment_status === 'success'
-                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                          : result.payment_status === 'failed' || result.payment_status === 'expire' || result.payment_status === 'cancel'
-                          ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                          : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                      }`}>
-                        {result.payment_status === 'paid' || result.payment_status === 'settlement' || result.payment_status === 'success'
-                          ? 'Lunas'
-                          : result.payment_status === 'failed' || result.payment_status === 'expire' || result.payment_status === 'cancel'
-                          ? 'Gagal / Expired'
-                          : 'Menunggu Pembayaran'}
-                      </span>
-                    </div>
+            {/* Visual Status Header Bar with BOTH Payment & Topup status */}
+            <div className="bg-[#183644] border border-sky/30 p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between border-b border-sky/20 pb-2.5">
+                <span className="text-xs font-black uppercase tracking-wider text-white/90">
+                  Status Pembayaran
+                </span>
+                <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${
+                  result.payment_status === 'paid' || result.payment_status === 'settlement' || result.payment_status === 'success'
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : result.payment_status === 'failed' || result.payment_status === 'expire' || result.payment_status === 'cancel'
+                    ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                    : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                }`}>
+                  {result.payment_status === 'paid' || result.payment_status === 'settlement' || result.payment_status === 'success'
+                    ? 'Lunas'
+                    : result.payment_status === 'failed' || result.payment_status === 'expire' || result.payment_status === 'cancel'
+                    ? 'Gagal / Expired'
+                    : 'Menunggu Pembayaran'}
+                </span>
+              </div>
 
-                    <div className="flex items-center justify-between pt-0.5">
-                      <span className="text-xs font-black uppercase tracking-wider text-white/90">
-                        Status Topup / Pengiriman
-                      </span>
-                      <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${
-                        result.status === 'success' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
-                        result.status === 'processing' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
-                        result.status === 'pending' ? 'bg-blue-500/20 text-sky border-sky/30' :
-                        'bg-red-500/20 text-red-400 border-red-500/30'
-                      }`}>
-                        {result.status === 'success' ? 'Berhasil' :
-                         result.status === 'processing' ? 'Diproses' :
-                         result.status === 'pending' ? 'Pending' : 'Gagal'}
-                      </span>
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between pt-0.5">
+                <span className="text-xs font-black uppercase tracking-wider text-white/90">
+                  Status Topup / Pengiriman
+                </span>
+                <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${
+                  result.status === 'success' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                  result.status === 'processing' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                  result.status === 'pending' ? 'bg-blue-500/20 text-sky border-sky/30' :
+                  'bg-red-500/20 text-red-400 border-red-500/30'
+                }`}>
+                  {result.status === 'success' ? 'Berhasil' :
+                   result.status === 'processing' ? 'Diproses' :
+                   result.status === 'pending' ? 'Pending' : 'Gagal'}
+                </span>
+              </div>
+            </div>
 
-                  {/* Serial Number (SN / Token PLN / Kode Voucher) Box if available */}
-                  {result.sn && (
-                    <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl space-y-2">
-                      <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">
-                        Serial Number / Kode Token / SN Voucher
-                      </span>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-mono text-sm font-black text-white bg-black/40 px-3 py-1.5 rounded-lg border border-emerald-500/30 select-all tracking-wider">
-                          {result.sn}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard.writeText(result.sn)
-                            alert("SN / Token berhasil disalin!")
-                          }}
-                          className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold rounded-lg transition-colors uppercase shrink-0"
-                        >
-                          Salin SN
-                        </button>
-                      </div>
-                    </div>
-                  )}
+            {/* Error Detail Callout Box for Failed Transactions */}
+            {(result.status === 'failed' || result.payment_status === 'failed') && (
+              <div className="bg-red-500/10 border border-red-500/40 p-4 rounded-xl space-y-1.5 text-left">
+                <span className="text-[10px] font-black text-red-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
+                  Detail Alasan Transaksi Gagal (Provider / Digiflazz)
+                </span>
+                <p className="text-xs font-bold text-white leading-relaxed">
+                  {result.errorMessage || "Gagal memproses pengiriman ke provider. Silakan periksa kembali format User ID (ID + Zone ID) tujuan Anda atau hubungi Admin via WhatsApp."}
+                </p>
+              </div>
+            )}
+
+            {/* Serial Number (SN / Token PLN / Kode Voucher) Box if available */}
+            {result.sn && (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl space-y-2">
+                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">
+                  Serial Number / Kode Token / SN Voucher
+                </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-sm font-black text-white bg-black/40 px-3 py-1.5 rounded-lg border border-emerald-500/30 select-all tracking-wider">
+                    {result.sn}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(result.sn)
+                      alert("SN / Token berhasil disalin!")
+                    }}
+                    className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold rounded-lg transition-colors uppercase shrink-0"
+                  >
+                    Salin SN
+                  </button>
+                </div>
+              </div>
+            )}
 
                   {/* Details Receipt Table */}
                   <div className="border border-sky/30 rounded-xl bg-[#183644]/90 p-5 space-y-3.5 text-xs shadow-sky-soft">
@@ -386,7 +399,7 @@ export default function InvoiceDetailPage() {
                   </div>
 
                 </div>
-              )}
+              ) : null}
 
             </div>
           </div>

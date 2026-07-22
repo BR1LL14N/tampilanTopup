@@ -41,7 +41,9 @@ import {
   Smartphone,
   ExternalLink,
   QrCode,
-  Loader2
+  Loader2,
+  Volume2,
+  VolumeX
 } from "lucide-react"
 
 export default function AdminDashboardPage() {
@@ -143,6 +145,61 @@ export default function AdminDashboardPage() {
     }
   }
 
+  // Audio Notification Sound Alert states
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true)
+  const [prevTxCount, setPrevTxCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedSound = window.localStorage.getItem("admin_sound_alert")
+      if (storedSound !== null) {
+        setIsSoundEnabled(storedSound === "true")
+      }
+    }
+  }, [])
+
+  const toggleSound = () => {
+    const nextState = !isSoundEnabled
+    setIsSoundEnabled(nextState)
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("admin_sound_alert", String(nextState))
+    }
+  }
+
+  const playNotificationChime = () => {
+    if (typeof window === "undefined") return
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+      if (!AudioCtx) return
+      const ctx = new AudioCtx()
+      const now = ctx.currentTime
+
+      // Note 1: E5
+      const osc1 = ctx.createOscillator()
+      const gain1 = ctx.createGain()
+      osc1.type = "sine"
+      osc1.frequency.setValueAtTime(659.25, now)
+      gain1.gain.setValueAtTime(0.12, now)
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25)
+      osc1.connect(gain1)
+      gain1.connect(ctx.destination)
+      osc1.start(now)
+      osc1.stop(now + 0.25)
+
+      // Note 2: G#5
+      const osc2 = ctx.createOscillator()
+      const gain2 = ctx.createGain()
+      osc2.type = "sine"
+      osc2.frequency.setValueAtTime(830.61, now + 0.1)
+      gain2.gain.setValueAtTime(0.18, now + 0.1)
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45)
+      osc2.connect(gain2)
+      gain2.connect(ctx.destination)
+      osc2.start(now + 0.1)
+      osc2.stop(now + 0.45)
+    } catch (_) {}
+  }
+
   useEffect(() => {
     // Read cache on mount
     const cached = getCachedUser()
@@ -238,6 +295,15 @@ export default function AdminDashboardPage() {
             revenue: Number(p.revenue) || 0
           })))
         }
+        
+        // Play notification sound if new transactions arrive
+        const currentTxCount = Number(data.stats.totalTxCount || 0)
+        setPrevTxCount((prev) => {
+          if (prev !== null && currentTxCount > prev) {
+            playNotificationChime()
+          }
+          return currentTxCount
+        })
 
         if (data.activities) {
           setActivities({
@@ -284,6 +350,13 @@ export default function AdminDashboardPage() {
       }
     }
     verifyAdminAndFetchData()
+
+    // 8-second polling interval for real-time transactions & audio alerts
+    const pollInterval = setInterval(() => {
+      verifyAdminAndFetchData()
+    }, 8000)
+
+    return () => clearInterval(pollInterval)
   }, [router, refreshTrigger])
 
   // Polling WhatsApp status if enabled
@@ -591,6 +664,18 @@ export default function AdminDashboardPage() {
             >
               <Wallet className="h-3.5 w-3.5 text-emerald-400" />
               + Isi Saldo Digiflazz
+            </button>
+            <button
+              onClick={toggleSound}
+              className={`px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-1.5 border shadow-sky-soft hover:scale-105 ${
+                isSoundEnabled
+                  ? "bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30"
+                  : "bg-gray-500/20 text-gray-400 border-gray-500/40 hover:bg-gray-500/30"
+              }`}
+              title={isSoundEnabled ? "Suara Notifikasi Aktif (Klik untuk Matikan)" : "Suara Notifikasi Mati (Klik untuk Aktifkan)"}
+            >
+              {isSoundEnabled ? <Volume2 className="h-3.5 w-3.5 text-amber-400" /> : <VolumeX className="h-3.5 w-3.5 text-gray-400" />}
+              {isSoundEnabled ? "Audio Notif: ON" : "Audio Notif: OFF"}
             </button>
           </div>
         </div>
