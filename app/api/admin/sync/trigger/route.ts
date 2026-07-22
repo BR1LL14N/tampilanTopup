@@ -53,9 +53,9 @@ async function handleSync(req: NextRequest) {
       return NextResponse.json({ message: "Auto-sync is disabled by administrator." });
     }
 
-    // 3. Fetch credentials from env
-    const username = process.env.DIGIFLAZZ_USERNAME;
-    const apiKey = process.env.DIGIFLAZZ_API_KEY;
+    // 3. Fetch credentials using getDigiflazzCredentials()
+    const { getDigiflazzCredentials } = await import("@/lib/digiflazz");
+    const { username, apiKey } = getDigiflazzCredentials();
 
     if (!username || !apiKey) {
       await SettingService.set("last_sync_status", "failed");
