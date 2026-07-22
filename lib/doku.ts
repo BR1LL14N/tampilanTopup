@@ -109,6 +109,7 @@ export async function createDokuCheckoutSession(params: {
     payment: {
       payment_due_date: params.expiredMinutes || 60,
       payment_redirect_url: `${siteUrl}/history/${params.invoice}`,
+      ...(params.amount < 10000 ? { payment_method_types: ["QRIS", "EMONEY", "OVO", "SHOPEEPAY", "DANA", "GOPAY"] } : {}),
     },
     customer: {
       name: (params.customerName || 'Pelanggan').trim(),

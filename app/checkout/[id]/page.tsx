@@ -212,6 +212,10 @@ export default function CheckoutPage() {
       let pm = (paymentVal || 'qris').toLowerCase()
       if (pm === "va") pm = "qris"
       else if (pm === "e-wallet") pm = "gopay"
+
+      if (product && Number(product.sell_price) < 10000) {
+        pm = "qris"
+      }
       
       const matchedMethod = paymentMethods.find(m => m.id === pm) || paymentMethods[0]
       if (matchedMethod) {
