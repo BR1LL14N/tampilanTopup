@@ -56,7 +56,9 @@ export async function POST(req: NextRequest) {
     let gamesList: any[] = [...dbGames];
 
     // 5. Auto-create missing games from Digiflazz brands for ALL products
-    const findGameMatch = (bLower: string) => {
+    const findGameMatch = (brandInput: string) => {
+      if (!brandInput) return undefined;
+      const bLower = brandInput.toLowerCase().trim();
       const cleanB = bLower.replace(/[^a-z0-9]/g, '');
 
       if (cleanB.includes('mobilelegend') || cleanB.includes('mlbb')) {
