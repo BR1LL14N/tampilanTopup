@@ -55,7 +55,8 @@ export default function AdminTransactionsPage() {
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [transactionsList, setTransactionsList] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all")
+  const [topupStatusFilter, setTopupStatusFilter] = useState("all")
   
   // Detail Dialog states
   const [selectedTx, setSelectedTx] = useState<any | null>(null)
@@ -380,9 +381,32 @@ export default function AdminTransactionsPage() {
       tx.invoice.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tx.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tx.target_id.includes(searchQuery);
-    const matchesStatus =
-      statusFilter === "all" || tx.topup_status === statusFilter;
-    return matchesSearch && matchesStatus;
+
+    let matchesPayment = true;
+    if (paymentStatusFilter !== "all") {
+      const pStatus = (tx.payment_status || "").toLowerCase();
+      if (paymentStatusFilter === "paid") {
+        matchesPayment = pStatus === "paid" || pStatus === "settlement" || pStatus === "success";
+      } else if (paymentStatusFilter === "pending") {
+        matchesPayment = pStatus === "pending" || pStatus === "unpaid";
+      } else if (paymentStatusFilter === "failed") {
+        matchesPayment = pStatus === "failed" || pStatus === "expire" || pStatus === "cancel";
+      }
+    }
+
+    let matchesTopup = true;
+    if (topupStatusFilter !== "all") {
+      const tStatus = (tx.topup_status || "").toLowerCase();
+      if (topupStatusFilter === "success") {
+        matchesTopup = tStatus === "success";
+      } else if (topupStatusFilter === "pending") {
+        matchesTopup = tStatus === "pending" || tStatus === "processing";
+      } else if (topupStatusFilter === "failed") {
+        matchesTopup = tStatus === "failed";
+      }
+    }
+
+    return matchesSearch && matchesPayment && matchesTopup;
   })
 
   // Calculate dynamic stats
@@ -451,8 +475,8 @@ export default function AdminTransactionsPage() {
           </div>
 
           {/* Search and Filter */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1 max-w-md">
+          <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center flex-wrap">
+            <div className="relative flex-1 min-w-[240px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
               <Input
                 placeholder="Cari invoice, email, atau ID player..."
@@ -461,17 +485,36 @@ export default function AdminTransactionsPage() {
                 className="pl-10"
               />
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 rounded-lg border border-sky/30 bg-[#183644] text-white text-xs font-bold focus:outline-none focus:border-sky cursor-pointer"
-            >
-              <option value="all" className="bg-[#183644] text-white">Semua Status</option>
-              <option value="success" className="bg-[#183644] text-white">Berhasil</option>
-              <option value="processing" className="bg-[#183644] text-white">Diproses</option>
-              <option value="pending" className="bg-[#183644] text-white">Pending</option>
-              <option value="failed" className="bg-[#183644] text-white">Gagal</option>
-            </select>
+            
+            {/* Filter Status Pembayaran */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white/60 uppercase tracking-wider shrink-0">Status Bayar:</span>
+              <select
+                value={paymentStatusFilter}
+                onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                className="px-3 py-2 rounded-xl border border-sky/30 bg-[#183644] text-white text-xs font-bold focus:outline-none focus:border-sky cursor-pointer shadow-sm"
+              >
+                <option value="all" className="bg-[#183644] text-white">Semua Status Bayar</option>
+                <option value="paid" className="bg-[#183644] text-emerald-400 font-bold">🟢 Lunas / Success</option>
+                <option value="pending" className="bg-[#183644] text-amber-400 font-bold">🟡 Belum Bayar / Pending</option>
+                <option value="failed" className="bg-[#183644] text-red-400 font-bold">🔴 Expired / Gagal</option>
+              </select>
+            </div>
+
+            {/* Filter Status Topup */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white/60 uppercase tracking-wider shrink-0">Status Topup:</span>
+              <select
+                value={topupStatusFilter}
+                onChange={(e) => setTopupStatusFilter(e.target.value)}
+                className="px-3 py-2 rounded-xl border border-sky/30 bg-[#183644] text-white text-xs font-bold focus:outline-none focus:border-sky cursor-pointer shadow-sm"
+              >
+                <option value="all" className="bg-[#183644] text-white">Semua Status Topup</option>
+                <option value="success" className="bg-[#183644] text-emerald-400 font-bold">🟢 Topup Berhasil</option>
+                <option value="pending" className="bg-[#183644] text-amber-400 font-bold">🟡 Topup Diproses / Pending</option>
+                <option value="failed" className="bg-[#183644] text-red-400 font-bold">🔴 Topup Gagal / Eror</option>
+              </select>
+            </div>
           </div>
 
           {/* Transactions Table */}
