@@ -57,33 +57,82 @@ export async function POST(req: NextRequest) {
 
     // 5. Auto-create missing games from Digiflazz brands for ALL products
     const findGameMatch = (bLower: string) => {
-      if (bLower.includes('mobile legend') || bLower.includes('mlbb')) {
-        return gamesList.find(g => g.slug === 'mobile-legends');
+      const cleanB = bLower.replace(/[^a-z0-9]/g, '');
+
+      if (cleanB.includes('mobilelegend') || cleanB.includes('mlbb')) {
+        return gamesList.find(g => 
+          g.slug === 'mobile-legends' || 
+          g.slug === 'mobile-legend' || 
+          g.slug === 'mobilelegends' ||
+          (g.name || '').toLowerCase().includes('mobile legend')
+        );
       }
-      if (bLower.includes('free fire')) {
-        return gamesList.find(g => g.slug === 'free-fire');
+      if (cleanB.includes('freefire')) {
+        return gamesList.find(g => 
+          g.slug === 'free-fire' || 
+          g.slug === 'freefire' ||
+          (g.name || '').toLowerCase().includes('free fire')
+        );
       }
-      if (bLower.includes('pubg')) {
-        return gamesList.find(g => g.slug === 'pubg-mobile');
+      if (cleanB.includes('pubg')) {
+        return gamesList.find(g => 
+          g.slug === 'pubg-mobile' || 
+          g.slug === 'pubg' ||
+          (g.name || '').toLowerCase().includes('pubg')
+        );
       }
-      if (bLower.includes('valorant')) {
-        return gamesList.find(g => g.slug === 'valorant');
+      if (cleanB.includes('valorant')) {
+        return gamesList.find(g => g.slug === 'valorant' || (g.name || '').toLowerCase().includes('valorant'));
       }
-      if (bLower.includes('genshin')) {
-        return gamesList.find(g => g.slug === 'genshin-impact');
+      if (cleanB.includes('genshin')) {
+        return gamesList.find(g => g.slug === 'genshin-impact' || (g.name || '').toLowerCase().includes('genshin'));
       }
-      if (bLower.includes('honor of kings') || bLower.includes('hok')) {
-        return gamesList.find(g => g.slug === 'honor-of-kings');
+      if (cleanB.includes('honorofkings') || cleanB.includes('hok')) {
+        return gamesList.find(g => g.slug === 'honor-of-kings' || (g.name || '').toLowerCase().includes('honor of kings'));
+      }
+      if (cleanB.includes('telkomsel')) {
+        return gamesList.find(g => g.slug === 'telkomsel' || (g.name || '').toLowerCase().includes('telkomsel'));
+      }
+      if (cleanB.includes('indosat')) {
+        return gamesList.find(g => g.slug === 'indosat' || (g.name || '').toLowerCase().includes('indosat'));
+      }
+      if (cleanB === 'xl') {
+        return gamesList.find(g => g.slug === 'xl' || (g.name || '').toLowerCase().trim() === 'xl');
+      }
+      if (cleanB === 'axis') {
+        return gamesList.find(g => g.slug === 'axis' || (g.name || '').toLowerCase().trim() === 'axis');
+      }
+      if (cleanB === 'tri' || cleanB === 'three') {
+        return gamesList.find(g => g.slug === 'tri' || g.slug === 'three' || (g.name || '').toLowerCase().includes('tri'));
+      }
+      if (cleanB.includes('byu')) {
+        return gamesList.find(g => g.slug === 'by-u' || g.slug === 'byu' || (g.name || '').toLowerCase().includes('by.u'));
+      }
+      if (cleanB.includes('smartfren')) {
+        return gamesList.find(g => g.slug === 'smartfren' || (g.name || '').toLowerCase().includes('smartfren'));
+      }
+      if (cleanB.includes('pln')) {
+        return gamesList.find(g => g.slug === 'pln' || (g.name || '').toLowerCase().includes('pln'));
+      }
+      if (cleanB.includes('kvision') || cleanB.includes('gol')) {
+        return gamesList.find(g => g.slug === 'k-vision' || g.slug === 'kvision' || (g.name || '').toLowerCase().includes('k-vision'));
       }
       
       const slug = bLower.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      return gamesList.find(g => 
-        g.slug === slug ||
-        bLower === g.name.toLowerCase().trim() || 
-        g.name.toLowerCase().trim() === bLower ||
-        g.name.toLowerCase().trim().includes(bLower) ||
-        bLower.includes(g.name.toLowerCase().trim())
-      );
+      return gamesList.find(g => {
+        const gNameLower = (g.name || '').toLowerCase().trim();
+        const gSlugLower = (g.slug || '').toLowerCase().trim();
+        const gCleanName = gNameLower.replace(/[^a-z0-9]/g, '');
+
+        return (
+          gSlugLower === slug ||
+          gCleanName === cleanB ||
+          gNameLower === bLower ||
+          bLower === gNameLower ||
+          gNameLower.includes(bLower) ||
+          bLower.includes(gNameLower)
+        );
+      });
     };
 
     for (const item of rawProducts) {
