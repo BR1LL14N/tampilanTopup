@@ -79,6 +79,19 @@ export async function createDokuCheckoutSession(params: {
   const requestId = crypto.randomUUID();
   const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
 
+  let cleanPhone = (params.customerPhone || '').replace(/\D/g, '');
+  if (!cleanPhone || cleanPhone.length < 9) {
+    cleanPhone = '081234567890';
+  } else if (cleanPhone.startsWith('62')) {
+    cleanPhone = '0' + cleanPhone.substring(2);
+  } else if (!cleanPhone.startsWith('0')) {
+    cleanPhone = '0' + cleanPhone;
+  }
+
+  const cleanEmail = (params.customerEmail && params.customerEmail.includes('@')) 
+    ? params.customerEmail.trim()
+    : `${params.invoice.toLowerCase().replace(/[^a-z0-9]/g, '')}@mitsurushop.com`;
+
   const requestBody = {
     order: {
       invoice_number: params.invoice,
@@ -95,9 +108,9 @@ export async function createDokuCheckoutSession(params: {
       payment_due_date: params.expiredMinutes || 60,
     },
     customer: {
-      name: params.customerName || 'Pelanggan Mitsuru',
-      email: params.customerEmail || `${params.invoice.toLowerCase()}@mitsuru-shop.com`,
-      phone: params.customerPhone || '08123456789',
+      name: (params.customerName || 'Pelanggan').trim(),
+      email: cleanEmail,
+      phone: cleanPhone,
     },
   };
 
