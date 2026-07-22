@@ -141,7 +141,12 @@ export async function POST(req: NextRequest) {
 
     // 3. Process Digiflazz if requested
     if (process_digiflazz && product.provider_sku) {
-      const isTesting = process.env.DIGIFLAZZ_MODE !== 'production';
+      const { SettingService } = await import('@/lib/services/setting-service');
+      const { getDigiflazzCredentials } = await import('@/lib/digiflazz');
+      const dbMode = await SettingService.get('digiflazz_mode', '');
+      const { mode } = getDigiflazzCredentials();
+      const activeMode = (dbMode || mode || process.env.DIGIFLAZZ_MODE || 'production').trim();
+      const isTesting = (activeMode === 'simulation' || activeMode === 'sandbox');
       try {
         const response = await createTopup(
           product.provider_sku,

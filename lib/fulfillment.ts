@@ -41,7 +41,13 @@ export async function processOrderFulfillment(invoice: string): Promise<any> {
   let providerResponse = null;
 
   try {
-    const isTesting = process.env.DIGIFLAZZ_MODE !== 'production';
+    const { SettingService } = await import('@/lib/services/setting-service');
+    const { getDigiflazzCredentials } = await import('@/lib/digiflazz');
+    const dbMode = await SettingService.get('digiflazz_mode', '');
+    const { mode } = getDigiflazzCredentials();
+    const activeMode = (dbMode || mode || process.env.DIGIFLAZZ_MODE || 'production').trim();
+    const isTesting = (activeMode === 'simulation' || activeMode === 'sandbox');
+
     console.log(`[Fulfillment] Executing Digiflazz topup SKU: ${product.provider_sku}, Target: ${transaction.target_id}, Ref: ${transaction.invoice}, Mode: ${isTesting ? 'Sandbox' : 'Production'}`);
 
     const response = await createTopup(
