@@ -63,6 +63,9 @@ export default function AdminProductsPage() {
   const [markupPercent, setMarkupPercent] = useState("10")
   const [syncStatus, setSyncStatus] = useState<string | null>(null)
   const [syncLogs, setSyncLogs] = useState<any[] | null>(null)
+  const [rawDigiflazzResponse, setRawDigiflazzResponse] = useState<any | null>(null)
+  const [syncModalTab, setSyncModalTab] = useState<"log" | "raw">("log")
+  const [copiedJson, setCopiedJson] = useState(false)
   const [isSyncLogOpen, setIsSyncLogOpen] = useState(false)
   
   // Edit Quick Price States
@@ -163,10 +166,14 @@ export default function AdminProductsPage() {
         if (data.log || data.sampleItems) {
           setSyncLogs(data.log || data.sampleItems || [])
         }
+        if (data.rawResponse) {
+          setRawDigiflazzResponse(data.rawResponse)
+        }
         fetchAdminData() // Reload catalog
       } else {
         setSyncStatus(`Error: ${data.error || "Gagal melakukan sync"}`)
         if (data.digiflazzRawResponse) {
+          setRawDigiflazzResponse(data.digiflazzRawResponse)
           setSyncLogs([data.digiflazzRawResponse])
         } else if (data.log) {
           setSyncLogs(Array.isArray(data.log) ? data.log : [data.log])
@@ -928,71 +935,121 @@ export default function AdminProductsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto pr-1 my-2 space-y-2">
-            {syncLogs && syncLogs.length > 0 ? (
-              <div className="space-y-2">
-                {syncLogs.map((logItem: any, idx: number) => {
-                  if (!logItem.sku && !logItem.name && !logItem.product_name) {
-                    return (
-                      <pre key={idx} className="p-3 bg-black/60 border border-sky/30 rounded-xl text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap">
-                        {JSON.stringify(logItem, null, 2)}
-                      </pre>
-                    )
-                  }
-                  return (
-                    <div key={idx} className="p-3 bg-black/40 border border-sky/20 rounded-xl text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-sky text-[11px] bg-sky/10 px-1.5 py-0.5 rounded border border-sky/20">{logItem.sku}</span>
-                          <span className="font-bold text-white">{logItem.name || logItem.product_name}</span>
-                        </div>
-                        <p className="text-[10px] text-white/60 mt-1">
-                          Game/Brand: <span className="text-white font-semibold">{logItem.game || logItem.brand || "-"}</span> | Kategori: <span className="text-white font-semibold">{logItem.category || "-"}</span>
-                        </p>
-                        {logItem.reason && (
-                          <p className="text-[9px] font-bold text-amber-300 mt-1 flex items-center gap-1">
-                            <span>Alasan:</span> {logItem.reason}
-                          </p>
-                        )}
-                      </div>
+          <div className="flex items-center justify-between border-b border-sky/20 pb-2.5 pt-1">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setSyncModalTab("log")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                  syncModalTab === "log"
+                    ? "bg-sky text-white shadow"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                📋 Log Item ({syncLogs?.length || 0})
+              </button>
+              <button
+                type="button"
+                onClick={() => setSyncModalTab("raw")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                  syncModalTab === "raw"
+                    ? "bg-sky text-white shadow"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                📄 Raw Respon Digiflazz API (JSON)
+              </button>
+            </div>
 
-                      <div className="text-right shrink-0">
-                        {logItem.type === 'NEW' && (
-                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                            + BARU (Rp {Number(logItem.price).toLocaleString("id-ID")})
-                          </span>
-                        )}
-                        {logItem.type === 'UPDATE' && (
-                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-sky/20 text-sky border border-sky/30">
-                            DIPERBARUI (Rp {Number(logItem.new_price).toLocaleString("id-ID")})
-                          </span>
-                        )}
-                        {logItem.type === 'SKIPPED_INACTIVE' && (
-                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/30">
-                            DILEWATI (NONAKTIF SUPPLIER)
-                          </span>
-                        )}
-                        {logItem.type === 'SKIPPED_NO_GAME' && (
-                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            DILEWATI (GAME BELUM DAFTAR)
-                          </span>
-                        )}
-                        {(!logItem.type || (logItem.type !== 'NEW' && logItem.type !== 'UPDATE' && logItem.type !== 'SKIPPED_INACTIVE' && logItem.type !== 'SKIPPED_NO_GAME')) && (
-                          <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                            logItem.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                          }`}>
-                            {logItem.active ? 'AKTIF DI SUPPLIER' : 'NONAKTIF/SKU TIDAK DITEMUK'}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <p className="text-xs text-white/50 text-center py-6">Tidak ada log respon sync tersedia.</p>
+            {syncModalTab === "raw" && (
+              <button
+                type="button"
+                onClick={() => {
+                  const content = JSON.stringify(rawDigiflazzResponse || syncLogs, null, 2)
+                  navigator.clipboard.writeText(content)
+                  setCopiedJson(true)
+                  setTimeout(() => setCopiedJson(false), 2000)
+                }}
+                className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all flex items-center gap-1"
+              >
+                {copiedJson ? "✓ Tersalin" : "📋 Salin JSON"}
+              </button>
             )}
           </div>
+
+          {syncModalTab === "raw" ? (
+            <div className="flex-1 overflow-y-auto pr-1 my-2">
+              <pre className="p-4 bg-black/70 border border-sky/30 rounded-xl text-[11px] font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap select-all max-h-[55vh]">
+                {JSON.stringify(rawDigiflazzResponse || syncLogs, null, 2)}
+              </pre>
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto pr-1 my-2 space-y-2">
+              {syncLogs && syncLogs.length > 0 ? (
+                <div className="space-y-2">
+                  {syncLogs.map((logItem: any, idx: number) => {
+                    if (!logItem.sku && !logItem.name && !logItem.product_name) {
+                      return (
+                        <pre key={idx} className="p-3 bg-black/60 border border-sky/30 rounded-xl text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap">
+                          {JSON.stringify(logItem, null, 2)}
+                        </pre>
+                      )
+                    }
+                    return (
+                      <div key={idx} className="p-3 bg-black/40 border border-sky/20 rounded-xl text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-sky text-[11px] bg-sky/10 px-1.5 py-0.5 rounded border border-sky/20">{logItem.sku}</span>
+                            <span className="font-bold text-white">{logItem.name || logItem.product_name}</span>
+                          </div>
+                          <p className="text-[10px] text-white/60 mt-1">
+                            Game/Brand: <span className="text-white font-semibold">{logItem.game || logItem.brand || "-"}</span> | Kategori: <span className="text-white font-semibold">{logItem.category || "-"}</span>
+                          </p>
+                          {logItem.reason && (
+                            <p className="text-[9px] font-bold text-amber-300 mt-1 flex items-center gap-1">
+                              <span>Alasan:</span> {logItem.reason}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          {logItem.type === 'NEW' && (
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                              + BARU (Rp {Number(logItem.price).toLocaleString("id-ID")})
+                            </span>
+                          )}
+                          {logItem.type === 'UPDATE' && (
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-sky/20 text-sky border border-sky/30">
+                              DIPERBARUI (Rp {Number(logItem.new_price).toLocaleString("id-ID")})
+                            </span>
+                          )}
+                          {logItem.type === 'SKIPPED_INACTIVE' && (
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/30">
+                              DILEWATI (NONAKTIF SUPPLIER)
+                            </span>
+                          )}
+                          {logItem.type === 'SKIPPED_NO_GAME' && (
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              DILEWATI (GAME BELUM DAFTAR)
+                            </span>
+                          )}
+                          {(!logItem.type || (logItem.type !== 'NEW' && logItem.type !== 'UPDATE' && logItem.type !== 'SKIPPED_INACTIVE' && logItem.type !== 'SKIPPED_NO_GAME')) && (
+                            <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                              logItem.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                            }`}>
+                              {logItem.active ? 'AKTIF DI SUPPLIER' : 'NONAKTIF/SKU TIDAK DITEMUK'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-xs text-white/50 text-center py-6">Tidak ada log respon sync tersedia.</p>
+              )}
+            </div>
+          )}
 
           <DialogFooter className="border-t border-sky/20 pt-3">
             <Button

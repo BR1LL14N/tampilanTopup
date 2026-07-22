@@ -330,7 +330,8 @@ export async function POST(req: NextRequest) {
         sku: i.buyer_sku_code,
         active: i.buyer_product_status && i.seller_product_status
       })),
-      log: syncedItemsLog.slice(0, 200)
+      log: syncedItemsLog.slice(0, 500),
+      rawResponse: priceListRes
     });
 
   } catch (error: any) {
