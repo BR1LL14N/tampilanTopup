@@ -59,6 +59,7 @@ export default function AdminDashboardPage() {
     feedbacks: []
   })
   const [activeTab, setActiveTab] = useState<"checkout" | "pembayaran" | "failed" | "sync" | "feedback">("checkout")
+  const [adminMainTab, setAdminMainTab] = useState<"overview" | "sync" | "payment" | "whatsapp">("overview")
 
   // Sync Settings States
   const [isSyncActive, setIsSyncActive] = useState(true)
@@ -557,264 +558,328 @@ export default function AdminDashboardPage() {
             </div>
           ))}
         </div>
+        {/* Main Tab Navigation Bar */}
+        <div className="flex flex-wrap items-center gap-2 mb-8 bg-[#183644]/90 p-2 rounded-2xl border border-sky/30 shadow-sky-soft">
+          <button
+            type="button"
+            onClick={() => setAdminMainTab("overview")}
+            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all ${
+              adminMainTab === "overview"
+                ? "bg-sky text-white shadow-lg shadow-sky/20"
+                : "text-white/70 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <TrendingUp className="h-4 w-4 text-sky" />
+            Overview & Aktivitas
+          </button>
 
-        {/* Tables Split Layout */}
-        <div className="grid lg:grid-cols-12 gap-8">
+          <button
+            type="button"
+            onClick={() => setAdminMainTab("sync")}
+            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all ${
+              adminMainTab === "sync"
+                ? "bg-sky text-white shadow-lg shadow-sky/20"
+                : "text-white/70 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <RefreshCw className="h-4 w-4 text-sky" />
+            Auto-Sync Digiflazz
+          </button>
 
-          {/* Recent Transactions Panel -> Web Activity Panel */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="bg-mist backdrop-blur-md rounded-2xl border-sky/30 shadow-sky-soft relative overflow-hidden">
-              <div className="p-6 border-b border-sky/30 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
-                  <ShoppingBag className="h-4 w-4 text-sky" />
-                  Aktivitas Web Mitsuru
-                </h3>
-                
-                {/* Tabs selection */}
-                <div className="flex flex-wrap gap-1.5 bg-sky/10 p-1 rounded-xl">
-                  {(["checkout", "pembayaran", "failed", "sync", "feedback"] as const).map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-lg transition-all ${
-                        activeTab === tab
-                          ? "bg-mist backdrop-blur-md text-sky shadow-sm border border-sky/30"
-                          : "text-white/60 hover:text-white"
-                      }`}
-                    >
-                      {tab === "checkout" && "Checkout"}
-                      {tab === "pembayaran" && "Pembayaran"}
-                      {tab === "failed" && "Gagal & Eror"}
-                      {tab === "sync" && "Sync Digiflazz"}
-                      {tab === "feedback" && "Kritik & Saran"}
-                    </button>
+          <button
+            type="button"
+            onClick={() => setAdminMainTab("payment")}
+            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all ${
+              adminMainTab === "payment"
+                ? "bg-sky text-white shadow-lg shadow-sky/20"
+                : "text-white/70 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <Wallet className="h-4 w-4 text-sky" />
+            Payment Gateway (Doku & Midtrans)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setAdminMainTab("whatsapp")}
+            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all ${
+              adminMainTab === "whatsapp"
+                ? "bg-sky text-white shadow-lg shadow-sky/20"
+                : "text-white/70 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <MessageSquare className="h-4 w-4 text-sky" />
+            WhatsApp Gateway
+          </button>
+        </div>
+
+        {/* TAB 1: OVERVIEW & AKTIVITAS */}
+        {adminMainTab === "overview" && (
+          <div className="grid lg:grid-cols-12 gap-8 animate-fadeIn">
+            {/* Recent Transactions Panel -> Web Activity Panel */}
+            <div className="lg:col-span-8 space-y-6">
+              <div className="bg-mist backdrop-blur-md rounded-2xl border-sky/30 shadow-sky-soft relative overflow-hidden border">
+                <div className="p-6 border-b border-sky/30 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
+                    <ShoppingBag className="h-4 w-4 text-sky" />
+                    Aktivitas Web Mitsuru
+                  </h3>
+                  
+                  {/* Tabs selection */}
+                  <div className="flex flex-wrap gap-1.5 bg-sky/10 p-1 rounded-xl">
+                    {(["checkout", "pembayaran", "failed", "sync", "feedback"] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                          activeTab === tab
+                            ? "bg-mist backdrop-blur-md text-sky shadow-sm border border-sky/30"
+                            : "text-white/60 hover:text-white"
+                        }`}
+                      >
+                        {tab === "checkout" && "Checkout"}
+                        {tab === "pembayaran" && "Pembayaran"}
+                        {tab === "failed" && "Gagal & Eror"}
+                        {tab === "sync" && "Sync Digiflazz"}
+                        {tab === "feedback" && "Kritik & Saran"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-6 max-h-[500px] overflow-y-auto scrollbar-thin">
+                  {/* Tab: Checkout */}
+                  {activeTab === "checkout" && (
+                    <div className="space-y-4">
+                      {activities.checkouts.length > 0 ? (
+                        activities.checkouts.map((tx, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-4 bg-sky/20 border border-sky/30 hover:border-sky/20 rounded-xl transition-all duration-300 group"
+                          >
+                            <div>
+                              <p className="flex items-center gap-2 font-bold text-white group-hover:text-sky transition-colors text-sm uppercase tracking-tight">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1">
+                                  <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
+                                </span>
+                                {tx.product_name}
+                              </p>
+                              <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
+                                <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                                {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-black text-white font-mono text-sm">
+                                Rp {Number(tx.amount).toLocaleString("id-ID")}
+                              </p>
+                              <span className="inline-block mt-1 text-[8px] font-medium text-white/60">
+                                {tx.created_at ? new Date(tx.created_at).toLocaleString("id-ID") : ""}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada aktivitas checkout</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tab: Pembayaran */}
+                  {activeTab === "pembayaran" && (
+                    <div className="space-y-4">
+                      {activities.payments.length > 0 ? (
+                        activities.payments.map((tx, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/40 rounded-xl transition-all duration-300 group"
+                          >
+                            <div>
+                              <p className="flex items-center gap-2 font-bold text-white group-hover:text-emerald-400 transition-colors text-sm uppercase tracking-tight">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1">
+                                  <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
+                                </span>
+                                {tx.product_name}
+                              </p>
+                              <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
+                                <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                                {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-emerald-400 font-bold">Lunas</span>
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-black text-emerald-400 font-mono text-sm">
+                                Rp {Number(tx.amount).toLocaleString("id-ID")}
+                              </p>
+                              <span className="inline-block mt-1 text-[8px] font-medium text-white/60">
+                                {tx.created_at ? new Date(tx.created_at).toLocaleString("id-ID") : ""}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada pembayaran sukses</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tab: Gagal & Eror */}
+                  {activeTab === "failed" && (
+                    <div className="space-y-4">
+                      {activities.failed.length > 0 ? (
+                        activities.failed.map((tx, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/20 hover:border-red-500/40 rounded-xl transition-all duration-300 group"
+                          >
+                            <div>
+                              <p className="flex items-center gap-2 font-bold text-white group-hover:text-red-400 transition-colors text-sm uppercase tracking-tight">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1">
+                                  <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
+                                </span>
+                                {tx.product_name}
+                              </p>
+                              <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
+                                <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                                {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-red-400 font-bold">Gagal</span>
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-black text-red-400 font-mono text-sm">
+                                Rp {Number(tx.amount).toLocaleString("id-ID")}
+                              </p>
+                              <span className="inline-block mt-1 text-[8px] font-medium text-white/60">
+                                {tx.created_at ? new Date(tx.created_at).toLocaleString("id-ID") : ""}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Tidak ada transaksi gagal</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tab: Sync Digiflazz */}
+                  {activeTab === "sync" && (
+                    <div className="space-y-4">
+                      {activities.syncs.length > 0 ? (
+                        activities.syncs.map((prod, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-4 bg-sky/20 border border-sky/30 hover:border-sky/20 rounded-xl transition-all duration-300"
+                          >
+                            <div>
+                              <p className="font-bold text-white text-sm uppercase tracking-tight">
+                                {prod.product_name}
+                              </p>
+                              <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
+                                <img src={getGameAssetByName(prod.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                                {prod.game_name} • SKU: <span className="font-mono text-white/80">{prod.sku}</span>
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-white text-xs font-mono">
+                                Harga: Rp {Number(prod.sell_price).toLocaleString("id-ID")}
+                              </p>
+                              <span className="inline-block mt-1 text-[8px] font-medium text-white/60">
+                                Sync: {prod.updated_at ? new Date(prod.updated_at).toLocaleString("id-ID") : ""}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada sinkronisasi Digiflazz</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tab: Kritik & Saran */}
+                  {activeTab === "feedback" && (
+                    <div className="space-y-4">
+                      {activities.feedbacks.length > 0 ? (
+                        activities.feedbacks.map((fb, idx) => (
+                          <div
+                            key={idx}
+                            className="p-4 bg-purple-50/20 border border-purple-500/10 hover:border-purple-500/30 rounded-xl transition-all duration-300"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="font-bold text-white text-xs uppercase tracking-tight">
+                                {fb.user_name} <span className="text-[10px] text-white/60 lowercase flex items-center">({fb.user_email})</span>
+                              </p>
+                              <div className="flex items-center gap-0.5">
+                                {Array.from({ length: fb.rating }).map((_, rIdx) => (
+                                  <span key={rIdx} className="text-amber-400 text-xs">★</span>
+                                ))}
+                              </div>
+                            </div>
+                            <p className="text-xs text-white/80 leading-relaxed bg-mist backdrop-blur-md p-2.5 rounded-lg border border-sky/30 font-medium">
+                              "{fb.comment}"
+                            </p>
+                            <div className="flex justify-between items-center mt-2.5">
+                              <span className="text-[8px] font-bold text-white/60">
+                                Dikirim: {fb.created_at ? new Date(fb.created_at).toLocaleString("id-ID") : ""}
+                              </span>
+                              <Link href={`/admin/feedbacks`}>
+                                <span className="text-[9px] font-extrabold text-sky hover:underline cursor-pointer uppercase tracking-wider">
+                                  Balas Ulasan &rarr;
+                                </span>
+                              </Link>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada kritik &amp; saran</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Top Products */}
+            <div className="lg:col-span-4 space-y-8">
+              <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
+                <div className="p-6 border-b border-sky/30">
+                  <h3 className="text-base font-black uppercase tracking-wide text-white">
+                    Produk Terlaris
+                  </h3>
+                </div>
+                <div className="p-6 space-y-4">
+                  {topProducts.map((p, idx) => (
+                    <div key={idx} className="flex justify-between items-center bg-sky/20 p-4 rounded-xl border border-sky/30 hover:border-sky/10 transition-all duration-300">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mist backdrop-blur-md p-1.5">
+                          <img src={getItemAssetForProduct(p.name, p.sku, p.game)} alt="" className="max-h-full max-w-full object-contain" />
+                        </span>
+                        <div>
+                        <p className="font-extrabold text-white text-xs uppercase tracking-tight">{p.name}</p>
+                        <p className="mt-0.5 flex items-center gap-1.5 text-[9px] font-bold text-white/60 uppercase tracking-wider">
+                          <img src={getGameAssetByName(p.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
+                          {p.game} • {p.sold} terjual
+                        </p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-black text-green-500 font-mono">
+                        Rp {p.revenue.toLocaleString("id-ID")}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </div>
-
-              <div className="p-6 max-h-[500px] overflow-y-auto scrollbar-thin">
-                {/* Tab: Checkout */}
-                {activeTab === "checkout" && (
-                  <div className="space-y-4">
-                    {activities.checkouts.length > 0 ? (
-                      activities.checkouts.map((tx, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between p-4 bg-sky/20 border border-sky/30 hover:border-sky/20 rounded-xl transition-all duration-300 group"
-                        >
-                          <div>
-                            <p className="flex items-center gap-2 font-bold text-white group-hover:text-sky transition-colors text-sm uppercase tracking-tight">
-                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1">
-                                <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
-                              </span>
-                              {tx.product_name}
-                            </p>
-                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
-                              <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                              {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-black text-white font-mono text-sm">
-                              Rp {Number(tx.amount).toLocaleString("id-ID")}
-                            </p>
-                            <span className="inline-block mt-1 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded bg-amber-50 text-amber-500 border border-amber-500/20">
-                              Checkout
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada aktivitas checkout</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Tab: Pembayaran */}
-                {activeTab === "pembayaran" && (
-                  <div className="space-y-4">
-                    {activities.payments.length > 0 ? (
-                      activities.payments.map((tx, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between p-4 bg-green-50/20 border border-green-500/10 hover:border-green-500/30 rounded-xl transition-all duration-300 group"
-                        >
-                          <div>
-                            <p className="flex items-center gap-2 font-bold text-white group-hover:text-green-500 transition-colors text-sm uppercase tracking-tight">
-                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1">
-                                <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
-                              </span>
-                              {tx.product_name}
-                            </p>
-                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
-                              <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                              {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-black text-green-600 font-mono text-sm">
-                              Rp {Number(tx.amount).toLocaleString("id-ID")}
-                            </p>
-                            <span className="inline-block mt-1 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded bg-green-50 text-green-500 border border-green-500/20">
-                              Lunas
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada aktivitas pembayaran</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Tab: Gagal & Eror */}
-                {activeTab === "failed" && (
-                  <div className="space-y-4">
-                    {activities.failed.length > 0 ? (
-                      activities.failed.map((tx, idx) => {
-                        let errorMsg = "Transaksi gagal diproses.";
-                        try {
-                          if (tx.provider_response) {
-                            const parsed = typeof tx.provider_response === "string" ? JSON.parse(tx.provider_response) : tx.provider_response;
-                            if (parsed.data && parsed.data.message) {
-                              errorMsg = `${parsed.data.message} (RC: ${parsed.data.rc || 'unknown'})`;
-                            } else if (parsed.error) {
-                              errorMsg = parsed.error;
-                            } else if (parsed.message) {
-                              errorMsg = parsed.message;
-                            }
-                          }
-                        } catch (e) {
-                          // ignore parsing errors
-                        }
-
-                        return (
-                          <div
-                            key={idx}
-                            className="flex flex-col p-4 bg-red-50/20 border border-red-500/10 hover:border-red-500/30 rounded-xl transition-all duration-300 gap-3 text-left animate-fade-in"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="flex items-center gap-2 font-bold text-white text-sm uppercase tracking-tight">
-                                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-mist backdrop-blur-md p-1 border border-sky/30">
-                                    <img src={getItemAssetForProduct(tx.product_name, undefined, tx.game_name)} alt="" className="max-h-full max-w-full object-contain" />
-                                  </span>
-                                  {tx.product_name}
-                                </p>
-                                <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
-                                  <img src={getGameAssetByName(tx.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                                  {tx.game_name} • <span className="font-mono text-white/80">{tx.invoice}</span> • <span className="text-sky font-bold">Oleh {tx.user_name || "Pelanggan"}</span>
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-black text-red-600 font-mono text-sm">
-                                  Rp {Number(tx.amount).toLocaleString("id-ID")}
-                                </p>
-                                <span className="inline-block mt-1 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded bg-red-50 text-red-500 border border-red-500/20">
-                                  {tx.topup_status === 'failed' ? 'Topup Gagal' : 'Pembayaran Gagal'}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <div className="bg-red-50/40 p-2.5 rounded-lg border border-red-500/10 text-[10px] text-red-700 font-bold flex flex-col gap-0.5">
-                              <span className="text-[8px] uppercase tracking-wider text-red-500/70 font-black">Detail Penyebab Eror (Digiflazz/System):</span>
-                              <span>{errorMsg}</span>
-                            </div>
-                          </div>
-                        )
-                      })
-                    ) : (
-                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada aktivitas transaksi gagal</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Tab: Sync Digiflazz */}
-                {activeTab === "sync" && (
-                  <div className="space-y-4">
-                    {activities.syncs.length > 0 ? (
-                      activities.syncs.map((prod, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between p-4 bg-sky/5 border border-sky/10 hover:border-sky/30 rounded-xl transition-all duration-300"
-                        >
-                          <div>
-                            <p className="font-bold text-white text-sm uppercase tracking-tight">
-                              {prod.product_name}
-                            </p>
-                            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-white/60 uppercase tracking-wider">
-                              <img src={getGameAssetByName(prod.game_name)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                              {prod.game_name} • SKU: <span className="font-mono text-white/80">{prod.sku}</span>
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-white text-xs font-mono">
-                              Harga: Rp {Number(prod.sell_price).toLocaleString("id-ID")}
-                            </p>
-                            <span className="inline-block mt-1 text-[8px] font-medium text-white/60">
-                              Sync: {prod.updated_at ? new Date(prod.updated_at).toLocaleString("id-ID") : ""}
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada sinkronisasi Digiflazz</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Tab: Kritik & Saran */}
-                {activeTab === "feedback" && (
-                  <div className="space-y-4">
-                    {activities.feedbacks.length > 0 ? (
-                      activities.feedbacks.map((fb, idx) => (
-                        <div
-                          key={idx}
-                          className="p-4 bg-purple-50/20 border border-purple-500/10 hover:border-purple-500/30 rounded-xl transition-all duration-300"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <p className="font-bold text-white text-xs uppercase tracking-tight">
-                              {fb.user_name} <span className="text-[10px] text-white/60 lowercase flex items-center">({fb.user_email})</span>
-                            </p>
-                            <div className="flex items-center gap-0.5">
-                              {Array.from({ length: fb.rating }).map((_, rIdx) => (
-                                <span key={rIdx} className="text-amber-400 text-xs">★</span>
-                              ))}
-                            </div>
-                          </div>
-                          <p className="text-xs text-white/80 leading-relaxed bg-mist backdrop-blur-md p-2.5 rounded-lg border border-sky/30 font-medium">
-                            "{fb.comment}"
-                          </p>
-                          <div className="flex justify-between items-center mt-2.5">
-                            <span className="text-[8px] font-bold text-white/60">
-                              Dikirim: {fb.created_at ? new Date(fb.created_at).toLocaleString("id-ID") : ""}
-                            </span>
-                            <Link href={`/admin/feedbacks`}>
-                              <span className="text-[9px] font-extrabold text-sky hover:underline cursor-pointer uppercase tracking-wider">
-                                Balas Ulasan &rarr;
-                              </span>
-                            </Link>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-center py-10 text-xs text-white/60 font-bold uppercase tracking-wider">Belum ada kritik &amp; saran</p>
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
+        )}
 
-          {/* Right Column: Sync & Top Products */}
-          <div className="lg:col-span-4 space-y-8">
+        {/* TAB 2: AUTO-SYNC DIGIFLAZZ */}
+        {adminMainTab === "sync" && (
+          <div className="grid lg:grid-cols-12 gap-8 animate-fadeIn">
             {/* Sync Settings Card */}
-            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
+            <div className="lg:col-span-7 bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
               <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
               <div className="p-6 border-b border-sky/30 flex items-center justify-between">
                 <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
                   <Settings className="h-4 w-4 text-sky" />
-                  Auto-Sync Control
+                  Auto-Sync Control Digiflazz
                 </h3>
                 <span className={`inline-block px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded ${
                   lastSyncStatus === "success"
@@ -877,122 +942,6 @@ export default function AdminDashboardPage() {
                     Sistem akan menyinkronkan katalog harga modal Digiflazz setiap {syncInterval} jam.
                   </p>
                 </div>
-                        {/* Active Payment Gateway Selector */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
-                    <Wallet className="h-3.5 w-3.5 text-sky" />
-                    Payment Gateway Aktif
-                  </label>
-                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
-                    <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
-                      <select
-                        value={paymentGateway}
-                        onChange={(e) => setPaymentGateway(e.target.value)}
-                        className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
-                      >
-                        <option value="midtrans">MIDTRANS (Default)</option>
-                        <option value="doku">DOKU PAYMENT</option>
-                      </select>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-white/60 leading-relaxed">
-                    Pilih penyedia gerbang pembayaran (payment gateway) utama untuk website Anda.
-                  </p>
-                </div>
-
-                {/* Integration Type Selector */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
-                    <Settings className="h-3.5 w-3.5 text-sky" />
-                    Metode Integrasi Payment
-                  </label>
-                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
-                    <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
-                      <select
-                        value={paymentMethodType}
-                        onChange={(e) => setPaymentMethodType(e.target.value)}
-                        className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
-                      >
-                        <option value="checkout">CHECKOUT PAGE (Hosted/Built-in)</option>
-                        <option value="direct">DIRECT API (Custom Payment Page)</option>
-                      </select>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-white/60 leading-relaxed">
-                    Checkout Page mengalihkan user ke halaman hosted. Direct API memproses di dalam website sendiri.
-                  </p>
-                </div>
-
-                {paymentGateway === "doku" ? (
-                  <div className="p-4 rounded-xl border border-sky/35 bg-sky/5 space-y-4 animate-fadeIn">
-                    <h4 className="text-xs font-black uppercase text-white/90 tracking-wider">Konfigurasi Doku Merchant</h4>
-                    
-                    {/* Doku Client ID */}
-                    <div className="space-y-1.5">
-                      <Label htmlFor="doku-client-id" className="text-[10px] font-bold text-white/70 uppercase">Doku Client ID</Label>
-                      <Input
-                        id="doku-client-id"
-                        value={dokuClientId}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDokuClientId(e.target.value)}
-                        placeholder="Contoh: MALL-XXXXX"
-                        className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
-                      />
-                    </div>
-
-                    {/* Doku Shared Key */}
-                    <div className="space-y-1.5">
-                      <Label htmlFor="doku-shared-key" className="text-[10px] font-bold text-white/70 uppercase">Doku Shared / Secret Key</Label>
-                      <Input
-                        id="doku-shared-key"
-                        type="password"
-                        value={dokuSharedKey}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDokuSharedKey(e.target.value)}
-                        placeholder="Masukkan Doku Shared Key"
-                        className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
-                      />
-                    </div>
-
-                    {/* Doku Environment Mode */}
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] font-bold text-white/70 uppercase">Environment Doku</Label>
-                      <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
-                        <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
-                          <select
-                            value={dokuMode}
-                            onChange={(e) => setDokuMode(e.target.value)}
-                            className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
-                          >
-                            <option value="sandbox">SANDBOX (Uji Coba/Development)</option>
-                            <option value="production">PRODUCTION (Live Bisnis)</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* Midtrans Mode Input */
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
-                      <Wallet className="h-3.5 w-3.5 text-sky" />
-                      Mode Pembayaran Midtrans
-                    </label>
-                    <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
-                      <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
-                        <select
-                          value={midtransMode}
-                          onChange={(e) => setMidtransMode(e.target.value)}
-                          className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
-                        >
-                          <option value="sandbox">SANDBOX (Testing)</option>
-                          <option value="production">PRODUCTION (Live)</option>
-                        </select>
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-white/60 leading-relaxed">
-                      Pilih lingkungan pembayaran Midtrans yang aktif untuk transaksi.
-                    </p>
-                  </div>
-                )}
 
                 {/* Save Button */}
                 <div className="flex gap-2">
@@ -1003,7 +952,7 @@ export default function AdminDashboardPage() {
                       className="w-full bg-mist backdrop-blur-md py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors disabled:opacity-50"
                       style={inputBevelStyle}
                     >
-                      {saveLoading ? "Menyimpan..." : "Simpan Pengaturan"}
+                      {saveLoading ? "Menyimpan..." : "Simpan Pengaturan Sync"}
                     </button>
                   </div>
 
@@ -1058,13 +1007,216 @@ export default function AdminDashboardPage() {
               </form>
             </div>
 
-            {/* WhatsApp Integration Card */}
-            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
+            {/* Rekomendasi Produksi (Cron Job Tips) Card */}
+            <div className="lg:col-span-5 bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
               <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sky/20 to-transparent" />
+              <div className="p-6 border-b border-sky/30">
+                <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
+                  <Code className="h-4 w-4 text-sky" />
+                  Rekomendasi Produksi (Cron)
+                </h3>
+              </div>
+              <div className="p-6 space-y-4 text-xs text-white/80 leading-relaxed">
+                <p>
+                  Untuk memastikan harga modal &amp; jual selalu up-to-date, pasang penjadwal tugas otomatis (Cron Job / Task Scheduler) untuk memicu API di bawah:
+                </p>
+
+                <div className="space-y-1">
+                  <span className="font-bold text-white uppercase tracking-wider text-[9px]">Langkah 1: Setup Kunci Keamanan</span>
+                  <p className="text-[10px] text-white/60">
+                    Definisikan token rahasia di file <code className="bg-sky/20 px-1 py-0.5 rounded text-sky font-mono font-bold text-[9px]">.env.local</code> Anda:
+                  </p>
+                  <pre className="bg-sky/20 p-2.5 rounded-lg border border-sky/30 text-[10px] font-mono text-sky font-bold overflow-x-auto select-all">
+                    DIGIFLAZZ_WEBHOOK_SECRET=mitsurusecurewebhooksecret99f3a1b7c8d2e6a0a
+                  </pre>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="font-bold text-white uppercase tracking-wider text-[9px]">Langkah 2: Konfigurasi Penjadwal</span>
+                  <p className="text-[10px] text-white/60">
+                    Tambahkan perintah berikut di Linux Crontab (<code className="font-mono text-[9px]">crontab -e</code>) untuk berjalan otomatis setiap malam (00:00):
+                  </p>
+                  <pre className="bg-sky/20 p-2.5 rounded-lg border border-sky/30 text-[9px] font-mono text-white overflow-x-auto select-all whitespace-pre-wrap break-all">
+                    0 0 * * * curl -s "https://mitsurushop.com/api/admin/sync/trigger?key=mitsurusecurewebhooksecret99f3a1b7c8d2e6a0a" &gt;/dev/null 2&gt;&amp;1
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: PAYMENT GATEWAY (DOKU & MIDTRANS) */}
+        {adminMainTab === "payment" && (
+          <div className="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden border">
+              <div className="p-6 border-b border-sky/30 flex items-center justify-between">
+                <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
+                  <Wallet className="h-4 w-4 text-sky" />
+                  Konfigurasi Payment Gateway (Doku & Midtrans)
+                </h3>
+                <span className="px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded bg-sky/20 text-sky border border-sky/30">
+                  Aktif: {paymentGateway.toUpperCase()}
+                </span>
+              </div>
+
+              <form onSubmit={handleSaveSettings} className="p-6 space-y-6">
+                {/* Active Payment Gateway Selector */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
+                    <Wallet className="h-3.5 w-3.5 text-sky" />
+                    Payment Gateway Utama
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
+                      <select
+                        value={paymentGateway}
+                        onChange={(e) => setPaymentGateway(e.target.value)}
+                        className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
+                      >
+                        <option value="midtrans">MIDTRANS (Default)</option>
+                        <option value="doku">DOKU PAYMENT GATEWAY</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-white/60 leading-relaxed">
+                    Pilih penyedia gerbang pembayaran utama untuk memproses pembayaran pelanggan di website.
+                  </p>
+                </div>
+
+                {/* Integration Type Selector */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
+                    <Settings className="h-3.5 w-3.5 text-sky" />
+                    Metode Integrasi Pembayaran
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
+                      <select
+                        value={paymentMethodType}
+                        onChange={(e) => setPaymentMethodType(e.target.value)}
+                        className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
+                      >
+                        <option value="checkout">CHECKOUT PAGE (Hosted Page Doku / Midtrans Snap)</option>
+                        <option value="direct">DIRECT API (Halaman Pembayaran Kustom)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-white/60 leading-relaxed">
+                    Checkout Page mengalihkan user ke halaman resmi Doku/Midtrans. Direct API memproses langsung di web Anda.
+                  </p>
+                </div>
+
+                {paymentGateway === "doku" ? (
+                  <div className="p-5 rounded-2xl border border-sky/35 bg-sky/5 space-y-4">
+                    <h4 className="text-xs font-black uppercase text-white/90 tracking-wider flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-sky" />
+                      Kredensial Merchant Doku
+                    </h4>
+                    
+                    {/* Doku Client ID */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="doku-client-id" className="text-[10px] font-bold text-white/70 uppercase">Doku Client ID</Label>
+                      <Input
+                        id="doku-client-id"
+                        value={dokuClientId}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDokuClientId(e.target.value)}
+                        placeholder="Contoh: BRN-0270-1784635922691"
+                        className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
+                      />
+                    </div>
+
+                    {/* Doku Shared Key */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="doku-shared-key" className="text-[10px] font-bold text-white/70 uppercase">Doku Shared / Secret Key</Label>
+                      <Input
+                        id="doku-shared-key"
+                        type="password"
+                        value={dokuSharedKey}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDokuSharedKey(e.target.value)}
+                        placeholder="Masukkan Doku Secret Key (SK-...)"
+                        className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
+                      />
+                    </div>
+
+                    {/* Doku Environment Mode */}
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-bold text-white/70 uppercase">Environment Doku</Label>
+                      <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                        <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
+                          <select
+                            value={dokuMode}
+                            onChange={(e) => setDokuMode(e.target.value)}
+                            className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
+                          >
+                            <option value="sandbox">SANDBOX (Uji Coba / Testing)</option>
+                            <option value="production">PRODUCTION (Live Bisnis)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Midtrans Mode Input */
+                  <div className="p-5 rounded-2xl border border-sky/35 bg-sky/5 space-y-4">
+                    <h4 className="text-xs font-black uppercase text-white/90 tracking-wider flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-sky" />
+                      Konfigurasi Midtrans
+                    </h4>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
+                        <Wallet className="h-3.5 w-3.5 text-sky" />
+                        Mode Pembayaran Midtrans
+                      </label>
+                      <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                        <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
+                          <select
+                            value={midtransMode}
+                            onChange={(e) => setMidtransMode(e.target.value)}
+                            className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
+                          >
+                            <option value="sandbox">SANDBOX (Testing)</option>
+                            <option value="production">PRODUCTION (Live)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-white/60 leading-relaxed">
+                      Pilih lingkungan pembayaran Midtrans yang aktif untuk transaksi. Kunci disimpan di file env server.
+                    </p>
+                  </div>
+                )}
+
+                {/* Save Button */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={saveLoading}
+                    className="w-full bg-sky hover:bg-sky/90 text-white font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-sky/20 disabled:opacity-50"
+                  >
+                    {saveLoading ? "Menyimpan..." : "Simpan Pengaturan Gateway"}
+                  </button>
+                </div>
+
+                {saveSuccess && (
+                  <div className="p-3 bg-green-50 border border-green-500/20 text-green-600 rounded-xl flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Pengaturan Payment Gateway Berhasil Disimpan!</span>
+                  </div>
+                )}
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: WHATSAPP GATEWAY */}
+        {adminMainTab === "whatsapp" && (
+          <div className="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+            <div className="bg-mist backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden border">
               <div className="p-6 border-b border-sky/30 flex items-center justify-between">
                 <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-sky" />
-                  WhatsApp Integration
+                  WhatsApp Integration Gateway
                 </h3>
                 <span className={`inline-block px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded ${
                   waStatus === "enabled"
@@ -1075,15 +1227,15 @@ export default function AdminDashboardPage() {
                 </span>
               </div>
 
-              <form onSubmit={handleSaveSettings} className="p-6 space-y-5">
+              <form onSubmit={handleSaveSettings} className="p-6 space-y-6">
                 {/* Status Toggle */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                       <Power className="h-3.5 w-3.5 text-sky" />
-                      Status Notifikasi
+                      Status Notifikasi WA
                     </label>
-                    <p className="text-[10px] text-white/60 font-medium">Aktifkan notifikasi otomatis ke WhatsApp.</p>
+                    <p className="text-[10px] text-white/60 font-medium">Aktifkan notifikasi otomatis ke WhatsApp pelanggan &amp; admin.</p>
                   </div>
                   <button
                     type="button"
@@ -1104,7 +1256,7 @@ export default function AdminDashboardPage() {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <Smartphone className="h-3.5 w-3.5 text-sky" />
-                    Metode Gateway
+                    Metode Gateway WA
                   </label>
                   <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
                     <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
@@ -1150,17 +1302,17 @@ export default function AdminDashboardPage() {
                       value={waToken}
                       onChange={(e) => setWaToken(e.target.value)}
                       className="w-full px-3 py-2 text-xs font-semibold text-white focus:outline-none bg-transparent"
-                      placeholder="Masukkan Token Rahasia (jika ada)"
+                      placeholder="Masukkan Token Fonnte / Custom Auth"
                       style={inputBevelStyle}
                     />
                   </div>
                 </div>
 
-                {/* Admin WA Number */}
+                {/* Admin Phone Number */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <Smartphone className="h-3.5 w-3.5 text-sky" />
-                    Nomor WhatsApp Admin (Notif Order)
+                    Nomor WhatsApp Admin (Penerima Notif Pesanan)
                   </label>
                   <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
                     <input
@@ -1168,19 +1320,20 @@ export default function AdminDashboardPage() {
                       value={waAdminNumber}
                       onChange={(e) => setWaAdminNumber(e.target.value)}
                       className="w-full px-3 py-2 text-xs font-semibold text-white focus:outline-none bg-transparent"
-                      placeholder="e.g. 6281234567890"
+                      placeholder="Contoh: 081234567890"
                       style={inputBevelStyle}
                     />
                   </div>
                 </div>
 
-                {/* Customer Notif Toggle */}
-                <div className="flex items-center justify-between">
+                {/* Customer Notification Toggle */}
+                <div className="flex items-center justify-between pt-2">
                   <div className="space-y-0.5">
-                    <label className="text-xs font-bold text-white/80 uppercase tracking-wider">
-                      Notifikasi Pelanggan
+                    <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
+                      <MessageSquare className="h-3.5 w-3.5 text-sky" />
+                      Kirim Notifikasi ke Pembeli
                     </label>
-                    <p className="text-[10px] text-white/60 font-medium">Kirim tagihan &amp; status pesanan ke WA pembeli.</p>
+                    <p className="text-[10px] text-white/60 font-medium">Kirim status checkout &amp; sukses topup ke WA pembeli.</p>
                   </div>
                   <button
                     type="button"
@@ -1196,14 +1349,12 @@ export default function AdminDashboardPage() {
                     />
                   </button>
                 </div>
-
-                {/* Submit Settings Button */}
-                <div className="relative p-[1px] bg-sky/30 hover:bg-sky transition-all duration-300" style={inputBevelStyle}>
+                {/* Save Button */}
+                <div className="pt-2">
                   <button
                     type="submit"
                     disabled={saveLoading}
-                    className="w-full bg-mist backdrop-blur-md py-2 text-[10px] font-black uppercase tracking-widest text-sky hover:text-diamond transition-colors disabled:opacity-50"
-                    style={inputBevelStyle}
+                    className="w-full bg-sky hover:bg-sky/90 text-white font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-sky/20 disabled:opacity-50"
                   >
                     {saveLoading ? "Menyimpan..." : "Simpan Pengaturan WhatsApp"}
                   </button>
@@ -1421,14 +1572,12 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           </div>
-
+        )}
         </div>
-        </div>
+      </main>
 
-        </main>
-
-        <Footer />
-      </SidebarContentWrapper>
-    </div>
+      <Footer />
+    </SidebarContentWrapper>
+  </div>
   )
 }
