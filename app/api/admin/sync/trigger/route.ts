@@ -79,17 +79,23 @@ async function handleSync(req: NextRequest) {
 
     const allItems = result.data;
     
-    // Filter game products
-    const gameProducts = allItems.filter((item: any) =>
-      item.category &&
-      (item.category.toLowerCase().includes("voucher game") ||
-        item.category.toLowerCase().includes("game") ||
-        item.category.toLowerCase().includes("voucher") ||
-        item.brand.toLowerCase().includes("mobile legends") ||
-        item.brand.toLowerCase().includes("free fire") ||
-        item.brand.toLowerCase().includes("pubg") ||
-        item.brand.toLowerCase().includes("valorant"))
-    );
+    // Filter game products: include any items where category or brand is game-related
+    const gameProducts = allItems.filter((item: any) => {
+      const cat = String(item.category || '').toLowerCase();
+      const brand = String(item.brand || '').toLowerCase();
+      return (
+        cat.includes("voucher") ||
+        cat.includes("game") ||
+        brand.includes("mobile") ||
+        brand.includes("free fire") ||
+        brand.includes("pubg") ||
+        brand.includes("valorant") ||
+        brand.includes("genshin") ||
+        brand.includes("honor") ||
+        brand.includes("roblox") ||
+        brand.includes("steam")
+      );
+    });
 
     if (gameProducts.length === 0) {
       await SettingService.set("last_sync_status", "success");
@@ -97,37 +103,97 @@ async function handleSync(req: NextRequest) {
       return NextResponse.json({ success: true, message: "Sync finished. No game products found." });
     }
 
-    const brands = gameProducts
-      .map((item: any) => item.brand)
-      .filter((value: any, index: number, self: any[]) => value && self.indexOf(value) === index) as string[];
+    // Fetch existing games from database
+    const dbGames = await executeQuery("SELECT id, name, slug FROM games");
+    let gamesList: any[] = [...dbGames];
 
-    // A. Sync Games
-    const brandToGameId: Record<string, string> = {};
-    for (const brand of brands) {
-      const slug = slugify(brand);
-      const existing = await executeQuery("SELECT id FROM games WHERE slug = $1 LIMIT 1", [slug]);
+    // Smart Fuzzy Match Digiflazz brand to DB game
+    const findGameMatch = (brandInput: string) => {
+      if (!brandInput) return undefined;
+      const bLower = brandInput.toLowerCase().trim();
+      const cleanB = bLower.replace(/[^a-z0-9]/g, '');
 
-      if (existing.length > 0) {
-        brandToGameId[brand] = existing[0].id;
-      } else {
-        const id = crypto.randomUUID();
+      if (cleanB.includes('mobilelegend') || cleanB.includes('mlbb')) {
+        return gamesList.find(g => 
+          g.slug === 'mobile-legends' || 
+          g.slug === 'mobile-legend' || 
+          g.slug === 'mobilelegends' ||
+          (g.name || '').toLowerCase().includes('mobile legend')
+        );
+      }
+      if (cleanB.includes('freefire')) {
+        return gamesList.find(g => 
+          g.slug === 'free-fire' || 
+          g.slug === 'freefire' ||
+          (g.name || '').toLowerCase().includes('free fire')
+        );
+      }
+      if (cleanB.includes('pubg')) {
+        return gamesList.find(g => 
+          g.slug === 'pubg-mobile' || 
+          g.slug === 'pubg' ||
+          (g.name || '').toLowerCase().includes('pubg')
+        );
+      }
+      if (cleanB.includes('valorant')) {
+        return gamesList.find(g => g.slug === 'valorant' || (g.name || '').toLowerCase().includes('valorant'));
+      }
+      if (cleanB.includes('genshin')) {
+        return gamesList.find(g => g.slug === 'genshin-impact' || (g.name || '').toLowerCase().includes('genshin'));
+      }
+      if (cleanB.includes('honorofkings') || cleanB.includes('hok')) {
+        return gamesList.find(g => g.slug === 'honor-of-kings' || (g.name || '').toLowerCase().includes('honor of kings'));
+      }
+      if (cleanB.includes('roblox')) {
+        return gamesList.find(g => g.slug === 'roblox' || (g.name || '').toLowerCase().includes('roblox'));
+      }
+      if (cleanB.includes('steam')) {
+        return gamesList.find(g => g.slug === 'steam' || (g.name || '').toLowerCase().includes('steam'));
+      }
+
+      const slug = bLower.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      return gamesList.find(g => {
+        const gNameLower = (g.name || '').toLowerCase().trim();
+        const gSlugLower = (g.slug || '').toLowerCase().trim();
+        const gCleanName = gNameLower.replace(/[^a-z0-9]/g, '');
+
+        return (
+          gSlugLower === slug ||
+          gCleanName === cleanB ||
+          gNameLower === bLower ||
+          bLower === gNameLower ||
+          gNameLower.includes(bLower) ||
+          bLower.includes(gNameLower)
+        );
+      });
+    };
+
+    let productsCreated = 0;
+    let productsUpdated = 0;
+    let gamesCreated = 0;
+
+    for (const item of gameProducts) {
+      const brand = item.brand || '';
+      if (!brand || !brand.trim()) continue;
+
+      let gameObj = findGameMatch(brand);
+
+      if (!gameObj) {
+        let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        if (!slug) slug = 'game-' + crypto.randomUUID().slice(0, 8);
+
+        const newGameId = crypto.randomUUID();
         await executeQuery(
           `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order) 
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [id, brand, slug, "🎮", "Game", `Top up voucher dan diamonds untuk ${brand} dengan proses instan.`, true, 0]
+          [newGameId, brand, slug, "🎮", "Game", `Top up voucher dan diamonds untuk ${brand} dengan proses instan.`, true, 0]
         );
-        brandToGameId[brand] = id;
+        gameObj = { id: newGameId, name: brand, slug };
+        gamesList.push(gameObj);
+        gamesCreated++;
       }
-    }
 
-    // B. Sync Products
-    let productsCreated = 0;
-    let productsUpdated = 0;
-
-    for (const item of gameProducts) {
-      const gameId = brandToGameId[item.brand];
-      if (!gameId) continue;
-
+      const gameId = gameObj.id;
       const providerSku = item.buyer_sku_code;
       const productName = item.product_name;
       const modalPrice = Number(item.price);
@@ -169,9 +235,10 @@ async function handleSync(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      gamesCount: brands.length,
+      gamesCount: gamesList.length,
       productsCreated,
       productsUpdated,
+      gamesCreated,
       timestamp: new Date().toISOString()
     });
 
