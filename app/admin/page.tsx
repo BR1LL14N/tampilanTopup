@@ -7,6 +7,8 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapper"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { getCachedUser, setCachedUser } from "@/lib/auth-cache"
 import { formatCurrency } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
@@ -66,6 +68,11 @@ export default function AdminDashboardPage() {
   const [lastSyncTime, setLastSyncTime] = useState("")
   const [lastSyncStatus, setLastSyncStatus] = useState("idle")
   const [midtransMode, setMidtransMode] = useState("sandbox")
+  const [paymentGateway, setPaymentGateway] = useState("midtrans")
+  const [paymentMethodType, setPaymentMethodType] = useState("checkout")
+  const [dokuClientId, setDokuClientId] = useState("")
+  const [dokuSharedKey, setDokuSharedKey] = useState("")
+  const [dokuMode, setDokuMode] = useState("sandbox")
   const [isSyncing, setIsSyncing] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
@@ -205,6 +212,11 @@ export default function AdminDashboardPage() {
             setLastSyncTime(settingsData.settings.lastSyncTime)
             setLastSyncStatus(settingsData.settings.lastSyncStatus)
             setMidtransMode(settingsData.settings.midtransMode || "sandbox")
+            setPaymentGateway(settingsData.settings.paymentGateway || "midtrans")
+            setPaymentMethodType(settingsData.settings.paymentMethodType || "checkout")
+            setDokuClientId(settingsData.settings.dokuClientId || "")
+            setDokuSharedKey(settingsData.settings.dokuSharedKey || "")
+            setDokuMode(settingsData.settings.dokuMode || "sandbox")
             setWaStatus(settingsData.settings.waStatus || "disabled")
             setWaMethod(settingsData.settings.waMethod || "baileys")
             setWaEndpoint(settingsData.settings.waEndpoint || "http://localhost:5000/send")
@@ -315,6 +327,11 @@ export default function AdminDashboardPage() {
           isSyncActive,
           syncInterval,
           midtransMode,
+          paymentGateway,
+          paymentMethodType,
+          dokuClientId,
+          dokuSharedKey,
+          dokuMode,
           waStatus,
           waMethod,
           waEndpoint,
@@ -860,29 +877,122 @@ export default function AdminDashboardPage() {
                     Sistem akan menyinkronkan katalog harga modal Digiflazz setiap {syncInterval} jam.
                   </p>
                 </div>
-
-                {/* Midtrans Mode Input */}
+                        {/* Active Payment Gateway Selector */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
                     <Wallet className="h-3.5 w-3.5 text-sky" />
-                    Mode Pembayaran Midtrans
+                    Payment Gateway Aktif
                   </label>
                   <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
                     <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
                       <select
-                        value={midtransMode}
-                        onChange={(e) => setMidtransMode(e.target.value)}
+                        value={paymentGateway}
+                        onChange={(e) => setPaymentGateway(e.target.value)}
                         className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
                       >
-                        <option value="sandbox">SANDBOX (Testing)</option>
-                        <option value="production">PRODUCTION (Live)</option>
+                        <option value="midtrans">MIDTRANS (Default)</option>
+                        <option value="doku">DOKU PAYMENT</option>
                       </select>
                     </div>
                   </div>
                   <p className="text-[10px] text-white/60 leading-relaxed">
-                    Pilih lingkungan pembayaran Midtrans yang aktif untuk transaksi.
+                    Pilih penyedia gerbang pembayaran (payment gateway) utama untuk website Anda.
                   </p>
                 </div>
+
+                {/* Integration Type Selector */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
+                    <Settings className="h-3.5 w-3.5 text-sky" />
+                    Metode Integrasi Payment
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
+                      <select
+                        value={paymentMethodType}
+                        onChange={(e) => setPaymentMethodType(e.target.value)}
+                        className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
+                      >
+                        <option value="checkout">CHECKOUT PAGE (Hosted/Built-in)</option>
+                        <option value="direct">DIRECT API (Custom Payment Page)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-white/60 leading-relaxed">
+                    Checkout Page mengalihkan user ke halaman hosted. Direct API memproses di dalam website sendiri.
+                  </p>
+                </div>
+
+                {paymentGateway === "doku" ? (
+                  <div className="p-4 rounded-xl border border-sky/35 bg-sky/5 space-y-4 animate-fadeIn">
+                    <h4 className="text-xs font-black uppercase text-white/90 tracking-wider">Konfigurasi Doku Merchant</h4>
+                    
+                    {/* Doku Client ID */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="doku-client-id" className="text-[10px] font-bold text-white/70 uppercase">Doku Client ID</Label>
+                      <Input
+                        id="doku-client-id"
+                        value={dokuClientId}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDokuClientId(e.target.value)}
+                        placeholder="Contoh: MALL-XXXXX"
+                        className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
+                      />
+                    </div>
+
+                    {/* Doku Shared Key */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="doku-shared-key" className="text-[10px] font-bold text-white/70 uppercase">Doku Shared / Secret Key</Label>
+                      <Input
+                        id="doku-shared-key"
+                        type="password"
+                        value={dokuSharedKey}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDokuSharedKey(e.target.value)}
+                        placeholder="Masukkan Doku Shared Key"
+                        className="rounded-xl border-sky/30 text-xs font-semibold font-mono"
+                      />
+                    </div>
+
+                    {/* Doku Environment Mode */}
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-bold text-white/70 uppercase">Environment Doku</Label>
+                      <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                        <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
+                          <select
+                            value={dokuMode}
+                            onChange={(e) => setDokuMode(e.target.value)}
+                            className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
+                          >
+                            <option value="sandbox">SANDBOX (Uji Coba/Development)</option>
+                            <option value="production">PRODUCTION (Live Bisnis)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Midtrans Mode Input */
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
+                      <Wallet className="h-3.5 w-3.5 text-sky" />
+                      Mode Pembayaran Midtrans
+                    </label>
+                    <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                      <div className="flex items-center bg-mist backdrop-blur-md" style={inputBevelStyle}>
+                        <select
+                          value={midtransMode}
+                          onChange={(e) => setMidtransMode(e.target.value)}
+                          className="w-full px-3 py-2 text-xs font-bold text-white focus:outline-none bg-transparent"
+                        >
+                          <option value="sandbox">SANDBOX (Testing)</option>
+                          <option value="production">PRODUCTION (Live)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-white/60 leading-relaxed">
+                      Pilih lingkungan pembayaran Midtrans yang aktif untuk transaksi.
+                    </p>
+                  </div>
+                )}
 
                 {/* Save Button */}
                 <div className="flex gap-2">

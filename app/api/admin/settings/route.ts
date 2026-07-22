@@ -17,6 +17,13 @@ export async function GET(req: NextRequest) {
     const lastSyncStatus = await SettingService.get("last_sync_status", "idle");
     const midtransMode = await SettingService.get("midtrans_mode", "sandbox");
 
+    // Doku and Multi-Payment Gateway Settings
+    const paymentGateway = await SettingService.get("payment_gateway", "midtrans");
+    const paymentMethodType = await SettingService.get("payment_method_type", "checkout"); // checkout vs direct
+    const dokuClientId = await SettingService.get("doku_client_id", "");
+    const dokuSharedKey = await SettingService.get("doku_shared_key", "");
+    const dokuMode = await SettingService.get("doku_mode", "sandbox");
+
     // WhatsApp Integration Settings
     const waStatus = await SettingService.get("wa_status", "disabled");
     const waMethod = await SettingService.get("wa_method", "baileys");
@@ -50,6 +57,11 @@ export async function GET(req: NextRequest) {
         lastSyncTime,
         lastSyncStatus,
         midtransMode,
+        paymentGateway,
+        paymentMethodType,
+        dokuClientId,
+        dokuSharedKey,
+        dokuMode,
         waStatus,
         waMethod,
         waEndpoint,
@@ -86,6 +98,11 @@ export async function POST(req: NextRequest) {
       isSyncActive,
       syncInterval,
       midtransMode,
+      paymentGateway,
+      paymentMethodType,
+      dokuClientId,
+      dokuSharedKey,
+      dokuMode,
       waStatus,
       waMethod,
       waEndpoint,
@@ -114,6 +131,21 @@ export async function POST(req: NextRequest) {
     }
     if (midtransMode !== undefined) {
       await SettingService.set("midtrans_mode", String(midtransMode));
+    }
+    if (paymentGateway !== undefined) {
+      await SettingService.set("payment_gateway", String(paymentGateway));
+    }
+    if (paymentMethodType !== undefined) {
+      await SettingService.set("payment_method_type", String(paymentMethodType));
+    }
+    if (dokuClientId !== undefined) {
+      await SettingService.set("doku_client_id", String(dokuClientId));
+    }
+    if (dokuSharedKey !== undefined) {
+      await SettingService.set("doku_shared_key", String(dokuSharedKey));
+    }
+    if (dokuMode !== undefined) {
+      await SettingService.set("doku_mode", String(dokuMode));
     }
     
     // Save WhatsApp settings
