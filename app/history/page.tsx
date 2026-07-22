@@ -127,21 +127,27 @@ export default function HistoryPage() {
           </div>
 
           {/* Search and Filter */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (!searchQuery.trim()) return;
+            const inv = searchQuery.trim().toUpperCase();
+            if (inv.startsWith("INV") || inv.startsWith("ADM") || inv.length >= 8) {
+              window.location.href = `/history/${encodeURIComponent(inv)}`;
+            }
+          }} className="flex flex-col sm:flex-row gap-4 mb-8">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
               <Input
-                placeholder="Cari invoice atau ID player..."
+                placeholder="Masukkan Nomor Invoice (misal: INV-2026... atau ADM...) atau ID Player"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 uppercase tracking-wider font-mono text-sm"
               />
             </div>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              Filter
+            <Button type="submit" className="bg-sky hover:bg-sky-600 text-white font-black uppercase tracking-wider px-6">
+              Cek Struk Transaksi
             </Button>
-          </div>
+          </form>
 
           {/* Transactions */}
           {isLoading ? (
