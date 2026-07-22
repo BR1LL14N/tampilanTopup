@@ -17,15 +17,17 @@ export async function POST(req: NextRequest) {
     const dataObj = payload.data || payload;
     const { ref_id, status, rc, sn, message } = dataObj;
 
-    if (!ref_id) {
-      return NextResponse.json({ error: 'Missing ref_id' }, { status: 400 });
+    // Handle Digiflazz Test Ping / Verification request when clicking 'Simpan' in Digiflazz dashboard
+    if (!ref_id || payload.ping || payload.event === 'ping') {
+      console.log('Digiflazz Webhook test ping received successfully.');
+      return NextResponse.json({ success: true, message: 'Digiflazz Webhook Endpoint Active' }, { status: 200 });
     }
 
-    // Security Log Warning: Verify Signature or Sender IP in Production
-    const isProduction = process.env.DIGIFLAZZ_MODE === 'production';
-    const webhookSecret = process.env.DIGIFLAZZ_WEBHOOK_SECRET;
+    // Security Verification: Read Webhook Secret from SettingService or ENV
+    const { SettingService } = await import('@/lib/services/setting-service');
+    const webhookSecret = (await SettingService.get('digiflazz_webhook_secret', '')) || process.env.DIGIFLAZZ_WEBHOOK_SECRET || 'mitsurusecurewebhooksecret99f3a1b7c8d2e6a0';
 
-    if (isProduction && webhookSecret) {
+    if (webhookSecret) {
       const signature = req.headers.get('x-hub-signature') || req.headers.get('x-digiflazz-signature') || '';
       if (signature) {
         const hmac = crypto.createHmac('sha1', webhookSecret);
