@@ -166,10 +166,18 @@ export default function AdminProductsPage() {
         fetchAdminData() // Reload catalog
       } else {
         setSyncStatus(`Error: ${data.error || "Gagal melakukan sync"}`)
+        if (data.digiflazzRawResponse) {
+          setSyncLogs([data.digiflazzRawResponse])
+        } else if (data.log) {
+          setSyncLogs(Array.isArray(data.log) ? data.log : [data.log])
+        } else {
+          setSyncLogs([data])
+        }
       }
     } catch (err: any) {
       console.error(err)
       setSyncStatus(`Error: ${err.message || "Gagal melakukan sync"}`)
+      setSyncLogs([{ error: err.message }])
     } finally {
       setSyncing(false)
     }
@@ -923,35 +931,44 @@ export default function AdminProductsPage() {
           <div className="flex-1 overflow-y-auto pr-1 my-2 space-y-2">
             {syncLogs && syncLogs.length > 0 ? (
               <div className="space-y-2">
-                {syncLogs.map((logItem: any, idx: number) => (
-                  <div key={idx} className="p-3 bg-black/40 border border-sky/20 rounded-xl text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-sky text-[11px] bg-sky/10 px-1.5 py-0.5 rounded border border-sky/20">{logItem.sku}</span>
-                        <span className="font-bold text-white">{logItem.name || logItem.product_name}</span>
+                {syncLogs.map((logItem: any, idx: number) => {
+                  if (!logItem.sku && !logItem.name && !logItem.product_name) {
+                    return (
+                      <pre key={idx} className="p-3 bg-black/60 border border-sky/30 rounded-xl text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap">
+                        {JSON.stringify(logItem, null, 2)}
+                      </pre>
+                    )
+                  }
+                  return (
+                    <div key={idx} className="p-3 bg-black/40 border border-sky/20 rounded-xl text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-sky text-[11px] bg-sky/10 px-1.5 py-0.5 rounded border border-sky/20">{logItem.sku}</span>
+                          <span className="font-bold text-white">{logItem.name || logItem.product_name}</span>
+                        </div>
+                        <p className="text-[10px] text-white/60 mt-1">
+                          Game/Brand: <span className="text-white font-semibold">{logItem.game || logItem.brand || "-"}</span> | Kategori: <span className="text-white font-semibold">{logItem.category || "-"}</span>
+                        </p>
                       </div>
-                      <p className="text-[10px] text-white/60 mt-1">
-                        Game/Brand: <span className="text-white font-semibold">{logItem.game || logItem.brand || "-"}</span> | Kategori: <span className="text-white font-semibold">{logItem.category || "-"}</span>
-                      </p>
-                    </div>
 
-                    <div className="text-right shrink-0">
-                      {logItem.type ? (
-                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                          logItem.type === 'NEW' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sky/20 text-sky'
-                        }`}>
-                          {logItem.type === 'NEW' ? '+ BARU' : 'DIPERBARUI'} (Rp {Number(logItem.price || logItem.new_price).toLocaleString("id-ID")})
-                        </span>
-                      ) : (
-                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                          logItem.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                        }`}>
-                          {logItem.active ? 'AKTIF DI SUPPLIER' : 'NONAKTIF/SKU TIDAK DITEMUK'}
-                        </span>
-                      )}
+                      <div className="text-right shrink-0">
+                        {logItem.type ? (
+                          <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                            logItem.type === 'NEW' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sky/20 text-sky'
+                          }`}>
+                            {logItem.type === 'NEW' ? '+ BARU' : 'DIPERBARUI'} (Rp {Number(logItem.price || logItem.new_price).toLocaleString("id-ID")})
+                          </span>
+                        ) : (
+                          <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                            logItem.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                          }`}>
+                            {logItem.active ? 'AKTIF DI SUPPLIER' : 'NONAKTIF/SKU TIDAK DITEMUK'}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             ) : (
               <p className="text-xs text-white/50 text-center py-6">Tidak ada log respon sync tersedia.</p>

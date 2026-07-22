@@ -25,7 +25,7 @@ export function generateDepoSignature(): string {
 }
 
 export async function checkBalance(): Promise<any> {
-  const { mode } = DIGIFLAZZ_CONFIG;
+  const { username, mode } = getDigiflazzCredentials();
 
   if (mode === 'simulation') {
     return {
@@ -44,7 +44,7 @@ export async function checkBalance(): Promise<any> {
     },
     body: JSON.stringify({
       cmd: 'deposit',
-      username: DIGIFLAZZ_CONFIG.username,
+      username,
       sign,
     }),
   });
@@ -53,7 +53,7 @@ export async function checkBalance(): Promise<any> {
 }
 
 export async function checkPriceList(): Promise<any> {
-  const { mode } = DIGIFLAZZ_CONFIG;
+  const { username, mode } = getDigiflazzCredentials();
 
   if (mode === 'simulation') {
     return {
@@ -105,7 +105,7 @@ export async function checkPriceList(): Promise<any> {
     },
     body: JSON.stringify({
       cmd: 'prepaid',
-      username: DIGIFLAZZ_CONFIG.username,
+      username,
       sign,
     }),
   });

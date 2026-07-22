@@ -34,8 +34,19 @@ export async function POST(req: NextRequest) {
     }
 
     if (!rawProducts) {
+      let digiErrMsg = 'Struktur respons tidak dikenali.';
+      if (priceListRes?.data?.message) {
+        digiErrMsg = `${priceListRes.data.message}${priceListRes.data.rc ? ` (RC: ${priceListRes.data.rc})` : ''}`;
+      } else if (priceListRes?.message) {
+        digiErrMsg = priceListRes.message;
+      } else if (priceListRes?.error) {
+        digiErrMsg = typeof priceListRes.error === 'string' ? priceListRes.error : JSON.stringify(priceListRes.error);
+      } else if (typeof priceListRes === 'string') {
+        digiErrMsg = priceListRes;
+      }
+
       return NextResponse.json({
-        error: 'Gagal membaca daftar produk dari Digiflazz. Struktur respons tidak dikenali.',
+        error: `Gagal membaca daftar produk dari Digiflazz: ${digiErrMsg}`,
         digiflazzRawResponse: priceListRes
       }, { status: 502 });
     }
