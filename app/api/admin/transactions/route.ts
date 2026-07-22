@@ -43,7 +43,12 @@ export async function PUT(req: NextRequest) {
       }
       const providerSku = prodRows[0].provider_sku;
 
-      const isTesting = process.env.DIGIFLAZZ_MODE !== 'production';
+      const { SettingService } = await import('@/lib/services/setting-service');
+      const { getDigiflazzCredentials } = await import('@/lib/digiflazz');
+      const dbMode = await SettingService.get('digiflazz_mode', '');
+      const { mode } = getDigiflazzCredentials();
+      const activeMode = (dbMode || mode || process.env.DIGIFLAZZ_MODE || 'production').trim();
+      const isTesting = (activeMode === 'simulation' || activeMode === 'sandbox');
       let topupStatus = 'processing';
       let providerRef = null;
       let providerResponse = null;
