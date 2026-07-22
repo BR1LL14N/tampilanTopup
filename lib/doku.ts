@@ -92,6 +92,8 @@ export async function createDokuCheckoutSession(params: {
     ? params.customerEmail.trim()
     : `${params.invoice.toLowerCase().replace(/[^a-z0-9]/g, '')}@mitsurushop.com`;
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mitsurushop.com';
+
   const requestBody = {
     order: {
       invoice_number: params.invoice,
@@ -106,6 +108,7 @@ export async function createDokuCheckoutSession(params: {
     },
     payment: {
       payment_due_date: params.expiredMinutes || 60,
+      payment_redirect_url: `${siteUrl}/history/${params.invoice}`,
     },
     customer: {
       name: (params.customerName || 'Pelanggan').trim(),
