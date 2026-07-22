@@ -858,25 +858,25 @@ export default function AdminProductsPage() {
             </div>
 
             {/* Flash Sale Section */}
-            <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/30 space-y-3">
+            <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-500/10 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="prod-flash" className="text-xs font-black text-amber-700 uppercase tracking-wider block">Set Event Flash Sale</Label>
-                  <span className="text-[10px] text-white/60">Masukkan produk ke dalam listing promo flash sale di beranda.</span>
+                  <Label htmlFor="prod-flash" className="text-xs font-black text-amber-400 uppercase tracking-wider block cursor-pointer">Set Event Flash Sale</Label>
+                  <span className="text-[10px] text-white/80 font-medium">Masukkan produk ke dalam listing promo flash sale di beranda.</span>
                 </div>
                 <input
                   id="prod-flash"
                   type="checkbox"
                   checked={editForm.is_flash_sale}
                   onChange={(e) => setEditForm(prev => ({ ...prev, is_flash_sale: e.target.checked }))}
-                  className="h-4.5 w-4.5 rounded border-sky/30 text-sky focus:ring-sky cursor-pointer"
+                  className="h-4.5 w-4.5 rounded border-amber-400/50 text-amber-500 focus:ring-amber-400 cursor-pointer"
                 />
               </div>
 
               {editForm.is_flash_sale && (
                 <div className="grid grid-cols-2 gap-4 pt-1.5 animate-fadeIn">
                   <div className="space-y-1.5">
-                    <Label htmlFor="flash-price" className="text-xs font-bold text-amber-700 uppercase tracking-wider">Harga Promo (Rp)</Label>
+                    <Label htmlFor="flash-price" className="text-xs font-bold text-amber-400 uppercase tracking-wider">Harga Promo (Rp)</Label>
                     <Input
                       id="flash-price"
                       type="number"
@@ -884,12 +884,12 @@ export default function AdminProductsPage() {
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => setEditForm(prev => ({ ...prev, flash_sale_price: e.target.value === "" ? 0 : Number(e.target.value) || 0 }))}
                       placeholder="0"
-                      className="rounded-xl border-amber-300 text-xs font-semibold font-mono focus-visible:ring-amber-500 bg-mist backdrop-blur-md"
+                      className="rounded-xl border-amber-500/40 text-xs font-semibold font-mono text-white bg-black/20 focus-visible:ring-amber-400"
                       required={editForm.is_flash_sale}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="flash-stock" className="text-xs font-bold text-amber-700 uppercase tracking-wider">Stok Kuota Promo</Label>
+                    <Label htmlFor="flash-stock" className="text-xs font-bold text-amber-400 uppercase tracking-wider">Stok Kuota Promo</Label>
                     <Input
                       id="flash-stock"
                       type="number"
@@ -897,7 +897,7 @@ export default function AdminProductsPage() {
                       onFocus={(e) => e.target.select()}
                       onChange={(e) => setEditForm(prev => ({ ...prev, flash_sale_stock: e.target.value === "" ? 0 : Number(e.target.value) || 0 }))}
                       placeholder="0"
-                      className="rounded-xl border-amber-300 text-xs font-semibold font-mono focus-visible:ring-amber-500 bg-mist backdrop-blur-md"
+                      className="rounded-xl border-amber-500/40 text-xs font-semibold font-mono text-white bg-black/20 focus-visible:ring-amber-400"
                       required={editForm.is_flash_sale}
                     />
                   </div>

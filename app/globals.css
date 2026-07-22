@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* High contrast text selection styling across the entire website */
+::selection {
+  background-color: #38bdf8 !important;
+  color: #0f172a !important;
+}
+::-moz-selection {
+  background-color: #38bdf8 !important;
+  color: #0f172a !important;
+}
+
 /* Custom Sky Fantasy utilities for @apply compatibility */
 @layer utilities {
   /* Shadows */
