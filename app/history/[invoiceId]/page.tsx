@@ -75,7 +75,7 @@ export default function InvoiceDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState("")
-  const [waAdminNumber, setWaAdminNumber] = useState("6281234567890")
+  const [waAdminNumber, setWaAdminNumber] = useState("6285856457892")
 
   useEffect(() => {
     const fetchWaNumber = async () => {

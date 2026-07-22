@@ -72,7 +72,7 @@ export default function CheckoutPage() {
     qr_string?: string
   } | null>(null)
 
-  const [waAdminNumber, setWaAdminNumber] = useState("6281234567890")
+  const [waAdminNumber, setWaAdminNumber] = useState("6285856457892")
 
   useEffect(() => {
     const fetchWaNumber = async () => {

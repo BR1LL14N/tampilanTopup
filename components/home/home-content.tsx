@@ -571,7 +571,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           </div>
 
           <div
-            onClick={() => router.push("https://wa.me/6281234567890")}
+            onClick={() => router.push("https://wa.me/6285856457892")}
             className="bg-[#183644]/90 backdrop-blur-md flex items-center gap-5 p-6 cursor-pointer group h-full rounded-[20px] border border-sky/30 hover:border-sky/60 shadow-2xl transition-all duration-300"
           >
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-sky/20 text-sky group-hover:bg-sky group-hover:text-white transition-all duration-300 border border-sky/30">

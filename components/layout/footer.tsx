@@ -25,7 +25,7 @@ const TiktokIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export function Footer() {
   const currentYear = new Date().getFullYear()
 
-  const [waAdminNumber, setWaAdminNumber] = useState("6281234567890")
+  const [waAdminNumber, setWaAdminNumber] = useState("6285856457892")
   const [siteInfo, setSiteInfo] = useState({
     logoUrl: "",
     legalName: "",

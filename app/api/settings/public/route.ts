@@ -98,7 +98,7 @@ export async function GET() {
 
 function buildResponse(data: Record<string, string>) {
   return {
-    wa_admin_number:      data["wa_admin_number"]      ?? "6281234567890",
+    wa_admin_number:      data["wa_admin_number"]      ?? "6285856457892",
     business_owner_name:  data["business_owner_name"]  ?? "",
     business_legal_name:  data["business_legal_name"]  ?? "",
     business_address:     data["business_address"]     ?? "",

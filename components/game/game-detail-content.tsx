@@ -542,7 +542,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
 
               {/* CS Support Card */}
               <div
-                onClick={() => router.push("https://wa.me/6281234567890")}
+                onClick={() => router.push("https://wa.me/6285856457892")}
                 className="bg-[#183644]/90 backdrop-blur-md p-5 rounded-2xl border border-sky/30 flex items-center gap-4 hover:border-sky/50 cursor-pointer transition-all duration-300 group shadow-sky-medium"
               >
                 <span className="grid h-11 w-11 place-items-center rounded bg-sky/10 text-sky group-hover:bg-sky group-hover:text-white transition-colors">
