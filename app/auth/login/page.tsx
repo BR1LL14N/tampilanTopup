@@ -60,12 +60,17 @@ function LoginForm() {
         throw new Error(data?.error || "Email atau password Anda salah.")
       }
 
-      if (data.user?.role === "admin") {
-        router.push("/admin")
-      } else {
-        router.push("/dashboard")
+      if (data.user) {
+        const { setCachedUser } = await import("@/lib/auth-cache")
+        setCachedUser({
+          name: data.user.name || '',
+          email: data.user.email || '',
+          role: data.user.role || 'user'
+        })
       }
-      router.refresh()
+
+      const targetUrl = data.user?.role === "admin" ? "/admin" : "/dashboard"
+      window.location.href = targetUrl
     } catch (err: any) {
       setError(err.message || "Login gagal. Silakan periksa email dan password Anda.")
     } finally {

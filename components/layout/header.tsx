@@ -265,13 +265,26 @@ export function Header({ user }: HeaderProps) {
     setFilteredGames(matches)
   }, [searchQuery, games])
 
+  useEffect(() => {
+    const handleAuthChange = async () => {
+      const { getCachedUser } = await import("@/lib/auth-cache")
+      const cached = getCachedUser()
+      setCurrentUser(cached || null)
+    }
+    window.addEventListener("auth-state-change", handleAuthChange)
+    return () => window.removeEventListener("auth-state-change", handleAuthChange)
+  }, [])
+
   const handleLogout = async () => {
     try {
       const { setCachedUser } = await import("@/lib/auth-cache")
       setCachedUser(null)
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("topup_cached_user")
+      }
+      setCurrentUser(null)
       await fetch("/api/auth/logout", { method: "POST" })
       
-      // Try to sign out client-side for completeness, if Supabase is configured
       try {
         const { createClient } = await import("@/lib/supabase/client")
         const supabase = createClient()
