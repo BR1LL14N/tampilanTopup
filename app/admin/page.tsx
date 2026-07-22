@@ -488,7 +488,7 @@ export default function AdminDashboardPage() {
       })
       const data = await res.json()
       if (data.success) {
-        setSyncMessage(`Berhasil menyinkronkan ${data.gamesCount || 0} Game dan memperbarui produk.`)
+        setSyncMessage(`Berhasil menyinkronkan: ${data.productsCreated || 0} Produk Baru, ${data.productsUpdated || 0} Produk Diperbarui. (${data.skippedProductsCount || 0} Produk dari Digiflazz Dilewati karena Nonaktif dari Supplier/Game).`)
         setRefreshTrigger(prev => prev + 1)
       } else {
         setSyncMessage(`Gagal: ${data.error || "Kesalahan tidak dikenal"}`)

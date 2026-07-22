@@ -79,31 +79,15 @@ async function handleSync(req: NextRequest) {
 
     const allItems = result.data;
     
-    // Filter game products: include any items where category or brand is game-related
-    const gameProducts = allItems.filter((item: any) => {
-      const cat = String(item.category || '').toLowerCase();
-      const brand = String(item.brand || '').toLowerCase();
-      return (
-        cat.includes("voucher") ||
-        cat.includes("game") ||
-        brand.includes("mobile") ||
-        brand.includes("free fire") ||
-        brand.includes("pubg") ||
-        brand.includes("valorant") ||
-        brand.includes("genshin") ||
-        brand.includes("honor") ||
-        brand.includes("roblox") ||
-        brand.includes("steam")
-      );
-    });
+    // Process ALL active Digiflazz products across all categories (Games, Pulsa, Data, PLN, TV, Voucher, etc.)
+    const activeProducts = allItems.filter((item: any) => 
+      item && item.brand && item.brand.trim() !== '' &&
+      item.buyer_product_status === true && item.seller_product_status === true
+    );
 
-    if (gameProducts.length === 0) {
-      await SettingService.set("last_sync_status", "success");
-      await SettingService.set("last_sync_time", new Date().toISOString());
-      return NextResponse.json({ success: true, message: "Sync finished. No game products found." });
-    }
+    const skippedProductsCount = allItems.length - activeProducts.length;
 
-    // Fetch existing games from database
+    // Fetch existing games/categories from database
     const dbGames = await executeQuery("SELECT id, name, slug FROM games");
     let gamesList: any[] = [...dbGames];
 
@@ -172,7 +156,7 @@ async function handleSync(req: NextRequest) {
     let productsUpdated = 0;
     let gamesCreated = 0;
 
-    for (const item of gameProducts) {
+    for (const item of activeProducts) {
       const brand = item.brand || '';
       if (!brand || !brand.trim()) continue;
 
@@ -180,13 +164,14 @@ async function handleSync(req: NextRequest) {
 
       if (!gameObj) {
         let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        if (!slug) slug = 'game-' + crypto.randomUUID().slice(0, 8);
+        if (!slug) slug = 'cat-' + crypto.randomUUID().slice(0, 8);
 
+        const categoryName = item.category || 'Voucher';
         const newGameId = crypto.randomUUID();
         await executeQuery(
           `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order) 
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [newGameId, brand, slug, "🎮", "Game", `Top up voucher dan diamonds untuk ${brand} dengan proses instan.`, true, 0]
+          [newGameId, brand, slug, "⚡", categoryName, `Top up ${brand} (${categoryName}) instan 24 jam.`, true, 0]
         );
         gameObj = { id: newGameId, name: brand, slug };
         gamesList.push(gameObj);
@@ -203,7 +188,7 @@ async function handleSync(req: NextRequest) {
       const rawSellPrice = modalPrice * markupPercentage;
       const sellPrice = Math.ceil(rawSellPrice / 100) * 100;
 
-      const isActive = item.buyer_product_status === true && item.seller_product_status === true;
+      const isActive = true; // activeProducts filter guarantees buyer & seller status are true
 
       const existingProduct = await executeQuery(
         "SELECT id FROM products WHERE game_id = $1 AND provider_sku = $2 LIMIT 1",
@@ -239,6 +224,8 @@ async function handleSync(req: NextRequest) {
       productsCreated,
       productsUpdated,
       gamesCreated,
+      skippedProductsCount,
+      totalDigiflazzCount: allItems.length,
       timestamp: new Date().toISOString()
     });
 
