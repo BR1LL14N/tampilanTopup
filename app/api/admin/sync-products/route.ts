@@ -202,12 +202,12 @@ export async function POST(req: NextRequest) {
           await executeQuery(
             `INSERT INTO games (id, name, slug, image, icon, category, status, description, publisher) 
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-            [newGame.id, newGame.name, newGame.slug, newGame.image, newGame.icon, newGame.category, newGame.status ? 1 : 0, newGame.description, newGame.publisher]
+            [newGame.id, newGame.name, newGame.slug, newGame.image, newGame.icon, newGame.category, true, newGame.description, newGame.publisher]
           );
-          gamesList.push(newGame);
         } catch (insertErr) {
-          console.error(`Failed to auto-insert game ${brand}:`, insertErr);
+          console.error(`Auto-insert game ${brand} log:`, insertErr);
         }
+        gamesList.push(newGame);
       }
     }
 
