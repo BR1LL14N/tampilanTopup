@@ -9,6 +9,15 @@ import { SidebarContentWrapper } from "@/components/layout/sidebar-content-wrapp
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { getCachedUser, setCachedUser } from "@/lib/auth-cache"
 import { formatCurrency } from "@/lib/utils"
 import { getGameAssetByName, getItemAssetForProduct } from "@/lib/assets"
@@ -96,6 +105,43 @@ export default function AdminDashboardPage() {
   const [testMessage, setTestMessage] = useState("Uji coba koneksi WhatsApp Mitsuru Top Up Hub. Koneksi sukses! ✅")
   const [testLoading, setTestLoading] = useState(false)
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
+
+  // Digiflazz Deposit Ticket Modal states
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false)
+  const [depoAmount, setDepoAmount] = useState<number | string>(500000)
+  const [depoBank, setDepoBank] = useState("BCA")
+  const [depoOwnerName, setDepoOwnerName] = useState("MITSURU TOPUP")
+  const [loadingDepoTicket, setLoadingDepoTicket] = useState(false)
+  const [depoResultTicket, setDepoResultTicket] = useState<any>(null)
+  const [depoTicketError, setDepoTicketError] = useState("")
+
+  const handleCreateDepoTicket = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoadingDepoTicket(true)
+    setDepoTicketError("")
+    setDepoResultTicket(null)
+    try {
+      const res = await fetch("/api/admin/digiflazz/deposit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: depoAmount,
+          bank: depoBank,
+          ownerName: depoOwnerName,
+        }),
+      })
+      const data = await res.json()
+      if (data.error) {
+        setDepoTicketError(data.error)
+      } else if (data.depositTicket) {
+        setDepoResultTicket(data.depositTicket)
+      }
+    } catch (err: any) {
+      setDepoTicketError(err.message || "Gagal membuat tiket deposit")
+    } finally {
+      setLoadingDepoTicket(false)
+    }
+  }
 
   useEffect(() => {
     // Read cache on mount
@@ -531,6 +577,17 @@ export default function AdminDashboardPage() {
                 </button>
               </div>
             </Link>
+            <button
+              onClick={() => {
+                setIsDepositModalOpen(true)
+                setDepoResultTicket(null)
+                setDepoTicketError("")
+              }}
+              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-1.5 shadow-sky-soft hover:scale-105"
+            >
+              <Wallet className="h-3.5 w-3.5 text-emerald-400" />
+              + Isi Saldo Digiflazz
+            </button>
           </div>
         </div>
 
@@ -1575,6 +1632,137 @@ export default function AdminDashboardPage() {
         )}
         </div>
       </main>
+
+      {/* Digiflazz Deposit Ticket Modal */}
+      <Dialog open={isDepositModalOpen} onOpenChange={setIsDepositModalOpen}>
+        <DialogContent className="max-w-md bg-[#183644] border border-sky/30 rounded-[24px] p-6 shadow-sky-medium text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black text-white uppercase tracking-wide flex items-center gap-2">
+              <Wallet className="h-5 w-5 text-emerald-400" />
+              Isi Saldo Digiflazz
+            </DialogTitle>
+            <DialogDescription className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+              Buat tiket isi saldo deposit Digiflazz otomatis langsung dari admin panel.
+            </DialogDescription>
+          </DialogHeader>
+
+          {!depoResultTicket ? (
+            <form onSubmit={handleCreateDepoTicket} className="space-y-4 my-2">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-white/80 uppercase">Pilih Nominal Topup</Label>
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  {[100000, 250000, 500000, 1000000, 2500000, 5000000].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setDepoAmount(amt)}
+                      className={`py-2 rounded-xl text-xs font-bold font-mono transition-all border ${
+                        Number(depoAmount) === amt
+                          ? "bg-emerald-500 text-white border-emerald-400 shadow-sky-soft"
+                          : "bg-black/20 text-white/80 border-sky/20 hover:border-sky/40"
+                      }`}
+                    >
+                      Rp {(amt / 1000).toLocaleString()}k
+                    </button>
+                  ))}
+                </div>
+                <Input
+                  type="number"
+                  value={depoAmount === 0 || depoAmount === "" ? "" : depoAmount}
+                  onFocus={(e: any) => e.target.select()}
+                  onChange={(e: any) => setDepoAmount(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="Atau masukkan nominal custom..."
+                  className="bg-black/20 border-sky/30 text-white placeholder-white/40 font-mono text-sm"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-white/80 uppercase">Bank Tujuan</Label>
+                  <select
+                    value={depoBank}
+                    onChange={(e: any) => setDepoBank(e.target.value)}
+                    className="w-full rounded-xl border border-sky/30 bg-black/20 px-3 py-2 text-xs font-bold text-white focus:outline-none focus:ring-1 focus:ring-sky h-10"
+                  >
+                    <option value="BCA" className="bg-[#183644] text-white font-bold">BCA</option>
+                    <option value="BRI" className="bg-[#183644] text-white font-bold">BRI</option>
+                    <option value="MANDIRI" className="bg-[#183644] text-white font-bold">MANDIRI</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-white/80 uppercase">Nama Pengirim</Label>
+                  <Input
+                    type="text"
+                    value={depoOwnerName}
+                    onChange={(e: any) => setDepoOwnerName(e.target.value.toUpperCase())}
+                    placeholder="NAMA PEMILIK TOKO"
+                    className="bg-black/20 border-sky/30 text-white uppercase text-xs font-bold"
+                    required
+                  />
+                </div>
+              </div>
+
+              {depoTicketError && (
+                <p className="text-xs text-red-400 font-bold bg-red-500/10 p-3 rounded-xl border border-red-500/30">
+                  {depoTicketError}
+                </p>
+              )}
+
+              <DialogFooter className="pt-4 gap-2">
+                <Button type="button" variant="outline" onClick={() => setIsDepositModalOpen(false)}>
+                  Batal
+                </Button>
+                <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold" disabled={loadingDepoTicket}>
+                  {loadingDepoTicket && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                  Dapatkan Tiket Transfer
+                </Button>
+              </DialogFooter>
+            </form>
+          ) : (
+            <div className="space-y-4 my-2">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-2xl space-y-3">
+                <div className="flex justify-between items-center border-b border-emerald-500/20 pb-3">
+                  <span className="text-xs font-bold text-white/70 uppercase">Transfer Tepat Pas</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-black text-emerald-400 font-mono">
+                      Rp {Number(depoResultTicket.amount || 0).toLocaleString("id-ID")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(String(depoResultTicket.amount))
+                        alert("Nominal transfer berhasil disalin!")
+                      }}
+                      className="px-2 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded hover:bg-emerald-600 transition-colors uppercase"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 text-xs text-white/80">
+                  <p className="font-bold text-white uppercase text-[10px] tracking-wider">Instruksi Transfer:</p>
+                  <p className="text-xs leading-relaxed text-emerald-300 font-medium">
+                    {depoResultTicket.notes || `Silakan transfer nominal diatas ke Bank ${depoResultTicket.bank} a.n. PT DIGIFLAZZ INTERNASIONAL INDONESIA`}
+                  </p>
+                </div>
+              </div>
+
+              <DialogFooter className="pt-2">
+                <Button
+                  type="button"
+                  onClick={() => setIsDepositModalOpen(false)}
+                  className="w-full bg-sky text-white hover:bg-diamond font-bold"
+                >
+                  Selesai
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </SidebarContentWrapper>

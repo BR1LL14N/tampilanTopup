@@ -212,3 +212,38 @@ export async function createTopup(
 
   return response.json();
 }
+
+export async function requestDepositTicket(amount: number, bank: string, ownerName: string): Promise<any> {
+  const { username, mode } = getDigiflazzCredentials();
+
+  if (mode === 'simulation') {
+    const uniqueAmount = amount + Math.floor(Math.random() * 900) + 100;
+    return {
+      data: {
+        rc: "00",
+        amount: uniqueAmount,
+        notes: `Silahkan transfer Rp ${uniqueAmount.toLocaleString('id-ID')} ke Bank ${bank} a.n. PT DIGIFLAZZ INTERNASIONAL INDONESIA (Simulasi)`,
+        bank: bank,
+        owner_name: ownerName
+      }
+    };
+  }
+
+  const sign = generateDepoSignature();
+
+  const response = await fetch('https://api.digiflazz.com/v1/deposit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username,
+      amount,
+      Bank: bank,
+      owner_name: ownerName,
+      sign,
+    }),
+  });
+
+  return response.json();
+}
