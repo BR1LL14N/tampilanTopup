@@ -33,7 +33,8 @@ export async function GET(req: NextRequest) {
     const tokenData = await tokenRes.json();
     if (!tokenData.access_token) {
       console.error('Google token error:', tokenData);
-      return NextResponse.redirect(`${siteUrl}/auth/login?error=Gagal+autentikasi+Google`);
+      const errDetail = tokenData.error_description || tokenData.error || 'Gagal autentikasi Google';
+      return NextResponse.redirect(`${siteUrl}/auth/login?error=${encodeURIComponent(errDetail)}`);
     }
 
     // 2. Fetch user profile from Google API
