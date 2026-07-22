@@ -80,10 +80,17 @@ export async function GET(req: NextRequest) {
           [newUserId, email, name, role]
         );
       } else {
-        await executeQuery(
-          `INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)`,
-          [newUserId, name, email, dummyPassword, role]
-        );
+        try {
+          await executeQuery(
+            `INSERT INTO users (id, name, email, password_hash, role) VALUES ($1, $2, $3, $4, $5)`,
+            [newUserId, name, email, dummyPassword, role]
+          );
+        } catch (passErr) {
+          await executeQuery(
+            `INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)`,
+            [newUserId, name, email, dummyPassword, role]
+          );
+        }
       }
 
       userObj = { id: newUserId, email, name, role };
