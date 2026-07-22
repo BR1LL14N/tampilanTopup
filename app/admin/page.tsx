@@ -255,6 +255,8 @@ export default function AdminDashboardPage() {
           const settingsData = await resSettings.json()
           if (settingsData.settings) {
             setIsSyncActive(settingsData.settings.isSyncActive)
+            setDigiflazzMode(settingsData.settings.digiflazzMode || "production")
+            setDigiflazzUsername(settingsData.settings.digiflazzUsername || "")
             setSyncInterval(settingsData.settings.syncInterval)
             setLastSyncTime(settingsData.settings.lastSyncTime)
             setLastSyncStatus(settingsData.settings.lastSyncStatus)
@@ -372,6 +374,8 @@ export default function AdminDashboardPage() {
         },
         body: JSON.stringify({
           isSyncActive,
+          digiflazzMode,
+          digiflazzUsername,
           syncInterval,
           midtransMode,
           paymentGateway,
@@ -997,6 +1001,28 @@ export default function AdminDashboardPage() {
                   </div>
                   <p className="text-[10px] text-white/60 leading-relaxed">
                     Sistem akan menyinkronkan katalog harga modal Digiflazz setiap {syncInterval} jam.
+                  </p>
+                </div>
+
+                {/* Digiflazz Environment Mode Selector */}
+                <div className="space-y-2 pt-3 border-t border-sky/20">
+                  <label className="text-xs font-bold text-white/80 uppercase tracking-wider flex items-center gap-1.5">
+                    <Shield className="h-3.5 w-3.5 text-sky" />
+                    Mode Transaksi Topup Digiflazz
+                  </label>
+                  <div className="relative p-[1px] bg-sky-border" style={inputBevelStyle}>
+                    <select
+                      value={digiflazzMode}
+                      onChange={(e) => setDigiflazzMode(e.target.value)}
+                      className="w-full bg-[#183644] px-3 py-2.5 text-xs font-bold text-white focus:outline-none cursor-pointer border-none"
+                      style={inputBevelStyle}
+                    >
+                      <option value="production" className="bg-[#183644] text-emerald-400 font-bold">PRODUCTION (LIVE - Transaksi & Saldo Asli)</option>
+                      <option value="simulation" className="bg-[#183644] text-amber-400 font-bold">SANDBOX / SIMULASI (TESTING - Gratis & Dummy)</option>
+                    </select>
+                  </div>
+                  <p className="text-[10px] text-white/60 leading-relaxed">
+                    Pilih <strong className="text-emerald-400">PRODUCTION</strong> untuk transaksi live asli, atau <strong className="text-amber-400">SANDBOX</strong> untuk pengujian simulasi tanpa memotong saldo. Kredensial diambil otomatis dari file <code className="text-sky font-mono">.env</code>.
                   </p>
                 </div>
 
