@@ -43,7 +43,7 @@ export default function TermsPage() {
 
                 <h3 className="font-extrabold text-xs uppercase text-white">3. Transaksi &amp; Pembayaran</h3>
                 <p className="text-xs">
-                  Seluruh pembayaran menggunakan sistem tagihan Midtrans. Segala bentuk kecurangan transaksi, pembayaran palsu, atau tindakan meretas sistem pembayaran akan langsung dilaporkan ke pihak berwajib dan akun Anda akan diblokir permanen.
+                  Seluruh pembayaran menggunakan sistem Payment Gateway resmi terenkripsi (DOKU / Midtrans). Segala bentuk kecurangan transaksi, pembayaran palsu, atau tindakan meretas sistem pembayaran akan langsung dilaporkan ke pihak berwajib dan akun Anda akan diblokir permanen.
                 </p>
 
                 <h3 className="font-extrabold text-xs uppercase text-white">4. Batasan Tanggung Jawab</h3>
