@@ -45,10 +45,11 @@ export function generateInvoice(): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
-  const random = Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, "0");
-  return `INV-${year}${month}${day}-${random}`;
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return `INV-${year}${month}${day}-${hours}${minutes}${seconds}${random}`;
 }
 
 export function generateRefId(invoice: string): string {
