@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get('code');
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin;
+  let siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin).trim().replace(/\/+$/, '');
 
   if (!code) {
     return NextResponse.redirect(`${siteUrl}/auth/login?error=Google+login+canceled`);

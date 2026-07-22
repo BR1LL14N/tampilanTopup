@@ -26,7 +26,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<"google" | "discord" | null>(null)
-  const [error, setError] = useState("")
+  const [error, setError] = useState(searchParams.get("error") || "")
   const [formData, setFormData] = useState({
     email: "",
     password: "",
