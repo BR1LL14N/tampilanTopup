@@ -206,14 +206,14 @@ export default function CheckoutPage() {
     // Do not run if id === "mock" because it is a mockup screen for already existing invoice
     if (id === "mock") return
 
-    if (targetVal && paymentVal && whatsappVal) {
+    if (targetVal && whatsappVal) {
       setAutoSubmitted(true)
       
-      let pm = paymentVal.toLowerCase()
+      let pm = (paymentVal || 'qris').toLowerCase()
       if (pm === "va") pm = "qris"
       else if (pm === "e-wallet") pm = "gopay"
       
-      const matchedMethod = paymentMethods.find(m => m.id === pm)
+      const matchedMethod = paymentMethods.find(m => m.id === pm) || paymentMethods[0]
       if (matchedMethod) {
         setSelectedPayment(matchedMethod.id)
         
