@@ -71,27 +71,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, message: 'Transaction already paid' });
       }
 
-      console.log(`Doku Webhook: Transaction ${invoice} is PAID. Fulfilling order...`);
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-
-      try {
-        const payRes = await fetch(`${siteUrl}/api/transactions/pay`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ invoice }),
-        });
-        const payData = await payRes.json();
-        console.log(`Pay API execution result for Doku transaction ${invoice}:`, payData);
-      } catch (payErr) {
-        console.error(`Failed triggering pay API for Doku transaction ${invoice}:`, payErr);
-        const now = new Date().toISOString();
-        await TransactionService.update(transaction.id, {
-          payment_status: 'paid',
-          updated_at: now,
-        });
-      }
+      console.log(`Doku Webhook: Transaction ${invoice} is PAID. Fulfilling order via processOrderFulfillment...`);
+      const { processOrderFulfillment } = await import('@/lib/fulfillment');
+      const result = await processOrderFulfillment(invoice);
+      console.log(`Doku Webhook fulfillment result for ${invoice}:`, result);
     } else if (isFailed) {
       console.log(`Doku Webhook: Transaction ${invoice} FAILED or EXPIRED.`);
       const now = new Date().toISOString();

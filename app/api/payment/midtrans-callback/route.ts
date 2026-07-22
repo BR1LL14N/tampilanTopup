@@ -79,32 +79,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, message: 'Transaction already marked as paid' });
       }
 
-      console.log(`Midtrans Webhook: Transaction ${order_id} is PAID. Fulfilling order...`);
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-      
-      try {
-        const payRes = await fetch(`${siteUrl}/api/transactions/pay`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${serverKey}`
-          },
-          body: JSON.stringify({ invoice: order_id }),
-        });
-        const payData = await payRes.json();
-        console.log(`Pay API execution result for ${order_id}:`, payData);
-      } catch (payErr) {
-        console.error(`Failed to trigger pay API for ${order_id}, falling back to manual DB update:`, payErr);
-        
-        // Manual database fallback
-        const now = new Date().toISOString();
-        await TransactionService.update(transaction.id, {
-          payment_status: 'paid',
-          paid_at: now,
-          topup_status: 'processing',
-          updated_at: now,
-        });
-      }
+      console.log(`Midtrans Webhook: Transaction ${order_id} is PAID. Fulfilling order via processOrderFulfillment...`);
+      const { processOrderFulfillment } = await import('@/lib/fulfillment');
+      const result = await processOrderFulfillment(order_id);
+      console.log(`Midtrans Webhook fulfillment result for ${order_id}:`, result);
     } else if (isFailed) {
       console.log(`Midtrans Webhook: Transaction ${order_id} is FAILED/EXPIRED/CANCELLED.`);
       await TransactionService.update(transaction.id, {
