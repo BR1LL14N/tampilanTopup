@@ -46,6 +46,7 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  RefreshCw,
 } from "lucide-react"
 
 export default function AdminTransactionsPage() {
@@ -60,6 +61,7 @@ export default function AdminTransactionsPage() {
   const [selectedTx, setSelectedTx] = useState<any | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [updatingStatus, setUpdatingStatus] = useState(false)
+  const [checkingDigiflazzStatus, setCheckingDigiflazzStatus] = useState(false)
   const [showAdminPassword, setShowAdminPassword] = useState(false) // untuk toggle visibility password di detail dialog
 
   // Direct Topup / Gift Modal states
@@ -174,6 +176,29 @@ export default function AdminTransactionsPage() {
       alert(`Gagal memperbarui status: ${err.message}`)
     } finally {
       setUpdatingStatus(false)
+    }
+  }
+
+  const handleCheckDigiflazzStatus = async (invoice: string) => {
+    setCheckingDigiflazzStatus(true)
+    try {
+      const res = await fetch("/api/admin/transactions/check-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invoice })
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+
+      alert(`Status transaksi #${invoice} dari Digiflazz: ${data.message || data.topupStatus}`)
+      fetchAdminData()
+      if (selectedTx && selectedTx.invoice === invoice) {
+        setSelectedTx(data.transaction || { ...selectedTx, topup_status: data.topupStatus, provider_ref: data.sn })
+      }
+    } catch (err: any) {
+      alert(`Gagal mengecek status ke Digiflazz: ${err.message}`)
+    } finally {
+      setCheckingDigiflazzStatus(false)
     }
   }
 
@@ -656,6 +681,16 @@ export default function AdminTransactionsPage() {
                     className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-500 text-white hover:bg-red-600 shrink-0"
                   >
                     Set Gagal
+                  </Button>
+                </div>
+                <div className="pt-2">
+                  <Button
+                    disabled={checkingDigiflazzStatus}
+                    onClick={() => handleCheckDigiflazzStatus(selectedTx.invoice)}
+                    className="w-full h-9 text-xs font-black uppercase tracking-wider bg-sky hover:bg-sky/90 text-white shadow-lg shadow-sky/20 flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${checkingDigiflazzStatus ? "animate-spin" : ""}`} />
+                    {checkingDigiflazzStatus ? "Mengecek ke Digiflazz..." : "Cek Status ke Digiflazz (Sync API)"}
                   </Button>
                 </div>
               </div>

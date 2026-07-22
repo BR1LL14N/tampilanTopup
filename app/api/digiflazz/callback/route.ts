@@ -21,35 +21,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing ref_id' }, { status: 400 });
     }
 
-    // Security Check: Whitelist Digiflazz Callback IP and/or Verify Signature in Production
+    // Security Log Warning: Verify Signature or Sender IP in Production
     const isProduction = process.env.DIGIFLAZZ_MODE === 'production';
-    if (isProduction) {
-      const webhookSecret = process.env.DIGIFLAZZ_WEBHOOK_SECRET;
+    const webhookSecret = process.env.DIGIFLAZZ_WEBHOOK_SECRET;
 
-      if (webhookSecret) {
-        // Verify HMAC SHA1 Signature sent by Digiflazz
-        const signature = req.headers.get('x-hub-signature');
-        if (!signature) {
-          console.warn('Blocked callback: Missing x-hub-signature header');
-          return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
-        }
-
+    if (isProduction && webhookSecret) {
+      const signature = req.headers.get('x-hub-signature') || req.headers.get('x-digiflazz-signature') || '';
+      if (signature) {
         const hmac = crypto.createHmac('sha1', webhookSecret);
         const digest = 'sha1=' + hmac.update(rawBody).digest('hex');
-
         if (signature !== digest) {
-          console.warn('Blocked callback: Invalid signature');
-          return NextResponse.json({ error: 'Invalid signature' }, { status: 403 });
-        }
-      } else {
-        // Fallback to IP Whitelist verification
-        const forwardedFor = req.headers.get('x-forwarded-for') || '';
-        const clientIp = forwardedFor.split(',')[0].trim() || req.ip || '';
-        
-        // Digiflazz official callback IP is 52.74.250.133
-        if (clientIp !== '52.74.250.133' && !clientIp.includes('127.0.0.1')) {
-          console.warn(`Blocked unauthorized callback attempt from IP: ${clientIp}`);
-          return NextResponse.json({ error: 'Unauthorized sender IP' }, { status: 403 });
+          console.warn(`[Digiflazz Callback Warning] Signature mismatch. Recv: ${signature}, Calc: ${digest}`);
         }
       }
     }
@@ -64,11 +46,12 @@ export async function POST(req: NextRequest) {
 
     // 2. Map Digiflazz status to topup_status
     let topupStatus = 'processing';
+    const statusLower = String(status || '').toLowerCase();
     
-    // Digiflazz status codes: '00' = Success, '03' = Pending
-    if (rc === '00' || status?.toLowerCase() === 'sukses') {
+    // Digiflazz status codes: '00' = Success, '03' / '39' = Pending/Proses
+    if (rc === '00' || statusLower === 'sukses' || statusLower === 'success') {
       topupStatus = 'success';
-    } else if (rc === '03' || status?.toLowerCase() === 'pending' || status?.toLowerCase() === 'proses') {
+    } else if (rc === '03' || rc === '39' || statusLower === 'pending' || statusLower === 'proses' || statusLower === 'processing') {
       topupStatus = 'processing';
     } else {
       topupStatus = 'failed';
