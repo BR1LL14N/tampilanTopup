@@ -298,10 +298,10 @@ export default function DashboardPage() {
 
               {/* Left Column: Tabs */}
               <div className="lg:col-span-8 space-y-6">
-                <div className="dark-stripes-teal rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
+                <div className="bg-[#183644]/90 backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
 
-                  {/* Tab Header */}
-                  <div className="border-b border-sky/20 flex items-center justify-between bg-black/20">
+                  {/* Tab Header (Diagonal Stripes on Header only) */}
+                  <div className="border-b border-sky/20 flex items-center justify-between dark-stripes-teal">
                     <div className="flex">
                       <button
                         onClick={() => setActiveTab("transactions")}

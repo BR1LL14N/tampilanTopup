@@ -765,7 +765,7 @@ export default function AdminDashboardPage() {
             {/* Recent Transactions Panel -> Web Activity Panel */}
             <div className="lg:col-span-8 space-y-6">
               <div className="bg-mist backdrop-blur-md rounded-2xl border-sky/30 shadow-sky-soft relative overflow-hidden border">
-                <div className="p-6 border-b border-sky/30 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="p-6 border-b border-sky/30 flex flex-col md:flex-row md:items-center md:justify-between gap-4 dark-stripes-teal">
                   <h3 className="text-base font-black uppercase tracking-wide text-white flex items-center gap-2">
                     <ShoppingBag className="h-4 w-4 text-sky" />
                     Aktivitas Web Mitsuru
