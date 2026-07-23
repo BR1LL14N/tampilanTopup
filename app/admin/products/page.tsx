@@ -61,6 +61,7 @@ export default function AdminProductsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
   const [selectedGameFilter, setSelectedGameFilter] = useState("all")
+  const [sortBy, setSortBy] = useState("active_first")
 
   // Bulk Action States
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([])
@@ -453,33 +454,65 @@ export default function AdminProductsPage() {
     )
   }
 
-  // Filter products by game, tab, and search query
-  const filteredProducts = productsList.filter((product) => {
-    const nameStr = product.name || ""
-    const gameStr = product.game_name || product.game || ""
-    const gameId = product.game_id || ""
-    const skuStr = product.provider_sku || ""
-    const isFlash = product.is_flash_sale === 1 || product.is_flash_sale === true
+  // Filter & sort products
+  const filteredProducts = productsList
+    .filter((product) => {
+      const nameStr = product.name || ""
+      const gameStr = product.game_name || product.game || ""
+      const gameId = product.game_id || ""
+      const skuStr = product.provider_sku || ""
+      const isFlash = product.is_flash_sale === 1 || product.is_flash_sale === true
 
-    const matchesSearch =
-      nameStr.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      gameStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      skuStr.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesSearch =
+        nameStr.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        gameStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        skuStr.toLowerCase().includes(searchQuery.toLowerCase())
 
-    const matchesTab =
-      activeTab === "all" ||
-      (activeTab === "active" && (product.status === 1 || product.status === true)) ||
-      (activeTab === "inactive" && !(product.status === 1 || product.status === true)) ||
-      (activeTab === "flash_sale" && isFlash)
+      const matchesTab =
+        activeTab === "all" ||
+        (activeTab === "active" && (product.status === 1 || product.status === true)) ||
+        (activeTab === "inactive" && !(product.status === 1 || product.status === true)) ||
+        (activeTab === "flash_sale" && isFlash)
 
-    const matchesGame =
-      selectedGameFilter === "all" ||
-      gameId === selectedGameFilter ||
-      product.game_slug === selectedGameFilter ||
-      gameStr.toLowerCase() === selectedGameFilter.toLowerCase()
+      const matchesGame =
+        selectedGameFilter === "all" ||
+        gameId === selectedGameFilter ||
+        product.game_slug === selectedGameFilter ||
+        gameStr.toLowerCase() === selectedGameFilter.toLowerCase()
 
-    return matchesSearch && matchesTab && matchesGame
-  })
+      return matchesSearch && matchesTab && matchesGame
+    })
+    .sort((a, b) => {
+      const aActive = a.status === 1 || a.status === true ? 1 : 0
+      const bActive = b.status === 1 || b.status === true ? 1 : 0
+
+      if (sortBy === "active_first") {
+        if (aActive !== bActive) return bActive - aActive
+        return (a.name || "").localeCompare(b.name || "")
+      }
+      if (sortBy === "sell_price_asc") {
+        return (Number(a.sell_price) || 0) - (Number(b.sell_price) || 0)
+      }
+      if (sortBy === "sell_price_desc") {
+        return (Number(b.sell_price) || 0) - (Number(a.sell_price) || 0)
+      }
+      if (sortBy === "price_asc") {
+        return (Number(a.price) || 0) - (Number(b.price) || 0)
+      }
+      if (sortBy === "price_desc") {
+        return (Number(b.price) || 0) - (Number(a.price) || 0)
+      }
+      if (sortBy === "name_asc") {
+        return (a.name || "").localeCompare(b.name || "")
+      }
+      if (sortBy === "name_desc") {
+        return (b.name || "").localeCompare(a.name || "")
+      }
+
+      // Default fallback
+      if (aActive !== bActive) return bActive - aActive
+      return 0
+    })
 
   return (
     <div className="min-h-screen flex flex-col ">
@@ -619,11 +652,11 @@ export default function AdminProductsPage() {
               </div>
 
               {/* Filter Game Dropdown */}
-              <div className="min-w-[200px]">
+              <div className="min-w-[190px]">
                 <select
                   value={selectedGameFilter}
                   onChange={(e) => setSelectedGameFilter(e.target.value)}
-                  className="w-full bg-[#183644] text-white border border-sky/30 rounded-xl px-3.5 py-2 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-sky cursor-pointer h-10 shadow-sm"
+                  className="w-full bg-[#183644] text-white border border-sky/30 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-sky cursor-pointer h-10 shadow-sm"
                 >
                   <option value="all" className="bg-[#183644] text-white font-bold">
                     🎮 Semua Game ({productsList.length})
@@ -638,6 +671,37 @@ export default function AdminProductsPage() {
                       </option>
                     )
                   })}
+                </select>
+              </div>
+
+              {/* Sort By Dropdown */}
+              <div className="min-w-[210px]">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full bg-[#183644] text-white border border-sky/30 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-sky cursor-pointer h-10 shadow-sm"
+                >
+                  <option value="active_first" className="bg-[#183644] text-white font-bold">
+                    ⚡ Status Aktif Paling Atas
+                  </option>
+                  <option value="sell_price_asc" className="bg-[#183644] text-white font-medium">
+                    💵 Harga Jual Terendah
+                  </option>
+                  <option value="sell_price_desc" className="bg-[#183644] text-white font-medium">
+                    💎 Harga Jual Tertinggi
+                  </option>
+                  <option value="price_asc" className="bg-[#183644] text-white font-medium">
+                    📉 Harga Modal Terendah
+                  </option>
+                  <option value="price_desc" className="bg-[#183644] text-white font-medium">
+                    📈 Harga Modal Tertinggi
+                  </option>
+                  <option value="name_asc" className="bg-[#183644] text-white font-medium">
+                    🔤 Nama (A-Z)
+                  </option>
+                  <option value="name_desc" className="bg-[#183644] text-white font-medium">
+                    🔤 Nama (Z-A)
+                  </option>
                 </select>
               </div>
 
