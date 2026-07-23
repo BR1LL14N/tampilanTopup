@@ -204,9 +204,9 @@ async function handleSync(req: NextRequest) {
       if (existingProduct.length > 0) {
         await executeQuery(
           `UPDATE products 
-           SET name = $1, price = $2, sell_price = $3, status = $4, provider = $5, provider_sku = $6, updated_at = CURRENT_TIMESTAMP 
-           WHERE id = $7`,
-          [productName, modalPrice, sellPrice, isActive ? 1 : 0, 'digiflazz', providerSku, existingProduct[0].id]
+           SET name = $1, price = $2, sell_price = $3, status = $4, provider_sku = $5, updated_at = CURRENT_TIMESTAMP 
+           WHERE id = $6`,
+          [productName, modalPrice, sellPrice, isActive ? 1 : 0, providerSku, existingProduct[0].id]
         );
         productsUpdated++;
         syncedItemsLog.push({
@@ -223,9 +223,9 @@ async function handleSync(req: NextRequest) {
       } else {
         const id = crypto.randomUUID();
         await executeQuery(
-          `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order, provider) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-          [id, gameId, providerSku, productName, modalPrice, sellPrice, isActive ? 1 : 0, 0, 'digiflazz']
+          `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [id, gameId, providerSku, productName, modalPrice, sellPrice, isActive ? 1 : 0, 0]
         );
         productsCreated++;
         syncedItemsLog.push({
