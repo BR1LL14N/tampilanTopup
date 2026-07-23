@@ -197,7 +197,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     clipPath: "polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% 100%, 0% 100%)"
   }
 
-  const bannerBg = gameWallpapers[game.slug] || defaultWallpaper
+  const bannerBg = game.image || gameWallpapers[game.slug] || defaultWallpaper
   const publisher = getPublisher(game.slug)
 
   return (
@@ -210,29 +210,29 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
           {/* Game Header Banner Redesign */}
-          <div className="relative mb-10 rounded-2xl border border-sky-border overflow-hidden bg-white shadow-lg shadow-sky-soft group transition-all duration-300">
+          <div className="relative mb-10 rounded-2xl border border-sky/30 overflow-hidden bg-[#183644]/90 backdrop-blur-md shadow-2xl group transition-all duration-300">
 
             {/* Banner background visual spanning the entire card */}
             <div className="absolute inset-0 z-0">
               <div
-                className="absolute inset-0 bg-cover bg-center"
+                className="absolute inset-0 bg-cover bg-center opacity-40 scale-105 transition-transform duration-750 group-hover:scale-100"
                 style={{ backgroundImage: `url('${bannerBg}')` }}
               />
-              {/* Light gradient overlay from left to right */}
-              <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/45 to-transparent z-10" />
-              <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent z-10" />
+              {/* Dark gradient overlay from left to right */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#102a36] via-[#102a36]/80 to-transparent z-10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#102a36] via-transparent to-transparent z-10" />
             </div>
 
             {/* Shimmer overlay sweep on hover */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden z-[15]">
-              <div className="absolute top-0 left-[-150%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-25deg] transition-all duration-1000 ease-out group-hover:left-[150%]" />
+              <div className="absolute top-0 left-[-150%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-25deg] transition-all duration-1000 ease-out group-hover:left-[150%]" />
             </div>
 
             {/* Banner Content Grid */}
-            <div className="relative z-20 grid md:grid-cols-[240px_1fr] gap-8 p-6 md:p-8 pt-16 md:pt-20 items-end">
+            <div className="relative z-20 grid md:grid-cols-[240px_1fr] gap-8 p-6 md:p-8 pt-12 md:pt-16 items-end">
 
               {/* Cover Image */}
-              <div className="relative overflow-hidden w-44 md:w-52 mx-auto md:mx-0 rounded-2xl border border-sky-border/40 shadow-sky-glow/10 h-60 md:h-64">
+              <div className="relative overflow-hidden w-44 md:w-52 mx-auto md:mx-0 rounded-2xl border border-sky/40 shadow-sky-glow/20 h-60 md:h-64 bg-black/40">
                 <img
                   className="h-full w-full object-cover transition-transform duration-750 hover:scale-110"
                   src={game.image}
@@ -243,29 +243,29 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
               {/* Title & Info Panel */}
               <div className="space-y-4 text-center md:text-left relative z-20">
                 <div>
-                  <span className="text-[10px] font-black uppercase text-white bg-sky px-2.5 py-1 rounded shadow-sm shadow-sky/20">
+                  <span className="text-[10px] font-black uppercase text-white bg-sky px-3 py-1 rounded-full shadow-md shadow-sky/30 border border-sky/40">
                     Penyedia Resmi
                   </span>
-                  <h1 className="text-3xl md:text-5xl font-black uppercase text-text-primary mt-3 tracking-tight">
+                  <h1 className="text-3xl md:text-5xl font-black uppercase text-white mt-3 tracking-tight drop-shadow-md">
                     {game.name}
                   </h1>
-                  <p className="text-xs font-bold text-text-secondary uppercase tracking-widest mt-1">
-                    Publisher: <span className="text-text-primary">{publisher}</span> • Kategori: <span className="text-sky-600 font-extrabold">{game.category}</span>
+                  <p className="text-xs font-bold text-white/80 uppercase tracking-widest mt-1.5">
+                    Publisher: <span className="text-white font-black">{publisher}</span> • Kategori: <span className="text-sky font-black">{game.category}</span>
                   </p>
                 </div>
 
                 {/* Sub-badges layout */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-3.5 pt-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-amber-500/20 text-amber-600 text-[10px] font-black uppercase tracking-wider shadow-sm">
-                    <Zap className="h-3.5 w-3.5 fill-amber-500/20" />
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#183644]/90 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                    <Zap className="h-3.5 w-3.5 fill-amber-500/20 text-amber-400" />
                     Proses Cepat
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-sky-border/40 text-text-primary text-[10px] font-black uppercase tracking-wider shadow-sm">
-                    <MessagesSquare className="h-3.5 w-3.5 fill-sky/20" />
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#183644]/90 border border-sky/30 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">
+                    <MessagesSquare className="h-3.5 w-3.5 fill-sky/20 text-sky" />
                     Layanan Chat 24/7
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase tracking-wider shadow-sm">
-                    <BadgeCheck className="h-3.5 w-3.5 fill-emerald-500/20" />
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#183644]/90 border border-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                    <BadgeCheck className="h-3.5 w-3.5 fill-emerald-500/20 text-emerald-400" />
                     Pembayaran Aman!
                   </span>
                 </div>
@@ -556,15 +556,15 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                     <FileText className="h-5 w-5 text-sky" />
                     Keterangan Game {game.name}
                   </h2>
-                  <p className="mt-4 text-sm font-medium leading-relaxed text-white/70">
+                  <p className="mt-4 text-sm font-medium leading-relaxed text-white/90">
                     {game.description}
                   </p>
 
-                  <h3 className="mt-8 font-black uppercase tracking-widest text-xs text-text-primary flex items-center gap-2">
+                  <h3 className="mt-8 font-black uppercase tracking-widest text-xs text-white flex items-center gap-2">
                     <Shield className="h-4 w-4 text-sky" />
                     Syarat &amp; Ketentuan Pengisian
                   </h3>
-                  <ol className="mt-4 list-decimal space-y-3 pl-5 text-xs text-text-muted font-medium">
+                  <ol className="mt-4 list-decimal space-y-3 pl-5 text-xs text-white/80 font-medium">
                     <li>Harap teliti kembali nominal produk dan target ID akun Anda. Transaksi yang salah diinput di luar tanggung jawab pihak Mitsuru.</li>
                     <li>Proses distribusi top up diselesaikan secara otomatis dalam 10-60 detik segera setelah dana masuk.</li>
                   </ol>

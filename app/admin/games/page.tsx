@@ -56,6 +56,7 @@ export default function AdminGamesPage() {
   const [selectedGame, setSelectedGame] = useState<any>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [editForm, setEditForm] = useState({
     name: "",
     slug: "",
@@ -67,6 +68,32 @@ export default function AdminGamesPage() {
     status: true,
     sort_order: 0,
   })
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingImage(true)
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("folder", "games")
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      })
+      const data = await res.json()
+      if (data.url) {
+        setEditForm(prev => ({ ...prev, image: data.url }))
+      } else {
+        alert(data.error || "Gagal mengunggah gambar")
+      }
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah gambar")
+    } finally {
+      setUploadingImage(false)
+    }
+  }
 
   const fetchAdminData = async () => {
     try {
@@ -397,6 +424,7 @@ export default function AdminGamesPage() {
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                   placeholder="e.g. Free Fire"
                   required
+                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
                 />
               </div>
               <div className="space-y-1.5">
@@ -407,6 +435,7 @@ export default function AdminGamesPage() {
                   onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })}
                   placeholder="e.g. free-fire"
                   required
+                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
                 />
               </div>
             </div>
@@ -419,6 +448,7 @@ export default function AdminGamesPage() {
                   value={editForm.publisher}
                   onChange={(e) => setEditForm({ ...editForm, publisher: e.target.value })}
                   placeholder="e.g. Garena"
+                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
                 />
               </div>
               <div className="space-y-1.5">
@@ -428,6 +458,7 @@ export default function AdminGamesPage() {
                   value={editForm.category}
                   onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                   placeholder="e.g. Battle Royale, MOBA"
+                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
                 />
               </div>
             </div>
@@ -438,7 +469,7 @@ export default function AdminGamesPage() {
                 id="game_desc"
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full min-h-[60px] rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-white/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="w-full min-h-[75px] rounded-xl border border-sky/30 bg-[#183644] text-white font-medium px-3 py-2 text-xs shadow-sm placeholder:text-white/40 focus:outline-none focus:border-sky"
                 placeholder="Deskripsi game..."
               />
             </div>
@@ -451,6 +482,7 @@ export default function AdminGamesPage() {
                   value={editForm.icon}
                   onChange={(e) => setEditForm({ ...editForm, icon: e.target.value })}
                   placeholder="e.g. 🎮 atau 🔥"
+                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
                 />
               </div>
               <div className="space-y-1.5">
@@ -462,18 +494,45 @@ export default function AdminGamesPage() {
                   onFocus={(e) => e.target.select()}
                   onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value === "" ? 0 : parseInt(e.target.value) || 0 })}
                   placeholder="0"
+                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="game_image" className="text-xs font-bold text-white/80 uppercase">Image Banner URL (Opsional)</Label>
-              <Input
-                id="game_image"
-                value={editForm.image}
-                onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
-                placeholder="https://..."
-              />
+            <div className="space-y-2">
+              <Label htmlFor="game_image" className="text-xs font-bold text-white/80 uppercase block">
+                Image Banner / Poster Game
+              </Label>
+              <div className="space-y-2">
+                <Input
+                  id="game_image"
+                  value={editForm.image}
+                  onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
+                  placeholder="https://... atau /uploads/games/..."
+                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
+                />
+                
+                <div className="flex items-center gap-3 pt-1">
+                  <label className="cursor-pointer bg-sky/20 hover:bg-sky/40 border border-sky/30 hover:border-sky/60 text-sky hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all">
+                    {uploadingImage ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                    {uploadingImage ? "Mengunggah..." : "Upload File Gambar"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImage}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {editForm.image && (
+                    <div className="flex items-center gap-2 bg-black/30 p-1.5 pr-3 rounded-xl border border-sky/20">
+                      <img src={editForm.image} alt="Preview" className="h-7 w-10 object-cover rounded" />
+                      <span className="text-[10px] text-white/70 font-mono truncate max-w-[110px]">{editForm.image}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 pt-2">

@@ -28,7 +28,7 @@ export default async function GameDetailPage({ params }: Props) {
     name: dbGame.name,
     icon: dbGame.icon || "🎮",
     slug: dbGame.slug,
-    image: getGameAsset(dbGame.slug)?.poster || dbGame.image || gameAssets["mobile-legends"].poster,
+    image: dbGame.image || getGameAsset(dbGame.slug)?.poster || getGameAsset(dbGame.slug)?.banner || gameAssets["mobile-legends"].poster,
     description: dbGame.description || "",
     category: dbGame.category || "Game",
     products: dbProducts.map((p: any) => ({
