@@ -267,63 +267,32 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
       <SidebarContentWrapper isAuthenticated={!!user}>
         <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 w-full overflow-hidden">
 
-        {/* Hero Carousel - Sky Fantasy with Touch Swipe Support */}
+        {/* Hero Carousel - Full HD Banner with Hover Scale & Shimmer Effect */}
         <div
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className="hero-carousel mb-10 overflow-hidden relative rounded-[24px] border border-sky/30 shadow-2xl select-none"
+          className="hero-carousel mb-10 overflow-hidden relative rounded-[24px] border border-sky/30 shadow-2xl select-none group/carousel transition-all duration-500 hover:border-sky/60 hover:shadow-sky-glow shimmer-hover"
         >
           <div
-            className="carousel-track flex transition-transform duration-500"
+            className="carousel-track flex transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${activeSlide * 100}%)` }}
           >
             {slides.map((slide, idx) => (
               <div
                 key={idx}
-                className="carousel-slide min-h-[440px] bg-cover bg-center flex items-center relative w-full shrink-0 auto-shimmer-bg"
-                style={{ backgroundImage: `url('${slide.bg}')` }}
+                onClick={() => router.push("/games")}
+                className="carousel-slide relative w-full shrink-0 h-[220px] sm:h-[340px] md:h-[420px] lg:h-[460px] overflow-hidden cursor-pointer group/slide"
               >
-                {/* Smooth left-to-right dark gradient overlay to blend backdrop and elevate readability */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent z-0" />
-
-                <div className="relative z-10 flex min-h-[360px] sm:min-h-[440px] items-center p-4 sm:py-10 sm:px-24 lg:py-16 lg:px-28 w-full">
-                  {/* Glassmorphism content panel to completely separate text from busy backgrounds */}
-                  <div className="w-full min-w-0 max-w-2xl bg-[#12313E]/40 sm:bg-[#12313E]/30 backdrop-blur-[12px] p-5 sm:p-8 md:p-10 rounded-[18px] sm:rounded-[20px] border border-white/10 shadow-2xl relative overflow-hidden group/panel transition-all duration-300 hover:bg-[#12313E]/45 hover:border-white/20">
-                    {/* Subtle corner hover glow effect */}
-                    <div className="absolute -top-10 -left-10 w-24 h-24 bg-sky/20 rounded-full blur-2xl pointer-events-none transition-all duration-500 group-hover/panel:bg-diamond/30 group-hover/panel:scale-150" />
-                    
-                    <span className="inline-block rounded-full border border-white/30 bg-white/10 px-3 py-0.5 sm:px-3.5 sm:py-1 text-[10px] sm:text-xs font-black uppercase tracking-wider text-white">
-                      {slide.tag}
-                    </span>
-                    <h2 className="mt-3 sm:mt-5 text-xl sm:text-4xl md:text-5xl font-black uppercase leading-tight text-white tracking-tight break-words whitespace-normal" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
-                      {slide.title}
-                    </h2>
-                    <p className="mt-2.5 sm:mt-4 max-w-xl text-[11px] sm:text-sm font-medium text-white/80 leading-relaxed break-words whitespace-normal">
-                      {slide.desc}
-                    </p>
-
-                    {/* Rounded Slide Action Buttons - Sky Fantasy */}
-                    <div className="mt-5 sm:mt-8 flex flex-wrap gap-2.5 sm:gap-4">
-                      {/* Primary button: solid sky blue with glow default */}
-                      <button
-                        onClick={() => handleSliderClick(slide.btn1)}
-                        className="bg-sky text-white hover:bg-diamond font-black px-4 py-2.5 sm:px-5 sm:py-3.5 text-[9px] sm:text-[10px] tracking-widest uppercase rounded-xl shadow-sky-soft hover:shadow-sky-glow transition-all duration-300 hover:scale-105 active:scale-95 shimmer-hover"
-                      >
-                        {slide.btn1}
-                      </button>
-
-                      {/* Secondary button: outline sky blue */}
-                      <button
-                        onClick={() => handleSliderClick(slide.btn2)}
-                        className="bg-white text-sky border border-sky-border hover:bg-sky hover:text-white font-black px-4 py-2.5 sm:px-5 sm:py-3.5 text-[9px] sm:text-[10px] tracking-widest uppercase rounded-xl shadow-sky-soft hover:shadow-sky-medium transition-all duration-300 hover:scale-105 active:scale-95 shimmer-hover"
-                      >
-                        {slide.btn2}
-                      </button>
-                    </div>
-
-                  </div>
-                </div>
+                <img
+                  src={slide.bg}
+                  alt={`Banner ${idx + 1}`}
+                  className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover/slide:scale-[1.03]"
+                  loading={idx === 0 ? "eager" : "lazy"}
+                />
+                
+                {/* Subtle vignette gradient overlay at edges */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 opacity-60 group-hover/slide:opacity-30 transition-opacity duration-500 pointer-events-none" />
               </div>
             ))}
           </div>
