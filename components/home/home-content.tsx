@@ -142,6 +142,20 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
         })
     : catalogItems;
 
+  const handleBannerClick = (linkUrl?: string) => {
+    if (!linkUrl) {
+      router.push("/games")
+      return
+    }
+
+    const trimmed = linkUrl.trim()
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      window.open(trimmed, "_blank", "noopener,noreferrer")
+    } else {
+      router.push(trimmed)
+    }
+  }
+
   const handleSliderClick = (action: string) => {
     if (action === "Topup Sekarang" || action === "Lihat Produk" || action === "Buka Katalog") {
       const catalogEl = document.getElementById("catalog")
@@ -309,7 +323,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             {activeSlides.map((slide, idx) => (
               <div
                 key={idx}
-                onClick={() => router.push(slide.link || "/games")}
+                onClick={() => handleBannerClick(slide.link)}
                 className="carousel-slide relative w-full shrink-0 h-[220px] sm:h-[340px] md:h-[420px] lg:h-[460px] overflow-hidden cursor-pointer group/slide"
               >
                 <img

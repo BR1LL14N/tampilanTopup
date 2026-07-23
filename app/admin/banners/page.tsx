@@ -341,10 +341,15 @@ export default function AdminBannersPage() {
                           </TableCell>
                           <TableCell className="text-xs text-sky font-mono font-medium">
                             {b.link_url ? (
-                              <span className="flex items-center gap-1.5 hover:underline">
+                              <a
+                                href={b.link_url}
+                                target={b.link_url.startsWith("http") ? "_blank" : "_self"}
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1.5 hover:underline"
+                              >
                                 <LinkIcon className="h-3 w-3 shrink-0" />
                                 {b.link_url}
-                              </span>
+                              </a>
                             ) : (
                               <span className="text-white/40 text-[10px] uppercase font-sans font-bold">- Tidak ada link -</span>
                             )}
@@ -466,9 +471,10 @@ export default function AdminBannersPage() {
                   id="banner_link"
                   value={editForm.link_url}
                   onChange={(e) => setEditForm({ ...editForm, link_url: e.target.value })}
-                  placeholder="e.g. /games/mobile-legends"
+                  placeholder="e.g. https://instagram.com/mitsurushop atau /games/mobile-legends"
                   className="bg-[#102530] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky text-xs"
                 />
+                <p className="text-[10px] text-white/50">Mendukung link web internal (contoh: <code>/games/mobile-legends</code>) atau link luar/sosmed (contoh: <code>https://instagram.com/...</code> atau WhatsApp).</p>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="banner_sort" className="text-xs font-bold text-white/80 uppercase">Urutan (Sort Order)</Label>
