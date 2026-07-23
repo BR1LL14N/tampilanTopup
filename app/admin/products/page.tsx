@@ -159,12 +159,14 @@ export default function AdminProductsPage() {
     try {
       setSyncing(true)
       setSyncStatus(null)
-      const res = await fetch(`/api/admin/sync-products?markup=${markupPercent}`, {
+      const res = await fetch(`/api/admin/sync/trigger?manual=true&markup=${markupPercent}`, {
         method: "POST"
       })
       const data = await res.json()
       if (data.success) {
-        const { newAdded, updated, skipped } = data.summary
+        const newAdded = data.productsCreated ?? data.summary?.newAdded ?? 0
+        const updated = data.productsUpdated ?? data.summary?.updated ?? 0
+        const skipped = data.skippedProductsCount ?? data.summary?.skipped ?? 0
         let msg = `Berhasil menyinkronkan: ${newAdded} produk baru, ${updated} produk diperbarui.`
         if (skipped > 0) {
           msg += ` (${skipped} produk dari Digiflazz dilewati karena nonaktif dari supplier/game).`
@@ -179,9 +181,9 @@ export default function AdminProductsPage() {
         fetchAdminData() // Reload catalog
       } else {
         setSyncStatus(`Error: ${data.error || "Gagal melakukan sync"}`)
-        if (data.digiflazzRawResponse) {
-          setRawDigiflazzResponse(data.digiflazzRawResponse)
-          setSyncLogs([data.digiflazzRawResponse])
+        if (data.details) {
+          setRawDigiflazzResponse(data.details)
+          setSyncLogs([data.details])
         } else if (data.log) {
           setSyncLogs(Array.isArray(data.log) ? data.log : [data.log])
         } else {
@@ -525,7 +527,7 @@ export default function AdminProductsPage() {
                     setIsSyncLogOpen(true)
                     if (!syncLogs || syncLogs.length === 0) {
                       try {
-                        const res = await fetch(`/api/admin/sync-products?markup=${markupPercent}`, { method: "POST" })
+                        const res = await fetch(`/api/admin/sync/trigger?manual=true&markup=${markupPercent}`, { method: "POST" })
                         const data = await res.json()
                         if (data.log || data.sampleItems) {
                           setSyncLogs(data.log || data.sampleItems || [])

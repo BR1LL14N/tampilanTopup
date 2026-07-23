@@ -156,6 +156,14 @@ async function handleSync(req: NextRequest) {
     let productsUpdated = 0;
     let gamesCreated = 0;
 
+    // Dynamic markup from query param (default 8%)
+    const markupParam = searchParams.get("markup");
+    const markupPercentage = (markupParam && !isNaN(parseFloat(markupParam)) && parseFloat(markupParam) >= 0)
+      ? (1 + parseFloat(markupParam) / 100)
+      : 1.08;
+
+    const syncedItemsLog: any[] = [];
+
     for (const item of activeProducts) {
       const brand = item.brand || '';
       if (!brand || !brand.trim()) continue;
@@ -183,34 +191,53 @@ async function handleSync(req: NextRequest) {
       const productName = item.product_name;
       const modalPrice = Number(item.price);
       
-      // Calculate sell price: Add 8% markup, rounded up to the nearest Rp 100
-      const markupPercentage = 1.08; 
       const rawSellPrice = modalPrice * markupPercentage;
       const sellPrice = Math.ceil(rawSellPrice / 100) * 100;
 
       const isActive = true; // activeProducts filter guarantees buyer & seller status are true
 
       const existingProduct = await executeQuery(
-        "SELECT id FROM products WHERE game_id = $1 AND provider_sku = $2 LIMIT 1",
+        "SELECT id, price, sell_price FROM products WHERE game_id = $1 AND provider_sku = $2 LIMIT 1",
         [gameId, providerSku]
       );
 
       if (existingProduct.length > 0) {
         await executeQuery(
           `UPDATE products 
-           SET name = $1, price = $2, sell_price = $3, status = $4, updated_at = CURRENT_TIMESTAMP 
-           WHERE id = $5`,
-          [productName, modalPrice, sellPrice, isActive, existingProduct[0].id]
+           SET name = $1, price = $2, sell_price = $3, status = $4, provider = $5, provider_sku = $6, updated_at = CURRENT_TIMESTAMP 
+           WHERE id = $7`,
+          [productName, modalPrice, sellPrice, isActive ? 1 : 0, 'digiflazz', providerSku, existingProduct[0].id]
         );
         productsUpdated++;
+        syncedItemsLog.push({
+          sku: providerSku,
+          name: productName,
+          game: gameObj.name,
+          brand,
+          category: item.category,
+          old_price: existingProduct[0].price,
+          new_price: modalPrice,
+          sell_price: sellPrice,
+          type: 'UPDATE'
+        });
       } else {
         const id = crypto.randomUUID();
         await executeQuery(
-          `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [id, gameId, providerSku, productName, modalPrice, sellPrice, isActive, 0]
+          `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order, provider) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+          [id, gameId, providerSku, productName, modalPrice, sellPrice, isActive ? 1 : 0, 0, 'digiflazz']
         );
         productsCreated++;
+        syncedItemsLog.push({
+          sku: providerSku,
+          name: productName,
+          game: gameObj.name,
+          brand,
+          category: item.category,
+          price: modalPrice,
+          sell_price: sellPrice,
+          type: 'NEW'
+        });
       }
     }
 
@@ -226,6 +253,21 @@ async function handleSync(req: NextRequest) {
       gamesCreated,
       skippedProductsCount,
       totalDigiflazzCount: allItems.length,
+      summary: {
+        totalFromDigiflazz: allItems.length,
+        newAdded: productsCreated,
+        updated: productsUpdated,
+        skipped: skippedProductsCount
+      },
+      sampleItems: activeProducts.slice(0, 10).map((i: any) => ({
+        name: i.product_name,
+        brand: i.brand,
+        category: i.category,
+        sku: i.buyer_sku_code,
+        active: i.buyer_product_status && i.seller_product_status
+      })),
+      log: syncedItemsLog.slice(0, 500),
+      rawResponse: result,
       timestamp: new Date().toISOString()
     });
 
