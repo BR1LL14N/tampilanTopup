@@ -551,6 +551,16 @@ export function Header({ user }: HeaderProps) {
                     Kelola Game
                   </Link>
                   <Link
+                    href="/admin/banners"
+                    className={cn(
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
+                      pathname === "/admin/banners" && "nav-active bg-sky/10 text-sky"
+                    )}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Kelola Banner
+                  </Link>
+                  <Link
                     href="/admin/products"
                     className={cn(
                       "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",

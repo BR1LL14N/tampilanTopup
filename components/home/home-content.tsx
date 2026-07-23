@@ -159,9 +159,37 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
     }
   }
 
-  // Carousel State
+  // Carousel & Banners State
+  const [dynamicBanners, setDynamicBanners] = useState<any[]>([])
   const [activeSlide, setActiveSlide] = useState(0)
   const carouselInterval = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    async function loadBanners() {
+      try {
+        const res = await fetch("/api/banners")
+        const data = await res.json()
+        if (data.banners && data.banners.length > 0) {
+          setDynamicBanners(data.banners)
+        }
+      } catch (err) {
+        console.error("Failed to load hero banners:", err)
+      }
+    }
+    loadBanners()
+  }, [])
+
+  const activeSlides = dynamicBanners.length > 0
+    ? dynamicBanners.map((b) => ({
+        bg: b.image_url,
+        link: b.link_url || "/games",
+        title: b.title || "Banner",
+      }))
+    : slides.map((s) => ({
+        bg: s.bg,
+        link: "/games",
+        title: s.title,
+      }))
 
   // Catalog Tab State
   const [activeTab, setActiveTab] = useState("all")
@@ -189,12 +217,12 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
   useEffect(() => {
     startCarousel()
     return () => stopCarousel()
-  }, [])
+  }, [activeSlides.length])
 
   const startCarousel = () => {
     stopCarousel()
     carouselInterval.current = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % slides.length)
+      setActiveSlide((prev) => (prev + 1) % activeSlides.length)
     }, 5500)
   }
 
@@ -206,13 +234,13 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
 
   const handlePrevSlide = () => {
     stopCarousel()
-    setActiveSlide((prev) => (prev - 1 + slides.length) % slides.length)
+    setActiveSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length)
     startCarousel()
   }
 
   const handleNextSlide = () => {
     stopCarousel()
-    setActiveSlide((prev) => (prev + 1) % slides.length)
+    setActiveSlide((prev) => (prev + 1) % activeSlides.length)
     startCarousel()
   }
 
@@ -278,15 +306,15 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             className="carousel-track flex transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${activeSlide * 100}%)` }}
           >
-            {slides.map((slide, idx) => (
+            {activeSlides.map((slide, idx) => (
               <div
                 key={idx}
-                onClick={() => router.push("/games")}
+                onClick={() => router.push(slide.link || "/games")}
                 className="carousel-slide relative w-full shrink-0 h-[220px] sm:h-[340px] md:h-[420px] lg:h-[460px] overflow-hidden cursor-pointer group/slide"
               >
                 <img
                   src={slide.bg}
-                  alt={`Banner ${idx + 1}`}
+                  alt={slide.title || `Banner ${idx + 1}`}
                   className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover/slide:scale-[1.03]"
                   loading={idx === 0 ? "eager" : "lazy"}
                 />
@@ -315,7 +343,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             <ChevronRight className="h-6 w-6 text-white stroke-[2.5]" />
           </button>
           <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2.5">
-            {slides.map((_, idx) => (
+            {activeSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => handleDotClick(idx)}
