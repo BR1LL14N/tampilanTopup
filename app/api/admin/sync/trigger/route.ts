@@ -16,6 +16,79 @@ function slugify(text: string) {
     .replace(/\-\-+/g, "-");
 }
 
+function isGameProduct(item: any): boolean {
+  if (!item || !item.brand) return false;
+
+  const category = (item.category || "").toLowerCase().trim();
+  const brand = (item.brand || "").toLowerCase().trim();
+  const productName = (item.product_name || "").toLowerCase().trim();
+  const cleanBrand = brand.replace(/[^a-z0-9]/g, "");
+
+  // 1. Explicit Non-Game Brand Exclusions (Pulsa, Operator, PLN, TV, E-Money)
+  const nonGameBrandList = [
+    "telkomsel", "indosat", "xl", "axis", "tri", "three", "smartfren", "byu",
+    "pln", "kvision", "kvisiondangol", "nexparabola", "matrixtv", "indovision", "tv",
+    "gopay", "ovo", "dana", "linkaja", "shopeepay", "maxim", "grab", "gojek", "isaku", "doku"
+  ];
+
+  if (nonGameBrandList.some(b => cleanBrand === b || cleanBrand.includes(b))) {
+    return false;
+  }
+
+  // 2. Explicit Non-Game Category Keywords
+  if (
+    category.includes("pulsa") ||
+    category.includes("data") ||
+    category.includes("internet") ||
+    category.includes("pln") ||
+    category.includes("pasca") ||
+    category.includes("e-money") ||
+    category.includes("emoney") ||
+    category.includes("tv") ||
+    category.includes("telepon") ||
+    category.includes("sms")
+  ) {
+    return false;
+  }
+
+  // 3. Explicit Non-Game Product Name Keywords
+  if (
+    productName.includes("pulsa") ||
+    productName.includes("paket data") ||
+    productName.includes("token pln") ||
+    productName.includes("voucher tv") ||
+    productName.includes("paket internet") ||
+    productName.includes("kuota")
+  ) {
+    return false;
+  }
+
+  // 4. Positive Game Inclusion Rules
+  if (category.includes("game") || category === "games" || category.includes("voucher game")) {
+    return true;
+  }
+
+  const gameKeywords = [
+    "mobile legend", "mlbb", "free fire", "pubg", "valorant", "genshin", "roblox",
+    "honor of kings", "hok", "steam", "point blank", "call of duty", "codm",
+    "arena of valor", "aov", "ragnarok", "clash of clans", "clash royale",
+    "fifa", "ea sports", "efootball", "eggy party", "honkai", "lifeafter", "stumble guys",
+    "higgs domino", "undawn", "arena breakout", "blood strike", "marvel", "supercell",
+    "garena", "unipin", "razer", "google play", "playstation", "xbox", "nintendo"
+  ];
+
+  if (gameKeywords.some(g => brand.includes(g) || productName.includes(g))) {
+    return true;
+  }
+
+  // If category is Voucher and not non-game, allow it as game voucher
+  if (category.includes("voucher")) {
+    return true;
+  }
+
+  return false;
+}
+
 export async function POST(req: NextRequest) {
   return handleSync(req);
 }
@@ -79,13 +152,28 @@ async function handleSync(req: NextRequest) {
 
     const allItems = result.data;
     
-    // Process ALL active Digiflazz products across all categories (Games, Pulsa, Data, PLN, TV, Voucher, etc.)
+    // Process ONLY active GAME products (filtering out Pulsa, Data, PLN, TV, Operator Telco, E-Money)
     const activeProducts = allItems.filter((item: any) => 
       item && item.brand && item.brand.trim() !== '' &&
-      item.buyer_product_status === true && item.seller_product_status === true
+      item.buyer_product_status === true && item.seller_product_status === true &&
+      isGameProduct(item)
     );
 
     const skippedProductsCount = allItems.length - activeProducts.length;
+
+    // Clean up non-game operator and utility entries from games and products tables
+    try {
+      await executeQuery(
+        `DELETE FROM products WHERE game_id IN (
+          SELECT id FROM games WHERE category IN ('Pulsa', 'Data', 'PLN', 'E-Money', 'TV') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
+        )`
+      );
+      await executeQuery(
+        `DELETE FROM games WHERE category IN ('Pulsa', 'Data', 'PLN', 'E-Money', 'TV') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
+      );
+    } catch (cleanupErr) {
+      console.warn("Non-game cleanup warning:", cleanupErr);
+    }
 
     // Fetch existing games/categories from database
     const dbGames = await executeQuery("SELECT id, name, slug FROM games");
