@@ -60,6 +60,7 @@ export default function AdminProductsPage() {
   const [games, setGames] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
+  const [selectedGameFilter, setSelectedGameFilter] = useState("all")
 
   // Bulk Action States
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([])
@@ -452,10 +453,11 @@ export default function AdminProductsPage() {
     )
   }
 
-  // Filter products by tab and search query
+  // Filter products by game, tab, and search query
   const filteredProducts = productsList.filter((product) => {
     const nameStr = product.name || ""
     const gameStr = product.game_name || product.game || ""
+    const gameId = product.game_id || ""
     const skuStr = product.provider_sku || ""
     const isFlash = product.is_flash_sale === 1 || product.is_flash_sale === true
 
@@ -470,7 +472,13 @@ export default function AdminProductsPage() {
       (activeTab === "inactive" && !(product.status === 1 || product.status === true)) ||
       (activeTab === "flash_sale" && isFlash)
 
-    return matchesSearch && matchesTab
+    const matchesGame =
+      selectedGameFilter === "all" ||
+      gameId === selectedGameFilter ||
+      product.game_slug === selectedGameFilter ||
+      gameStr.toLowerCase() === selectedGameFilter.toLowerCase()
+
+    return matchesSearch && matchesTab && matchesGame
   })
 
   return (
@@ -599,18 +607,42 @@ export default function AdminProductsPage() {
             </div>
 
             {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-4">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 mb-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
                 <Input
-                  placeholder="Cari nama, game, atau SKU..."
+                  placeholder="Cari nama produk, game, atau SKU..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 rounded-xl border-sky/30 text-xs font-semibold focus-visible:ring-sky"
+                  className="pl-10 rounded-xl border-sky/30 text-xs font-semibold focus-visible:ring-sky h-10"
                 />
               </div>
+
+              {/* Filter Game Dropdown */}
+              <div className="min-w-[200px]">
+                <select
+                  value={selectedGameFilter}
+                  onChange={(e) => setSelectedGameFilter(e.target.value)}
+                  className="w-full bg-[#183644] text-white border border-sky/30 rounded-xl px-3.5 py-2 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-sky cursor-pointer h-10 shadow-sm"
+                >
+                  <option value="all" className="bg-[#183644] text-white font-bold">
+                    🎮 Semua Game ({productsList.length})
+                  </option>
+                  {games.map((g) => {
+                    const count = productsList.filter(
+                      p => p.game_id === g.id || p.game_name === g.name || p.game_slug === g.slug
+                    ).length
+                    return (
+                      <option key={g.id} value={g.id} className="bg-[#183644] text-white font-medium">
+                        {g.name} ({count})
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="bg-sky/20 border border-sky/30 p-1 rounded-xl">
+                <TabsList className="bg-sky/20 border border-sky/30 p-1 rounded-xl h-10">
                   <TabsTrigger value="all" className="rounded-lg text-xs font-bold uppercase tracking-wider">Semua ({productsList.length})</TabsTrigger>
                   <TabsTrigger value="active" className="rounded-lg text-xs font-bold uppercase tracking-wider">Aktif ({productsList.filter(p => p.status === 1 || p.status === true).length})</TabsTrigger>
                   <TabsTrigger value="inactive" className="rounded-lg text-xs font-bold uppercase tracking-wider">Nonaktif ({productsList.filter(p => !(p.status === 1 || p.status === true)).length})</TabsTrigger>
