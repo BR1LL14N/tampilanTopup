@@ -26,6 +26,7 @@ import {
   Percent,
   Bell,
   MessageSquare,
+  Image as ImageIcon,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -768,6 +769,19 @@ export function Header({ user }: HeaderProps) {
                 >
                   <Gamepad2 className="h-4 w-4 group-hover:scale-105 transition-transform" />
                   {!isSidebarCollapsed && <span className="animate-fadeIn">Kelola Game</span>}
+                </Link>
+
+                <Link
+                  href="/admin/banners"
+                  className={cn(
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+                    pathname === "/admin/banners" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
+                  )}
+                  title={isSidebarCollapsed ? "Kelola Banner" : undefined}
+                >
+                  <ImageIcon className="h-4 w-4 group-hover:scale-105 transition-transform" />
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Kelola Banner</span>}
                 </Link>
 
                 <Link
