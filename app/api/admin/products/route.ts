@@ -35,7 +35,13 @@ export async function PUT(req: NextRequest) {
     if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
-    const { id, ...data } = await req.json();
+    const body = await req.json();
+    if (body.action === "bulk_status" || (Array.isArray(body.ids) && body.status !== undefined)) {
+      const { ids, status } = body;
+      await ProductService.bulkUpdateStatus(!!status, ids);
+      return NextResponse.json({ success: true, count: ids ? ids.length : "all" });
+    }
+    const { id, ...data } = body;
     if (!id) {
       return NextResponse.json({ error: "Missing product ID" }, { status: 400 });
     }

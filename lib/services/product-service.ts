@@ -144,6 +144,21 @@ export class ProductService {
   }
 
   /**
+   * Bulk updates status (active/inactive) for selected product IDs or all products.
+   */
+  static async bulkUpdateStatus(status: boolean, ids?: string[]): Promise<void> {
+    const statusVal = status ? true : false;
+    if (ids && ids.length > 0) {
+      const placeholders = ids.map((_, i) => `$${i + 2}`).join(", ");
+      const sql = `UPDATE products SET status = $1 WHERE id IN (${placeholders})`;
+      await executeQuery(sql, [statusVal, ...ids]);
+    } else {
+      const sql = `UPDATE products SET status = $1`;
+      await executeQuery(sql, [statusVal]);
+    }
+  }
+
+  /**
    * Deletes a product.
    */
   static async delete(id: string): Promise<void> {

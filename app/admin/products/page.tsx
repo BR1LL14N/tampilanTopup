@@ -47,6 +47,9 @@ import {
   AlertCircle,
   CheckCircle2,
   Eye,
+  CheckSquare,
+  Power,
+  PowerOff,
 } from "lucide-react"
 
 export default function AdminProductsPage() {
@@ -57,6 +60,10 @@ export default function AdminProductsPage() {
   const [games, setGames] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
+
+  // Bulk Action States
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([])
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false)
   
   // Sync States
   const [syncing, setSyncing] = useState(false)
@@ -298,6 +305,86 @@ export default function AdminProductsPage() {
     }
   }
 
+  // Bulk Status Update Handlers
+  const handleBulkStatusUpdate = async (targetStatus: boolean, scope: 'selected' | 'filtered' | 'all') => {
+    let idsToUpdate: string[] | undefined = undefined
+    let confirmMsg = ""
+
+    if (scope === 'selected') {
+      if (selectedProductIds.length === 0) {
+        alert("Pilih setidaknya 1 produk untuk diubah statusnya.")
+        return
+      }
+      idsToUpdate = selectedProductIds
+      confirmMsg = `Apakah Anda yakin ingin ${targetStatus ? 'MENGAKTIFKAN' : 'MENONAKTIFKAN'} ${selectedProductIds.length} produk terpilih?`
+    } else if (scope === 'filtered') {
+      idsToUpdate = filteredProducts.map((p) => p.id)
+      if (idsToUpdate.length === 0) {
+        alert("Tidak ada produk dalam hasil pencarian/filter saat ini.")
+        return
+      }
+      confirmMsg = `Apakah Anda yakin ingin ${targetStatus ? 'MENGAKTIFKAN' : 'MENONAKTIFKAN'} ${idsToUpdate.length} produk hasil filter ini?`
+    } else {
+      confirmMsg = `Apakah Anda yakin ingin ${targetStatus ? 'MENGAKTIFKAN SEMUA' : 'MENONAKTIFKAN SEMUA'} ${productsList.length} produk di database?`
+    }
+
+    if (!confirm(confirmMsg)) return
+
+    try {
+      setIsBulkUpdating(true)
+      const res = await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "bulk_status",
+          status: targetStatus,
+          ids: idsToUpdate,
+        })
+      })
+
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+
+      // Optimistically update local state
+      setProductsList((prev) =>
+        prev.map((p) => {
+          if (!idsToUpdate || idsToUpdate.includes(p.id)) {
+            return { ...p, status: targetStatus ? 1 : 0 }
+          }
+          return p
+        })
+      )
+
+      if (scope === 'selected') {
+        setSelectedProductIds([])
+      }
+
+      setSyncStatus(`Berhasil ${targetStatus ? 'mengaktifkan' : 'menonaktifkan'} produk!`)
+    } catch (err: any) {
+      alert("Gagal mengubah status massal: " + err.message)
+    } finally {
+      setIsBulkUpdating(false)
+    }
+  }
+
+  const toggleSelectProduct = (id: string) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    )
+  }
+
+  const toggleSelectAllFiltered = () => {
+    const filteredIds = filteredProducts.map((p) => p.id)
+    const allSelected = filteredIds.length > 0 && filteredIds.every((id) => selectedProductIds.includes(id))
+
+    if (allSelected) {
+      setSelectedProductIds((prev) => prev.filter((id) => !filteredIds.includes(id)))
+    } else {
+      const combined = Array.from(new Set([...selectedProductIds, ...filteredIds]))
+      setSelectedProductIds(combined)
+    }
+  }
+
   const handleDeleteProduct = async (productId: string) => {
     if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return
     try {
@@ -510,7 +597,7 @@ export default function AdminProductsPage() {
             </div>
 
             {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 mb-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
                 <Input
@@ -522,12 +609,109 @@ export default function AdminProductsPage() {
               </div>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="bg-sky/20 border border-sky/30 p-1 rounded-xl">
-                  <TabsTrigger value="all" className="rounded-lg text-xs font-bold uppercase tracking-wider">Semua</TabsTrigger>
-                  <TabsTrigger value="active" className="rounded-lg text-xs font-bold uppercase tracking-wider">Aktif</TabsTrigger>
-                  <TabsTrigger value="inactive" className="rounded-lg text-xs font-bold uppercase tracking-wider">Nonaktif</TabsTrigger>
+                  <TabsTrigger value="all" className="rounded-lg text-xs font-bold uppercase tracking-wider">Semua ({productsList.length})</TabsTrigger>
+                  <TabsTrigger value="active" className="rounded-lg text-xs font-bold uppercase tracking-wider">Aktif ({productsList.filter(p => p.status === 1 || p.status === true).length})</TabsTrigger>
+                  <TabsTrigger value="inactive" className="rounded-lg text-xs font-bold uppercase tracking-wider">Nonaktif ({productsList.filter(p => !(p.status === 1 || p.status === true)).length})</TabsTrigger>
                   <TabsTrigger value="flash_sale" className="rounded-lg text-xs font-bold uppercase tracking-wider">Flash Sale</TabsTrigger>
                 </TabsList>
               </Tabs>
+            </div>
+
+            {/* Bulk Action Controls Toolbar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 bg-[#183644]/90 backdrop-blur-md p-3.5 rounded-2xl border border-sky/30 shadow-sky-soft">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                  <CheckSquare className="h-4 w-4 text-sky" />
+                  Kontrol Status Massal:
+                </span>
+                {selectedProductIds.length > 0 && (
+                  <span className="px-2.5 py-1 rounded-lg bg-sky/20 border border-sky/30 text-sky text-[11px] font-black uppercase tracking-wider animate-pulse">
+                    {selectedProductIds.length} Terpilih
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {selectedProductIds.length > 0 ? (
+                  <>
+                    <Button
+                      size="sm"
+                      onClick={() => handleBulkStatusUpdate(true, 'selected')}
+                      disabled={isBulkUpdating}
+                      className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase tracking-wider rounded-xl h-8 shadow-sm transition-all"
+                    >
+                      {isBulkUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Power className="h-3.5 w-3.5 mr-1 text-emerald-400" />}
+                      Aktifkan ({selectedProductIds.length}) Terpilih
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      onClick={() => handleBulkStatusUpdate(false, 'selected')}
+                      disabled={isBulkUpdating}
+                      className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-[10px] font-black uppercase tracking-wider rounded-xl h-8 shadow-sm transition-all"
+                    >
+                      {isBulkUpdating ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <PowerOff className="h-3.5 w-3.5 mr-1 text-red-400" />}
+                      Nonaktifkan ({selectedProductIds.length}) Terpilih
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setSelectedProductIds([])}
+                      className="text-white/60 hover:text-white text-[10px] font-bold uppercase h-8"
+                    >
+                      Batal Pilih
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    {searchQuery || activeTab !== 'all' ? (
+                      <>
+                        <Button
+                          size="sm"
+                          onClick={() => handleBulkStatusUpdate(true, 'filtered')}
+                          disabled={isBulkUpdating || filteredProducts.length === 0}
+                          className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase tracking-wider rounded-xl h-8 shadow-sm"
+                          title="Aktifkan semua produk di hasil pencarian/filter"
+                        >
+                          <Power className="h-3.5 w-3.5 mr-1 text-emerald-400" />
+                          Aktifkan Hasil Filter ({filteredProducts.length})
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleBulkStatusUpdate(false, 'filtered')}
+                          disabled={isBulkUpdating || filteredProducts.length === 0}
+                          className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-[10px] font-black uppercase tracking-wider rounded-xl h-8 shadow-sm"
+                          title="Nonaktifkan semua produk di hasil pencarian/filter"
+                        >
+                          <PowerOff className="h-3.5 w-3.5 mr-1 text-red-400" />
+                          Nonaktifkan Hasil Filter ({filteredProducts.length})
+                        </Button>
+                      </>
+                    ) : null}
+
+                    <Button
+                      size="sm"
+                      onClick={() => handleBulkStatusUpdate(true, 'all')}
+                      disabled={isBulkUpdating}
+                      className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 text-[10px] font-black uppercase tracking-wider rounded-xl h-8 shadow-sm"
+                    >
+                      <Power className="h-3.5 w-3.5 mr-1 text-emerald-400" />
+                      Aktifkan SEMUA ({productsList.length})
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      onClick={() => handleBulkStatusUpdate(false, 'all')}
+                      disabled={isBulkUpdating}
+                      className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/40 text-[10px] font-black uppercase tracking-wider rounded-xl h-8 shadow-sm"
+                    >
+                      <PowerOff className="h-3.5 w-3.5 mr-1 text-red-400" />
+                      Nonaktifkan SEMUA ({productsList.length})
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Products Table Card */}
@@ -535,6 +719,18 @@ export default function AdminProductsPage() {
               <Table>
                 <TableHeader className="bg-sky/20/50">
                   <TableRow>
+                    <TableHead className="w-10 text-center">
+                      <input
+                        type="checkbox"
+                        checked={
+                          filteredProducts.length > 0 &&
+                          filteredProducts.every((p) => selectedProductIds.includes(p.id))
+                        }
+                        onChange={toggleSelectAllFiltered}
+                        className="h-4 w-4 rounded border-sky/30 accent-sky cursor-pointer align-middle"
+                        title="Pilih / Batal Pilih Semua"
+                      />
+                    </TableHead>
                     <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">Produk</TableHead>
                     <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">SKU</TableHead>
                     <TableHead className="text-xs font-black uppercase text-white/80 tracking-wider">Harga Modal</TableHead>
@@ -551,7 +747,15 @@ export default function AdminProductsPage() {
                     const isFlash = product.is_flash_sale === 1 || product.is_flash_sale === true
 
                     return (
-                      <TableRow key={product.id} className="hover:bg-sky/20/20 border-b border-sky/30">
+                      <TableRow key={product.id} className={`hover:bg-sky/20/20 border-b border-sky/30 ${selectedProductIds.includes(product.id) ? 'bg-sky/10' : ''}`}>
+                        <TableCell className="w-10 text-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedProductIds.includes(product.id)}
+                            onChange={() => toggleSelectProduct(product.id)}
+                            className="h-4 w-4 rounded border-sky/30 accent-sky cursor-pointer align-middle"
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mist backdrop-blur-md p-1.5 border border-sky/30">
