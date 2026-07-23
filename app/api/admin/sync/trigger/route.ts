@@ -152,14 +152,12 @@ async function handleSync(req: NextRequest) {
 
     const allItems = result.data;
     
-    // Process ONLY active GAME products (filtering out Pulsa, Data, PLN, TV, Operator Telco, E-Money)
-    const activeProducts = allItems.filter((item: any) => 
-      item && item.brand && item.brand.trim() !== '' &&
-      item.buyer_product_status === true && item.seller_product_status === true &&
-      isGameProduct(item)
+    // Filter ALL Digiflazz game items (both active and inactive)
+    const gameProductsFromDigiflazz = allItems.filter((item: any) => 
+      item && item.brand && item.brand.trim() !== '' && isGameProduct(item)
     );
 
-    const skippedProductsCount = allItems.length - activeProducts.length;
+    const skippedProductsCount = allItems.length - gameProductsFromDigiflazz.length;
 
     // Clean up non-game operator and utility entries from games and products tables
     try {
@@ -242,6 +240,7 @@ async function handleSync(req: NextRequest) {
 
     let productsCreated = 0;
     let productsUpdated = 0;
+    let productsDeactivated = 0;
     let gamesCreated = 0;
 
     // Dynamic markup from query param (default 8%)
@@ -251,14 +250,22 @@ async function handleSync(req: NextRequest) {
       : 1.08;
 
     const syncedItemsLog: any[] = [];
+    const digiflazzSkus = new Set<string>();
 
-    for (const item of activeProducts) {
+    for (const item of gameProductsFromDigiflazz) {
       const brand = item.brand || '';
       if (!brand || !brand.trim()) continue;
 
+      const providerSku = item.buyer_sku_code;
+      if (providerSku) {
+        digiflazzSkus.add(providerSku.toLowerCase());
+      }
+
+      const isDigiActive = item.buyer_product_status === true && item.seller_product_status === true;
+
       let gameObj = findGameMatch(brand);
 
-      if (!gameObj) {
+      if (!gameObj && isDigiActive) {
         let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         if (!slug) slug = 'cat-' + crypto.randomUUID().slice(0, 8);
 
@@ -274,46 +281,63 @@ async function handleSync(req: NextRequest) {
         gamesCreated++;
       }
 
+      if (!gameObj) continue;
+
       const gameId = gameObj.id;
-      const providerSku = item.buyer_sku_code;
       const productName = item.product_name;
       const modalPrice = Number(item.price);
       
       const rawSellPrice = modalPrice * markupPercentage;
       const sellPrice = Math.ceil(rawSellPrice / 100) * 100;
 
-      const isActive = true; // activeProducts filter guarantees buyer & seller status are true
-
       const existingProduct = await executeQuery(
-        "SELECT id, price, sell_price FROM products WHERE game_id = $1 AND provider_sku = $2 LIMIT 1",
-        [gameId, providerSku]
+        "SELECT id, price, sell_price, status FROM products WHERE provider_sku = $1 LIMIT 1",
+        [providerSku]
       );
 
       if (existingProduct.length > 0) {
+        // Automatically sync product status with Digiflazz status (0 if OFF/inactive, 1 if ON/active)
+        const targetStatus = isDigiActive ? 1 : 0;
         await executeQuery(
           `UPDATE products 
-           SET name = $1, price = $2, sell_price = $3, status = $4, provider_sku = $5, updated_at = CURRENT_TIMESTAMP 
-           WHERE id = $6`,
-          [productName, modalPrice, sellPrice, isActive ? 1 : 0, providerSku, existingProduct[0].id]
+           SET game_id = $1, name = $2, price = $3, sell_price = $4, status = $5, provider_sku = $6, updated_at = CURRENT_TIMESTAMP 
+           WHERE id = $7`,
+          [gameId, productName, modalPrice, sellPrice, targetStatus, providerSku, existingProduct[0].id]
         );
-        productsUpdated++;
-        syncedItemsLog.push({
-          sku: providerSku,
-          name: productName,
-          game: gameObj.name,
-          brand,
-          category: item.category,
-          old_price: existingProduct[0].price,
-          new_price: modalPrice,
-          sell_price: sellPrice,
-          type: 'UPDATE'
-        });
-      } else {
+
+        if (!isDigiActive) {
+          productsDeactivated++;
+          syncedItemsLog.push({
+            sku: providerSku,
+            name: productName,
+            game: gameObj.name,
+            brand,
+            category: item.category,
+            price: modalPrice,
+            sell_price: sellPrice,
+            type: 'DEACTIVATED',
+            reason: 'Dinonaktifkan otomatis (Status OFF dari Digiflazz)'
+          });
+        } else {
+          productsUpdated++;
+          syncedItemsLog.push({
+            sku: providerSku,
+            name: productName,
+            game: gameObj.name,
+            brand,
+            category: item.category,
+            old_price: existingProduct[0].price,
+            new_price: modalPrice,
+            sell_price: sellPrice,
+            type: 'UPDATE'
+          });
+        }
+      } else if (isDigiActive) {
         const id = crypto.randomUUID();
         await executeQuery(
           `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order) 
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [id, gameId, providerSku, productName, modalPrice, sellPrice, isActive ? 1 : 0, 0]
+          [id, gameId, providerSku, productName, modalPrice, sellPrice, 1, 0]
         );
         productsCreated++;
         syncedItemsLog.push({
@@ -329,6 +353,27 @@ async function handleSync(req: NextRequest) {
       }
     }
 
+    // Automatically deactivate DB products whose SKU no longer exists in Digiflazz pricelist
+    try {
+      const dbDigiProducts = await executeQuery(
+        "SELECT id, provider_sku, name FROM products WHERE provider_sku IS NOT NULL AND provider_sku != '' AND status = 1"
+      );
+      for (const p of dbDigiProducts) {
+        if (p.provider_sku && !digiflazzSkus.has(p.provider_sku.toLowerCase())) {
+          await executeQuery("UPDATE products SET status = 0, updated_at = CURRENT_TIMESTAMP WHERE id = $1", [p.id]);
+          productsDeactivated++;
+          syncedItemsLog.push({
+            sku: p.provider_sku,
+            name: p.name,
+            type: 'DEACTIVATED_MISSING',
+            reason: 'Dinonaktifkan otomatis (SKU tidak ditemukan di katalog Digiflazz)'
+          });
+        }
+      }
+    } catch (missingErr) {
+      console.warn("Deactivating missing SKUs warning:", missingErr);
+    }
+
     // 5. Update settings metadata
     await SettingService.set("last_sync_status", "success");
     await SettingService.set("last_sync_time", new Date().toISOString());
@@ -338,6 +383,7 @@ async function handleSync(req: NextRequest) {
       gamesCount: gamesList.length,
       productsCreated,
       productsUpdated,
+      productsDeactivated,
       gamesCreated,
       skippedProductsCount,
       totalDigiflazzCount: allItems.length,
@@ -345,9 +391,10 @@ async function handleSync(req: NextRequest) {
         totalFromDigiflazz: allItems.length,
         newAdded: productsCreated,
         updated: productsUpdated,
+        deactivated: productsDeactivated,
         skipped: skippedProductsCount
       },
-      sampleItems: activeProducts.slice(0, 10).map((i: any) => ({
+      sampleItems: gameProductsFromDigiflazz.slice(0, 10).map((i: any) => ({
         name: i.product_name,
         brand: i.brand,
         category: i.category,

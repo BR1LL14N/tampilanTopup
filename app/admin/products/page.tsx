@@ -168,10 +168,14 @@ export default function AdminProductsPage() {
       if (data.success) {
         const newAdded = data.productsCreated ?? data.summary?.newAdded ?? 0
         const updated = data.productsUpdated ?? data.summary?.updated ?? 0
+        const deactivated = data.productsDeactivated ?? data.summary?.deactivated ?? 0
         const skipped = data.skippedProductsCount ?? data.summary?.skipped ?? 0
         let msg = `Berhasil menyinkronkan: ${newAdded} produk baru, ${updated} produk diperbarui.`
+        if (deactivated > 0) {
+          msg += ` (${deactivated} produk dinonaktifkan otomatis mengikuti Digiflazz).`
+        }
         if (skipped > 0) {
-          msg += ` (${skipped} produk dari Digiflazz dilewati karena nonaktif dari supplier/game).`
+          msg += ` (${skipped} produk non-game dilewati).`
         }
         setSyncStatus(msg)
         if (data.log || data.sampleItems) {
