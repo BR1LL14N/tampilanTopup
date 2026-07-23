@@ -165,11 +165,11 @@ async function handleSync(req: NextRequest) {
     try {
       await executeQuery(
         `DELETE FROM products WHERE game_id IN (
-          SELECT id FROM games WHERE category IN ('Pulsa', 'Data', 'PLN', 'E-Money', 'TV') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
+          SELECT id FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'PLN', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
         )`
       );
       await executeQuery(
-        `DELETE FROM games WHERE category IN ('Pulsa', 'Data', 'PLN', 'E-Money', 'TV') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
+        `DELETE FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'PLN', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
       );
     } catch (cleanupErr) {
       console.warn("Non-game cleanup warning:", cleanupErr);

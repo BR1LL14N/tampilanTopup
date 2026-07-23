@@ -8,14 +8,26 @@ export async function GET(req: NextRequest) {
     if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
+    const { executeQuery } = await import("@/lib/db");
+
+    // Auto-purge any non-game operator / PPOB entries
+    try {
+      await executeQuery(
+        `DELETE FROM products WHERE game_id IN (
+          SELECT id FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'PLN', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
+        )`
+      );
+      await executeQuery(
+        `DELETE FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'PLN', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
+      );
+    } catch (_) {}
+
     const games = await GameService.getAll();
     
     // Fetch product counts on the server
-    const { executeQuery } = await import("@/lib/db");
     const gamesWithCount = await Promise.all(
       games.map(async (game: any) => {
         const rows = await executeQuery(`SELECT COUNT(*) as count FROM products WHERE game_id = $1`, [game.id]);
-        // Support both PostgreSQL (count) and MySQL (COUNT(*)) column naming
         const count = Number(rows[0]?.count ?? rows[0]?.COUNT ?? 0);
         return {
           ...game,
