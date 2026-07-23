@@ -79,11 +79,27 @@ export default function AdminTransactionsPage() {
   })
   const [submittingDirect, setSubmittingDirect] = useState(false)
 
+  const [selectedGameForDirect, setSelectedGameForDirect] = useState<string>("all")
+
+  // Extract unique games list from productsList
+  const uniqueGames = Array.from(
+    new Map(
+      productsList
+        .filter(p => p.game_name || p.game)
+        .map(p => [p.game_id || p.game_name, { id: p.game_id || p.game_name, name: p.game_name || p.game }])
+    ).values()
+  ).sort((a, b) => a.name.localeCompare(b.name))
+
   const selectedProductObj = productsList.find(p => p.id === directForm.product_id)
   const selectedGameSlug = selectedProductObj?.game_slug || selectedProductObj?.game_name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || ""
   const isMobileLegends = selectedGameSlug.includes("mobile-legend") || selectedGameSlug.includes("mlbb")
 
   const filteredProductsForSelect = productsList.filter(p => {
+    const gId = p.game_id || p.game_name
+    const matchesGame = selectedGameForDirect === "all" || gId === selectedGameForDirect || p.game_name === selectedGameForDirect
+
+    if (!matchesGame) return false
+
     if (!productSearch.trim()) return true
     const q = productSearch.toLowerCase()
     const pName = (p.name || "").toLowerCase()
@@ -95,6 +111,7 @@ export default function AdminTransactionsPage() {
   const openDirectTopupModal = async () => {
     setIsDirectTopupOpen(true)
     setProductSearch("")
+    setSelectedGameForDirect("all")
     if (productsList.length === 0) {
       setLoadingProducts(true)
       try {
@@ -794,28 +811,76 @@ export default function AdminTransactionsPage() {
           </DialogHeader>
 
           <form onSubmit={handleDirectTopupSubmit} className="space-y-4 pt-2">
-            <div>
-              <label className="text-xs font-bold text-white/80 uppercase block mb-1.5">Pilih Produk *</label>
+            {/* Step 1: Select Game */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-white/80 uppercase flex items-center justify-between">
+                <span>1. Pilih Game / Kategori *</span>
+                {selectedGameForDirect !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedGameForDirect("all"); setDirectForm(prev => ({ ...prev, product_id: "" })); }}
+                    className="text-[10px] text-sky hover:underline normal-case font-bold"
+                  >
+                    Reset Filter Game
+                  </button>
+                )}
+              </label>
+
               {loadingProducts ? (
-                <div className="h-10 bg-white/10 rounded-lg animate-pulse" />
+                <div className="h-10 bg-white/10 rounded-xl animate-pulse" />
+              ) : (
+                <select
+                  value={selectedGameForDirect}
+                  onChange={(e) => {
+                    setSelectedGameForDirect(e.target.value)
+                    setDirectForm(prev => ({ ...prev, product_id: "" }))
+                  }}
+                  className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-sky/30 text-white text-xs font-bold focus:outline-none focus:border-sky cursor-pointer shadow-sm"
+                >
+                  <option value="all" className="bg-[#183644] text-white font-bold">
+                    🎮 Semua Game ({productsList.length} Total Produk)
+                  </option>
+                  {uniqueGames.map((g) => {
+                    const count = productsList.filter(p => (p.game_id || p.game_name) === g.id || p.game_name === g.name).length
+                    return (
+                      <option key={g.id} value={g.id} className="bg-[#183644] text-white font-medium">
+                        {g.name} ({count} Nominal)
+                      </option>
+                    )
+                  })}
+                </select>
+              )}
+            </div>
+
+            {/* Step 2: Select Nominal Product */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-white/80 uppercase block">2. Pilih Nominal Produk *</label>
+              {loadingProducts ? (
+                <div className="h-10 bg-white/10 rounded-xl animate-pulse" />
               ) : (
                 <div className="space-y-2">
-                  <Input
-                    placeholder="🔍 Ketik nama game/produk atau SKU untuk mencari..."
-                    value={productSearch}
-                    onChange={(e) => setProductSearch(e.target.value)}
-                    className="bg-black/40 border-sky/30 text-white placeholder:text-white/40 text-xs"
-                  />
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/50" />
+                    <Input
+                      placeholder="Cari nominal/item atau SKU..."
+                      value={productSearch}
+                      onChange={(e) => setProductSearch(e.target.value)}
+                      className="pl-9 h-9 bg-black/40 border-sky/30 text-white placeholder:text-white/40 text-xs rounded-xl"
+                    />
+                  </div>
+
                   <select
                     required
                     value={directForm.product_id}
                     onChange={(e) => setDirectForm(prev => ({ ...prev, product_id: e.target.value }))}
-                    className="w-full h-10 px-3 rounded-lg bg-black/30 border border-sky/30 text-white text-xs focus:outline-none focus:border-sky"
+                    className="w-full h-11 px-3.5 rounded-xl bg-black/40 border border-sky/30 text-white text-xs font-bold focus:outline-none focus:border-sky cursor-pointer shadow-sm"
                   >
-                    <option value="" className="bg-[#183644]">-- Pilih Produk Topup ({filteredProductsForSelect.length} Produk) --</option>
+                    <option value="" className="bg-[#183644] text-white/60">
+                      -- Pilih Nominal ({filteredProductsForSelect.length} Item Tersedia) --
+                    </option>
                     {filteredProductsForSelect.map((p) => (
-                      <option key={p.id} value={p.id} className="bg-[#183644]">
-                        {p.game_name ? `${p.game_name} - ` : ''}{p.name} (SKU: {p.provider_sku || '-'}) - Rp {Number(p.price).toLocaleString("id-ID")}
+                      <option key={p.id} value={p.id} className="bg-[#183644] text-white">
+                        {selectedGameForDirect === "all" && p.game_name ? `${p.game_name} - ` : ''}{p.name} — Rp {Number(p.sell_price || p.price).toLocaleString("id-ID")} (SKU: {p.provider_sku || '-'})
                       </option>
                     ))}
                   </select>
