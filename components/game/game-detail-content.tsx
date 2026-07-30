@@ -17,7 +17,10 @@ import {
   User,
   Shield,
   FileText,
-  Tag
+  Tag,
+  Loader2,
+  Search,
+  CheckCircle2,
 } from "lucide-react"
 import { gameAssets, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
 import { formatCurrency } from "@/lib/utils"
@@ -95,6 +98,54 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(game.products[0] || null)
   const [quantity, setQuantity] = useState(1)
   const [whatsapp, setWhatsapp] = useState("")
+
+  // Nickname verification states
+  const [checkingId, setCheckingId] = useState(false)
+  const [verifiedNickname, setVerifiedNickname] = useState("")
+  const [checkError, setCheckError] = useState("")
+
+  const handleCheckNickname = async () => {
+    if (!gameId.trim()) {
+      setCheckError("Silakan masukkan User ID terlebih dahulu")
+      return
+    }
+    if (game.slug === "mobile-legends" && !serverId.trim()) {
+      setCheckError("Silakan masukkan Server ID terlebih dahulu")
+      return
+    }
+
+    setCheckingId(true)
+    setCheckError("")
+    setVerifiedNickname("")
+
+    try {
+      const res = await fetch("/api/game/check-id", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gameSlug: game.slug,
+          targetId: gameId.trim(),
+          serverId: serverId.trim(),
+          sku: selectedProduct?.provider_sku || undefined,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || data.error) {
+        setCheckError(data.error || "ID Akun tidak ditemukan / tidak valid")
+      } else if (data.nickname) {
+        setVerifiedNickname(data.nickname)
+        setCheckError("")
+      } else {
+        setCheckError("ID Akun tidak ditemukan / tidak valid")
+      }
+    } catch (err: any) {
+      setCheckError(err.message || "Gagal menghubungi server verifikasi")
+    } finally {
+      setCheckingId(false)
+    }
+  }
 
   // Promo Code states
   const [promoCode, setPromoCode] = useState("")
@@ -317,7 +368,11 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                         <span className="block text-xs font-bold uppercase tracking-wider text-white/60">User ID <span className="text-sky">*</span></span>
                         <input
                           value={gameId}
-                          onChange={(e) => setGameId(e.target.value)}
+                          onChange={(e) => {
+                            setGameId(e.target.value);
+                            setVerifiedNickname("");
+                            setCheckError("");
+                          }}
                           placeholder="Masukkan User ID"
                           className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
                           required
@@ -330,13 +385,50 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                           <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Server ID <span className="text-sky">*</span></span>
                           <input
                             value={serverId}
-                            onChange={(e) => setServerId(e.target.value)}
+                            onChange={(e) => {
+                              setServerId(e.target.value);
+                              setVerifiedNickname("");
+                              setCheckError("");
+                            }}
                             placeholder="Masukkan Server ID"
                             className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
                             required
                           />
                         </div>
                       )}
+
+                      {/* Real-time Nickname Verification Action & Result */}
+                      <div className="sm:col-span-2 space-y-2 pt-1 pb-1">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={handleCheckNickname}
+                            disabled={checkingId || !gameId.trim()}
+                            className="px-4 py-2.5 bg-sky/20 hover:bg-sky/40 border border-sky/40 hover:border-sky/70 text-sky hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                          >
+                            {checkingId ? (
+                              <Loader2 className="h-4 w-4 animate-spin text-sky" />
+                            ) : (
+                              <Search className="h-4 w-4 text-sky" />
+                            )}
+                            {checkingId ? "Mengecek ID ke Server Digiflazz..." : "🔍 Cek Nickname Akun Player"}
+                          </button>
+
+                          {verifiedNickname && (
+                            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-md animate-fadeIn">
+                              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                              <span>Akun Terverifikasi: <strong className="text-white underline decoration-emerald-400 decoration-2">{verifiedNickname}</strong></span>
+                            </div>
+                          )}
+                        </div>
+
+                        {checkError && (
+                          <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
+                            <span className="text-sm">⚠️</span>
+                            <span>{checkError}</span>
+                          </div>
+                        )}
+                      </div>
 
                       <div className="space-y-2">
                         <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Email (Opsional)</span>
@@ -625,9 +717,17 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                       <span className="font-mono text-sky font-bold bg-sky/10 px-2 py-0.5 rounded">x{quantity}</span>
                     </div>
                     {gameId && (
-                      <div className="flex justify-between items-center border-t border-sky/20 pt-3">
-                        <span className="text-white/60 uppercase text-[10px] tracking-wider">ID Akun</span>
-                        <span className="font-mono text-white font-bold">{gameId} {serverId && `(${serverId})`}</span>
+                      <div className="space-y-1.5 border-t border-sky/20 pt-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/60 uppercase text-[10px] tracking-wider">ID Akun</span>
+                          <span className="font-mono text-white font-bold">{gameId} {serverId && `(${serverId})`}</span>
+                        </div>
+                        {verifiedNickname && (
+                          <div className="flex justify-between items-center text-emerald-400">
+                            <span className="uppercase text-[10px] tracking-wider font-bold">Nickname Player</span>
+                            <span className="font-extrabold text-xs text-emerald-400 underline decoration-emerald-500">{verifiedNickname}</span>
+                          </div>
+                        )}
                       </div>
                     )}
                     {promoDiscount > 0 && (
