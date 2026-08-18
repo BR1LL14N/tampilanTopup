@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     let payment_url = null;
     
     const { SettingService } = await import('@/lib/services/setting-service');
-    const activeGateway = await SettingService.get('payment_gateway', 'doku');
+    const activeGateway = await SettingService.get('payment_gateway', 'midtrans');
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
     let customerName = 'Pelanggan';
