@@ -31,7 +31,7 @@ import {
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { gameAssets } from "@/lib/assets"
-import { getCachedUser } from "@/lib/auth-cache"
+import { getCachedUser, setCachedUser } from "@/lib/auth-cache"
 
 const IndonesiaFlag = ({ className = "h-3.5 w-5" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2" className={cn("rounded-sm object-cover shadow-sm inline-block border border-sky-border shrink-0", className)}>
@@ -278,23 +278,16 @@ export function Header({ user }: HeaderProps) {
 
   const handleLogout = async () => {
     try {
-      const { setCachedUser } = await import("@/lib/auth-cache")
       setCachedUser(null)
       if (typeof window !== "undefined") {
         sessionStorage.removeItem("topup_cached_user")
       }
       setCurrentUser(null)
       await fetch("/api/auth/logout", { method: "POST" })
-      
-      try {
-        const { createClient } = await import("@/lib/supabase/client")
-        const supabase = createClient()
-        await supabase.auth.signOut()
-      } catch (_) {}
     } catch (e) {
       console.error("Logout failed:", e)
     }
-    window.location.href = "/"
+    window.location.replace("/")
   }
 
   const handleSaveLangSettings = () => {

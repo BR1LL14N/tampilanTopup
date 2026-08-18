@@ -4,7 +4,7 @@ import { useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
+import { setCachedUser } from "@/lib/auth-cache"
 
 export default function LoginPage() {
   return (
@@ -32,20 +32,30 @@ function LoginForm() {
     password: "",
   })
 
-  const supabase = createClient()
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (isLoading) return
     setIsLoading(true)
     setError("")
+
+    // Extract values with fallback to FormData in case browser autofill didn't trigger React onChange
+    const nativeForm = new FormData(e.currentTarget)
+    const emailVal = (nativeForm.get("email") as string || formData.email).trim()
+    const passwordVal = (nativeForm.get("password") as string || formData.password)
+
+    if (!emailVal || !passwordVal) {
+      setError("Silakan masukkan email dan password Anda.")
+      setIsLoading(false)
+      return
+    }
 
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
+          email: emailVal,
+          password: passwordVal,
         }),
       })
 
@@ -61,7 +71,6 @@ function LoginForm() {
       }
 
       if (data.user) {
-        const { setCachedUser } = await import("@/lib/auth-cache")
         setCachedUser({
           name: data.user.name || '',
           email: data.user.email || '',
@@ -70,10 +79,10 @@ function LoginForm() {
       }
 
       const targetUrl = data.user?.role === "admin" ? "/admin" : "/dashboard"
-      window.location.href = targetUrl
+      // Use replace so login is committed and redirects immediately on 1st click
+      window.location.replace(targetUrl)
     } catch (err: any) {
       setError(err.message || "Login gagal. Silakan periksa email dan password Anda.")
-    } finally {
       setIsLoading(false)
     }
   }
