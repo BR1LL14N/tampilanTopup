@@ -44,11 +44,20 @@ export async function processOrderFulfillment(invoice: string): Promise<any> {
     const { SettingService } = await import('@/lib/services/setting-service');
     const { getDigiflazzCredentials } = await import('@/lib/digiflazz');
     const dbMode = await SettingService.get('digiflazz_mode', '');
+    const dbPaymentGateway = await SettingService.get('payment_gateway', 'midtrans');
+    const dbMidtransMode = await SettingService.get('midtrans_mode', 'sandbox');
+    const dbDokuMode = await SettingService.get('doku_mode', 'sandbox');
+
+    const isGatewaySandbox = (dbPaymentGateway === 'midtrans' && dbMidtransMode === 'sandbox') ||
+                             (dbPaymentGateway === 'doku' && dbDokuMode === 'sandbox');
+
     const { mode } = getDigiflazzCredentials();
     const activeMode = (dbMode || mode || process.env.DIGIFLAZZ_MODE || 'production').trim();
-    const isTesting = (activeMode === 'simulation' || activeMode === 'sandbox');
+    
+    // Safety Shield: If payment was made via Sandbox OR Digiflazz is in Simulation, treat as safe testing (never deduct real production balance)
+    const isTesting = isGatewaySandbox || (activeMode === 'simulation' || activeMode === 'sandbox');
 
-    console.log(`[Fulfillment] Executing Digiflazz topup SKU: ${product.provider_sku}, Target: ${transaction.target_id}, Ref: ${transaction.invoice}, Mode: ${isTesting ? 'Sandbox' : 'Production'}`);
+    console.log(`[Fulfillment] Executing Digiflazz topup SKU: ${product.provider_sku}, Target: ${transaction.target_id}, Ref: ${transaction.invoice}, Mode: ${isTesting ? 'Sandbox / Simulasi' : 'Production'}`);
 
     const response = await createTopup(
       product.provider_sku,

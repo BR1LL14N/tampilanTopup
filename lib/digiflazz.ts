@@ -131,8 +131,8 @@ export async function createTopup(
 ): Promise<any> {
   const { mode } = getDigiflazzCredentials();
 
-  if (mode === 'simulation') {
-    // Simulasi berdasarkan Test Case Resmi Digiflazz
+  if (mode === 'simulation' || mode === 'sandbox' || testing) {
+    // Simulasi Pengujian Dev / Sandbox (Tidak Memotong Saldo Riil)
     if (customerNo === '087800001230') {
       // Skenario Sukses
       return {
