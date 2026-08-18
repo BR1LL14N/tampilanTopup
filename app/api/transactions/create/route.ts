@@ -173,6 +173,29 @@ export async function POST(req: NextRequest) {
             });
           }
 
+          // Filter active payment methods based on Merchant Midtrans account:
+          // Active: QRIS Dinamis (GoPay), GoPay, BNI VA, BRI VA, Mandiri Bill, Permata VA, CIMB VA, BSI/Other VA, SeaBank
+          let enabledPayments: string[] = [];
+
+          if (amount < 10000) {
+            // Virtual Accounts in Indonesia strictly require minimum Rp 10.000.
+            // For micro-transactions under Rp 10.000 (< 10k), enable QRIS & E-Wallets:
+            enabledPayments = ['qris', 'gopay', 'shopeepay'];
+          } else {
+            // For transactions >= Rp 10.000, enable all active channels:
+            enabledPayments = [
+              'qris',
+              'gopay',
+              'bni_va',
+              'bri_va',
+              'echannel',      // Mandiri Bill
+              'permata_va',
+              'cimb_va',
+              'other_va',       // BSI & SeaBank / Other Bank VA
+              'shopeepay'
+            ];
+          }
+
           const midtransRes = await fetch(midtransUrl, {
             method: 'POST',
             headers: {
@@ -191,6 +214,7 @@ export async function POST(req: NextRequest) {
                 phone: customerPhone,
               },
               item_details: itemDetails,
+              enabled_payments: enabledPayments,
               callbacks: {
                 finish: `${siteUrl}/history/${invoice}`
               }

@@ -723,6 +723,12 @@ export default function CheckoutPage() {
                   <CardTitle>Pilih Metode Pembayaran</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {finalTotal < 10000 && (
+                    <div className="mb-4 p-3 rounded-xl bg-sky/10 border border-sky/30 text-sky text-xs font-semibold flex items-center gap-2">
+                      <span>💡</span>
+                      <span>Transaksi di bawah Rp 10.000 diproses melalui <strong>QRIS &amp; GoPay</strong> (Bank Virtual Account memerlukan minimal Rp 10.000).</span>
+                    </div>
+                  )}
                   <div className="space-y-3">
                     {paymentMethods.map((method) => (
                       <button
