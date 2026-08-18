@@ -95,10 +95,14 @@ export default function InvoiceDetailPage() {
   useEffect(() => {
     if (!invoiceId) return
 
-    const fetchInvoice = async () => {
-      setIsLoading(true)
-      setError("")
-      setResult(null)
+    let isSubscribed = true
+    let pollTimer: NodeJS.Timeout | null = null
+
+    const fetchInvoice = async (isInitial = false) => {
+      if (isInitial) {
+        setIsLoading(true)
+        setError("")
+      }
 
       try {
         const invStr = String(invoiceId).toUpperCase()
@@ -106,18 +110,20 @@ export default function InvoiceDetailPage() {
         // 1. Check Mock Data
         const mockMatch = mockTransactions.find(t => t.invoice === invStr)
         if (mockMatch) {
-          setResult({
-            invoice: mockMatch.invoice,
-            product: mockMatch.product_name,
-            game: mockMatch.game_name,
-            target_id: mockMatch.target_id,
-            amount: mockMatch.amount,
-            status: mockMatch.topup_status,
-            payment_method: mockMatch.payment_method,
-            payment_status: mockMatch.payment_status,
-            date: mockMatch.created_at,
-          })
-          setIsLoading(false)
+          if (isSubscribed) {
+            setResult({
+              invoice: mockMatch.invoice,
+              product: mockMatch.product_name,
+              game: mockMatch.game_name,
+              target_id: mockMatch.target_id,
+              amount: mockMatch.amount,
+              status: mockMatch.topup_status,
+              payment_method: mockMatch.payment_method,
+              payment_status: mockMatch.payment_status,
+              date: mockMatch.created_at,
+            })
+            setIsLoading(false)
+          }
           return
         }
 
@@ -125,11 +131,15 @@ export default function InvoiceDetailPage() {
         const res = await fetch(`/api/transactions/check?invoice=${encodeURIComponent(invStr)}`)
         const dataJson = await res.json()
 
+        if (!isSubscribed) return
+
         if (dataJson.error || !dataJson.transaction) {
-          setError(dataJson.error || "Transaksi tidak ditemukan. Harap periksa kembali nomor invoice Anda.")
+          if (isInitial) {
+            setError(dataJson.error || "Transaksi tidak ditemukan. Harap periksa kembali nomor invoice Anda.")
+          }
         } else {
           const data = dataJson.transaction
-          setResult({
+          const updatedResult = {
             invoice: data.invoice,
             product: data.product_name,
             game: data.game_name,
@@ -143,16 +153,32 @@ export default function InvoiceDetailPage() {
             password: data.password,
             request_notes: data.request_notes,
             sn: data.sn || data.provider_ref,
-          })
+          }
+          setResult(updatedResult)
+
+          // If transaction is still pending payment or processing topup, continue polling
+          const isPending = data.payment_status === "pending" || data.topup_status === "processing" || data.topup_status === "pending"
+          if (isPending && isSubscribed) {
+            pollTimer = setTimeout(() => fetchInvoice(false), 3500)
+          }
         }
       } catch (err) {
-        setError("Terjadi kesalahan saat memeriksa transaksi. Silakan coba lagi.")
+        if (isInitial && isSubscribed) {
+          setError("Terjadi kesalahan saat memeriksa transaksi. Silakan coba lagi.")
+        }
       } finally {
-        setIsLoading(false)
+        if (isInitial && isSubscribed) {
+          setIsLoading(false)
+        }
       }
     }
 
-    fetchInvoice()
+    fetchInvoice(true)
+
+    return () => {
+      isSubscribed = false
+      if (pollTimer) clearTimeout(pollTimer)
+    }
   }, [invoiceId])
 
   const bevelStyle = {
