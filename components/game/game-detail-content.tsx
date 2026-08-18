@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
@@ -21,6 +21,9 @@ import {
   Loader2,
   Search,
   CheckCircle2,
+  Crown,
+  Sparkles,
+  Layers,
 } from "lucide-react"
 import { gameAssets, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
 import { formatCurrency } from "@/lib/utils"
@@ -95,9 +98,46 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
   const [requestNotes, setRequestNotes] = useState("")
 
   // Selection states
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(game.products[0] || null)
   const [quantity, setQuantity] = useState(1)
   const [whatsapp, setWhatsapp] = useState("")
+
+  // Helper to identify Pass, Membership, Weekly, Monthly, Starlight products
+  const isPassOrMembership = (name: string, sku: string = "") => {
+    const str = `${name} ${sku}`.toLowerCase()
+    return /pass|weekly|monthly|starlight|twilight|membership|member|langganan|subscription|welkin|battle\s*pass/i.test(str)
+  }
+
+  // Filter & Sort Products (from lowest price to highest)
+  const [nominalCategory, setNominalCategory] = useState<"all" | "regular" | "pass">("all")
+
+  const sortedAllProducts = useMemo(() => {
+    return [...(game.products || [])].sort(
+      (a, b) => (Number(a.sell_price) || 0) - (Number(b.sell_price) || 0)
+    )
+  }, [game.products])
+
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(() => {
+    const sorted = [...(game.products || [])].sort(
+      (a, b) => (Number(a.sell_price) || 0) - (Number(b.sell_price) || 0)
+    )
+    return sorted[0] || null
+  })
+
+  const passProducts = useMemo(() => {
+    return sortedAllProducts.filter((p) => isPassOrMembership(p.name, p.provider_sku))
+  }, [sortedAllProducts])
+
+  const regularProducts = useMemo(() => {
+    return sortedAllProducts.filter((p) => !isPassOrMembership(p.name, p.provider_sku))
+  }, [sortedAllProducts])
+
+  const hasPassProducts = passProducts.length > 0
+
+  const displayedProducts = useMemo(() => {
+    if (nominalCategory === "pass") return passProducts
+    if (nominalCategory === "regular") return regularProducts
+    return sortedAllProducts
+  }, [nominalCategory, passProducts, regularProducts, sortedAllProducts])
 
   // Nickname verification states
   const [checkingId, setCheckingId] = useState(false)
@@ -509,28 +549,81 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
 
                   {/* Step 2: Pilih Nominal */}
                   <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
-                    <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">2</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-white">Pilih Nominal Top Up</h3>
+                    <div className="p-4 border-b border-sky/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark-stripes-teal">
+                      <div className="flex items-center gap-3">
+                        <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">2</span>
+                        <h3 className="text-xs font-black uppercase tracking-widest text-white">Pilih Nominal Top Up</h3>
+                      </div>
+
+                      {/* Category Filter Tabs (Semua / Diamonds / Membership Pass) */}
+                      {hasPassProducts && (
+                        <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-sky/20 self-start sm:self-auto overflow-x-auto max-w-full">
+                          <button
+                            type="button"
+                            onClick={() => setNominalCategory("all")}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                              nominalCategory === "all"
+                                ? "bg-sky text-white shadow-sky-soft"
+                                : "text-white/60 hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            <Layers className="h-3 w-3" />
+                            Semua ({sortedAllProducts.length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setNominalCategory("regular")}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                              nominalCategory === "regular"
+                                ? "bg-sky text-white shadow-sky-soft"
+                                : "text-white/60 hover:text-white hover:bg-white/5"
+                            }`}
+                          >
+                            <Sparkles className="h-3 w-3" />
+                            Diamonds / Koin ({regularProducts.length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setNominalCategory("pass")}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                              nominalCategory === "pass"
+                                ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold shadow-sm"
+                                : "text-amber-300/70 hover:text-amber-300 hover:bg-amber-500/10"
+                            }`}
+                          >
+                            <Crown className="h-3 w-3" />
+                            Pass &amp; Member ({passProducts.length})
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-3 sm:p-6">
                       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4">
-                        {game.products.map((prod) => {
+                        {displayedProducts.map((prod) => {
                           const originalPrice = Math.round(prod.sell_price * 1.25)
                           const discount = 20
                           const isSelected = selectedProduct?.id === prod.id
+                          const isPassItem = isPassOrMembership(prod.name, prod.provider_sku)
                           return (
                             <button
                               key={prod.id}
                               onClick={() => setSelectedProduct(prod)}
-                              className={`w-full p-2.5 sm:p-4 text-left group rounded-[16px] sm:rounded-[20px] transition-all duration-300 border ${
+                              className={`w-full p-2.5 sm:p-4 text-left group rounded-[16px] sm:rounded-[20px] transition-all duration-300 border relative overflow-hidden ${
                                 isSelected
                                   ? "border-sky bg-sky/10 shadow-lg scale-[1.02] ring-2 ring-sky/30"
+                                  : isPassItem
+                                  ? "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:-translate-y-0.5 shadow-md hover:bg-amber-500/10 hover:shadow-lg"
                                   : "border-white/10 bg-black/20 hover:border-white/30 hover:-translate-y-0.5 shadow-md hover:bg-white/5 hover:shadow-lg"
                               }`}
                               type="button"
                             >
+                              {isPassItem && (
+                                <span className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-yellow-400 text-slate-950 font-black text-[8px] sm:text-[9px] uppercase px-2 py-0.5 rounded-bl-lg tracking-wider flex items-center gap-1 shadow-sm">
+                                  <Crown className="h-2.5 w-2.5" />
+                                  PASS
+                                </span>
+                              )}
                               <span className="mb-2 sm:mb-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-black/30 p-1 sm:p-1.5 border border-white/10 group-hover:border-white/20 transition-colors">
                                 <img
                                   src={getItemAssetForProduct(prod.name, prod.provider_sku, game.name)}
@@ -548,7 +641,11 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                                 </span>
                               </div>
                               <span className={`inline-block px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-black uppercase tracking-wider mt-2 sm:mt-3 ${
-                                isSelected ? "bg-sky text-white shadow-sm shadow-sky/50" : "bg-red-500/20 text-red-400"
+                                isSelected 
+                                  ? "bg-sky text-white shadow-sm shadow-sky/50" 
+                                  : isPassItem
+                                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                  : "bg-red-500/20 text-red-400"
                               }`}>
                                 HEMAT {discount}%
                               </span>
