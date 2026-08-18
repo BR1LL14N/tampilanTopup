@@ -208,72 +208,99 @@ export default function AdminDashboardPage() {
       setCurrentUser(cached)
     }
 
-    async function verifyAdminAndFetchData() {
+    async function loadStatsAndActivities(isInitial = false) {
       try {
-        const resUser = await fetch("/api/auth/me")
-        const { user } = await resUser.json()
+        if (isInitial) {
+          const resUser = await fetch("/api/auth/me")
+          const { user } = await resUser.json()
 
-        if (!user || user.role !== "admin") {
-          setCachedUser(null)
-          router.push("/auth/login")
-          return
+          if (!user || user.role !== "admin") {
+            setCachedUser(null)
+            router.push("/auth/login")
+            return
+          }
+
+          setIsAdmin(true)
+          setCachedUser(user)
+          setCurrentUser(user)
+
+          // Load Settings ONCE on initial mount
+          try {
+            const resSettings = await fetch("/api/admin/settings")
+            const settingsData = await resSettings.json()
+            if (settingsData.settings) {
+              setIsSyncActive(settingsData.settings.isSyncActive)
+              setDigiflazzMode(settingsData.settings.digiflazzMode || "production")
+              setDigiflazzUsername(settingsData.settings.digiflazzUsername || "")
+              setSyncInterval(settingsData.settings.syncInterval)
+              setLastSyncTime(settingsData.settings.lastSyncTime)
+              setLastSyncStatus(settingsData.settings.lastSyncStatus)
+              setMidtransMode(settingsData.settings.midtransMode || "sandbox")
+              setPaymentGateway(settingsData.settings.paymentGateway || "midtrans")
+              setPaymentMethodType(settingsData.settings.paymentMethodType || "checkout")
+              setDokuClientId(settingsData.settings.dokuClientId || "")
+              setDokuSharedKey(settingsData.settings.dokuSharedKey || "")
+              setDokuMode(settingsData.settings.dokuMode || "sandbox")
+              setWaStatus(settingsData.settings.waStatus || "disabled")
+              setWaMethod(settingsData.settings.waMethod || "baileys")
+              setWaEndpoint(settingsData.settings.waEndpoint || "http://localhost:5000/send")
+              setWaToken(settingsData.settings.waToken || "")
+              setWaAdminNumber(settingsData.settings.waAdminNumber || "")
+              setWaCustomerNotif(settingsData.settings.waCustomerNotif !== false)
+            }
+          } catch (err) {
+            console.error("Error loading sync settings:", err)
+          }
         }
 
-        setIsAdmin(true)
-        setCachedUser(user)
-        setCurrentUser(user)
-
-        // Fetch stats
+        // Fetch live stats & activities (polled periodically)
         const resStats = await fetch("/api/admin/stats")
         const data = await resStats.json()
 
         if (data.stats) {
-          if (data.stats.digiflazzMode) setDigiflazzMode(data.stats.digiflazzMode)
-          if (data.stats.digiflazzUsername) setDigiflazzUsername(data.stats.digiflazzUsername)
+          setStats([
+            {
+              title: "Total Revenue",
+              value: formatCurrency(Number(data.stats.totalRevenue) || 0),
+              change: "+12.5%",
+              trend: "up",
+              icon: TrendingUp,
+              color: "text-green-500 bg-green-50 border-green-500/20",
+            },
+            {
+              title: "Total Transaksi",
+              value: String(data.stats.totalTxCount || 0),
+              change: "+8.2%",
+              trend: "up",
+              icon: ShoppingBag,
+              color: "text-sky bg-sky/10 border-sky/20",
+            },
+            {
+              title: "Total User",
+              value: String(data.stats.userCount || 0),
+              change: "+15.3%",
+              trend: "up",
+              icon: Users,
+              color: "text-blue-500 bg-blue-50 border-blue-500/20",
+            },
+            {
+              title: "Total Game",
+              value: String(data.stats.gameCount || 0),
+              change: "0%",
+              trend: "neutral",
+              icon: Gamepad2,
+              color: "text-purple-500 bg-purple-50 border-purple-500/20",
+            },
+            {
+              title: "Saldo Digiflazz",
+              value: formatCurrency(Number(data.stats.digiflazzBalance) || 0),
+              change: "Live",
+              trend: "neutral",
+              icon: Wallet,
+              color: "text-amber-500 bg-amber-50 border-amber-500/20",
+            },
+          ])
         }
-
-        setStats([
-          {
-            title: "Total Revenue",
-            value: formatCurrency(Number(data.stats.totalRevenue) || 0),
-            change: "+12.5%",
-            trend: "up",
-            icon: TrendingUp,
-            color: "text-green-500 bg-green-50 border-green-500/20",
-          },
-          {
-            title: "Total Transaksi",
-            value: String(data.stats.totalTxCount || 0),
-            change: "+8.2%",
-            trend: "up",
-            icon: ShoppingBag,
-            color: "text-sky bg-sky/10 border-sky/20",
-          },
-          {
-            title: "Total User",
-            value: String(data.stats.userCount || 0),
-            change: "+15.3%",
-            trend: "up",
-            icon: Users,
-            color: "text-blue-500 bg-blue-50 border-blue-500/20",
-          },
-          {
-            title: "Total Game",
-            value: String(data.stats.gameCount || 0),
-            change: "0%",
-            trend: "neutral",
-            icon: Gamepad2,
-            color: "text-purple-500 bg-purple-50 border-purple-500/20",
-          },
-          {
-            title: "Saldo Digiflazz",
-            value: formatCurrency(Number(data.stats.digiflazzBalance) || 0),
-            change: "Live",
-            trend: "neutral",
-            icon: Wallet,
-            color: "text-amber-500 bg-amber-50 border-amber-500/20",
-          },
-        ])
 
         if (data.recentTransactions) {
           setRecentTransactions(data.recentTransactions.map((tx: any) => ({
@@ -297,7 +324,7 @@ export default function AdminDashboardPage() {
         }
         
         // Play notification sound if new transactions arrive
-        const currentTxCount = Number(data.stats.totalTxCount || 0)
+        const currentTxCount = Number(data.stats?.totalTxCount || 0)
         setPrevTxCount((prev) => {
           if (prev !== null && currentTxCount > prev) {
             playNotificationChime()
@@ -314,46 +341,19 @@ export default function AdminDashboardPage() {
             feedbacks: data.activities.feedbacks || []
           });
         }
-
-        // Fetch sync settings
-        try {
-          const resSettings = await fetch("/api/admin/settings")
-          const settingsData = await resSettings.json()
-          if (settingsData.settings) {
-            setIsSyncActive(settingsData.settings.isSyncActive)
-            setDigiflazzMode(settingsData.settings.digiflazzMode || "production")
-            setDigiflazzUsername(settingsData.settings.digiflazzUsername || "")
-            setSyncInterval(settingsData.settings.syncInterval)
-            setLastSyncTime(settingsData.settings.lastSyncTime)
-            setLastSyncStatus(settingsData.settings.lastSyncStatus)
-            setMidtransMode(settingsData.settings.midtransMode || "sandbox")
-            setPaymentGateway(settingsData.settings.paymentGateway || "midtrans")
-            setPaymentMethodType(settingsData.settings.paymentMethodType || "checkout")
-            setDokuClientId(settingsData.settings.dokuClientId || "")
-            setDokuSharedKey(settingsData.settings.dokuSharedKey || "")
-            setDokuMode(settingsData.settings.dokuMode || "sandbox")
-            setWaStatus(settingsData.settings.waStatus || "disabled")
-            setWaMethod(settingsData.settings.waMethod || "baileys")
-            setWaEndpoint(settingsData.settings.waEndpoint || "http://localhost:5000/send")
-            setWaToken(settingsData.settings.waToken || "")
-            setWaAdminNumber(settingsData.settings.waAdminNumber || "")
-            setWaCustomerNotif(settingsData.settings.waCustomerNotif !== false)
-          }
-        } catch (err) {
-          console.error("Error loading sync settings:", err)
-        }
-
       } catch (err) {
         console.error("Error loading admin data:", err)
       } finally {
-        setLoading(false)
+        if (isInitial) setLoading(false)
       }
     }
-    verifyAdminAndFetchData()
 
-    // 8-second polling interval for real-time transactions & audio alerts
+    // Load initial data on mount
+    loadStatsAndActivities(true)
+
+    // 8-second polling interval ONLY for live transactions & audio alerts (never overwrites form input)
     const pollInterval = setInterval(() => {
-      verifyAdminAndFetchData()
+      loadStatsAndActivities(false)
     }, 8000)
 
     return () => clearInterval(pollInterval)
