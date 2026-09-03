@@ -654,146 +654,181 @@ export default function AdminTransactionsPage() {
         </main>
       </SidebarContentWrapper>
 
-      {/* Detail & Status Management Dialog */}
+      {/* Detail & Status Management Dialog - Side-by-Side 2-Column Redesign */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-md bg-mist backdrop-blur-md border border-sky/30 shadow-sky-medium rounded-[24px] overflow-hidden p-6 text-white">
-          <DialogHeader className="mb-4">
-            <DialogTitle className="text-base font-black uppercase text-white">
-              Detail Transaksi
-            </DialogTitle>
-            <DialogDescription className="text-xs text-white/60 font-bold tracking-wider font-mono">
-              Invoice: {selectedTx?.invoice}
-            </DialogDescription>
+        <DialogContent className="max-w-4xl bg-[#142d3a] border border-sky/30 shadow-2xl rounded-[24px] overflow-hidden p-6 text-white max-h-[92vh] flex flex-col">
+          <DialogHeader className="mb-3 pb-3 border-b border-sky/20 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <DialogTitle className="text-base sm:text-lg font-black uppercase text-white flex items-center gap-2">
+                  Detail Transaksi
+                </DialogTitle>
+                <DialogDescription className="text-xs text-white/60 font-bold tracking-wider font-mono mt-0.5">
+                  Invoice: <span className="text-sky font-bold">{selectedTx?.invoice}</span>
+                </DialogDescription>
+              </div>
+              {selectedTx && (
+                <div className="flex items-center gap-2">
+                  <span className={`px-2.5 py-1 rounded-full font-bold uppercase text-[10px] ${getStatusBgColor(selectedTx.topup_status)}`}>
+                    Top Up: {selectedTx.topup_status === "success" ? "Berhasil" : selectedTx.topup_status === "processing" ? "Diproses" : selectedTx.topup_status === "pending" ? "Pending" : "Gagal"}
+                  </span>
+                  <span className={`px-2.5 py-1 rounded-full font-bold uppercase text-[10px] ${selectedTx.payment_status === "paid" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-amber-500/20 text-amber-400 border border-amber-500/30"}`}>
+                    Bayar: {selectedTx.payment_status === "paid" ? "Lunas" : selectedTx.payment_status?.toUpperCase() || "Belum"}
+                  </span>
+                </div>
+              )}
+            </div>
           </DialogHeader>
 
           {selectedTx && (
-            <div className="space-y-5 text-xs">
-              {/* Product and general info */}
-              <div className="border border-sky/30 rounded-xl bg-sky/20/40 p-4 space-y-2.5">
-                <div className="flex justify-between items-center">
-                  <span className="text-white/80 font-medium">Game / Produk</span>
-                  <span className="font-bold text-white">{selectedTx.game} - {selectedTx.product}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white/80 font-medium">Target ID / No. Tujuan</span>
-                  <span className="font-mono font-bold text-white bg-mist backdrop-blur-md px-2 py-0.5 rounded border border-sky/30">{selectedTx.target_id}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white/80 font-medium">Total Pembayaran</span>
-                  <span className="font-black text-sky text-sm">{formatCurrency(selectedTx.amount)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white/80 font-medium">Status Saat Ini</span>
-                  <span className={`px-2 py-0.5 rounded-full font-bold uppercase text-[9px] ${getStatusBgColor(selectedTx.topup_status)}`}>
-                    {selectedTx.topup_status === "success" ? "Berhasil" : selectedTx.topup_status === "processing" ? "Diproses" : selectedTx.topup_status === "pending" ? "Pending" : "Gagal"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Digiflazz Response / Error Details Box */}
-              {(selectedTx.provider_ref || selectedTx.provider_response) && (
-                <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl space-y-2 text-left">
-                  <div className="flex justify-between items-center border-b border-red-500/20 pb-2">
-                    <span className="text-red-400 font-bold uppercase tracking-wider text-[10px]">Detail Respon Provider (Digiflazz)</span>
-                    <span className="font-mono text-[10px] text-white/70 font-semibold">SN/Ref: {selectedTx.provider_ref || "-"}</span>
-                  </div>
-                  {(() => {
-                    let parsed: any = null;
-                    try {
-                      parsed = typeof selectedTx.provider_response === "string" ? JSON.parse(selectedTx.provider_response) : selectedTx.provider_response;
-                    } catch (e) {
-                      parsed = selectedTx.provider_response;
-                    }
-                    const dataObj = parsed?.data || parsed;
-                    const message = dataObj?.message || dataObj?.error || (typeof dataObj === "string" ? dataObj : null);
-                    const rc = dataObj?.rc;
-
-                    return (
-                      <div className="space-y-2 font-mono text-[11px] text-white/90">
-                        {rc && <p><span className="text-red-300 font-bold">Response Code (RC):</span> {rc}</p>}
-                        {message && <p><span className="text-red-300 font-bold">Keterangan Error:</span> {message}</p>}
-                        <div className="mt-2 pt-2 border-t border-red-500/10">
-                          <span className="text-[10px] text-white/50 block mb-1">Payload JSON Lengkap:</span>
-                          <pre className="text-[10px] text-emerald-400 overflow-x-auto whitespace-pre-wrap max-h-40 p-2.5 bg-black/50 rounded-lg border border-white/10 font-mono">
-                            {JSON.stringify(parsed, null, 2)}
-                          </pre>
-                        </div>
+            <div className="overflow-y-auto pr-1 flex-1 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+                
+                {/* KOLOM KIRI: Detail Produk, Akun & Respon Digiflazz */}
+                <div className="space-y-4">
+                  {/* Product and general info */}
+                  <div className="border border-sky/30 rounded-xl bg-black/20 p-4 space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/60 font-medium">Game / Produk</span>
+                      <span className="font-bold text-white text-right">{selectedTx.game} - {selectedTx.product}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/60 font-medium">Target ID / No. Tujuan</span>
+                      <span className="font-mono font-bold text-white bg-black/40 px-2.5 py-0.5 rounded border border-sky/30">{selectedTx.target_id}</span>
+                    </div>
+                    {selectedTx.whatsapp && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-white/60 font-medium">No. WhatsApp</span>
+                        <a 
+                          href={`https://wa.me/${selectedTx.whatsapp.replace(/^0/, '62').replace(/\D/g, '')}`} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="font-mono font-bold text-emerald-400 hover:underline flex items-center gap-1"
+                        >
+                          {selectedTx.whatsapp}
+                        </a>
                       </div>
-                    );
-                  })()}
-                </div>
-              )}
+                    )}
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/60 font-medium">Total Pembayaran</span>
+                      <span className="font-black text-sky text-base">{formatCurrency(selectedTx.amount)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/60 font-medium">Waktu Transaksi</span>
+                      <span className="text-white/80 font-mono text-[11px]">{formatDate(selectedTx.created_at)}</span>
+                    </div>
+                  </div>
 
-              {selectedTx.request_notes && (
-                <div className="bg-sky/20 border border-sky/30 p-4 rounded-xl">
-                  <div className="flex flex-col gap-1 text-xs text-left">
-                    <span className="text-white/80 font-semibold">Catatan Khusus Pelanggan:</span>
-                    <p className="bg-mist backdrop-blur-md p-2.5 rounded-lg border border-sky/30 font-medium text-white whitespace-pre-wrap leading-relaxed">{selectedTx.request_notes}</p>
+                  {/* Digiflazz Response / Error Details Box */}
+                  {(selectedTx.provider_ref || selectedTx.provider_response) && (
+                    <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl space-y-2 text-left text-xs">
+                      <div className="flex justify-between items-center border-b border-red-500/20 pb-2">
+                        <span className="text-red-400 font-bold uppercase tracking-wider text-[10px]">Respon Provider (Digiflazz)</span>
+                        <span className="font-mono text-[10px] text-white/70 font-semibold truncate max-w-[180px]">Ref: {selectedTx.provider_ref || "-"}</span>
+                      </div>
+                      {(() => {
+                        let parsed: any = null;
+                        try {
+                          parsed = typeof selectedTx.provider_response === "string" ? JSON.parse(selectedTx.provider_response) : selectedTx.provider_response;
+                        } catch (e) {
+                          parsed = selectedTx.provider_response;
+                        }
+                        const dataObj = parsed?.data || parsed;
+                        const message = dataObj?.message || dataObj?.error || (typeof dataObj === "string" ? dataObj : null);
+                        const rc = dataObj?.rc;
+
+                        return (
+                          <div className="space-y-2 font-mono text-[11px] text-white/90">
+                            {rc && <p><span className="text-red-300 font-bold">Response Code (RC):</span> {rc}</p>}
+                            {message && <p><span className="text-red-300 font-bold">Keterangan:</span> {message}</p>}
+                            <div className="mt-2 pt-2 border-t border-red-500/10">
+                              <span className="text-[10px] text-white/50 block mb-1">Payload JSON Lengkap:</span>
+                              <pre className="text-[10px] text-emerald-400 overflow-x-auto whitespace-pre-wrap max-h-44 p-2.5 bg-black/50 rounded-lg border border-white/10 font-mono">
+                                {JSON.stringify(parsed, null, 2)}
+                              </pre>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+
+                {/* KOLOM KANAN: Catatan, Kelola Status, dan Tindakan */}
+                <div className="space-y-4">
+                  {selectedTx.request_notes && (
+                    <div className="bg-sky/20 border border-sky/30 p-4 rounded-xl">
+                      <div className="flex flex-col gap-1 text-xs text-left">
+                        <span className="text-white/80 font-semibold">Catatan Khusus Pelanggan:</span>
+                        <p className="bg-black/30 p-2.5 rounded-lg border border-sky/20 font-medium text-white whitespace-pre-wrap leading-relaxed">{selectedTx.request_notes}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons to edit topup status */}
+                  <div className="border border-sky/30 rounded-xl bg-black/20 p-4 space-y-3">
+                    <span className="text-white/90 font-black uppercase tracking-wider text-[11px] block">Kelola Status Pesanan</span>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button
+                        disabled={updatingStatus || selectedTx.topup_status === "processing"}
+                        onClick={() => handleUpdateStatus(selectedTx.id, undefined, "processing")}
+                        variant="outline"
+                        className="h-9 text-[10px] font-black uppercase tracking-wider border-amber-400/50 hover:bg-amber-500/20 text-amber-400 shrink-0"
+                      >
+                        Set Diproses
+                      </Button>
+                      <Button
+                        disabled={updatingStatus || selectedTx.topup_status === "success"}
+                        onClick={() => handleUpdateStatus(selectedTx.id, undefined, "success")}
+                        className="h-9 text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white hover:bg-emerald-500 shrink-0 shadow-md shadow-emerald-900/30"
+                      >
+                        Set Berhasil
+                      </Button>
+                      <Button
+                        disabled={updatingStatus || selectedTx.topup_status === "failed"}
+                        onClick={() => handleUpdateStatus(selectedTx.id, undefined, "failed")}
+                        variant="destructive"
+                        className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-600 text-white hover:bg-red-500 shrink-0 shadow-md shadow-red-900/30"
+                      >
+                        Set Gagal
+                      </Button>
+                    </div>
+                    <div className="pt-1">
+                      <Button
+                        disabled={checkingDigiflazzStatus}
+                        onClick={() => handleCheckDigiflazzStatus(selectedTx.invoice)}
+                        className="w-full h-9 text-xs font-black uppercase tracking-wider bg-sky hover:bg-sky/90 text-white shadow-lg shadow-sky/20 flex items-center justify-center gap-2"
+                      >
+                        <RefreshCw className={`h-3.5 w-3.5 ${checkingDigiflazzStatus ? "animate-spin" : ""}`} />
+                        {checkingDigiflazzStatus ? "Mengecek ke Digiflazz..." : "Cek Status ke Digiflazz (Sync API)"}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Special Actions for failed or problem transactions */}
+                  <div className="border border-sky/30 rounded-xl bg-black/20 p-4 space-y-3">
+                    <span className="text-white/90 font-black uppercase tracking-wider text-[11px] block">Tindakan Penyelesaian (Gagal / Error)</span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        disabled={updatingStatus}
+                        onClick={() => handleRetry(selectedTx.id)}
+                        variant="outline"
+                        className="h-9 text-[10px] font-black uppercase tracking-wider border-sky/40 hover:bg-sky/20 text-sky shrink-0"
+                      >
+                        Proses Ulang (API)
+                      </Button>
+                      <Button
+                        disabled={updatingStatus || selectedTx.provider_ref === "REFUNDED"}
+                        onClick={() => handleRefund(selectedTx.id)}
+                        variant="destructive"
+                        className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-600 hover:bg-red-700 text-white shrink-0"
+                      >
+                        Refund &amp; Set Gagal
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* Action Buttons to edit topup status */}
-              <div className="space-y-2 pt-2 border-t border-sky/30">
-                <span className="text-white/80 font-black uppercase tracking-wider text-[10px] block">Kelola Status Pesanan</span>
-                <div className="grid grid-cols-3 gap-2">
-                  <Button
-                    disabled={updatingStatus || selectedTx.topup_status === "processing"}
-                    onClick={() => handleUpdateStatus(selectedTx.id, undefined, "processing")}
-                    variant="outline"
-                    className="h-9 text-[10px] font-black uppercase tracking-wider border-amber-300 hover:bg-amber-50 text-amber-600 shrink-0"
-                  >
-                    Set Diproses
-                  </Button>
-                  <Button
-                    disabled={updatingStatus || selectedTx.topup_status === "success"}
-                    onClick={() => handleUpdateStatus(selectedTx.id, undefined, "success")}
-                    className="h-9 text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white hover:bg-emerald-700 shrink-0"
-                  >
-                    Set Berhasil
-                  </Button>
-                  <Button
-                    disabled={updatingStatus || selectedTx.topup_status === "failed"}
-                    onClick={() => handleUpdateStatus(selectedTx.id, undefined, "failed")}
-                    variant="destructive"
-                    className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-500 text-white hover:bg-red-600 shrink-0"
-                  >
-                    Set Gagal
-                  </Button>
-                </div>
-                <div className="pt-2">
-                  <Button
-                    disabled={checkingDigiflazzStatus}
-                    onClick={() => handleCheckDigiflazzStatus(selectedTx.invoice)}
-                    className="w-full h-9 text-xs font-black uppercase tracking-wider bg-sky hover:bg-sky/90 text-white shadow-lg shadow-sky/20 flex items-center justify-center gap-2"
-                  >
-                    <RefreshCw className={`h-3.5 w-3.5 ${checkingDigiflazzStatus ? "animate-spin" : ""}`} />
-                    {checkingDigiflazzStatus ? "Mengecek ke Digiflazz..." : "Cek Status ke Digiflazz (Sync API)"}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Special Actions for failed or problem transactions */}
-              <div className="space-y-2 pt-2 border-t border-sky/30">
-                <span className="text-white/80 font-black uppercase tracking-wider text-[10px] block">Tindakan Penyelesaian (Gagal/Error)</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    disabled={updatingStatus}
-                    onClick={() => handleRetry(selectedTx.id)}
-                    variant="outline"
-                    className="h-9 text-[10px] font-black uppercase tracking-wider border-sky/30 hover:bg-sky-border/20 text-sky shrink-0"
-                  >
-                    Proses Ulang (API)
-                  </Button>
-                  <Button
-                    disabled={updatingStatus || selectedTx.provider_ref === "REFUNDED"}
-                    onClick={() => handleRefund(selectedTx.id)}
-                    variant="destructive"
-                    className="h-9 text-[10px] font-black uppercase tracking-wider bg-red-600 hover:bg-red-700 text-white shrink-0"
-                  >
-                    Refund & Set Gagal
-                  </Button>
-                </div>
               </div>
             </div>
           )}
