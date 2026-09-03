@@ -56,10 +56,12 @@ export default function AdminBannersPage() {
   const [selectedBanner, setSelectedBanner] = useState<any>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [uploadingImage, setUploadingImage] = useState(false)
+  const [uploadingDesktop, setUploadingDesktop] = useState(false)
+  const [uploadingMobile, setUploadingMobile] = useState(false)
   const [editForm, setEditForm] = useState({
     title: "",
     image_url: "",
+    mobile_image_url: "",
     link_url: "",
     status: true,
     sort_order: 0,
@@ -99,10 +101,12 @@ export default function AdminBannersPage() {
     fetchAdminData()
   }, [router])
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "desktop" | "mobile") => {
     const file = e.target.files?.[0]
     if (!file) return
-    setUploadingImage(true)
+    if (type === "desktop") setUploadingDesktop(true)
+    else setUploadingMobile(true)
+
     try {
       const formData = new FormData()
       formData.append("file", file)
@@ -114,14 +118,19 @@ export default function AdminBannersPage() {
       })
       const data = await res.json()
       if (data.url) {
-        setEditForm(prev => ({ ...prev, image_url: data.url }))
+        if (type === "desktop") {
+          setEditForm(prev => ({ ...prev, image_url: data.url }))
+        } else {
+          setEditForm(prev => ({ ...prev, mobile_image_url: data.url }))
+        }
       } else {
         alert(data.error || "Gagal mengunggah gambar")
       }
     } catch (err: any) {
       alert(err.message || "Gagal mengunggah gambar")
     } finally {
-      setUploadingImage(false)
+      if (type === "desktop") setUploadingDesktop(false)
+      else setUploadingMobile(false)
     }
   }
 
@@ -130,6 +139,7 @@ export default function AdminBannersPage() {
     setEditForm({
       title: banner.title || "",
       image_url: banner.image_url || "",
+      mobile_image_url: banner.mobile_image_url || "",
       link_url: banner.link_url || "",
       status: banner.status ? true : false,
       sort_order: banner.sort_order || 0,
@@ -142,6 +152,7 @@ export default function AdminBannersPage() {
     setEditForm({
       title: "",
       image_url: "",
+      mobile_image_url: "",
       link_url: "",
       status: true,
       sort_order: 0,
@@ -327,12 +338,36 @@ export default function AdminBannersPage() {
                       filteredBanners.map((b) => (
                         <TableRow key={b.id} className="border-sky/20 hover:bg-white/5">
                           <TableCell>
-                            <div className="h-16 w-36 rounded-xl border border-sky/30 overflow-hidden bg-black/40 relative shadow-md">
-                              <img
-                                src={b.image_url}
-                                alt={b.title || "Banner"}
-                                className="h-full w-full object-cover"
-                              />
+                            <div className="flex items-center gap-2">
+                              {/* Desktop thumbnail */}
+                              <div className="h-14 w-28 rounded-lg border border-sky/30 overflow-hidden bg-black/40 relative shadow-md shrink-0" title="Banner Desktop">
+                                <img
+                                  src={b.image_url}
+                                  alt={b.title || "Banner Desktop"}
+                                  className="h-full w-full object-cover"
+                                />
+                                <span className="absolute bottom-0 left-0 bg-black/80 text-sky text-[8px] font-black px-1.5 py-0.5 rounded-tr">
+                                  PC
+                                </span>
+                              </div>
+
+                              {/* Mobile thumbnail if available */}
+                              {b.mobile_image_url ? (
+                                <div className="h-14 w-12 rounded-lg border border-emerald-500/40 overflow-hidden bg-black/40 relative shadow-md shrink-0" title="Banner Mobile Khusus">
+                                  <img
+                                    src={b.mobile_image_url}
+                                    alt={b.title || "Banner Mobile"}
+                                    className="h-full w-full object-cover"
+                                  />
+                                  <span className="absolute bottom-0 left-0 bg-emerald-600/90 text-white text-[8px] font-black px-1 py-0.5 rounded-tr">
+                                    HP
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="h-14 w-12 rounded-lg border border-white/10 bg-black/20 flex flex-col items-center justify-center text-center p-1 shrink-0" title="Menggunakan gambar PC sebagai fallback">
+                                  <span className="text-[8px] text-white/40 font-bold leading-tight">Auto PC</span>
+                                </div>
+                              )}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -406,17 +441,17 @@ export default function AdminBannersPage() {
 
       {/* Edit / Add Banner Dialog Modal */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md bg-[#183644] border border-sky/30 rounded-[24px] p-6 shadow-2xl text-white">
+        <DialogContent className="max-w-2xl bg-[#183644] border border-sky/30 rounded-[24px] p-6 shadow-2xl text-white max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-white uppercase tracking-wide">
-              {selectedBanner ? "Edit Banner" : "Tambah Banner Baru"}
+              {selectedBanner ? "Edit Banner Hero" : "Tambah Banner Hero Baru"}
             </DialogTitle>
             <DialogDescription className="text-xs font-semibold text-white/60 uppercase tracking-wider">
-              {selectedBanner ? "Ubah detail banner hero di bawah ini." : "Unggah gambar banner hero baru untuk halaman depan."}
+              {selectedBanner ? "Sesuaikan gambar dan pengaturan banner di bawah ini." : "Unggah banner untuk desktop dan mobile agar tampilan tidak terpotong."}
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSaveBanner} className="space-y-4 my-2">
+          <form onSubmit={handleSaveBanner} className="space-y-5 my-2">
             <div className="space-y-1.5">
               <Label htmlFor="banner_title" className="text-xs font-bold text-white/80 uppercase">Judul / Catatan Banner (Opsional)</Label>
               <Input
@@ -428,40 +463,98 @@ export default function AdminBannersPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="banner_image" className="text-xs font-bold text-white/80 uppercase block">
-                Gambar Banner *
-              </Label>
-              <div className="space-y-2">
+            {/* Dua Seksi Upload: Desktop & Mobile */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* 1. Desktop Banner */}
+              <div className="bg-black/25 border border-sky/30 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="banner_image" className="text-xs font-black text-sky uppercase flex items-center gap-1.5">
+                    🖥️ Banner Desktop *
+                  </Label>
+                  <span className="text-[9px] bg-sky/20 text-sky px-2 py-0.5 rounded-md font-bold uppercase">
+                    Wajib
+                  </span>
+                </div>
+                
+                <p className="text-[10.5px] text-white/70 font-medium leading-tight">
+                  <strong className="text-white">Rekomendasi:</strong> 1920 x 720 px (Rasio 16:6) atau 1440 x 540 px.
+                </p>
+
                 <Input
                   id="banner_image"
                   required
                   value={editForm.image_url}
                   onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
-                  placeholder="https://... atau /uploads/hero/..."
-                  className="bg-[#102530] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky text-xs"
+                  placeholder="URL gambar desktop..."
+                  className="bg-[#102530] border-sky/30 text-white font-semibold placeholder:text-white/40 text-xs"
                 />
 
-                <div className="flex items-center gap-3 pt-1">
-                  <label className="cursor-pointer bg-sky/20 hover:bg-sky/40 border border-sky/30 hover:border-sky/60 text-sky hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all">
-                    {uploadingImage ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-                    {uploadingImage ? "Mengunggah..." : "Upload File Gambar Banner"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={uploadingImage}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
+                <label className="cursor-pointer w-full bg-sky/20 hover:bg-sky/30 border border-sky/30 text-sky hover:text-white py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all">
+                  {uploadingDesktop ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                  {uploadingDesktop ? "Mengunggah..." : "Upload File Desktop"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, "desktop")}
+                    disabled={uploadingDesktop}
+                    className="hidden"
+                  />
+                </label>
 
                 {editForm.image_url && (
-                  <div className="h-28 w-full rounded-xl border border-sky/30 overflow-hidden bg-black/40 relative shadow-inner mt-2">
-                    <img src={editForm.image_url} alt="Preview" className="h-full w-full object-cover" />
+                  <div className="h-24 w-full rounded-xl border border-sky/30 overflow-hidden bg-black/40 relative shadow-inner">
+                    <img src={editForm.image_url} alt="Preview Desktop" className="h-full w-full object-cover" />
                   </div>
                 )}
               </div>
+
+              {/* 2. Mobile Banner */}
+              <div className="bg-black/25 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="banner_mobile_image" className="text-xs font-black text-emerald-400 uppercase flex items-center gap-1.5">
+                    📱 Banner Mobile
+                  </Label>
+                  <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md font-bold uppercase">
+                    Opsional
+                  </span>
+                </div>
+
+                <p className="text-[10.5px] text-white/70 font-medium leading-tight">
+                  <strong className="text-white">Rekomendasi:</strong> 1080 x 810 px (Rasio 4:3) atau 800 x 600 px.
+                </p>
+
+                <Input
+                  id="banner_mobile_image"
+                  value={editForm.mobile_image_url}
+                  onChange={(e) => setEditForm({ ...editForm, mobile_image_url: e.target.value })}
+                  placeholder="URL gambar mobile (opsional)..."
+                  className="bg-[#102530] border-emerald-500/30 text-white font-semibold placeholder:text-white/40 text-xs"
+                />
+
+                <label className="cursor-pointer w-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-400 hover:text-white py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all">
+                  {uploadingMobile ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                  {uploadingMobile ? "Mengunggah..." : "Upload File Mobile"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, "mobile")}
+                    disabled={uploadingMobile}
+                    className="hidden"
+                  />
+                </label>
+
+                {editForm.mobile_image_url ? (
+                  <div className="h-24 w-full rounded-xl border border-emerald-500/30 overflow-hidden bg-black/40 relative shadow-inner">
+                    <img src={editForm.mobile_image_url} alt="Preview Mobile" className="h-full w-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="h-24 w-full rounded-xl border border-dashed border-white/10 bg-black/20 flex flex-col items-center justify-center text-center p-2">
+                    <p className="text-[10px] text-white/40 font-medium">Kosong (Otomatis memakai gambar desktop di HP)</p>
+                  </div>
+                )}
+              </div>
+
             </div>
 
             <div className="grid grid-cols-2 gap-4">

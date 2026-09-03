@@ -5,6 +5,7 @@ export interface BannerData {
   id?: string;
   title?: string | null;
   image_url: string;
+  mobile_image_url?: string | null;
   link_url?: string | null;
   status: boolean;
   sort_order: number;
@@ -22,6 +23,7 @@ async function ensureBannersTable() {
           id VARCHAR(36) PRIMARY KEY,
           title VARCHAR(255) NULL,
           image_url TEXT NOT NULL,
+          mobile_image_url TEXT NULL,
           link_url VARCHAR(255) NULL,
           status TINYINT(1) NOT NULL DEFAULT 1,
           sort_order INT NOT NULL DEFAULT 0,
@@ -35,6 +37,7 @@ async function ensureBannersTable() {
           id VARCHAR(36) PRIMARY KEY,
           title VARCHAR(255) NULL,
           image_url TEXT NOT NULL,
+          mobile_image_url TEXT NULL,
           link_url VARCHAR(255) NULL,
           status BOOLEAN NOT NULL DEFAULT TRUE,
           sort_order INT NOT NULL DEFAULT 0,
@@ -42,6 +45,13 @@ async function ensureBannersTable() {
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
+    }
+
+    // Attempt to add mobile_image_url column if table already existed without it
+    try {
+      await executeQuery(`ALTER TABLE banners ADD COLUMN mobile_image_url TEXT NULL`);
+    } catch (_) {
+      // Column already exists
     }
 
     // Seed default hero banners if table is completely empty
@@ -124,13 +134,14 @@ export class BannerService {
     await ensureBannersTable();
     const id = data.id || crypto.randomUUID();
     const sql = `
-      INSERT INTO banners (id, title, image_url, link_url, status, sort_order)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO banners (id, title, image_url, mobile_image_url, link_url, status, sort_order)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
     await executeQuery(sql, [
       id,
       data.title || null,
       data.image_url,
+      data.mobile_image_url || null,
       data.link_url || null,
       data.status ? true : false,
       data.sort_order || 0,
@@ -145,12 +156,13 @@ export class BannerService {
     await ensureBannersTable();
     const sql = `
       UPDATE banners
-      SET title = $1, image_url = $2, link_url = $3, status = $4, sort_order = $5, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $6
+      SET title = $1, image_url = $2, mobile_image_url = $3, link_url = $4, status = $5, sort_order = $6, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $7
     `;
     await executeQuery(sql, [
       data.title || null,
       data.image_url,
+      data.mobile_image_url !== undefined ? data.mobile_image_url : null,
       data.link_url || null,
       data.status ? true : false,
       data.sort_order || 0,

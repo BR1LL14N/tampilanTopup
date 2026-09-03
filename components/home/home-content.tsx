@@ -196,11 +196,13 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
   const activeSlides = dynamicBanners.length > 0
     ? dynamicBanners.map((b) => ({
         bg: b.image_url,
+        mobile_bg: b.mobile_image_url || null,
         link: b.link_url || "/games",
         title: b.title || "Banner",
       }))
     : slides.map((s) => ({
         bg: s.bg,
+        mobile_bg: null,
         link: "/games",
         title: s.title,
       }))
@@ -324,14 +326,19 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               <div
                 key={idx}
                 onClick={() => handleBannerClick(slide.link)}
-                className="carousel-slide relative w-full shrink-0 h-[220px] sm:h-[340px] md:h-[420px] lg:h-[460px] overflow-hidden cursor-pointer group/slide"
+                className="carousel-slide relative w-full shrink-0 aspect-[16/10] sm:aspect-auto sm:h-[340px] md:h-[420px] lg:h-[460px] overflow-hidden cursor-pointer group/slide"
               >
-                <img
-                  src={slide.bg}
-                  alt={slide.title || `Banner ${idx + 1}`}
-                  className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover/slide:scale-[1.03]"
-                  loading={idx === 0 ? "eager" : "lazy"}
-                />
+                <picture className="w-full h-full block">
+                  {slide.mobile_bg && (
+                    <source media="(max-width: 639px)" srcSet={slide.mobile_bg} />
+                  )}
+                  <img
+                    src={slide.bg}
+                    alt={slide.title || `Banner ${idx + 1}`}
+                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover/slide:scale-[1.03]"
+                    loading={idx === 0 ? "eager" : "lazy"}
+                  />
+                </picture>
                 
                 {/* Subtle vignette gradient overlay at edges */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 opacity-60 group-hover/slide:opacity-30 transition-opacity duration-500 pointer-events-none" />
