@@ -100,6 +100,12 @@ export async function processOrderFulfillment(invoice: string): Promise<any> {
     updated_at: new Date().toISOString(),
   });
 
+  // Invalidate balance cache so next user balance check fetches fresh balance
+  try {
+    const { BalanceGuardService } = await import('@/lib/services/balance-guard-service');
+    BalanceGuardService.invalidateCache();
+  } catch (_) {}
+
   const freshTx = await TransactionService.getByInvoice(invoice);
 
   // 6. Trigger WhatsApp & In-App Notifications if topup is successful

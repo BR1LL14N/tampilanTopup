@@ -3,7 +3,14 @@ import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-mitsuru-2026';
+const JWT_SECRET = process.env.JWT_SECRET || (
+  process.env.NODE_ENV === 'production'
+    ? (() => {
+        console.warn('[SECURITY WARNING] JWT_SECRET is not explicitly set in environment! Using server-scoped secret.');
+        return `mitsuru_jwt_${process.env.MYSQL_DATABASE || 'prod'}_${process.env.MYSQL_PASSWORD || 'auth_key'}`;
+      })()
+    : 'dev-jwt-secret-mitsuru-local'
+);
 
 export interface AuthUser {
   id: string;

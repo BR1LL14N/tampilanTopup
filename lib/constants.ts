@@ -1,8 +1,8 @@
 export const DIGIFLAZZ_CONFIG = {
-  username: process.env.DIGIFLAZZ_USERNAME || 'tuwumiWXAdqg',
-  apiKey: process.env.DIGIFLAZZ_API_KEY || 'dev-b8bd5f40-d97c-11ef-8d09-333896381645',
+  username: process.env.DIGIFLAZZ_USERNAME || '',
+  apiKey: process.env.DIGIFLAZZ_API_KEY || '',
   baseUrl: 'https://api.digiflazz.com/v1',
-  mode: process.env.DIGIFLAZZ_MODE || 'simulation',
+  mode: process.env.DIGIFLAZZ_MODE || 'production',
 };
 
 export const PAYMENT_METHODS = [

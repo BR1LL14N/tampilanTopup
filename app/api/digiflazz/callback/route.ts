@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     // Security Verification: Read Webhook Secret from SettingService or ENV
     const { SettingService } = await import('@/lib/services/setting-service');
-    const webhookSecret = (await SettingService.get('digiflazz_webhook_secret', '')) || process.env.DIGIFLAZZ_WEBHOOK_SECRET || 'mitsurusecurewebhooksecret99f3a1b7c8d2e6a0';
+    const webhookSecret = (await SettingService.get('digiflazz_webhook_secret', '')) || process.env.DIGIFLAZZ_WEBHOOK_SECRET;
 
     if (webhookSecret) {
       const signature = req.headers.get('x-hub-signature') || req.headers.get('x-digiflazz-signature') || '';
@@ -33,7 +33,8 @@ export async function POST(req: NextRequest) {
         const hmac = crypto.createHmac('sha1', webhookSecret);
         const digest = 'sha1=' + hmac.update(rawBody).digest('hex');
         if (signature !== digest) {
-          console.warn(`[Digiflazz Callback Warning] Signature mismatch. Recv: ${signature}, Calc: ${digest}`);
+          console.error(`[Digiflazz Callback Rejected] Invalid signature. Recv: ${signature}, Calc: ${digest}`);
+          return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 });
         }
       }
     }

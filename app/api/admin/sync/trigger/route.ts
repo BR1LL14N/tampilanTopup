@@ -103,9 +103,9 @@ async function handleSync(req: NextRequest) {
     let authorized = false;
     const { searchParams } = new URL(req.url);
     const key = searchParams.get("key");
-    const secretKey = process.env.DIGIFLAZZ_WEBHOOK_SECRET || "mitsurusecurewebhooksecret99f3a1b7c8d2e6a0a";
+    const secretKey = process.env.DIGIFLAZZ_WEBHOOK_SECRET;
 
-    if (key === secretKey) {
+    if (secretKey && key && key === secretKey) {
       authorized = true;
     } else {
       const isAdmin = await verifyAdmin();

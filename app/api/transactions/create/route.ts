@@ -31,6 +31,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Product not found or inactive' }, { status: 404 });
     }
 
+    // 🛡️ BACKEND SECURITY SHIELD: Verify Digiflazz deposit balance before accepting order
+    const modalPrice = Number(product.price) || 0;
+    try {
+      const { BalanceGuardService } = await import('@/lib/services/balance-guard-service');
+      const availableBalance = await BalanceGuardService.getAvailableBalance();
+      if (modalPrice > availableBalance) {
+        console.warn(`[Checkout Blocked] Product modal Rp ${modalPrice} exceeds available Digiflazz balance Rp ${availableBalance}`);
+        return NextResponse.json({
+          error: 'Mohon maaf, nominal produk ini sedang dalam pengisian stok kembali (Out of Stock). Silakan pilih nominal lain atau hubungi Admin kami.'
+        }, { status: 400 });
+      }
+    } catch (balanceErr) {
+      console.error('Failed to verify Digiflazz balance in checkout:', balanceErr);
+    }
+
     const qty = Math.max(1, parseInt(quantity) || 1);
     
     // Check if product is currently on flash sale

@@ -34,6 +34,7 @@ interface Product {
   price: number
   sell_price: number
   provider_sku: string
+  is_out_of_stock?: boolean
 }
 
 interface Game {
@@ -120,7 +121,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     const sorted = [...(game.products || [])].sort(
       (a, b) => (Number(a.sell_price) || 0) - (Number(b.sell_price) || 0)
     )
-    return sorted[0] || null
+    return sorted.find((p) => !p.is_out_of_stock) || sorted[0] || null
   })
 
   const passProducts = useMemo(() => {
@@ -677,15 +678,20 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                           const discount = 20
                           const isSelected = selectedProduct?.id === prod.id
                           const isPassItem = isPassOrMembership(prod.name, prod.provider_sku)
+                          const isOutOfStock = !!prod.is_out_of_stock
                           return (
                             <button
                               key={prod.id}
+                              disabled={isOutOfStock}
                               onClick={() => {
+                                if (isOutOfStock) return
                                 setSelectedProduct(prod)
                                 if (validationError?.field === "step-2-nominal") setValidationError(null)
                               }}
                               className={`w-full max-w-full min-w-0 p-2 sm:p-3.5 text-left group rounded-[14px] sm:rounded-[20px] transition-all duration-200 border relative overflow-hidden flex flex-col justify-between box-border ${
-                                isSelected
+                                isOutOfStock
+                                  ? "border-red-500/20 bg-black/40 opacity-50 cursor-not-allowed grayscale-[20%]"
+                                  : isSelected
                                   ? "border-sky bg-sky/15 shadow-lg scale-[1.01] ring-2 ring-sky/30"
                                   : isPassItem
                                   ? "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/10"
@@ -693,7 +699,11 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                               }`}
                               type="button"
                             >
-                              {isPassItem && (
+                              {isOutOfStock ? (
+                                <span className="absolute top-0 right-0 bg-red-600/90 text-white font-black text-[7.5px] sm:text-[9px] uppercase px-1.5 sm:px-2 py-0.5 rounded-bl-lg tracking-wider shadow-sm">
+                                  STOK HABIS
+                                </span>
+                              ) : isPassItem && (
                                 <span className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-yellow-400 text-slate-950 font-black text-[7.5px] sm:text-[9px] uppercase px-1.5 sm:px-2 py-0.5 rounded-bl-lg tracking-wider flex items-center gap-1 shadow-sm">
                                   <Crown className="h-2.5 w-2.5" />
                                   PASS

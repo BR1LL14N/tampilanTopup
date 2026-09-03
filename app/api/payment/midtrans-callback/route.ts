@@ -38,7 +38,14 @@ export async function POST(req: NextRequest) {
       ? process.env.MIDTRANS_SERVER_KEY
       : (process.env.MIDTRANS_SANDBOX_SERVER_KEY || process.env.MIDTRANS_SERVER_KEY);
 
-    if (serverKey) {
+    if (!serverKey) {
+      if (process.env.NODE_ENV === 'production') {
+        console.error('FATAL: Midtrans Server Key is not defined in production environment. Rejecting callback for security.');
+        return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+      } else {
+        console.warn('Midtrans Server Key is not defined. Skipping signature validation (Development Mode only).');
+      }
+    } else {
       const signatureSource = `${order_id}${status_code}${gross_amount}${serverKey}`;
       const calculatedSignature = crypto.createHash('sha512').update(signatureSource).digest('hex');
       
@@ -46,8 +53,6 @@ export async function POST(req: NextRequest) {
         console.error('Invalid Midtrans signature. Verification failed.');
         return NextResponse.json({ error: 'Invalid signature key' }, { status: 403 });
       }
-    } else {
-      console.warn('Midtrans Server Key is not defined. Skipping signature validation (Development Mode).');
     }
 
     // 2. Fetch the corresponding transaction

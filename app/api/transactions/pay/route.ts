@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processOrderFulfillment } from '@/lib/fulfillment';
+import { verifyAdmin } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
+    const isAdmin = await verifyAdmin();
+    if (!isAdmin) {
+      return NextResponse.json({ 
+        error: 'Akses ditolak. Eksekusi pengisian produk manual hanya dapat dilakukan oleh Administrator terverifikasi.' 
+      }, { status: 403 });
+    }
+
     const { invoice } = await req.json();
 
     if (!invoice) {
