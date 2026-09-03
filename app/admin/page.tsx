@@ -41,9 +41,11 @@ import {
   Smartphone,
   ExternalLink,
   QrCode,
-  Loader2,
   Volume2,
-  VolumeX
+  VolumeX,
+  CreditCard,
+  Zap,
+  Loader2,
 } from "lucide-react"
 
 export default function AdminDashboardPage() {
@@ -76,6 +78,7 @@ export default function AdminDashboardPage() {
   const [isSyncActive, setIsSyncActive] = useState(true)
   const [digiflazzMode, setDigiflazzMode] = useState("simulation")
   const [digiflazzUsername, setDigiflazzUsername] = useState("")
+  const [digiflazzBalance, setDigiflazzBalance] = useState<number>(0)
   const [syncInterval, setSyncInterval] = useState(24)
   const [lastSyncTime, setLastSyncTime] = useState("")
   const [lastSyncStatus, setLastSyncStatus] = useState("idle")
@@ -258,6 +261,9 @@ export default function AdminDashboardPage() {
         const data = await resStats.json()
 
         if (data.stats) {
+          if (data.stats.digiflazzBalance !== undefined) {
+            setDigiflazzBalance(Number(data.stats.digiflazzBalance) || 0)
+          }
           setStats([
             {
               title: "Total Revenue",
@@ -677,6 +683,99 @@ export default function AdminDashboardPage() {
               {isSoundEnabled ? <Volume2 className="h-3.5 w-3.5 text-amber-400" /> : <VolumeX className="h-3.5 w-3.5 text-gray-400" />}
               {isSoundEnabled ? "Audio Notif: ON" : "Audio Notif: OFF"}
             </button>
+          </div>
+        </div>
+
+        {/* Live System Engine & Gateway Status Card */}
+        <div className="mb-8 bg-gradient-to-r from-[#183644]/95 via-[#1a4052]/95 to-[#183644]/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-sky/30 shadow-sky-medium">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            
+            {/* Payment Gateway Status */}
+            <div className="flex items-center gap-3.5 flex-1 border-b lg:border-b-0 lg:border-r border-sky/20 pb-3 lg:pb-0 lg:pr-4 w-full lg:w-auto">
+              <div className={`p-2.5 rounded-xl border ${
+                (paymentGateway === 'midtrans' ? midtransMode : dokuMode) === 'production'
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                  : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+              }`}>
+                <CreditCard className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Payment Gateway</span>
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                    (paymentGateway === 'midtrans' ? midtransMode : dokuMode) === 'production'
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                  }`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${
+                      (paymentGateway === 'midtrans' ? midtransMode : dokuMode) === 'production'
+                        ? 'bg-emerald-400 animate-pulse'
+                        : 'bg-amber-400'
+                    }`} />
+                    {(paymentGateway === 'midtrans' ? midtransMode : dokuMode) === 'production' ? 'PRODUCTION (LIVE)' : 'SANDBOX (TEST)'}
+                  </span>
+                </div>
+                <p className="text-sm font-black text-white uppercase tracking-tight mt-0.5">
+                  {paymentGateway.toUpperCase()} GATEWAY
+                  <span className="text-[11px] font-normal text-sky ml-2">● Siap Menerima Pembayaran</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Provider Top-up Status */}
+            <div className="flex items-center gap-3.5 flex-1 border-b lg:border-b-0 lg:border-r border-sky/20 pb-3 lg:pb-0 lg:pr-4 w-full lg:w-auto">
+              <div className={`p-2.5 rounded-xl border ${
+                digiflazzMode === 'production'
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                  : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+              }`}>
+                <Zap className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Top-up Provider</span>
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                    digiflazzMode === 'production'
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                  }`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${
+                      digiflazzMode === 'production' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                    }`} />
+                    {digiflazzMode === 'production' ? 'DIGIFLAZZ PROD (LIVE)' : 'SIMULASI TESTING'}
+                  </span>
+                </div>
+                <p className="text-sm font-black text-white font-mono tracking-tight mt-0.5">
+                  {formatCurrency(digiflazzBalance)}
+                  <span className="text-[10px] font-sans font-bold text-emerald-400 ml-2">● Saldo Terhubung</span>
+                </p>
+              </div>
+            </div>
+
+            {/* WhatsApp Notif Status */}
+            <div className="flex items-center gap-3.5 w-full lg:w-auto">
+              <div className={`p-2.5 rounded-xl border ${
+                waStatus === 'enabled'
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                  : 'bg-white/5 text-white/40 border-white/10'
+              }`}>
+                <MessageSquare className="h-5 w-5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">WhatsApp Gateway</span>
+                <p className="text-sm font-black text-white uppercase tracking-tight mt-0.5 flex items-center gap-2">
+                  {waStatus === 'enabled' ? (
+                    <span className="text-emerald-400 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      AKTIF ({waMethod.toUpperCase()})
+                    </span>
+                  ) : (
+                    <span className="text-white/40">NONAKTIF</span>
+                  )}
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
 
