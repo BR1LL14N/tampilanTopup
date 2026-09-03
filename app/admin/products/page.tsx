@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
@@ -50,6 +50,9 @@ import {
   CheckSquare,
   Power,
   PowerOff,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus,
 } from "lucide-react"
 
 export default function AdminProductsPage() {
@@ -74,8 +77,45 @@ export default function AdminProductsPage() {
   const [syncLogs, setSyncLogs] = useState<any[] | null>(null)
   const [rawDigiflazzResponse, setRawDigiflazzResponse] = useState<any | null>(null)
   const [syncModalTab, setSyncModalTab] = useState<"log" | "raw">("log")
+  const [syncLogFilter, setSyncLogFilter] = useState<"all" | "up" | "down" | "same" | "new" | "deactivated">("all")
   const [copiedJson, setCopiedJson] = useState(false)
   const [isSyncLogOpen, setIsSyncLogOpen] = useState(false)
+
+  const logStats = useMemo(() => {
+    if (!syncLogs) return { up: 0, down: 0, same: 0, newItems: 0, deactivated: 0 }
+    let up = 0, down = 0, same = 0, newItems = 0, deactivated = 0
+    for (const item of syncLogs) {
+      if (item.type === "NEW") newItems++
+      else if (item.type === "DEACTIVATED" || item.type === "DEACTIVATED_MISSING" || item.type === "SKIPPED_INACTIVE") deactivated++
+      else if (item.type === "UPDATE") {
+        const diff = item.price_diff !== undefined 
+          ? Number(item.price_diff) 
+          : (item.old_price !== undefined ? Number(item.new_price) - Number(item.old_price) : 0)
+        if (diff > 0) up++
+        else if (diff < 0) down++
+        else same++
+      }
+    }
+    return { up, down, same, newItems, deactivated }
+  }, [syncLogs])
+
+  const filteredLogs = useMemo(() => {
+    if (!syncLogs) return []
+    if (syncLogFilter === "all") return syncLogs
+    return syncLogs.filter((item: any) => {
+      if (syncLogFilter === "new") return item.type === "NEW"
+      if (syncLogFilter === "deactivated") return item.type === "DEACTIVATED" || item.type === "DEACTIVATED_MISSING" || item.type === "SKIPPED_INACTIVE"
+      if (item.type === "UPDATE") {
+        const diff = item.price_diff !== undefined 
+          ? Number(item.price_diff) 
+          : (item.old_price !== undefined ? Number(item.new_price) - Number(item.old_price) : 0)
+        if (syncLogFilter === "up") return diff > 0
+        if (syncLogFilter === "down") return diff < 0
+        if (syncLogFilter === "same") return diff === 0
+      }
+      return false
+    })
+  }, [syncLogs, syncLogFilter])
   
   // Edit Quick Price States
   const [editingProduct, setEditingProduct] = useState<any | null>(null)
@@ -1245,45 +1285,129 @@ export default function AdminProductsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex items-center justify-between border-b border-sky/20 pb-2.5 pt-1">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setSyncModalTab("log")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                  syncModalTab === "log"
-                    ? "bg-sky text-white shadow"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                📋 Log Item ({syncLogs?.length || 0})
-              </button>
-              <button
-                type="button"
-                onClick={() => setSyncModalTab("raw")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                  syncModalTab === "raw"
-                    ? "bg-sky text-white shadow"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                📄 Raw Respon Digiflazz API (JSON)
-              </button>
+          <div className="flex flex-col gap-2 border-b border-sky/20 pb-3 pt-1">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSyncModalTab("log")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                    syncModalTab === "log"
+                      ? "bg-sky text-white shadow"
+                      : "text-white/60 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  📋 Log Item ({syncLogs?.length || 0})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSyncModalTab("raw")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                    syncModalTab === "raw"
+                      ? "bg-sky text-white shadow"
+                      : "text-white/60 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  📄 Raw Respon Digiflazz API (JSON)
+                </button>
+              </div>
+
+              {syncModalTab === "raw" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const content = JSON.stringify(rawDigiflazzResponse || syncLogs, null, 2)
+                    navigator.clipboard.writeText(content)
+                    setCopiedJson(true)
+                    setTimeout(() => setCopiedJson(false), 2000)
+                  }}
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all flex items-center gap-1"
+                >
+                  {copiedJson ? "✓ Tersalin" : "📋 Salin JSON"}
+                </button>
+              )}
             </div>
 
-            {syncModalTab === "raw" && (
-              <button
-                type="button"
-                onClick={() => {
-                  const content = JSON.stringify(rawDigiflazzResponse || syncLogs, null, 2)
-                  navigator.clipboard.writeText(content)
-                  setCopiedJson(true)
-                  setTimeout(() => setCopiedJson(false), 2000)
-                }}
-                className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all flex items-center gap-1"
-              >
-                {copiedJson ? "✓ Tersalin" : "📋 Salin JSON"}
-              </button>
+            {/* Price Change Filters when in log tab */}
+            {syncModalTab === "log" && syncLogs && syncLogs.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 overflow-x-auto">
+                <button
+                  type="button"
+                  onClick={() => setSyncLogFilter("all")}
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+                    syncLogFilter === "all"
+                      ? "bg-sky text-white"
+                      : "bg-black/30 text-white/60 hover:text-white"
+                  }`}
+                >
+                  Semua ({syncLogs.length})
+                </button>
+                {logStats.up > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSyncLogFilter("up")}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all border ${
+                      syncLogFilter === "up"
+                        ? "bg-red-500 text-white border-red-400"
+                        : "bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500/20"
+                    }`}
+                  >
+                    🔺 Naik ({logStats.up})
+                  </button>
+                )}
+                {logStats.down > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSyncLogFilter("down")}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all border ${
+                      syncLogFilter === "down"
+                        ? "bg-emerald-500 text-white border-emerald-400"
+                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
+                    }`}
+                  >
+                    🔻 Turun ({logStats.down})
+                  </button>
+                )}
+                {logStats.same > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSyncLogFilter("same")}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all border ${
+                      syncLogFilter === "same"
+                        ? "bg-sky text-white border-sky-400"
+                        : "bg-sky/10 text-sky border-sky/30 hover:bg-sky/20"
+                    }`}
+                  >
+                    ➡️ Tetap ({logStats.same})
+                  </button>
+                )}
+                {logStats.newItems > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSyncLogFilter("new")}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all border ${
+                      syncLogFilter === "new"
+                        ? "bg-amber-500 text-slate-950 font-black border-amber-400"
+                        : "bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500/20"
+                    }`}
+                  >
+                    ➕ Baru ({logStats.newItems})
+                  </button>
+                )}
+                {logStats.deactivated > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSyncLogFilter("deactivated")}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all border ${
+                      syncLogFilter === "deactivated"
+                        ? "bg-gray-500 text-white border-gray-400"
+                        : "bg-gray-500/10 text-gray-400 border-gray-500/30 hover:bg-gray-500/20"
+                    }`}
+                  >
+                    ⛔ Nonaktif ({logStats.deactivated})
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
@@ -1295,9 +1419,9 @@ export default function AdminProductsPage() {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto pr-1 my-2 space-y-2">
-              {syncLogs && syncLogs.length > 0 ? (
+              {filteredLogs && filteredLogs.length > 0 ? (
                 <div className="space-y-2">
-                  {syncLogs.map((logItem: any, idx: number) => {
+                  {filteredLogs.map((logItem: any, idx: number) => {
                     if (!logItem.sku && !logItem.name && !logItem.product_name) {
                       return (
                         <pre key={idx} className="p-3 bg-black/60 border border-sky/30 rounded-xl text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre-wrap">
@@ -1305,45 +1429,110 @@ export default function AdminProductsPage() {
                         </pre>
                       )
                     }
+
+                    const priceDiff = logItem.price_diff !== undefined 
+                      ? Number(logItem.price_diff) 
+                      : (logItem.old_price !== undefined ? Number(logItem.new_price) - Number(logItem.old_price) : 0);
+
+                    const hasOldPrice = logItem.old_price !== undefined && Number(logItem.old_price) > 0;
+                    const percentChange = hasOldPrice && priceDiff !== 0 
+                      ? Math.abs((priceDiff / Number(logItem.old_price)) * 100).toFixed(1) 
+                      : "0";
+
                     return (
-                      <div key={idx} className="p-3 bg-black/40 border border-sky/20 rounded-xl text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                        <div>
+                      <div key={idx} className="p-3 bg-black/40 border border-sky/20 rounded-xl text-xs flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <div className="space-y-1">
                           <div className="flex items-center gap-2">
                             <span className="font-mono font-bold text-sky text-[11px] bg-sky/10 px-1.5 py-0.5 rounded border border-sky/20">{logItem.sku}</span>
                             <span className="font-bold text-white">{logItem.name || logItem.product_name}</span>
                           </div>
-                          <p className="text-[10px] text-white/60 mt-1">
+                          <p className="text-[10px] text-white/60">
                             Game/Brand: <span className="text-white font-semibold">{logItem.game || logItem.brand || "-"}</span> | Kategori: <span className="text-white font-semibold">{logItem.category || "-"}</span>
                           </p>
                           {logItem.reason && (
-                            <p className="text-[9px] font-bold text-amber-300 mt-1 flex items-center gap-1">
+                            <p className="text-[9px] font-bold text-amber-300 flex items-center gap-1">
                               <span>Alasan:</span> {logItem.reason}
                             </p>
                           )}
                         </div>
 
-                        <div className="text-right shrink-0">
+                        <div className="text-left sm:text-right shrink-0">
                           {logItem.type === 'NEW' && (
-                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                              + BARU (Rp {Number(logItem.price).toLocaleString("id-ID")})
-                            </span>
+                            <div className="flex flex-col sm:items-end gap-1">
+                              <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                                ➕ PRODUK BARU
+                              </span>
+                              <span className="text-[10px] text-white/70 font-mono">
+                                Modal: <strong className="text-white">Rp {Number(logItem.price || logItem.new_price).toLocaleString("id-ID")}</strong>
+                              </span>
+                              {logItem.sell_price && (
+                                <span className="text-[9px] text-sky font-mono font-bold">
+                                  Jual: Rp {Number(logItem.sell_price).toLocaleString("id-ID")}
+                                </span>
+                              )}
+                            </div>
                           )}
+
                           {logItem.type === 'UPDATE' && (
-                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-sky/20 text-sky border border-sky/30">
-                              DIPERBARUI (Rp {Number(logItem.new_price).toLocaleString("id-ID")})
+                            <div className="flex flex-col sm:items-end gap-1">
+                              {priceDiff > 0 ? (
+                                <>
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-red-500/20 text-red-400 border border-red-500/30">
+                                    <ArrowUpRight className="h-3 w-3" />
+                                    NAIK (+Rp {priceDiff.toLocaleString("id-ID")})
+                                  </span>
+                                  <span className="text-[10px] text-white/60 font-mono">
+                                    Modal: Rp {Number(logItem.old_price).toLocaleString("id-ID")} ➜ <strong className="text-red-300">Rp {Number(logItem.new_price).toLocaleString("id-ID")}</strong> (+{percentChange}%)
+                                  </span>
+                                </>
+                              ) : priceDiff < 0 ? (
+                                <>
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    <ArrowDownRight className="h-3 w-3" />
+                                    TURUN (-Rp {Math.abs(priceDiff).toLocaleString("id-ID")})
+                                  </span>
+                                  <span className="text-[10px] text-white/60 font-mono">
+                                    Modal: Rp {Number(logItem.old_price).toLocaleString("id-ID")} ➜ <strong className="text-emerald-300">Rp {Number(logItem.new_price).toLocaleString("id-ID")}</strong> (-{percentChange}%)
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-sky/20 text-sky border border-sky/30">
+                                    ➡️ TETAP (Rp {Number(logItem.new_price).toLocaleString("id-ID")})
+                                  </span>
+                                  <span className="text-[10px] text-white/50 font-mono">
+                                    Harga modal tidak berubah
+                                  </span>
+                                </>
+                              )}
+
+                              {logItem.sell_price && (
+                                <span className="text-[9px] text-sky font-mono font-bold">
+                                  Harga Jual Baru: Rp {Number(logItem.sell_price).toLocaleString("id-ID")}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {logItem.type === 'DEACTIVATED' && (
+                            <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/30">
+                              ⛔ DINONAKTIFKAN (OFF DI SUPPLIER)
                             </span>
                           )}
+
                           {logItem.type === 'SKIPPED_INACTIVE' && (
-                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/30">
-                              DILEWATI (NONAKTIF SUPPLIER)
+                            <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-500/20 text-gray-300 border border-gray-500/30">
+                              DILEWATI (NONAKTIF)
                             </span>
                           )}
+
                           {logItem.type === 'SKIPPED_NO_GAME' && (
-                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
                               DILEWATI (GAME BELUM DAFTAR)
                             </span>
                           )}
-                          {(!logItem.type || (logItem.type !== 'NEW' && logItem.type !== 'UPDATE' && logItem.type !== 'SKIPPED_INACTIVE' && logItem.type !== 'SKIPPED_NO_GAME')) && (
+
+                          {(!logItem.type || (logItem.type !== 'NEW' && logItem.type !== 'UPDATE' && logItem.type !== 'DEACTIVATED' && logItem.type !== 'SKIPPED_INACTIVE' && logItem.type !== 'SKIPPED_NO_GAME')) && (
                             <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase ${
                               logItem.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                             }`}>
@@ -1356,7 +1545,7 @@ export default function AdminProductsPage() {
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-white/50 text-center py-6">Tidak ada log respon sync tersedia.</p>
+                <p className="text-xs text-white/50 text-center py-6">Tidak ada log respon sync pada filter ini.</p>
               )}
             </div>
           )}

@@ -336,15 +336,23 @@ async function handleSync(req: NextRequest) {
           });
         } else {
           productsUpdated++;
+          const oldPrice = Number(existingProduct[0].price) || 0;
+          const oldSellPrice = Number(existingProduct[0].sell_price) || 0;
+          const priceDiff = modalPrice - oldPrice;
+          const sellPriceDiff = sellPrice - oldSellPrice;
+
           syncedItemsLog.push({
             sku: providerSku,
             name: productName,
             game: gameObj.name,
             brand,
             category: item.category,
-            old_price: existingProduct[0].price,
+            old_price: oldPrice,
             new_price: modalPrice,
+            old_sell_price: oldSellPrice,
             sell_price: sellPrice,
+            price_diff: priceDiff,
+            sell_price_diff: sellPriceDiff,
             type: 'UPDATE'
           });
         }
