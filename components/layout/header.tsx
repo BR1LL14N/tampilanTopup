@@ -27,6 +27,7 @@ import {
   Bell,
   MessageSquare,
   Image as ImageIcon,
+  Wallet,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -575,6 +576,17 @@ export function Header({ user }: HeaderProps) {
                     Transaksi Masuk
                   </Link>
                   <Link
+                    href="/admin/finance"
+                    className={cn(
+                      "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
+                      pathname === "/admin/finance" && "nav-active bg-sky/10 text-sky"
+                    )}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Wallet className="h-4 w-4 text-emerald-400" />
+                    Laporan Keuangan
+                  </Link>
+                  <Link
                     href="/admin/promos"
                     className={cn(
                       "nav-btn rounded-lg border border-transparent px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white/70 hover:text-white flex items-center gap-2",
@@ -801,6 +813,18 @@ export function Header({ user }: HeaderProps) {
                 >
                   <History className="h-4 w-4 group-hover:scale-105 transition-transform" />
                   {!isSidebarCollapsed && <span className="animate-fadeIn">Transaksi Masuk</span>}
+                </Link>
+                <Link
+                  href="/admin/finance"
+                  className={cn(
+                    "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent",
+                    isSidebarCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+                    pathname === "/admin/finance" && "bg-sky/10 text-sky hover:text-sky hover:bg-sky/10 border-sky/10"
+                  )}
+                  title={isSidebarCollapsed ? "Laporan Keuangan" : undefined}
+                >
+                  <Wallet className="h-4 w-4 text-emerald-400 group-hover:scale-105 transition-transform" />
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Laporan Keuangan</span>}
                 </Link>
                 <Link
                   href="/admin/promos"
