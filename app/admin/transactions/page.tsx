@@ -303,13 +303,16 @@ export default function AdminTransactionsPage() {
           game: tx.game_name || "Game",
           target_id: tx.target_id,
           amount: Number(tx.amount) || 0,
-          topup_status: tx.topup_status,
+          payment_status: tx.payment_status || "pending",
+          payment_method: tx.payment_method || "-",
+          topup_status: tx.topup_status || "pending",
           provider_ref: tx.provider_ref,
           provider_response: tx.provider_response,
           created_at: tx.created_at,
           login_method: tx.login_method,
           password: tx.password,
           request_notes: tx.request_notes,
+          whatsapp: tx.customer_phone || tx.whatsapp || "",
         })))
       } else {
         setTransactionsList([])
@@ -394,30 +397,35 @@ export default function AdminTransactionsPage() {
   }
 
   const filteredTransactions = transactionsList.filter((tx) => {
+    const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
-      tx.invoice.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.target_id.includes(searchQuery);
+      !q ||
+      (tx.invoice || "").toLowerCase().includes(q) ||
+      (tx.user || "").toLowerCase().includes(q) ||
+      (tx.target_id || "").toLowerCase().includes(q) ||
+      (tx.product || "").toLowerCase().includes(q) ||
+      (tx.game || "").toLowerCase().includes(q) ||
+      (tx.whatsapp || "").includes(q);
 
     let matchesPayment = true;
     if (paymentStatusFilter !== "all") {
-      const pStatus = (tx.payment_status || "").toLowerCase();
+      const pStatus = (tx.payment_status || "pending").toLowerCase();
       if (paymentStatusFilter === "paid") {
-        matchesPayment = pStatus === "paid" || pStatus === "settlement" || pStatus === "success";
+        matchesPayment = ["paid", "settlement", "success", "capture"].includes(pStatus);
       } else if (paymentStatusFilter === "pending") {
-        matchesPayment = pStatus === "pending" || pStatus === "unpaid";
+        matchesPayment = ["pending", "unpaid", "waiting", ""].includes(pStatus);
       } else if (paymentStatusFilter === "failed") {
-        matchesPayment = pStatus === "failed" || pStatus === "expire" || pStatus === "cancel";
+        matchesPayment = ["failed", "expire", "cancel", "deny"].includes(pStatus);
       }
     }
 
     let matchesTopup = true;
     if (topupStatusFilter !== "all") {
-      const tStatus = (tx.topup_status || "").toLowerCase();
+      const tStatus = (tx.topup_status || "pending").toLowerCase();
       if (topupStatusFilter === "success") {
         matchesTopup = tStatus === "success";
       } else if (topupStatusFilter === "pending") {
-        matchesTopup = tStatus === "pending" || tStatus === "processing";
+        matchesTopup = ["pending", "processing"].includes(tStatus);
       } else if (topupStatusFilter === "failed") {
         matchesTopup = tStatus === "failed";
       }
@@ -434,19 +442,61 @@ export default function AdminTransactionsPage() {
     tx.created_at && tx.created_at.startsWith(todayStr)
   ).length.toString()
 
-  const pendingTransactions = transactionsList.filter((tx) =>
+  const pendingTopupCount = transactionsList.filter((tx) =>
     tx.topup_status === "pending" || tx.topup_status === "processing"
   ).length.toString()
+
+  const pendingPaymentCount = transactionsList.filter((tx) => {
+    const p = (tx.payment_status || "pending").toLowerCase();
+    return ["pending", "unpaid", "waiting", ""].includes(p);
+  }).length.toString()
 
   const failedTransactions = transactionsList.filter((tx) =>
     tx.topup_status === "failed"
   ).length.toString()
 
   const stats = [
-    { label: "Total Transaksi", value: totalTransactions, icon: TrendingUp, color: "text-primary" },
-    { label: "Hari Ini", value: todayTransactions, icon: Clock, color: "text-secondary" },
-    { label: "Pending", value: pendingTransactions, icon: Clock, color: "text-yellow-500" },
-    { label: "Gagal", value: failedTransactions, icon: XCircle, color: "text-red-500" },
+    { 
+      label: "Total Transaksi", 
+      value: totalTransactions, 
+      icon: TrendingUp, 
+      color: "text-primary",
+      active: paymentStatusFilter === "all" && topupStatusFilter === "all" && !searchQuery,
+      onClick: () => { setPaymentStatusFilter("all"); setTopupStatusFilter("all"); setSearchQuery(""); }
+    },
+    { 
+      label: "Hari Ini", 
+      value: todayTransactions, 
+      icon: Clock, 
+      color: "text-secondary" 
+    },
+    { 
+      label: "Topup Pending", 
+      sublabel: "Diproses / Antrean",
+      value: pendingTopupCount, 
+      icon: Clock, 
+      color: "text-yellow-500",
+      active: topupStatusFilter === "pending",
+      onClick: () => { setTopupStatusFilter("pending"); setPaymentStatusFilter("all"); }
+    },
+    { 
+      label: "Belum Bayar", 
+      sublabel: "Invoice Pending",
+      value: pendingPaymentCount, 
+      icon: Wallet, 
+      color: "text-amber-400",
+      active: paymentStatusFilter === "pending",
+      onClick: () => { setPaymentStatusFilter("pending"); setTopupStatusFilter("all"); }
+    },
+    { 
+      label: "Topup Gagal", 
+      sublabel: "Eror Provider",
+      value: failedTransactions, 
+      icon: XCircle, 
+      color: "text-red-500",
+      active: topupStatusFilter === "failed",
+      onClick: () => { setTopupStatusFilter("failed"); setPaymentStatusFilter("all"); }
+    },
   ]
 
   return (
@@ -477,15 +527,29 @@ export default function AdminTransactionsPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
             {stats.map((stat, index) => (
-              <Card key={index}>
-                <CardContent className="p-6">
+              <Card 
+                key={index}
+                onClick={stat.onClick}
+                className={`transition-all duration-200 ${
+                  stat.onClick ? "cursor-pointer hover:border-sky/50 hover:bg-white/5" : ""
+                } ${
+                  stat.active ? "ring-2 ring-sky border-sky bg-sky/15 shadow-lg" : ""
+                }`}
+              >
+                <CardContent className="p-4 sm:p-5">
                   <div className="flex items-center justify-between mb-2">
                     <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                    {stat.onClick && (
+                      <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Filter</span>
+                    )}
                   </div>
                   <p className="text-2xl font-black text-white">{stat.value}</p>
-                  <p className="text-xs font-bold text-white uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-xs font-bold text-white uppercase tracking-wider mt-0.5">{stat.label}</p>
+                  {stat.sublabel && (
+                    <p className="text-[10px] text-white/50 font-medium mt-0.5">{stat.sublabel}</p>
+                  )}
                 </CardContent>
               </Card>
             ))}
