@@ -228,17 +228,37 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     }
   }
 
+  // Validation Error state for auto-scrolling
+  const [validationError, setValidationError] = useState<{ field: string; message: string } | null>(null)
+
+  const scrollToField = (fieldId: string, message: string) => {
+    setValidationError({ field: fieldId, message })
+    const el = document.getElementById(fieldId)
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" })
+      setTimeout(() => {
+        el.focus()
+      }, 350)
+    }
+  }
+
   const handleOrder = () => {
+    setValidationError(null)
+
+    if (!gameId.trim()) {
+      scrollToField("input-user-id", "User ID akun game wajib diisi.")
+      return
+    }
+    if (game.slug === "mobile-legends" && !serverId.trim()) {
+      scrollToField("input-server-id", "Server / Zone ID Mobile Legends wajib diisi.")
+      return
+    }
     if (!selectedProduct) {
-      alert("Silakan pilih nominal terlebih dahulu.")
+      scrollToField("step-2-nominal", "Silakan pilih salah satu nominal produk top up di bawah ini.")
       return
     }
-    if (!gameId) {
-      alert("Silakan masukkan ID Game Anda.")
-      return
-    }
-    if (!whatsapp) {
-      alert("Silakan masukkan nomor WhatsApp Aktif Anda.")
+    if (!whatsapp.trim()) {
+      scrollToField("input-whatsapp", "Nomor WhatsApp aktif wajib diisi untuk menerima bukti transaksi.")
       return
     }
 
@@ -247,7 +267,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     
     const queryParams = new URLSearchParams({
       target,
-      whatsapp,
+      whatsapp: whatsapp.trim(),
       qty: String(quantity),
     })
 
@@ -407,16 +427,27 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                       <div className="space-y-2">
                         <span className="block text-xs font-bold uppercase tracking-wider text-white/60">User ID <span className="text-sky">*</span></span>
                         <input
+                          id="input-user-id"
                           value={gameId}
                           onChange={(e) => {
                             setGameId(e.target.value);
+                            if (validationError?.field === "input-user-id") setValidationError(null);
                             setVerifiedNickname("");
                             setCheckError("");
                           }}
                           placeholder="Masukkan User ID"
-                          className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
+                          className={`w-full bg-black/20 border transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none ${
+                            validationError?.field === "input-user-id"
+                              ? "border-amber-400 ring-4 ring-amber-400/30 bg-amber-500/10"
+                              : "border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20"
+                          }`}
                           required
                         />
+                        {validationError?.field === "input-user-id" && (
+                          <p className="text-[11px] font-bold text-amber-300 flex items-center gap-1.5 mt-1 animate-fadeIn">
+                            ⚠️ {validationError.message}
+                          </p>
+                        )}
                       </div>
 
                       {/* Conditionally show Server ID for Mobile Legends */}
@@ -424,16 +455,27 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                         <div className="space-y-2">
                           <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Server ID <span className="text-sky">*</span></span>
                           <input
+                            id="input-server-id"
                             value={serverId}
                             onChange={(e) => {
                               setServerId(e.target.value);
+                              if (validationError?.field === "input-server-id") setValidationError(null);
                               setVerifiedNickname("");
                               setCheckError("");
                             }}
                             placeholder="Masukkan Server ID"
-                            className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
+                            className={`w-full bg-black/20 border transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none ${
+                              validationError?.field === "input-server-id"
+                                ? "border-amber-400 ring-4 ring-amber-400/30 bg-amber-500/10"
+                                : "border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20"
+                            }`}
                             required
                           />
+                          {validationError?.field === "input-server-id" && (
+                            <p className="text-[11px] font-bold text-amber-300 flex items-center gap-1.5 mt-1 animate-fadeIn">
+                              ⚠️ {validationError.message}
+                            </p>
+                          )}
                         </div>
                       )}
 
@@ -485,12 +527,25 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                       <div className="space-y-2">
                         <span className="block text-xs font-bold uppercase tracking-wider text-white/60">No. WhatsApp Aktif <span className="text-sky">*</span></span>
                         <input
+                          id="input-whatsapp"
                           value={whatsapp}
-                          onChange={(e) => setWhatsapp(e.target.value)}
+                          onChange={(e) => {
+                            setWhatsapp(e.target.value);
+                            if (validationError?.field === "input-whatsapp") setValidationError(null);
+                          }}
                           placeholder="Contoh: 081234567890"
-                          className="w-full bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none"
+                          className={`w-full bg-black/20 border transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none ${
+                            validationError?.field === "input-whatsapp"
+                              ? "border-amber-400 ring-4 ring-amber-400/30 bg-amber-500/10"
+                              : "border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20"
+                          }`}
                           required
                         />
+                        {validationError?.field === "input-whatsapp" && (
+                          <p className="text-[11px] font-bold text-amber-300 flex items-center gap-1.5 mt-1 animate-fadeIn">
+                            ⚠️ {validationError.message}
+                          </p>
+                        )}
                       </div>
 
                       <div className="sm:col-span-2 space-y-2">
@@ -550,7 +605,14 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                   </div>
 
                   {/* Step 2: Pilih Nominal */}
-                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[20px] sm:rounded-[24px] shadow-sky-medium overflow-hidden mt-6 w-full max-w-full min-w-0">
+                  <div 
+                    id="step-2-nominal"
+                    className={`bg-[#183644] border rounded-[20px] sm:rounded-[24px] shadow-sky-medium overflow-hidden mt-6 w-full max-w-full min-w-0 transition-all duration-300 ${
+                      validationError?.field === "step-2-nominal"
+                        ? "border-amber-400 ring-4 ring-amber-400/30"
+                        : "border-sky/30"
+                    }`}
+                  >
                     <div className="p-3.5 sm:p-4 border-b border-sky/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark-stripes-teal w-full max-w-full min-w-0">
                       <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
                         <span className="grid h-6 w-6 sm:h-7 sm:w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft shrink-0">2</span>
@@ -602,6 +664,12 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                       )}
                     </div>
 
+                    {validationError?.field === "step-2-nominal" && (
+                      <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2.5 text-xs font-bold text-amber-300 flex items-center gap-2 animate-fadeIn">
+                        <span>⚠️ {validationError.message}</span>
+                      </div>
+                    )}
+
                     <div className="p-2 sm:p-5 w-full max-w-full min-w-0">
                       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 w-full max-w-full min-w-0">
                         {displayedProducts.map((prod) => {
@@ -612,13 +680,16 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                           return (
                             <button
                               key={prod.id}
-                              onClick={() => setSelectedProduct(prod)}
-                              className={`w-full max-w-full min-w-0 p-2 sm:p-3.5 text-left group rounded-[14px] sm:rounded-[20px] transition-all duration-300 border relative overflow-hidden flex flex-col justify-between box-border ${
+                              onClick={() => {
+                                setSelectedProduct(prod)
+                                if (validationError?.field === "step-2-nominal") setValidationError(null)
+                              }}
+                              className={`w-full max-w-full min-w-0 p-2 sm:p-3.5 text-left group rounded-[14px] sm:rounded-[20px] transition-all duration-200 border relative overflow-hidden flex flex-col justify-between box-border ${
                                 isSelected
-                                  ? "border-sky bg-sky/10 shadow-lg scale-[1.01] ring-2 ring-sky/30"
+                                  ? "border-sky bg-sky/15 shadow-lg scale-[1.01] ring-2 ring-sky/30"
                                   : isPassItem
-                                  ? "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:-translate-y-0.5 shadow-md hover:bg-amber-500/10 hover:shadow-lg"
-                                  : "border-white/10 bg-black/20 hover:border-white/30 hover:-translate-y-0.5 shadow-md hover:bg-white/5 hover:shadow-lg"
+                                  ? "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:bg-amber-500/10"
+                                  : "border-white/10 bg-black/25 hover:border-white/30 hover:bg-white/5"
                               }`}
                               type="button"
                             >
@@ -634,6 +705,8 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                                   <img
                                     src={getItemAssetForProduct(prod.name, prod.provider_sku, game.name)}
                                     alt=""
+                                    loading="lazy"
+                                    decoding="async"
                                     className="max-h-full max-w-full object-contain drop-shadow-md"
                                   />
                                 </span>
