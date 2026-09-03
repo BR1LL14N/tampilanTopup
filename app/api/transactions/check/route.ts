@@ -58,6 +58,17 @@ export async function GET(req: NextRequest) {
                 if (freshTx) {
                   return NextResponse.json({ transaction: freshTx });
                 }
+              } else if (midData && ["expire", "cancel", "deny"].includes(midData.transaction_status)) {
+                console.log(`[Check API] Invoice ${transaction.invoice} is ${midData.transaction_status} on Midtrans. Updating status...`);
+                await TransactionService.update(transaction.id, {
+                  payment_status: midData.transaction_status === "expire" ? "expired" : "failed",
+                  topup_status: "failed",
+                  updated_at: new Date().toISOString(),
+                });
+                const freshTx = await TransactionService.getDetailsByInvoice(transaction.invoice);
+                if (freshTx) {
+                  return NextResponse.json({ transaction: freshTx });
+                }
               }
             }
           }
