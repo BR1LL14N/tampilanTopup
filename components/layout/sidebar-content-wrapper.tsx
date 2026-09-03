@@ -136,14 +136,14 @@ export function SidebarContentWrapper({
 
   return (
     <div
-      className={`sidebar-content-wrapper flex flex-col flex-1 min-h-0 w-full max-w-full min-w-0 overflow-x-hidden ${
+      className={`sidebar-content-wrapper flex flex-col flex-1 min-h-0 min-w-0 ${
         isTransitionReady ? "transition-all duration-300 ease-in-out" : ""
       } ${
         isAuth
           ? mounted && collapsed
-            ? "lg:ml-20"
-            : "lg:ml-64"
-          : "lg:ml-0"
+            ? "lg:ml-20 lg:w-[calc(100%-5rem)] lg:max-w-[calc(100%-5rem)]"
+            : "lg:ml-64 lg:w-[calc(100%-16rem)] lg:max-w-[calc(100%-16rem)]"
+          : "w-full max-w-full"
       }`}
     >
       {children}

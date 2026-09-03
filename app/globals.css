@@ -1023,11 +1023,17 @@ select:focus {
 @media (min-width: 1024px) {
   html.has-user.sidebar-expanded .sidebar-content-wrapper {
     margin-left: 16rem !important; /* 256px */
+    width: calc(100% - 16rem) !important;
+    max-width: calc(100% - 16rem) !important;
   }
   html.has-user.sidebar-collapsed .sidebar-content-wrapper {
     margin-left: 5rem !important; /* 80px */
+    width: calc(100% - 5rem) !important;
+    max-width: calc(100% - 5rem) !important;
   }
   html.no-user .sidebar-content-wrapper {
     margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }

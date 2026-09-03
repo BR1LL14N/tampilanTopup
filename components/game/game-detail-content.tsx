@@ -312,13 +312,13 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
   const publisher = getPublisher(game.slug)
 
   return (
-    <div className="min-h-screen text-text-primary antialiased relative w-full max-w-full min-w-0 overflow-x-hidden">
+    <div className="min-h-screen text-text-primary antialiased relative w-full">
 
       <Header user={user} />
 
       <SidebarContentWrapper isAuthenticated={!!user}>
-        <main className="relative z-10 py-6 sm:py-8 pb-28 lg:pb-8 w-full max-w-full min-w-0 overflow-x-hidden">
-          <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
+        <main className="relative z-10 py-6 sm:py-8 pb-28 lg:pb-8 w-full">
+          <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 w-full">
 
           {/* Game Header Banner Redesign */}
           <div className="relative mb-10 rounded-2xl border border-sky/30 overflow-hidden bg-[#183644]/90 backdrop-blur-md shadow-2xl group transition-all duration-300 w-full max-w-full min-w-0">
@@ -385,7 +385,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
           </div>
 
           {/* Dynamic content grid */}
-          <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_380px] w-full max-w-full min-w-0">
+          <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px] w-full min-w-0">
 
             {/* Left Column Form */}
             <div className="space-y-6 w-full max-w-full min-w-0">
