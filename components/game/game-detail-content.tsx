@@ -658,86 +658,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                     </div>
                   </div>
 
-                  {/* Step 3: Jumlah Pembelian */}
-                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
-                    <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">3</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-white">Tentukan Jumlah Pembelian</h3>
-                    </div>
-
-                    <div className="flex gap-3.5 p-6 items-center">
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                        className="w-16 bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl py-3 text-center text-sm font-bold text-white outline-none"
-                      />
-                      <button
-                        onClick={() => setQuantity((q) => q + 1)}
-                        className="grid h-11 w-11 place-items-center rounded-xl bg-sky/10 hover:bg-sky text-sky hover:text-white border border-sky/20 transition-all hover:scale-105 active:scale-95"
-                        type="button"
-                      >
-                        <Plus className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                        className="grid h-11 w-11 place-items-center rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 hover:border-white/20 transition-all hover:scale-105 active:scale-95"
-                        type="button"
-                      >
-                        <Minus className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Step 4: Kode Promo / Voucher (Opsional) */}
-                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
-                    <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
-                      <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">4</span>
-                      <h3 className="text-xs font-black uppercase tracking-widest text-white">Kode Promo / Voucher (Opsional)</h3>
-                    </div>
-
-                    <div className="p-6 space-y-3">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={promoCode}
-                          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                          placeholder="Masukkan kode promo (misal: DISCOUNT10)"
-                          className="flex-1 bg-black/20 border border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20 transition-all rounded-xl px-4 py-2.5 text-xs font-bold text-white placeholder-white/40 outline-none uppercase"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleApplyPromo}
-                          disabled={isApplyingPromo || !promoCode.trim()}
-                          className="px-5 py-2.5 bg-sky hover:bg-diamond text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-sky-soft disabled:opacity-50"
-                        >
-                          {isApplyingPromo ? "Mengecek..." : "Gunakan"}
-                        </button>
-                      </div>
-
-                      {appliedPromoCode && (
-                        <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-bold flex items-center justify-between">
-                          <span>Voucher <strong>{appliedPromoCode}</strong> Berhasil Dipasang (-Rp {promoDiscount.toLocaleString("id-ID")})</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAppliedPromoCode("")
-                              setPromoCode("")
-                              setPromoDiscount(0)
-                            }}
-                            className="text-red-400 hover:underline text-[10px] uppercase font-black"
-                          >
-                            Hapus
-                          </button>
-                        </div>
-                      )}
-
-                      {promoError && (
-                        <p className="text-xs text-red-400 font-bold">{promoError}</p>
-                      )}
-                    </div>
-                  </div>
-
                 </>
               ) : (
                 /* Description & Rules Tab */
@@ -810,10 +730,6 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                         </span>
                         {selectedProduct.name}
                       </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-white/60 uppercase text-[10px] tracking-wider">Jumlah</span>
-                      <span className="font-mono text-sky font-bold bg-sky/10 px-2 py-0.5 rounded">x{quantity}</span>
                     </div>
                     {gameId && (
                       <div className="space-y-1.5 border-t border-sky/20 pt-3">
