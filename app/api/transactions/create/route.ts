@@ -148,96 +148,97 @@ export async function POST(req: NextRequest) {
         ? process.env.MIDTRANS_SERVER_KEY
         : (process.env.MIDTRANS_SANDBOX_SERVER_KEY || process.env.MIDTRANS_SERVER_KEY);
 
-      if (midtransServerKey) {
-        try {
-          const authHeader = 'Basic ' + Buffer.from(midtransServerKey + ':').toString('base64');
-          const midtransUrl = isProduction 
-            ? 'https://app.midtrans.com/snap/v1/transactions' 
-            : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
+      if (!midtransServerKey) {
+        return NextResponse.json({
+          error: 'Sistem Pembayaran sedang dalam pemeliharaan (Maintenance). Kredensial gateway sedang diperbarui, mohon coba beberapa saat lagi.',
+        }, { status: 503 });
+      }
 
-          const itemDetails: any[] = [
-            {
-              id: product.id,
-              price: basePrice,
-              quantity: qty,
-              name: product.name.substring(0, 50),
-            }
-          ];
+      try {
+        const authHeader = 'Basic ' + Buffer.from(midtransServerKey + ':').toString('base64');
+        const midtransUrl = isProduction 
+          ? 'https://app.midtrans.com/snap/v1/transactions' 
+          : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
 
-          if (discountAmount > 0) {
-            itemDetails.push({
-              id: 'PROMO-DISCOUNT',
-              price: -discountAmount,
-              quantity: 1,
-              name: 'Diskon Promo',
-            });
+        const itemDetails: any[] = [
+          {
+            id: product.id,
+            price: basePrice,
+            quantity: qty,
+            name: product.name.substring(0, 50),
           }
+        ];
 
-          // Filter active payment methods based on Merchant Midtrans account:
-          // Active: QRIS Dinamis (GoPay), GoPay, BNI VA, BRI VA, Mandiri Bill, Permata VA, CIMB VA, BSI/Other VA, SeaBank
-          let enabledPayments: string[] = [];
-
-          if (amount < 10000) {
-            // Virtual Accounts in Indonesia strictly require minimum Rp 10.000.
-            // For micro-transactions under Rp 10.000 (< 10k), enable QRIS & E-Wallets:
-            enabledPayments = ['qris', 'gopay', 'shopeepay'];
-          } else {
-            // For transactions >= Rp 10.000, enable all active channels:
-            enabledPayments = [
-              'qris',
-              'gopay',
-              'bni_va',
-              'bri_va',
-              'echannel',      // Mandiri Bill
-              'permata_va',
-              'cimb_va',
-              'other_va',       // BSI & SeaBank / Other Bank VA
-              'shopeepay'
-            ];
-          }
-
-          const midtransRes = await fetch(midtransUrl, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': authHeader,
-            },
-            body: JSON.stringify({
-              transaction_details: {
-                order_id: invoice,
-                gross_amount: amount,
-              },
-              customer_details: {
-                first_name: customerName,
-                email: customerEmail,
-                phone: customerPhone,
-              },
-              item_details: itemDetails,
-              enabled_payments: enabledPayments,
-              callbacks: {
-                finish: `${siteUrl}/history/${invoice}`
-              }
-            }),
+        if (discountAmount > 0) {
+          itemDetails.push({
+            id: 'PROMO-DISCOUNT',
+            price: -discountAmount,
+            quantity: 1,
+            name: 'Diskon Promo',
           });
+        }
 
-          const midtransData = await midtransRes.json();
-          if (midtransData && midtransData.redirect_url) {
-            payment_url = midtransData.redirect_url;
-          } else {
-            console.error('Midtrans API error response:', midtransData);
-            payment_url = `${siteUrl}/checkout/mock?invoice=${invoice}`;
-          }
-        } catch (midtransErr) {
-          console.error('Failed to call Midtrans API:', midtransErr);
-          payment_url = `${siteUrl}/checkout/mock?invoice=${invoice}`;
-        }
-      } else {
-        if (payment_method.toLowerCase() === 'qris') {
-          qr_string = "00020101021226620009com.bri.ccho.id010911000000000001020326303003000000000000000052040000000000000000052069000016000000000000000000103015802091573303710501000008000005820333待定00000000000000000000000000";
+        // Filter active payment methods based on Merchant Midtrans account:
+        let enabledPayments: string[] = [];
+
+        if (amount < 10000) {
+          // Virtual Accounts in Indonesia strictly require minimum Rp 10.000.
+          // For micro-transactions under Rp 10.000 (< 10k), enable QRIS & E-Wallets:
+          enabledPayments = ['qris', 'gopay', 'shopeepay'];
         } else {
-          payment_url = "https://checkout.sandbox.gateway.com/" + invoice;
+          // For transactions >= Rp 10.000, enable all active channels:
+          enabledPayments = [
+            'qris',
+            'gopay',
+            'bni_va',
+            'bri_va',
+            'echannel',      // Mandiri Bill
+            'permata_va',
+            'cimb_va',
+            'other_va',       // BSI & SeaBank / Other Bank VA
+            'shopeepay'
+          ];
         }
+
+        const midtransRes = await fetch(midtransUrl, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': authHeader,
+          },
+          body: JSON.stringify({
+            transaction_details: {
+              order_id: invoice,
+              gross_amount: amount,
+            },
+            customer_details: {
+              first_name: customerName,
+              email: customerEmail,
+              phone: customerPhone,
+            },
+            item_details: itemDetails,
+            enabled_payments: enabledPayments,
+            callbacks: {
+              finish: `${siteUrl}/history/${invoice}`
+            }
+          }),
+        });
+
+        const midtransData = await midtransRes.json();
+        if (midtransRes.ok && midtransData && midtransData.redirect_url) {
+          payment_url = midtransData.redirect_url;
+        } else {
+          console.error('Midtrans API error response:', midtransData);
+          return NextResponse.json({
+            error: 'Sistem Pembayaran sedang dalam pemeliharaan (Gateway Maintenance). Mohon coba beberapa saat lagi atau hubungi Layanan Pelanggan kami.',
+          }, { status: 503 });
+        }
+      } catch (midtransErr: any) {
+        console.error('Failed to call Midtrans API:', midtransErr);
+        return NextResponse.json({
+          error: 'Gagal terhubung ke penyedia pembayaran (Gateway Down / Maintenance). Mohon coba beberapa saat lagi.',
+        }, { status: 503 });
       }
     }
 
