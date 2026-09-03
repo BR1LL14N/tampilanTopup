@@ -99,18 +99,22 @@ export default function DashboardPage() {
         const res = await fetch(`/api/user/dashboard`)
         const dataJson = await res.json()
 
-        if (dataJson.stats) {
-          setStats([
-            { label: "Total Transaksi", value: String(dataJson.stats.total || 0), icon: ShoppingBag, color: "text-sky", bg: "bg-sky/10 border-sky/30" },
-            { label: "Berhasil", value: String(dataJson.stats.success || 0), icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-400/10 border-emerald-400/30" },
-            { label: "Pending", value: String(dataJson.stats.pending || 0), icon: Clock, color: "text-amber-400", bg: "bg-amber-400/10 border-amber-400/30" },
-            { label: "Gagal", value: String(dataJson.stats.failed || 0), icon: XCircle, color: "text-red-400", bg: "bg-red-400/10 border-red-400/30" },
-          ])
-        }
-
         if (dataJson.transactions) {
+          const txs = dataJson.transactions;
+          const total = dataJson.stats?.total !== undefined ? dataJson.stats.total : txs.length;
+          const success = dataJson.stats?.success !== undefined ? dataJson.stats.success : txs.filter((t: any) => t.topup_status === "success").length;
+          const pending = dataJson.stats?.pending !== undefined ? dataJson.stats.pending : txs.filter((t: any) => t.topup_status === "pending" || t.topup_status === "processing").length;
+          const failed = dataJson.stats?.failed !== undefined ? dataJson.stats.failed : txs.filter((t: any) => t.topup_status === "failed").length;
+
+          setStats([
+            { label: "Total Transaksi", value: String(total), icon: ShoppingBag, color: "text-sky", bg: "bg-sky/10 border-sky/30" },
+            { label: "Berhasil", value: String(success), icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-400/10 border-emerald-400/30" },
+            { label: "Pending", value: String(pending), icon: Clock, color: "text-amber-400", bg: "bg-amber-400/10 border-amber-400/30" },
+            { label: "Gagal", value: String(failed), icon: XCircle, color: "text-red-400", bg: "bg-red-400/10 border-red-400/30" },
+          ]);
+
           setRecentTransactions(
-            dataJson.transactions.map((tx: any) => ({
+            txs.map((tx: any) => ({
               invoice: tx.invoice,
               product: tx.product_name,
               game: tx.game_name,
@@ -122,14 +126,19 @@ export default function DashboardPage() {
                   ? "failed"
                   : "pending",
             }))
-          )
-        }
+          );
 
-        if (dataJson.transactions) {
-          const spent = dataJson.transactions
+          const spent = txs
             .filter((tx: any) => tx.payment_status === "paid" || tx.topup_status === "success")
-            .reduce((sum: number, tx: any) => sum + Number(tx.amount), 0)
-          setTotalSpent(spent)
+            .reduce((sum: number, tx: any) => sum + Number(tx.amount), 0);
+          setTotalSpent(spent);
+        } else if (dataJson.stats) {
+          setStats([
+            { label: "Total Transaksi", value: String(dataJson.stats.total || 0), icon: ShoppingBag, color: "text-sky", bg: "bg-sky/10 border-sky/30" },
+            { label: "Berhasil", value: String(dataJson.stats.success || 0), icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-400/10 border-emerald-400/30" },
+            { label: "Pending", value: String(dataJson.stats.pending || 0), icon: Clock, color: "text-amber-400", bg: "bg-amber-400/10 border-amber-400/30" },
+            { label: "Gagal", value: String(dataJson.stats.failed || 0), icon: XCircle, color: "text-red-400", bg: "bg-red-400/10 border-red-400/30" },
+          ]);
         }
 
         if (dataJson.digiflazzBalance !== undefined) {

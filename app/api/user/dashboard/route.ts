@@ -42,6 +42,13 @@ export async function GET(req: NextRequest) {
     // Fetch transactions by user ID using TransactionService
     const transactions = await TransactionService.getByUserId(userId);
 
+    // Calculate user transaction statistics
+    const total = transactions.length;
+    const success = transactions.filter((t: any) => t.topup_status === 'success').length;
+    const pending = transactions.filter((t: any) => t.topup_status === 'pending' || t.topup_status === 'processing').length;
+    const failed = transactions.filter((t: any) => t.topup_status === 'failed').length;
+    const stats = { total, success, pending, failed };
+
     let digiflazzBalance = null;
     if (role === 'admin') {
       try {
@@ -58,6 +65,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       user: { id: userId, name, email, role },
       transactions,
+      stats,
       digiflazzBalance
     });
   } catch (err: any) {
