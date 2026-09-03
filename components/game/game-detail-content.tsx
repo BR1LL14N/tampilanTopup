@@ -437,38 +437,40 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                         </div>
                       )}
 
-                      {/* Real-time Nickname Verification Action & Result */}
-                      <div className="sm:col-span-2 space-y-2 pt-1 pb-1">
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                          <button
-                            type="button"
-                            onClick={handleCheckNickname}
-                            disabled={checkingId || !gameId.trim()}
-                            className="px-4 py-2.5 bg-sky/20 hover:bg-sky/40 border border-sky/40 hover:border-sky/70 text-sky hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                          >
-                            {checkingId ? (
-                              <Loader2 className="h-4 w-4 animate-spin text-sky" />
-                            ) : (
-                              <Search className="h-4 w-4 text-sky" />
-                            )}
-                            {checkingId ? "Mengecek ID ke Server Digiflazz..." : "🔍 Cek Nickname Akun Player"}
-                          </button>
+                      {/* Real-time Nickname Verification Action & Result (Temporarily hidden until IP is whitelisted) */}
+                      {false && (
+                        <div className="sm:col-span-2 space-y-2 pt-1 pb-1">
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                            <button
+                              type="button"
+                              onClick={handleCheckNickname}
+                              disabled={checkingId || !gameId.trim()}
+                              className="px-4 py-2.5 bg-sky/20 hover:bg-sky/40 border border-sky/40 hover:border-sky/70 text-sky hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                            >
+                              {checkingId ? (
+                                <Loader2 className="h-4 w-4 animate-spin text-sky" />
+                              ) : (
+                                <Search className="h-4 w-4 text-sky" />
+                              )}
+                              {checkingId ? "Mengecek ID ke Server Digiflazz..." : "🔍 Cek Nickname Akun Player"}
+                            </button>
 
-                          {verifiedNickname && (
-                            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-md animate-fadeIn">
-                              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                              <span>Akun Terverifikasi: <strong className="text-white underline decoration-emerald-400 decoration-2">{verifiedNickname}</strong></span>
+                            {verifiedNickname && (
+                              <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-md animate-fadeIn">
+                                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <span>Akun Terverifikasi: <strong className="text-white underline decoration-emerald-400 decoration-2">{verifiedNickname}</strong></span>
+                              </div>
+                            )}
+                          </div>
+
+                          {checkError && (
+                            <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
+                              <span className="text-sm">⚠️</span>
+                              <span>{checkError}</span>
                             </div>
                           )}
                         </div>
-
-                        {checkError && (
-                          <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
-                            <span className="text-sm">⚠️</span>
-                            <span>{checkError}</span>
-                          </div>
-                        )}
-                      </div>
+                      )}
 
                       <div className="space-y-2">
                         <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Email (Opsional)</span>
