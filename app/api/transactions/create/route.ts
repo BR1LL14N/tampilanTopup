@@ -219,6 +219,13 @@ export async function POST(req: NextRequest) {
             },
             item_details: itemDetails,
             enabled_payments: enabledPayments,
+            qris: {
+              acquirer: 'gopay',
+            },
+            gopay: {
+              enable_callback: true,
+              callback_url: `${siteUrl}/history/${invoice}`,
+            },
             callbacks: {
               finish: `${siteUrl}/history/${invoice}`
             }
