@@ -715,24 +715,24 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                                 </span>
                               </div>
 
-                              <div className="w-full max-w-full min-w-0 mt-2 pt-2 border-t border-white/5">
-                                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-0.5 w-full">
-                                  <span className="text-[11px] sm:text-base font-black text-sky font-mono leading-none truncate">
-                                    Rp {prod.sell_price.toLocaleString("id-ID")}
-                                  </span>
-                                  <span className="text-[8.5px] sm:text-[10px] text-red-400 line-through font-mono leading-none truncate">
+                              <div className="w-full max-w-full min-w-0 mt-2.5 pt-2 border-t border-white/10 flex flex-col justify-end">
+                                <div className="flex items-center gap-1.5 mb-1">
+                                  <span className="text-[10px] sm:text-xs text-white/50 line-through font-semibold leading-none truncate">
                                     Rp {originalPrice.toLocaleString("id-ID")}
                                   </span>
+                                  <span className={`px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-black uppercase tracking-wider leading-none shrink-0 ${
+                                    isSelected 
+                                      ? "bg-sky text-white shadow-sm" 
+                                      : isPassItem
+                                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                      : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                  }`}>
+                                    -{discount}%
+                                  </span>
                                 </div>
-                                <span className={`inline-block px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-black uppercase tracking-wider mt-1.5 ${
-                                  isSelected 
-                                    ? "bg-sky text-white shadow-sm shadow-sky/50" 
-                                    : isPassItem
-                                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                                    : "bg-red-500/20 text-red-400"
-                                }`}>
-                                  HEMAT {discount}%
-                                </span>
+                                <div className="text-sm sm:text-base md:text-lg font-black text-sky tracking-tight leading-none truncate">
+                                  Rp {prod.sell_price.toLocaleString("id-ID")}
+                                </div>
                               </div>
                             </button>
                           )
