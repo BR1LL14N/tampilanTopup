@@ -292,16 +292,16 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
   const publisher = getPublisher(game.slug)
 
   return (
-    <div className="min-h-screen text-text-primary antialiased relative">
+    <div className="min-h-screen text-text-primary antialiased relative w-full max-w-full min-w-0 overflow-x-hidden">
 
       <Header user={user} />
 
       <SidebarContentWrapper isAuthenticated={!!user}>
-        <main className="relative z-10 py-8 pb-28 lg:pb-8">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <main className="relative z-10 py-6 sm:py-8 pb-28 lg:pb-8 w-full max-w-full min-w-0 overflow-x-hidden">
+          <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 w-full max-w-full min-w-0">
 
           {/* Game Header Banner Redesign */}
-          <div className="relative mb-10 rounded-2xl border border-sky/30 overflow-hidden bg-[#183644]/90 backdrop-blur-md shadow-2xl group transition-all duration-300">
+          <div className="relative mb-10 rounded-2xl border border-sky/30 overflow-hidden bg-[#183644]/90 backdrop-blur-md shadow-2xl group transition-all duration-300 w-full max-w-full min-w-0">
 
             {/* Banner background visual spanning the entire card */}
             <div className="absolute inset-0 z-0">
@@ -365,10 +365,10 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
           </div>
 
           {/* Dynamic content grid */}
-          <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+          <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_380px] w-full max-w-full min-w-0">
 
             {/* Left Column Form */}
-            <div className="space-y-6">
+            <div className="space-y-6 w-full max-w-full min-w-0">
 
               {/* Folder style tabs selector */}
               <div className="flex overflow-hidden border-b border-sky-border text-xs font-black uppercase tracking-wider gap-1">
@@ -397,7 +397,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
               {activeTab === "transaksi" ? (
                 <>
                   {/* Step 1: Input Akun */}
-                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden">
+                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[20px] sm:rounded-[24px] shadow-sky-medium overflow-hidden w-full max-w-full min-w-0">
                     <div className="p-4 border-b border-sky/30 flex items-center gap-3 dark-stripes-teal">
                       <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">1</span>
                       <h3 className="text-xs font-black uppercase tracking-widest text-white">Masukkan Data Akun</h3>
@@ -550,21 +550,21 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                   </div>
 
                   {/* Step 2: Pilih Nominal */}
-                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[24px] shadow-sky-medium overflow-hidden mt-6">
-                    <div className="p-4 border-b border-sky/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark-stripes-teal">
-                      <div className="flex items-center gap-3">
-                        <span className="grid h-7 w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft">2</span>
+                  <div className="bg-[#183644]/90 backdrop-blur-md border border-sky/30 rounded-[20px] sm:rounded-[24px] shadow-sky-medium overflow-hidden mt-6 w-full max-w-full min-w-0">
+                    <div className="p-3.5 sm:p-4 border-b border-sky/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark-stripes-teal w-full max-w-full min-w-0">
+                      <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                        <span className="grid h-6 w-6 sm:h-7 sm:w-7 place-items-center bg-sky text-white font-black text-xs rounded-lg shadow-sky-soft shrink-0">2</span>
                         <h3 className="text-xs font-black uppercase tracking-widest text-white">Pilih Nominal Top Up</h3>
                       </div>
 
                       {/* Category Filter Tabs (Semua / Diamonds / Membership Pass) */}
                       {hasPassProducts && (
-                        <div className="w-full overflow-x-auto pb-1 scrollbar-none">
-                          <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-sky/20 min-w-max">
+                        <div className="w-full max-w-full overflow-x-auto pb-1 scrollbar-none min-w-0">
+                          <div className="inline-flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-sky/20">
                             <button
                               type="button"
                               onClick={() => setNominalCategory("all")}
-                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shrink-0 ${
+                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap shrink-0 ${
                                 nominalCategory === "all"
                                   ? "bg-sky text-white shadow-sky-soft"
                                   : "text-white/60 hover:text-white hover:bg-white/5"
@@ -576,7 +576,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                             <button
                               type="button"
                               onClick={() => setNominalCategory("regular")}
-                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shrink-0 ${
+                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap shrink-0 ${
                                 nominalCategory === "regular"
                                   ? "bg-sky text-white shadow-sky-soft"
                                   : "text-white/60 hover:text-white hover:bg-white/5"
@@ -588,7 +588,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                             <button
                               type="button"
                               onClick={() => setNominalCategory("pass")}
-                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shrink-0 ${
+                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap shrink-0 ${
                                 nominalCategory === "pass"
                                   ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold shadow-sm"
                                   : "text-amber-300/70 hover:text-amber-300 hover:bg-amber-500/10"
@@ -602,8 +602,8 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                       )}
                     </div>
 
-                    <div className="p-2.5 sm:p-6">
-                      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
+                    <div className="p-2 sm:p-5 w-full max-w-full min-w-0">
+                      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 w-full max-w-full min-w-0">
                         {displayedProducts.map((prod) => {
                           const originalPrice = Math.round(prod.sell_price * 1.25)
                           const discount = 20
@@ -613,7 +613,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                             <button
                               key={prod.id}
                               onClick={() => setSelectedProduct(prod)}
-                              className={`w-full p-2.5 sm:p-4 text-left group rounded-[16px] sm:rounded-[20px] transition-all duration-300 border relative overflow-hidden flex flex-col justify-between ${
+                              className={`w-full max-w-full min-w-0 p-2 sm:p-3.5 text-left group rounded-[14px] sm:rounded-[20px] transition-all duration-300 border relative overflow-hidden flex flex-col justify-between box-border ${
                                 isSelected
                                   ? "border-sky bg-sky/10 shadow-lg scale-[1.01] ring-2 ring-sky/30"
                                   : isPassItem
@@ -629,8 +629,8 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                                 </span>
                               )}
                               
-                              <div>
-                                <span className="mb-2 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-black/30 p-1 sm:p-1.5 border border-white/10 group-hover:border-white/20 transition-colors">
+                              <div className="w-full max-w-full min-w-0">
+                                <span className="mb-1.5 sm:mb-2 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-black/30 p-1 sm:p-1.5 border border-white/10 group-hover:border-white/20 transition-colors">
                                   <img
                                     src={getItemAssetForProduct(prod.name, prod.provider_sku, game.name)}
                                     alt=""
@@ -642,12 +642,12 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                                 </span>
                               </div>
 
-                              <div className="w-full mt-2 pt-2 border-t border-white/5">
-                                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-0.5">
-                                  <span className="text-[11px] sm:text-base font-black text-sky font-mono leading-none">
+                              <div className="w-full max-w-full min-w-0 mt-2 pt-2 border-t border-white/5">
+                                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-0.5 w-full">
+                                  <span className="text-[11px] sm:text-base font-black text-sky font-mono leading-none truncate">
                                     Rp {prod.sell_price.toLocaleString("id-ID")}
                                   </span>
-                                  <span className="text-[8.5px] sm:text-[10px] text-red-400 line-through font-mono leading-none">
+                                  <span className="text-[8.5px] sm:text-[10px] text-red-400 line-through font-mono leading-none truncate">
                                     Rp {originalPrice.toLocaleString("id-ID")}
                                   </span>
                                 </div>
