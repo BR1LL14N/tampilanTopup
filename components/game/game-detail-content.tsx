@@ -24,6 +24,8 @@ import {
   Crown,
   Sparkles,
   Layers,
+  Info,
+  HelpCircle,
 } from "lucide-react"
 import { gameAssets, getItemAssetForProduct, paymentAssets } from "@/lib/assets"
 import { formatCurrency } from "@/lib/utils"
@@ -54,6 +56,139 @@ interface GameDetailContentProps {
     email: string
     role: string
   } | null
+}
+
+export interface GameGuide {
+  idLabel: string
+  idPlaceholder: string
+  idExample: string
+  hasServerId: boolean
+  serverLabel?: string
+  serverPlaceholder?: string
+  serverOptions?: string[]
+  howToFind: string[]
+  formatNotice: string
+  validate?: (id: string, server?: string) => string | null
+}
+
+export const GAME_GUIDES: Record<string, GameGuide> = {
+  "valorant": {
+    idLabel: "Riot ID & Tagline",
+    idPlaceholder: "Contoh: fauzan#123 atau Mitsuru#ID1",
+    idExample: "fauzan#123",
+    hasServerId: false,
+    howToFind: [
+      "Buka game Valorant atau aplikasi Riot Client di PC Anda.",
+      "Arahkan kursor ke foto profil avatar akun Anda di pojok kanan atas layar.",
+      "Catat Riot ID dan Tagline Anda (format: NamaAkun#TAG, misal: fauzan#123)."
+    ],
+    formatNotice: "Wajib menyertakan tanda pagar (#) beserta tag akun Riot Anda. Contoh: fauzan#123",
+    validate: (id) => {
+      if (!id.includes("#") || !id.split("#")[1]?.trim()) {
+        return "Format Riot ID harus menyertakan tanda # dan Tagline (Contoh: fauzan#123)"
+      }
+      return null
+    }
+  },
+  "mobile-legends": {
+    idLabel: "User ID",
+    idPlaceholder: "Contoh: 12345678",
+    idExample: "12345678",
+    hasServerId: true,
+    serverLabel: "Zone ID / Server ID",
+    serverPlaceholder: "Contoh: 2134",
+    howToFind: [
+      "Buka aplikasi Mobile Legends di HP Anda.",
+      "Klik avatar profil akun Anda di pojok kiri atas layar utama.",
+      "Di bawah foto profil dan nickname, temukan deretan angka: 12345678 (2134)."
+    ],
+    formatNotice: "Masukkan angka User ID pada kolom pertama, dan angka 4-5 digit di dalam kurung pada kolom Server ID.",
+  },
+  "free-fire": {
+    idLabel: "Player ID (UID)",
+    idPlaceholder: "Contoh: 1234567890 (8-10 digit)",
+    idExample: "1234567890",
+    hasServerId: false,
+    howToFind: [
+      "Buka game Free Fire di HP Anda.",
+      "Klik avatar profil Anda di pojok kiri atas layar utama.",
+      "Salin nomor UID yang tertera tepat di bawah nickname karakter Anda."
+    ],
+    formatNotice: "Hanya masukkan deretan angka Player ID (UID), bukan nickname karakter.",
+  },
+  "pubg-mobile": {
+    idLabel: "Player ID (UID)",
+    idPlaceholder: "Contoh: 5123456789 (9-10 digit)",
+    idExample: "5123456789",
+    hasServerId: false,
+    howToFind: [
+      "Buka game PUBG Mobile di HP Anda.",
+      "Klik foto profil avatar karakter Anda di pojok kiri atas.",
+      "Buka tab Info Utama, lalu salin deretan nomor Player ID akun Anda."
+    ],
+    formatNotice: "Hanya masukkan nomor angka Player ID akun Anda.",
+  },
+  "genshin-impact": {
+    idLabel: "UID Karakter",
+    idPlaceholder: "Contoh: 812345678 (9 digit)",
+    idExample: "812345678",
+    hasServerId: true,
+    serverLabel: "Server Game",
+    serverPlaceholder: "Pilih Server",
+    serverOptions: ["Asia", "America", "Europe", "TW, HK, MO"],
+    howToFind: [
+      "Buka game Genshin Impact di perangkat Anda.",
+      "UID 9 digit selalu tercetak jelas di sudut kanan bawah layar saat Anda sedang bermain.",
+      "Atau buka Menu Paimon (jeda) untuk melihat UID di bawah nama karakter."
+    ],
+    formatNotice: "Pastikan UID dan pilihan Server sesuai dengan wilayah akun tempat Anda bermain.",
+  },
+  "honor-of-kings": {
+    idLabel: "Player ID (UID)",
+    idPlaceholder: "Contoh: 123456789012",
+    idExample: "123456789012",
+    hasServerId: false,
+    howToFind: [
+      "Buka game Honor of Kings di perangkat Anda.",
+      "Klik avatar profil Anda di pojok kiri atas layar utama.",
+      "Salin nomor Player ID (UID) akun Anda yang tertera di halaman profil."
+    ],
+    formatNotice: "Pastikan nomor Player ID akun Anda sudah benar dan aktif.",
+  },
+  "steam": {
+    idLabel: "Steam Account ID / Wallet",
+    idPlaceholder: "Masukkan Akun Steam / ID",
+    idExample: "Steam Account ID",
+    hasServerId: false,
+    howToFind: [
+      "Buka aplikasi Steam di PC Anda.",
+      "Klik nama profil di pojok kanan atas > Account Details untuk melihat Steam ID Anda."
+    ],
+    formatNotice: "Pastikan akun Steam Anda berada dalam region Indonesia (IDR).",
+  },
+  "bigo": {
+    idLabel: "Bigo ID",
+    idPlaceholder: "Contoh: 12345678",
+    idExample: "12345678",
+    hasServerId: false,
+    howToFind: [
+      "Buka aplikasi Bigo Live di HP Anda.",
+      "Buka menu profil (Saya) di pojok kanan bawah, salin nomor Bigo ID Anda."
+    ],
+    formatNotice: "Hanya masukkan Bigo ID resmi akun Anda.",
+  },
+}
+
+export const defaultGameGuide: GameGuide = {
+  idLabel: "User ID",
+  idPlaceholder: "Masukkan User ID Akun Game",
+  idExample: "12345678",
+  hasServerId: false,
+  howToFind: [
+    "Buka game Anda dan periksa menu profil akun.",
+    "Temukan User ID atau Player ID yang tertera di informasi akun Anda."
+  ],
+  formatNotice: "Pastikan User ID yang dimasukkan sudah sesuai sebelum melanjutkan pembayaran.",
 }
 
 const gameWallpapers: Record<string, string> = {
@@ -229,6 +364,8 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     }
   }
 
+  const guide = GAME_GUIDES[game.slug] || defaultGameGuide
+
   // Validation Error state for auto-scrolling
   const [validationError, setValidationError] = useState<{ field: string; message: string } | null>(null)
 
@@ -247,12 +384,19 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     setValidationError(null)
 
     if (!gameId.trim()) {
-      scrollToField("input-user-id", "User ID akun game wajib diisi.")
+      scrollToField("input-user-id", `${guide.idLabel} akun game wajib diisi.`)
       return
     }
-    if (game.slug === "mobile-legends" && !serverId.trim()) {
-      scrollToField("input-server-id", "Server / Zone ID Mobile Legends wajib diisi.")
+    if (guide.hasServerId && !serverId.trim()) {
+      scrollToField("input-server-id", `${guide.serverLabel || "Server / Zone ID"} wajib diisi.`)
       return
+    }
+    if (guide.validate) {
+      const valError = guide.validate(gameId.trim(), serverId.trim())
+      if (valError) {
+        scrollToField("input-user-id", valError)
+        return
+      }
     }
     if (!selectedProduct) {
       scrollToField("step-2-nominal", "Silakan pilih salah satu nominal produk top up di bawah ini.")
@@ -264,7 +408,9 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
     }
 
     // Redirect to dynamic checkout/invoice route
-    const target = serverId ? `${gameId.trim()}${serverId.trim()}` : gameId.trim()
+    const target = (guide.hasServerId && serverId.trim() && game.slug === "mobile-legends")
+      ? `${gameId.trim()}${serverId.trim()}`
+      : gameId.trim()
     
     const queryParams = new URLSearchParams({
       target,
@@ -426,7 +572,9 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
 
                     <div className="grid gap-4 sm:gap-5 p-4 sm:p-6 sm:grid-cols-2">
                       <div className="space-y-2">
-                        <span className="block text-xs font-bold uppercase tracking-wider text-white/60">User ID <span className="text-sky">*</span></span>
+                        <span className="block text-xs font-bold uppercase tracking-wider text-white/60">
+                          {guide.idLabel} <span className="text-sky">*</span>
+                        </span>
                         <input
                           id="input-user-id"
                           value={gameId}
@@ -436,7 +584,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                             setVerifiedNickname("");
                             setCheckError("");
                           }}
-                          placeholder="Masukkan User ID"
+                          placeholder={guide.idPlaceholder}
                           className={`w-full bg-black/20 border transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none ${
                             validationError?.field === "input-user-id"
                               ? "border-amber-400 ring-4 ring-amber-400/30 bg-amber-500/10"
@@ -451,27 +599,55 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                         )}
                       </div>
 
-                      {/* Conditionally show Server ID for Mobile Legends */}
-                      {game.slug === "mobile-legends" && (
+                      {/* Conditionally show Server ID if game requires it */}
+                      {guide.hasServerId && (
                         <div className="space-y-2">
-                          <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Server ID <span className="text-sky">*</span></span>
-                          <input
-                            id="input-server-id"
-                            value={serverId}
-                            onChange={(e) => {
-                              setServerId(e.target.value);
-                              if (validationError?.field === "input-server-id") setValidationError(null);
-                              setVerifiedNickname("");
-                              setCheckError("");
-                            }}
-                            placeholder="Masukkan Server ID"
-                            className={`w-full bg-black/20 border transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none ${
-                              validationError?.field === "input-server-id"
-                                ? "border-amber-400 ring-4 ring-amber-400/30 bg-amber-500/10"
-                                : "border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20"
-                            }`}
-                            required
-                          />
+                          <span className="block text-xs font-bold uppercase tracking-wider text-white/60">
+                            {guide.serverLabel || "Server ID"} <span className="text-sky">*</span>
+                          </span>
+                          {guide.serverOptions ? (
+                            <select
+                              id="input-server-id"
+                              value={serverId}
+                              onChange={(e) => {
+                                setServerId(e.target.value);
+                                if (validationError?.field === "input-server-id") setValidationError(null);
+                                setVerifiedNickname("");
+                                setCheckError("");
+                              }}
+                              className={`w-full bg-[#102530] border transition-all rounded-xl px-4 py-2.5 text-sm text-white outline-none cursor-pointer ${
+                                validationError?.field === "input-server-id"
+                                  ? "border-amber-400 ring-4 ring-amber-400/30 bg-amber-500/10"
+                                  : "border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20"
+                              }`}
+                              required
+                            >
+                              <option value="" disabled className="bg-[#102530] text-white/40">Pilih Server...</option>
+                              {guide.serverOptions.map((opt) => (
+                                <option key={opt} value={opt} className="bg-[#102530] text-white">
+                                  {opt}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <input
+                              id="input-server-id"
+                              value={serverId}
+                              onChange={(e) => {
+                                setServerId(e.target.value);
+                                if (validationError?.field === "input-server-id") setValidationError(null);
+                                setVerifiedNickname("");
+                                setCheckError("");
+                              }}
+                              placeholder={guide.serverPlaceholder || "Masukkan Server ID"}
+                              className={`w-full bg-black/20 border transition-all rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none ${
+                                validationError?.field === "input-server-id"
+                                  ? "border-amber-400 ring-4 ring-amber-400/30 bg-amber-500/10"
+                                  : "border-white/10 hover:border-white/30 focus:border-sky focus:ring-2 focus:ring-sky/20"
+                              }`}
+                              required
+                            />
+                          )}
                           {validationError?.field === "input-server-id" && (
                             <p className="text-[11px] font-bold text-amber-300 flex items-center gap-1.5 mt-1 animate-fadeIn">
                               ⚠️ {validationError.message}
@@ -480,15 +656,28 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                         </div>
                       )}
 
-                      {/* Real-time Nickname Verification Action & Result (Temporarily hidden until IP is whitelisted) */}
-                      {false && (
+                      {/* Format Guidance Box */}
+                      <div className="sm:col-span-2 bg-sky/10 border border-sky/30 rounded-xl p-3.5 text-xs text-white flex items-start gap-2.5 shadow-sm">
+                        <Info className="h-4 w-4 text-sky shrink-0 mt-0.5" />
+                        <div className="space-y-1 text-[11px] leading-relaxed">
+                          <p className="font-bold text-sky uppercase tracking-wider">
+                            💡 Format Pengisian {game.name}:
+                          </p>
+                          <p className="text-white/80 font-medium">
+                            {guide.formatNotice}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Real-time Nickname Verification Action & Result for supported games */}
+                      {["mobile-legends", "free-fire", "pubg-mobile"].includes(game.slug) && (
                         <div className="sm:col-span-2 space-y-2 pt-1 pb-1">
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                             <button
                               type="button"
                               onClick={handleCheckNickname}
                               disabled={checkingId || !gameId.trim()}
-                              className="px-4 py-2.5 bg-sky/20 hover:bg-sky/40 border border-sky/40 hover:border-sky/70 text-sky hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                              className="px-4 py-2.5 bg-sky/20 hover:bg-sky/40 border border-sky/40 hover:border-sky/70 text-sky hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
                             >
                               {checkingId ? (
                                 <Loader2 className="h-4 w-4 animate-spin text-sky" />
@@ -763,6 +952,23 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                   <p className="mt-4 text-sm font-medium leading-relaxed text-white/90">
                     {game.description}
                   </p>
+
+                  {/* Panduan Cara Menemukan ID */}
+                  <div className="mt-6 bg-black/25 border border-sky/30 rounded-2xl p-5 space-y-3 shadow-inner">
+                    <h3 className="font-black uppercase tracking-wider text-xs text-sky flex items-center gap-2">
+                      <HelpCircle className="h-4 w-4 text-sky" />
+                      Panduan Cara Menemukan {guide.idLabel} {game.name}
+                    </h3>
+                    <ol className="list-decimal list-inside space-y-2 text-xs text-white/85 font-medium pl-1">
+                      {guide.howToFind.map((step, idx) => (
+                        <li key={idx} className="leading-relaxed">{step}</li>
+                      ))}
+                    </ol>
+                    <div className="pt-2 border-t border-white/10 text-[11px] text-amber-300 font-semibold flex items-center gap-2">
+                      <span className="text-sm">💡</span>
+                      <span>Contoh Format Input: <strong className="text-white bg-black/40 px-2 py-0.5 rounded font-mono border border-white/10">{guide.idExample}</strong></span>
+                    </div>
+                  </div>
 
                   <h3 className="mt-8 font-black uppercase tracking-widest text-xs text-white flex items-center gap-2">
                     <Shield className="h-4 w-4 text-sky" />
