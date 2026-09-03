@@ -297,7 +297,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
       <Header user={user} />
 
       <SidebarContentWrapper isAuthenticated={!!user}>
-        <main className="relative z-10 py-8">
+        <main className="relative z-10 py-8 pb-28 lg:pb-8">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
           {/* Game Header Banner Redesign */}
@@ -559,49 +559,51 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
 
                       {/* Category Filter Tabs (Semua / Diamonds / Membership Pass) */}
                       {hasPassProducts && (
-                        <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-sky/20 self-start sm:self-auto overflow-x-auto max-w-full">
-                          <button
-                            type="button"
-                            onClick={() => setNominalCategory("all")}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap ${
-                              nominalCategory === "all"
-                                ? "bg-sky text-white shadow-sky-soft"
-                                : "text-white/60 hover:text-white hover:bg-white/5"
-                            }`}
-                          >
-                            <Layers className="h-3 w-3" />
-                            Semua ({sortedAllProducts.length})
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setNominalCategory("regular")}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap ${
-                              nominalCategory === "regular"
-                                ? "bg-sky text-white shadow-sky-soft"
-                                : "text-white/60 hover:text-white hover:bg-white/5"
-                            }`}
-                          >
-                            <Sparkles className="h-3 w-3" />
-                            Diamonds / Koin ({regularProducts.length})
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setNominalCategory("pass")}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap ${
-                              nominalCategory === "pass"
-                                ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold shadow-sm"
-                                : "text-amber-300/70 hover:text-amber-300 hover:bg-amber-500/10"
-                            }`}
-                          >
-                            <Crown className="h-3 w-3" />
-                            Pass &amp; Member ({passProducts.length})
-                          </button>
+                        <div className="w-full overflow-x-auto pb-1 scrollbar-none">
+                          <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-sky/20 min-w-max">
+                            <button
+                              type="button"
+                              onClick={() => setNominalCategory("all")}
+                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shrink-0 ${
+                                nominalCategory === "all"
+                                  ? "bg-sky text-white shadow-sky-soft"
+                                  : "text-white/60 hover:text-white hover:bg-white/5"
+                              }`}
+                            >
+                              <Layers className="h-3 w-3 shrink-0" />
+                              Semua ({sortedAllProducts.length})
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setNominalCategory("regular")}
+                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shrink-0 ${
+                                nominalCategory === "regular"
+                                  ? "bg-sky text-white shadow-sky-soft"
+                                  : "text-white/60 hover:text-white hover:bg-white/5"
+                              }`}
+                            >
+                              <Sparkles className="h-3 w-3 shrink-0" />
+                              Diamonds / Koin ({regularProducts.length})
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setNominalCategory("pass")}
+                              className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shrink-0 ${
+                                nominalCategory === "pass"
+                                  ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-extrabold shadow-sm"
+                                  : "text-amber-300/70 hover:text-amber-300 hover:bg-amber-500/10"
+                              }`}
+                            >
+                              <Crown className="h-3 w-3 shrink-0" />
+                              Pass &amp; Member ({passProducts.length})
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
 
-                    <div className="p-3 sm:p-6">
-                      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4">
+                    <div className="p-2.5 sm:p-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
                         {displayedProducts.map((prod) => {
                           const originalPrice = Math.round(prod.sell_price * 1.25)
                           const discount = 20
@@ -611,9 +613,9 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                             <button
                               key={prod.id}
                               onClick={() => setSelectedProduct(prod)}
-                              className={`w-full p-2.5 sm:p-4 text-left group rounded-[16px] sm:rounded-[20px] transition-all duration-300 border relative overflow-hidden ${
+                              className={`w-full p-2.5 sm:p-4 text-left group rounded-[16px] sm:rounded-[20px] transition-all duration-300 border relative overflow-hidden flex flex-col justify-between ${
                                 isSelected
-                                  ? "border-sky bg-sky/10 shadow-lg scale-[1.02] ring-2 ring-sky/30"
+                                  ? "border-sky bg-sky/10 shadow-lg scale-[1.01] ring-2 ring-sky/30"
                                   : isPassItem
                                   ? "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50 hover:-translate-y-0.5 shadow-md hover:bg-amber-500/10 hover:shadow-lg"
                                   : "border-white/10 bg-black/20 hover:border-white/30 hover:-translate-y-0.5 shadow-md hover:bg-white/5 hover:shadow-lg"
@@ -621,36 +623,44 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                               type="button"
                             >
                               {isPassItem && (
-                                <span className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-yellow-400 text-slate-950 font-black text-[8px] sm:text-[9px] uppercase px-2 py-0.5 rounded-bl-lg tracking-wider flex items-center gap-1 shadow-sm">
+                                <span className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-yellow-400 text-slate-950 font-black text-[7.5px] sm:text-[9px] uppercase px-1.5 sm:px-2 py-0.5 rounded-bl-lg tracking-wider flex items-center gap-1 shadow-sm">
                                   <Crown className="h-2.5 w-2.5" />
                                   PASS
                                 </span>
                               )}
-                              <span className="mb-2 sm:mb-3 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-black/30 p-1 sm:p-1.5 border border-white/10 group-hover:border-white/20 transition-colors">
-                                <img
-                                  src={getItemAssetForProduct(prod.name, prod.provider_sku, game.name)}
-                                  alt=""
-                                  className="max-h-full max-w-full object-contain drop-shadow-md"
-                                />
-                              </span>
-                              <span className="block font-black text-[11px] sm:text-xs uppercase tracking-tight sm:tracking-wide text-white group-hover:text-sky transition-colors line-clamp-2 leading-tight">{prod.name}</span>
-                              <div className="mt-2 sm:mt-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-0.5">
-                                <span className="text-xs sm:text-base font-black text-sky font-mono leading-none">
-                                  Rp {prod.sell_price.toLocaleString("id-ID")}
+                              
+                              <div>
+                                <span className="mb-2 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-black/30 p-1 sm:p-1.5 border border-white/10 group-hover:border-white/20 transition-colors">
+                                  <img
+                                    src={getItemAssetForProduct(prod.name, prod.provider_sku, game.name)}
+                                    alt=""
+                                    className="max-h-full max-w-full object-contain drop-shadow-md"
+                                  />
                                 </span>
-                                <span className="text-[9px] sm:text-[10px] text-red-400 line-through font-mono leading-none">
-                                  Rp {originalPrice.toLocaleString("id-ID")}
+                                <span className="block font-black text-[10px] sm:text-xs uppercase tracking-tight text-white group-hover:text-sky transition-colors line-clamp-3 leading-snug min-h-[38px] sm:min-h-[34px] break-words">
+                                  {prod.name}
                                 </span>
                               </div>
-                              <span className={`inline-block px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-black uppercase tracking-wider mt-2 sm:mt-3 ${
-                                isSelected 
-                                  ? "bg-sky text-white shadow-sm shadow-sky/50" 
-                                  : isPassItem
-                                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                                  : "bg-red-500/20 text-red-400"
-                              }`}>
-                                HEMAT {discount}%
-                              </span>
+
+                              <div className="w-full mt-2 pt-2 border-t border-white/5">
+                                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-0.5">
+                                  <span className="text-[11px] sm:text-base font-black text-sky font-mono leading-none">
+                                    Rp {prod.sell_price.toLocaleString("id-ID")}
+                                  </span>
+                                  <span className="text-[8.5px] sm:text-[10px] text-red-400 line-through font-mono leading-none">
+                                    Rp {originalPrice.toLocaleString("id-ID")}
+                                  </span>
+                                </div>
+                                <span className={`inline-block px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-black uppercase tracking-wider mt-1.5 ${
+                                  isSelected 
+                                    ? "bg-sky text-white shadow-sm shadow-sky/50" 
+                                    : isPassItem
+                                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                    : "bg-red-500/20 text-red-400"
+                                }`}>
+                                  HEMAT {discount}%
+                                </span>
+                              </div>
                             </button>
                           )
                         })}
@@ -779,6 +789,36 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
           </div>
 
           </div>
+
+          {/* Mobile Floating Sticky Checkout Bar */}
+          {selectedProduct && (
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#102a36]/95 backdrop-blur-md border-t border-sky/40 p-3 sm:p-4 shadow-2xl animate-in slide-in-from-bottom duration-300">
+              <div className="mx-auto max-w-lg flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] text-white/60 uppercase font-bold tracking-wider block truncate">
+                    {selectedProduct.name}
+                  </span>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <span className="text-base font-black text-sky font-mono leading-none">
+                      Rp {Math.max(1, (selectedProduct.sell_price * quantity) - promoDiscount).toLocaleString("id-ID")}
+                    </span>
+                    {promoDiscount > 0 && (
+                      <span className="text-[9px] font-bold text-emerald-400">
+                        Hemat -Rp {promoDiscount.toLocaleString("id-ID")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={handleOrder}
+                  className="bg-sky text-white hover:bg-diamond px-4 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl shadow-sky-soft shimmer-hover shrink-0 flex items-center gap-1.5"
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  Pesan Instan
+                </button>
+              </div>
+            </div>
+          )}
         </main>
 
         <Footer />
