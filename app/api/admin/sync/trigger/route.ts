@@ -144,10 +144,26 @@ async function handleSync(req: NextRequest) {
       body: JSON.stringify({ cmd: "prepaid", username, sign }),
     });
 
-    const result = await response.json();
-    if (!result.data || !Array.isArray(result.data)) {
+    const textRes = await response.text();
+    let result: any = null;
+    try {
+      result = JSON.parse(textRes);
+    } catch (parseErr) {
+      console.error("Digiflazz returned non-JSON response (likely IP Whitelist block or 403 HTML):", textRes);
       await SettingService.set("last_sync_status", "failed");
-      return NextResponse.json({ error: "Failed to retrieve price list from Digiflazz API", details: result }, { status: 502 });
+      return NextResponse.json({
+        error: "Gagal terhubung ke Digiflazz: Server Digiflazz menolak permintaan (Respons HTML). Pastikan IP Server VPS (103.127.139.5) sudah ditambahkan ke IP Whitelist di Dashboard Digiflazz Anda.",
+        raw: textRes.substring(0, 150)
+      }, { status: 502 });
+    }
+
+    if (!result || !result.data || !Array.isArray(result.data)) {
+      await SettingService.set("last_sync_status", "failed");
+      const errDetail = result?.data?.message || result?.message || "Format data harga dari Digiflazz tidak valid";
+      return NextResponse.json({ 
+        error: `Gagal sinkronisasi katalog: ${errDetail}. Pastikan Username, API Key, dan IP Whitelist (103.127.139.5) sudah sesuai.`, 
+        details: result 
+      }, { status: 502 });
     }
 
     const allItems = result.data;

@@ -59,7 +59,15 @@ export async function checkBalance(): Promise<any> {
     }),
   });
 
-  return response.json();
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return {
+      error: "Respons Digiflazz bukan JSON yang valid. Kemungkinan IP Server belum di-whitelist.",
+      raw: text.substring(0, 150)
+    };
+  }
 }
 
 export async function checkPriceList(): Promise<any> {
@@ -120,7 +128,15 @@ export async function checkPriceList(): Promise<any> {
     }),
   });
 
-  return response.json();
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return {
+      error: "Respons Digiflazz bukan JSON yang valid. Pastikan IP Server sudah didaftarkan di IP Whitelist.",
+      raw: text.substring(0, 150)
+    };
+  }
 }
 
 export async function createTopup(
