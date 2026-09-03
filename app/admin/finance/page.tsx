@@ -219,8 +219,7 @@ export default function AdminFinancePage() {
                 <Button
                   onClick={() => fetchFinanceData()}
                   disabled={refreshing}
-                  variant="outline"
-                  className="gap-2 border-sky/30 hover:bg-sky/20 text-white font-bold text-xs"
+                  className="bg-[#183644] hover:bg-sky/20 border border-sky/30 text-white font-bold text-xs gap-2 shadow-sm"
                 >
                   <RefreshCw className={`h-4 w-4 text-sky ${refreshing ? "animate-spin" : ""}`} />
                   Refresh
@@ -242,8 +241,8 @@ export default function AdminFinancePage() {
 
                   {/* Preset Pills */}
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs font-bold text-white/60 uppercase tracking-wider mr-2 flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-sky" />
+                    <span className="text-xs font-bold text-white uppercase tracking-wider mr-2 flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4 text-white" />
                       Periode:
                     </span>
                     {[
@@ -279,7 +278,7 @@ export default function AdminFinancePage() {
                           setStartDate(e.target.value)
                           setActivePreset("custom")
                         }}
-                        className="bg-transparent text-white text-xs font-mono font-bold focus:outline-none cursor-pointer"
+                        className="bg-transparent text-white text-xs font-mono font-bold focus:outline-none cursor-pointer [color-scheme:dark]"
                       />
                     </div>
                     <div className="flex items-center gap-1.5 bg-black/30 border border-sky/20 px-2.5 py-1 rounded-xl">
@@ -291,7 +290,7 @@ export default function AdminFinancePage() {
                           setEndDate(e.target.value)
                           setActivePreset("custom")
                         }}
-                        className="bg-transparent text-white text-xs font-mono font-bold focus:outline-none cursor-pointer"
+                        className="bg-transparent text-white text-xs font-mono font-bold focus:outline-none cursor-pointer [color-scheme:dark]"
                       />
                     </div>
                     <Button

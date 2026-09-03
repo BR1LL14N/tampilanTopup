@@ -27,6 +27,9 @@ import {
   Bell,
   MessageSquare,
   Check,
+  Search,
+  RotateCcw,
+  Filter,
 } from "lucide-react"
 
 export default function DashboardPage() {
@@ -34,6 +37,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [recentTransactions, setRecentTransactions] = useState<any[]>([])
+  const [gameFilter, setGameFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
   const [stats, setStats] = useState([
     { label: "Total Transaksi", value: "0", icon: ShoppingBag, color: "text-sky", bg: "bg-sky/10 border-sky/30" },
     { label: "Berhasil", value: "0", icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-400/10 border-emerald-400/30" },
@@ -118,7 +124,10 @@ export default function DashboardPage() {
               invoice: tx.invoice,
               product: tx.product_name,
               game: tx.game_name,
+              game_slug: tx.game_slug || (tx.game_name ? tx.game_name.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "mobile-legends"),
+              target_id: tx.target_id,
               amount: Number(tx.amount),
+              created_at: tx.created_at,
               status:
                 tx.topup_status === "success"
                   ? "success"
@@ -241,6 +250,24 @@ export default function DashboardPage() {
     )
   }
 
+  const availableGames = Array.from(
+    new Set(recentTransactions.map((t: any) => t.game).filter(Boolean))
+  ) as string[];
+
+  const filteredTransactions = recentTransactions.filter((tx: any) => {
+    if (gameFilter !== "all" && tx.game !== gameFilter) return false;
+    if (statusFilter !== "all" && tx.status !== statusFilter) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchInvoice = tx.invoice?.toLowerCase().includes(q);
+      const matchProduct = tx.product?.toLowerCase().includes(q);
+      const matchGame = tx.game?.toLowerCase().includes(q);
+      const matchTarget = tx.target_id?.toLowerCase().includes(q);
+      if (!matchInvoice && !matchProduct && !matchGame && !matchTarget) return false;
+    }
+    return true;
+  });
+
   return (
     <div className="min-h-screen flex flex-col relative ">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky/5 rounded-full blur-3xl pointer-events-none" />
@@ -362,41 +389,136 @@ export default function DashboardPage() {
                   <div className="p-6">
                     {activeTab === "transactions" ? (
                       recentTransactions.length > 0 ? (
-                        <div className="space-y-3">
-                          {recentTransactions.map((tx, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-4 bg-black/20 border border-sky/20 hover:border-sky/40 rounded-xl transition-all duration-300 group"
-                            >
-                              <div className="flex items-center gap-4">
-                                <span className="grid h-10 w-10 place-items-center bg-sky/10 text-sky border border-sky/20 rounded-lg group-hover:border-sky/40 transition-colors">
-                                  <img src={getItemAssetForProduct(tx.product, undefined, tx.game)} alt="" className="max-h-7 max-w-7 object-contain" />
-                                </span>
-                                <div>
-                                  <p className="font-bold text-white group-hover:text-sky transition-colors text-sm uppercase tracking-tight">{tx.product}</p>
-                                  <p className="mt-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-white/40 uppercase tracking-wider">
-                                    <img src={getGameAssetByName(tx.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover" />
-                                    {tx.game} • <span className="font-mono">{tx.invoice}</span>
-                                  </p>
+                        <div className="space-y-4">
+                          {/* Simple & Neat Filter Bar */}
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pb-4 border-b border-sky/15">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {/* Filter Game */}
+                              <div className="relative">
+                                <select
+                                  value={gameFilter}
+                                  onChange={(e) => setGameFilter(e.target.value)}
+                                  className="bg-black/40 border border-sky/20 hover:border-sky/40 text-white text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:border-sky cursor-pointer appearance-none pr-8 transition-colors"
+                                >
+                                  <option value="all" className="bg-[#0f1f28] text-white">🎮 Semua Game</option>
+                                  {availableGames.map((gameName) => (
+                                    <option key={gameName} value={gameName} className="bg-[#0f1f28] text-white">
+                                      {gameName}
+                                    </option>
+                                  ))}
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/50 text-[9px]">
+                                  ▼
                                 </div>
                               </div>
-                              <div className="text-right">
-                                <p className="font-black text-white font-mono text-sm">
-                                  Rp {tx.amount.toLocaleString("id-ID")}
-                                </p>
-                                <span className={`inline-block px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded mt-1.5 ${
-                                  tx.status === "success"
-                                    ? "bg-emerald-400/10 text-emerald-400 border border-emerald-400/30"
-                                    : tx.status === "pending" || tx.status === "processing"
-                                    ? "bg-amber-400/10 text-amber-400 border border-amber-400/30"
-                                    : "bg-red-400/10 text-red-400 border border-red-400/30"
-                                }`} style={tagBevelStyle}>
-                                  {tx.status === "success" ? "Berhasil" :
-                                   tx.status === "processing" || tx.status === "pending" ? "Diproses" : "Gagal"}
-                                </span>
+
+                              {/* Filter Status */}
+                              <div className="relative">
+                                <select
+                                  value={statusFilter}
+                                  onChange={(e) => setStatusFilter(e.target.value)}
+                                  className="bg-black/40 border border-sky/20 hover:border-sky/40 text-white text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:border-sky cursor-pointer appearance-none pr-8 transition-colors"
+                                >
+                                  <option value="all" className="bg-[#0f1f28] text-white">🏷️ Semua Status</option>
+                                  <option value="success" className="bg-[#0f1f28] text-emerald-400">🟢 Berhasil</option>
+                                  <option value="pending" className="bg-[#0f1f28] text-amber-400">🟡 Diproses</option>
+                                  <option value="failed" className="bg-[#0f1f28] text-red-400">🔴 Gagal</option>
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/50 text-[9px]">
+                                  ▼
+                                </div>
                               </div>
+
+                              {(gameFilter !== "all" || statusFilter !== "all" || searchQuery) && (
+                                <button
+                                  onClick={() => {
+                                    setGameFilter("all")
+                                    setStatusFilter("all")
+                                    setSearchQuery("")
+                                  }}
+                                  className="text-[10px] text-sky hover:text-white font-bold underline px-1 transition-colors"
+                                >
+                                  Reset Filter
+                                </button>
+                              )}
                             </div>
-                          ))}
+
+                            {/* Search input */}
+                            <div className="relative w-full sm:w-56">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/40" />
+                              <input
+                                type="text"
+                                placeholder="Cari invoice / game..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-black/40 border border-sky/20 hover:border-sky/40 text-white text-xs font-medium rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:border-sky placeholder:text-white/30 transition-colors"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Filtered Transactions List */}
+                          {filteredTransactions.length > 0 ? (
+                            <div className="space-y-3">
+                              {filteredTransactions.map((tx, index) => (
+                                <div
+                                  key={index}
+                                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-black/20 border border-sky/20 hover:border-sky/40 rounded-xl transition-all duration-300 group gap-3"
+                                >
+                                  <Link href={`/history/${tx.invoice}`} className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                                    <span className="grid h-10 w-10 shrink-0 place-items-center bg-sky/10 text-sky border border-sky/20 rounded-lg group-hover:border-sky/40 transition-colors">
+                                      <img src={getItemAssetForProduct(tx.product, undefined, tx.game)} alt="" className="max-h-7 max-w-7 object-contain" />
+                                    </span>
+                                    <div className="min-w-0">
+                                      <p className="font-bold text-white group-hover:text-sky transition-colors text-sm uppercase tracking-tight truncate">{tx.product}</p>
+                                      <p className="mt-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-white/40 uppercase tracking-wider truncate">
+                                        <img src={getGameAssetByName(tx.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover shrink-0" />
+                                        <span className="truncate">{tx.game}</span> • <span className="font-mono">{tx.invoice}</span>
+                                        {tx.created_at && (
+                                          <span className="text-white/30 hidden md:inline">
+                                            • {new Date(tx.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                                          </span>
+                                        )}
+                                      </p>
+                                    </div>
+                                  </Link>
+
+                                  <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                                    <div className="text-left sm:text-right">
+                                      <p className="font-black text-white font-mono text-sm">
+                                        Rp {tx.amount.toLocaleString("id-ID")}
+                                      </p>
+                                      <span className={`inline-block px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded mt-1 ${
+                                        tx.status === "success"
+                                          ? "bg-emerald-400/10 text-emerald-400 border border-emerald-400/30"
+                                          : tx.status === "pending" || tx.status === "processing"
+                                          ? "bg-amber-400/10 text-amber-400 border border-amber-400/30"
+                                          : "bg-red-400/10 text-red-400 border border-red-400/30"
+                                      }`}>
+                                        {tx.status === "success" ? "Berhasil" :
+                                         tx.status === "processing" || tx.status === "pending" ? "Diproses" : "Gagal"}
+                                      </span>
+                                    </div>
+
+                                    {/* Quick Re-Order button */}
+                                    {tx.game_slug && (
+                                      <Link href={`/games/${tx.game_slug}`} title="Pesan Lagi">
+                                        <button className="bg-sky/10 hover:bg-sky text-sky hover:text-white border border-sky/30 p-2 rounded-xl transition-all flex items-center gap-1 text-[11px] font-bold shadow-sm">
+                                          <RotateCcw className="h-3.5 w-3.5" />
+                                          <span className="hidden sm:inline">Pesan Lagi</span>
+                                        </button>
+                                      </Link>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-10 flex flex-col items-center justify-center">
+                              <Search className="h-8 w-8 text-white/20 mb-2" />
+                              <p className="text-xs font-bold text-white/50 uppercase tracking-widest">Tidak ada transaksi yang cocok</p>
+                              <p className="text-[10px] text-white/30 mt-1">Coba sesuaikan filter game atau kata kunci pencarian Anda.</p>
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="text-center py-10 flex flex-col items-center justify-center">

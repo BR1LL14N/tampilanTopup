@@ -58,6 +58,8 @@ const mockTransactions = [
 
 export default function HistoryPage() {
   const [searchQuery, setSearchQuery] = useState("")
+  const [gameFilter, setGameFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
   const [transactions, setTransactions] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -101,13 +103,27 @@ export default function HistoryPage() {
     fetchTransactions()
   }, [])
 
-  const filteredTransactions = transactions.filter(
-    (tx) =>
-      tx.invoice.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.target_id.includes(searchQuery) ||
-      (tx.product?.name && tx.product.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (tx.product?.game?.name && tx.product.game.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+  const availableGames = Array.from(new Set(transactions.map((t) => t.product?.game?.name).filter(Boolean)))
+
+  const filteredTransactions = transactions.filter((tx) => {
+    // Game filter
+    if (gameFilter !== "all" && tx.product?.game?.name !== gameFilter) return false
+    // Status filter
+    if (statusFilter !== "all") {
+      const currentStatus = tx.topup_status === "success" ? "success" : tx.topup_status === "failed" ? "failed" : "pending"
+      if (currentStatus !== statusFilter) return false
+    }
+    // Search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      const matchInvoice = tx.invoice.toLowerCase().includes(q)
+      const matchTarget = tx.target_id.includes(q)
+      const matchProduct = tx.product?.name && tx.product.name.toLowerCase().includes(q)
+      const matchGame = tx.product?.game?.name && tx.product.game.name.toLowerCase().includes(q)
+      if (!matchInvoice && !matchTarget && !matchProduct && !matchGame) return false
+    }
+    return true
+  })
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -127,27 +143,79 @@ export default function HistoryPage() {
           </div>
 
           {/* Search and Filter */}
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            if (!searchQuery.trim()) return;
-            const inv = searchQuery.trim().toUpperCase();
-            if (inv.startsWith("INV") || inv.startsWith("ADM") || inv.length >= 8) {
-              window.location.href = `/history/${encodeURIComponent(inv)}`;
-            }
-          }} className="flex flex-col sm:flex-row gap-4 mb-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
-              <Input
-                placeholder="Masukkan Nomor Invoice (misal: INV-2026... atau ADM...) atau ID Player"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 uppercase tracking-wider font-mono text-sm"
-              />
+          <div className="space-y-3 mb-8">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (!searchQuery.trim()) return;
+              const inv = searchQuery.trim().toUpperCase();
+              if (inv.startsWith("INV") || inv.startsWith("ADM") || inv.length >= 8) {
+                window.location.href = `/history/${encodeURIComponent(inv)}`;
+              }
+            }} className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
+                <Input
+                  placeholder="Masukkan Nomor Invoice (misal: INV-2026... atau ADM...) atau ID Player"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 uppercase tracking-wider font-mono text-sm bg-black/30 border-sky/20"
+                />
+              </div>
+              <Button type="submit" className="bg-sky hover:bg-sky-600 text-white font-black uppercase tracking-wider px-6">
+                Cek Struk Transaksi
+              </Button>
+            </form>
+
+            {/* Quick Game & Status Filter Pills/Dropdowns */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="relative">
+                <select
+                  value={gameFilter}
+                  onChange={(e) => setGameFilter(e.target.value)}
+                  className="bg-[#142d3a] border border-sky/20 hover:border-sky/40 text-white text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:border-sky cursor-pointer appearance-none pr-8 transition-colors"
+                >
+                  <option value="all" className="bg-[#0f1f28] text-white">🎮 Semua Game</option>
+                  {availableGames.map((gameName) => (
+                    <option key={gameName} value={gameName} className="bg-[#0f1f28] text-white">
+                      {gameName}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/50 text-[9px]">
+                  ▼
+                </div>
+              </div>
+
+              <div className="relative">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="bg-[#142d3a] border border-sky/20 hover:border-sky/40 text-white text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:border-sky cursor-pointer appearance-none pr-8 transition-colors"
+                >
+                  <option value="all" className="bg-[#0f1f28] text-white">🏷️ Semua Status</option>
+                  <option value="success" className="bg-[#0f1f28] text-emerald-400">🟢 Berhasil</option>
+                  <option value="pending" className="bg-[#0f1f28] text-amber-400">🟡 Diproses</option>
+                  <option value="failed" className="bg-[#0f1f28] text-red-400">🔴 Gagal</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/50 text-[9px]">
+                  ▼
+                </div>
+              </div>
+
+              {(gameFilter !== "all" || statusFilter !== "all" || searchQuery) && (
+                <button
+                  onClick={() => {
+                    setGameFilter("all");
+                    setStatusFilter("all");
+                    setSearchQuery("");
+                  }}
+                  className="text-xs text-sky hover:text-white font-bold underline px-1 transition-colors"
+                >
+                  Reset Filter
+                </button>
+              )}
             </div>
-            <Button type="submit" className="bg-sky hover:bg-sky-600 text-white font-black uppercase tracking-wider px-6">
-              Cek Struk Transaksi
-            </Button>
-          </form>
+          </div>
 
           {/* Transactions */}
           {isLoading ? (
