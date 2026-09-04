@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS public.games (
     image TEXT,
     icon TEXT DEFAULT '🎮',
     category TEXT DEFAULT 'Game',
+    publisher TEXT DEFAULT 'Gamer',
     description TEXT,
     status BOOLEAN DEFAULT true,
     sort_order INTEGER DEFAULT 0,

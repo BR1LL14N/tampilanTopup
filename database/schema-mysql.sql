@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS games (
   image TEXT NULL,
   icon VARCHAR(20) DEFAULT '🎮',
   category VARCHAR(100) DEFAULT 'Game',
+  publisher VARCHAR(100) DEFAULT 'Gamer',
   description TEXT NULL,
   status TINYINT(1) DEFAULT 1,
   sort_order INT DEFAULT 0,
