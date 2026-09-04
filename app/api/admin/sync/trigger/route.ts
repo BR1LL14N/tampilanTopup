@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAdmin } from "@/lib/auth";
 import { SettingService } from "@/lib/services/setting-service";
 import { executeQuery } from "@/lib/db";
+import { ensureProductsColumns } from "@/lib/services/product-service";
 import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
@@ -117,6 +118,9 @@ async function handleSync(req: NextRequest) {
     if (!authorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
+
+    // Ensure database products table has all required columns
+    await ensureProductsColumns();
 
     // 2. Check if cron sync is active in settings (skip if forced manual sync from admin panel)
     const isManual = searchParams.get("manual") === "true";
