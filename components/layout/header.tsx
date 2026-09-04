@@ -28,6 +28,7 @@ import {
   MessageSquare,
   Image as ImageIcon,
   Wallet,
+  ArrowRight,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -108,6 +109,7 @@ export function Header({ user }: HeaderProps) {
 
   // Dynamic site logo (admin-configurable)
   const [logoUrl, setLogoUrl] = useState("")
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0)
 
   useEffect(() => {
     setMounted(true)
@@ -214,6 +216,30 @@ export function Header({ user }: HeaderProps) {
       window.removeEventListener("auth-state-change", handleAuthChange)
     }
   }, [user])
+
+  useEffect(() => {
+    if (!currentUser) {
+      setUnreadNotifCount(0)
+      return
+    }
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch("/api/notifications")
+        const data = await res.json()
+        if (data.notifications) {
+          setUnreadNotifCount(data.notifications.filter((n: any) => !n.is_read).length)
+        }
+      } catch (_) {}
+    }
+    fetchUnread()
+    const interval = setInterval(fetchUnread, 10000)
+    const handleNotifUpdate = () => fetchUnread()
+    window.addEventListener("notification-updated", handleNotifUpdate)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener("notification-updated", handleNotifUpdate)
+    }
+  }, [currentUser])
   
   useEffect(() => {
     const fetchGames = async () => {
@@ -739,6 +765,36 @@ export function Header({ user }: HeaderProps) {
                 <History className="h-4 w-4 group-hover:scale-105 transition-transform" />
                 {!isSidebarCollapsed && <span className="animate-fadeIn">{t.history}</span>}
               </Link>
+
+              {/* Menu Notifikasi di Sidebar */}
+              <Link
+                href="/dashboard?tab=notifications"
+                onClick={() => {
+                  if (pathname === "/dashboard" && typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent("switch-dashboard-tab", { detail: "notifications" }))
+                  }
+                }}
+                className={cn(
+                  "flex items-center rounded-lg text-xs font-bold text-white/70 hover:text-white hover:bg-black/20 transition-all duration-200 group border border-transparent relative",
+                  isSidebarCollapsed ? "justify-center p-2.5" : "justify-between px-3 py-2.5"
+                )}
+                title={isSidebarCollapsed ? "Notifikasi" : undefined}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Bell className="h-4 w-4 group-hover:scale-105 transition-transform" />
+                    {unreadNotifCount > 0 && isSidebarCollapsed && (
+                      <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && <span className="animate-fadeIn">Notifikasi</span>}
+                </div>
+                {!isSidebarCollapsed && unreadNotifCount > 0 && (
+                  <span className="min-w-4 h-4 px-1.5 rounded-full bg-red-500 text-white font-mono text-[9px] font-black grid place-items-center animate-pulse leading-none shadow-sm">
+                    {unreadNotifCount}
+                  </span>
+                )}
+              </Link>
             </div>
 
             {/* Admin Specific Links */}
@@ -1091,6 +1147,9 @@ function HeaderNotificationBell() {
         body: JSON.stringify({ id: notifId }),
       })
       fetchNotifications()
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("notification-updated"))
+      }
       setIsOpen(false)
       if (link) {
         router.push(link)
@@ -1108,6 +1167,9 @@ function HeaderNotificationBell() {
         body: JSON.stringify({ all: true }),
       })
       fetchNotifications()
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("notification-updated"))
+      }
     } catch (err) {
       console.error("Failed to mark all read:", err)
     }
@@ -1124,56 +1186,87 @@ function HeaderNotificationBell() {
       >
         <Bell className="h-4.5 w-4.5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white font-mono text-[9px] font-black grid place-items-center animate-pulse leading-none">
+          <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white font-mono text-[9px] font-black grid place-items-center animate-pulse leading-none shadow-sm">
             {unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-[#182024] border border-sky/20 rounded-[20px] shadow-sky-medium overflow-hidden z-50 p-2 space-y-1 animate-fadeIn">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#14232c] border border-sky/30 rounded-[20px] shadow-2xl shadow-black/80 overflow-hidden z-50 p-2 space-y-1 animate-fadeIn">
           <div className="px-4 py-3 border-b border-sky/20 flex items-center justify-between">
-            <p className="text-[10px] font-black text-white uppercase tracking-widest">
-              Notifikasi Baru ({unreadCount})
-            </p>
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-sky" />
+              <p className="text-xs font-black text-white uppercase tracking-wider">
+                Notifikasi ({notifications.length})
+              </p>
+              {unreadCount > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-red-500 text-white leading-none">
+                  {unreadCount} baru
+                </span>
+              )}
+            </div>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="text-[8px] font-black uppercase text-sky hover:text-sky-dark tracking-widest"
+                className="text-[9px] font-black uppercase text-sky hover:text-white tracking-widest transition-colors"
               >
-                Semua Dibaca
+                Tandai Semua Dibaca
               </button>
             )}
           </div>
 
-          <div className="max-h-64 overflow-y-auto divide-y divide-sky/20">
+          <div className="max-h-80 overflow-y-auto divide-y divide-sky/15">
             {notifications.length > 0 ? (
-              notifications.slice(0, 5).map((notif) => {
+              notifications.slice(0, 6).map((notif) => {
                 const isUnread = !notif.is_read
                 const isFeedback = notif.type === "feedback_reply" || notif.type === "new_feedback"
                 return (
                   <div
                     key={notif.id}
                     onClick={() => handleMarkAsRead(notif.id, notif.link)}
-                    className={`p-3 text-[11px] flex gap-3 cursor-pointer transition-colors ${
-                      isUnread ? "bg-sky/10 text-white" : "bg-black/20 hover:bg-black/40 text-white/70"
+                    className={`p-3 text-[11px] flex gap-3 cursor-pointer transition-all duration-200 border-l-4 ${
+                      isUnread
+                        ? "bg-[#0e2a38] hover:bg-[#123648] text-white border-l-sky shadow-sm"
+                        : "bg-black/35 hover:bg-black/55 text-white/50 border-l-white/10 opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <div className={`p-1.5 rounded-lg shrink-0 h-fit ${isUnread ? "bg-sky/20 text-sky" : "bg-white/5 text-white/40"}`}>
-                      {isFeedback ? <MessageSquare className="h-3.5 w-3.5" /> : <Bell className="h-3.5 w-3.5" />}
+                    <div className={`p-2 rounded-xl shrink-0 h-fit transition-transform ${
+                      isUnread ? "bg-sky/20 text-sky border border-sky/40" : "bg-white/5 text-white/30 border border-white/5"
+                    }`}>
+                      {isFeedback ? <MessageSquare className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
                     </div>
                     <div className="flex-grow min-w-0">
                       <div className="flex justify-between items-start gap-1">
-                        <p className={`font-black truncate ${isUnread ? "text-white" : "text-white/70"}`}>
-                          {notif.title}
-                        </p>
-                        <span className="text-[7.5px] font-bold text-text-muted uppercase shrink-0">
+                        <div className="flex items-center gap-1.5 min-w-0 truncate">
+                          <p className={`truncate text-xs ${isUnread ? "font-black text-white" : "font-semibold text-white/60"}`}>
+                            {notif.title}
+                          </p>
+                          {isUnread && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-sky animate-pulse shrink-0" />
+                          )}
+                        </div>
+                        <span className={`text-[8px] font-mono shrink-0 ${isUnread ? "text-sky font-bold" : "text-white/30"}`}>
                           {new Date(notif.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       </div>
-                      <p className="text-[10px] text-white/60 mt-0.5 line-clamp-2 leading-relaxed">
+                      <p className={`text-[10.5px] mt-1 line-clamp-2 leading-relaxed ${isUnread ? "text-white/85 font-medium" : "text-white/40"}`}>
                         {notif.message}
                       </p>
+                      <div className="mt-1.5 flex items-center justify-between">
+                        {isUnread ? (
+                          <span className="text-[7.5px] font-black uppercase text-sky bg-sky/15 px-1.5 py-0.5 rounded border border-sky/30">
+                            Baru / Belum Dibaca
+                          </span>
+                        ) : (
+                          <span className="text-[7.5px] font-semibold uppercase text-white/35 bg-white/5 px-1.5 py-0.5 rounded">
+                            Sudah Dibaca
+                          </span>
+                        )}
+                        <span className="text-[8px] text-white/30">
+                          {new Date(notif.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )
@@ -1185,13 +1278,19 @@ function HeaderNotificationBell() {
             )}
           </div>
 
-          <div className="p-2 border-t border-sky/20 flex justify-center">
+          <div className="p-2 border-t border-sky/20 flex justify-center bg-black/20">
             <Link
-              href="/dashboard"
-              onClick={() => setIsOpen(false)}
-              className="w-full text-center py-2 text-[9px] font-black uppercase text-sky hover:text-white tracking-widest bg-sky/10 rounded-xl border border-sky/20 transition"
+              href="/dashboard?tab=notifications"
+              onClick={() => {
+                setIsOpen(false)
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("switch-dashboard-tab", { detail: "notifications" }))
+                }
+              }}
+              className="w-full text-center py-2.5 text-[10px] font-black uppercase text-sky hover:text-white tracking-widest bg-sky/15 hover:bg-sky/25 rounded-xl border border-sky/30 transition-all flex items-center justify-center gap-1.5 shadow-sm"
             >
-              Buka Semua Notifikasi
+              <span>Buka Semua Notifikasi</span>
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>

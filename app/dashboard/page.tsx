@@ -75,6 +75,9 @@ export default function DashboardPage() {
         body: JSON.stringify({ id: notifId }),
       })
       fetchNotifications()
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("notification-updated"))
+      }
       if (link) {
         router.push(link)
       }
@@ -85,12 +88,47 @@ export default function DashboardPage() {
 
   const handleMarkAllRead = async () => {
     try {
-      await fetch("/api/notifications", { method: "DELETE" })
+      await fetch("/api/notifications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ all: true }),
+      })
       fetchNotifications()
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("notification-updated"))
+      }
     } catch (err) {
       console.error("Failed to mark all read:", err)
     }
   }
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const tab = params.get("tab")
+      if (tab === "notifications") {
+        setActiveTab("notifications")
+        setTimeout(() => {
+          const el = document.getElementById("dashboard-tabs-container")
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
+        }, 100)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleSwitchTab = (e: any) => {
+      if (e.detail === "notifications" || e.detail === "transactions") {
+        setActiveTab(e.detail)
+        setTimeout(() => {
+          const el = document.getElementById("dashboard-tabs-container")
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
+        }, 50)
+      }
+    }
+    window.addEventListener("switch-dashboard-tab", handleSwitchTab)
+    return () => window.removeEventListener("switch-dashboard-tab", handleSwitchTab)
+  }, [])
 
   useEffect(() => {
     async function fetchDashboardData() {
@@ -334,7 +372,7 @@ export default function DashboardPage() {
 
               {/* Left Column: Tabs */}
               <div className="lg:col-span-8 space-y-6">
-                <div className="bg-[#183644]/90 backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
+                <div id="dashboard-tabs-container" className="bg-[#183644]/90 backdrop-blur-md rounded-2xl border border-sky/30 shadow-sky-soft relative overflow-hidden">
 
                   {/* Tab Header (Diagonal Stripes on Header only) */}
                   <div className="border-b border-sky/20 flex items-center justify-between dark-stripes-teal">
@@ -377,7 +415,7 @@ export default function DashboardPage() {
                       notifications.filter(n => !n.is_read).length > 0 && (
                         <button
                           onClick={handleMarkAllRead}
-                          className="mr-4 text-[9px] font-black uppercase text-sky hover:text-white tracking-widest border border-sky/30 bg-sky/10 px-3 py-1 rounded-lg transition-all"
+                          className="mr-4 text-[9px] font-black uppercase text-sky hover:text-white tracking-widest border border-sky/30 bg-sky/10 hover:bg-sky/20 px-3 py-1 rounded-lg transition-all"
                         >
                           Tandai Semua Dibaca
                         </button>
@@ -448,10 +486,10 @@ export default function DashboardPage() {
                               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/40" />
                               <input
                                 type="text"
-                                placeholder="Cari invoice / game..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-black/40 border border-sky/20 hover:border-sky/40 text-white text-xs font-medium rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:border-sky placeholder:text-white/30 transition-colors"
+                                placeholder="Cari Invoice / game..."
+                                className="w-full bg-black/40 border border-sky/20 hover:border-sky/40 text-white text-xs rounded-xl pl-9 pr-3 py-1.5 focus:outline-none focus:border-sky transition-colors placeholder:text-white/30"
                               />
                             </div>
                           </div>
@@ -459,58 +497,93 @@ export default function DashboardPage() {
                           {/* Filtered Transactions List */}
                           {filteredTransactions.length > 0 ? (
                             <div className="space-y-3">
-                              {filteredTransactions.map((tx, index) => (
-                                <div
-                                  key={index}
-                                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-black/20 border border-sky/20 hover:border-sky/40 rounded-xl transition-all duration-300 group gap-3"
-                                >
-                                  <Link href={`/history/${tx.invoice}`} className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                                    <span className="grid h-10 w-10 shrink-0 place-items-center bg-sky/10 text-sky border border-sky/20 rounded-lg group-hover:border-sky/40 transition-colors">
-                                      <img src={getItemAssetForProduct(tx.product, undefined, tx.game)} alt="" className="max-h-7 max-w-7 object-contain" />
-                                    </span>
-                                    <div className="min-w-0">
-                                      <p className="font-bold text-white group-hover:text-sky transition-colors text-sm uppercase tracking-tight truncate">{tx.product}</p>
-                                      <p className="mt-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-white/40 uppercase tracking-wider truncate">
-                                        <img src={getGameAssetByName(tx.game)?.icon} alt="" className="h-3.5 w-3.5 rounded object-cover shrink-0" />
-                                        <span className="truncate">{tx.game}</span> • <span className="font-mono">{tx.invoice}</span>
-                                        {tx.created_at && (
-                                          <span className="text-white/30 hidden md:inline">
-                                            • {new Date(tx.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                              {filteredTransactions.map((tx) => {
+                                const gameAsset = getGameAssetByName(tx.game_name)
+                                const itemAsset = getItemAssetForProduct(tx.game_name, tx.product_name)
+
+                                return (
+                                  <div
+                                    key={tx.id}
+                                    className="p-4 bg-black/20 hover:bg-black/30 border border-sky/15 hover:border-sky/40 rounded-xl flex items-center justify-between transition-all duration-300 group"
+                                  >
+                                    <div className="flex items-center gap-3 min-w-0">
+                                      {/* Product / Game Thumbnail */}
+                                      <div className="h-11 w-11 rounded-xl bg-black/40 border border-sky/20 overflow-hidden flex items-center justify-center p-1.5 shrink-0 group-hover:border-sky transition-colors">
+                                        <img
+                                          src={itemAsset || gameAsset?.icon || "/assets/games/mobile-legends/icon.png"}
+                                          alt={tx.product_name}
+                                          className="h-full w-full object-contain"
+                                        />
+                                      </div>
+
+                                      <div className="min-w-0">
+                                        <p className="text-xs font-black uppercase tracking-wide text-white group-hover:text-sky transition-colors truncate">
+                                          {tx.product_name}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                          {gameAsset?.icon && (
+                                            <img
+                                              src={gameAsset.icon}
+                                              alt={tx.game_name}
+                                              className="h-3.5 w-3.5 rounded object-cover"
+                                            />
+                                          )}
+                                          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
+                                            {tx.game_name}
                                           </span>
-                                        )}
-                                      </p>
-                                    </div>
-                                  </Link>
-
-                                  <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
-                                    <div className="text-left sm:text-right">
-                                      <p className="font-black text-white font-mono text-sm">
-                                        Rp {tx.amount.toLocaleString("id-ID")}
-                                      </p>
-                                      <span className={`inline-block px-2 py-0.5 text-[8px] font-black uppercase tracking-wider rounded mt-1 ${
-                                        tx.status === "success"
-                                          ? "bg-emerald-400/10 text-emerald-400 border border-emerald-400/30"
-                                          : tx.status === "pending" || tx.status === "processing"
-                                          ? "bg-amber-400/10 text-amber-400 border border-amber-400/30"
-                                          : "bg-red-400/10 text-red-400 border border-red-400/30"
-                                      }`}>
-                                        {tx.status === "success" ? "Berhasil" :
-                                         tx.status === "processing" || tx.status === "pending" ? "Diproses" : "Gagal"}
-                                      </span>
+                                          <span className="text-white/20">•</span>
+                                          <span className="text-[10px] font-mono text-white/40">
+                                            {tx.invoice_id}
+                                          </span>
+                                          <span className="text-white/20">•</span>
+                                          <span className="text-[10px] text-white/40">
+                                            {new Date(tx.created_at).toLocaleDateString("id-ID", {
+                                              day: "numeric",
+                                              month: "short"
+                                            })}
+                                          </span>
+                                        </div>
+                                      </div>
                                     </div>
 
-                                    {/* Quick Re-Order button */}
-                                    {tx.game_slug && (
-                                      <Link href={`/games/${tx.game_slug}`} title="Pesan Lagi">
-                                        <button className="bg-sky/10 hover:bg-sky text-sky hover:text-white border border-sky/30 p-2 rounded-xl transition-all flex items-center gap-1 text-[11px] font-bold shadow-sm">
-                                          <RotateCcw className="h-3.5 w-3.5" />
-                                          <span className="hidden sm:inline">Pesan Lagi</span>
-                                        </button>
-                                      </Link>
-                                    )}
+                                    <div className="flex items-center gap-4 shrink-0">
+                                      <div className="text-right">
+                                        <p className="text-xs font-black text-white font-mono">
+                                          Rp {Number(tx.amount || 0).toLocaleString("id-ID")}
+                                        </p>
+                                        <div className="mt-1">
+                                          {tx.payment_status === "success" || tx.topup_status === "success" ? (
+                                            <span className="inline-block px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                              Berhasil
+                                            </span>
+                                          ) : tx.payment_status === "pending" || tx.topup_status === "pending" ? (
+                                            <span className="inline-block px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                                              Diproses
+                                            </span>
+                                          ) : (
+                                            <span className="inline-block px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30">
+                                              Gagal
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      {/* Quick Action: Pesan Lagi */}
+                                      {gameAsset?.slug && (
+                                        <Link href={`/games/${gameAsset.slug}`}>
+                                          <button
+                                            title="Pesan produk ini lagi"
+                                            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-sky/30 bg-sky/10 text-sky hover:bg-sky hover:text-white transition-all shadow-sm"
+                                          >
+                                            <RotateCcw className="h-3 w-3" />
+                                            <span>Pesan Lagi</span>
+                                          </button>
+                                        </Link>
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                )
+                              })}
                             </div>
                           ) : (
                             <div className="text-center py-10 flex flex-col items-center justify-center">
@@ -541,34 +614,59 @@ export default function DashboardPage() {
                               <div
                                 key={notif.id}
                                 onClick={() => handleMarkAsRead(notif.id, notif.link)}
-                                className={`p-4 border rounded-xl flex items-start gap-4 transition-all duration-300 cursor-pointer ${
+                                className={`p-4 sm:p-5 border-l-4 rounded-2xl flex items-start gap-4 transition-all duration-200 cursor-pointer relative overflow-hidden ${
                                   isUnread
-                                    ? "bg-sky/10 border-sky/30 hover:bg-sky/15"
-                                    : "bg-black/20 border-sky/10 hover:border-sky/20"
+                                    ? "bg-[#0d2a38] border-l-sky border-y border-r border-sky/40 hover:bg-[#113547] shadow-[0_4px_20px_rgba(56,189,248,0.12)]"
+                                    : "bg-black/35 border-l-white/20 border-y border-r border-white/5 opacity-65 hover:opacity-95 hover:bg-black/50"
                                 }`}
                               >
-                                <div className={`p-2 rounded-lg ${isUnread ? "bg-sky/20 text-sky animate-pulse" : "bg-mist backdrop-blur-md text-white/30"}`}>
-                                  {isFeedback ? <MessageSquare className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
+                                {isUnread && (
+                                  <div className="absolute top-0 right-0 w-28 h-28 bg-sky/10 rounded-full blur-xl pointer-events-none" />
+                                )}
+                                <div className={`p-2.5 rounded-xl shrink-0 transition-transform ${
+                                  isUnread
+                                    ? "bg-sky/20 text-sky border border-sky/40 shadow-sm"
+                                    : "bg-white/5 text-white/30 border border-white/5"
+                                }`}>
+                                  {isFeedback ? <MessageSquare className="h-5 w-5" /> : <Bell className="h-5 w-5" />}
                                 </div>
-                                <div className="flex-grow">
-                                  <div className="flex justify-between items-start">
-                                    <p className={`text-xs uppercase tracking-wide leading-tight ${isUnread ? "font-black text-white" : "font-bold text-white/50"}`}>
-                                      {notif.title}
-                                    </p>
-                                    <span className="text-[8px] font-bold text-white/30 uppercase">
+                                <div className="flex-grow min-w-0">
+                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <p className={`text-xs sm:text-sm uppercase tracking-wide leading-tight truncate ${
+                                        isUnread ? "font-black text-white" : "font-bold text-white/60"
+                                      }`}>
+                                        {notif.title}
+                                      </p>
+                                      {isUnread ? (
+                                        <span className="px-2 py-0.5 rounded-md text-[8px] sm:text-[9px] font-black uppercase bg-sky text-white tracking-wider shadow-sm shrink-0 animate-pulse">
+                                          Baru
+                                        </span>
+                                      ) : (
+                                        <span className="px-2 py-0.5 rounded-md text-[8px] sm:text-[9px] font-semibold uppercase bg-white/5 text-white/40 tracking-wider shrink-0">
+                                          Dibaca
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className={`text-[9px] font-mono shrink-0 ${isUnread ? "text-sky font-bold" : "text-white/40"}`}>
                                       {new Date(notif.created_at).toLocaleDateString("id-ID", {
                                         day: "numeric",
                                         month: "short",
+                                        year: "numeric",
                                         hour: "2-digit",
                                         minute: "2-digit"
                                       })}
                                     </span>
                                   </div>
-                                  <p className="text-[11px] text-white/50 mt-1 leading-relaxed">{notif.message}</p>
+                                  <p className={`text-xs mt-1.5 leading-relaxed ${isUnread ? "text-white/90 font-medium" : "text-white/45"}`}>
+                                    {notif.message}
+                                  </p>
                                   {isUnread && (
-                                    <span className="inline-flex items-center gap-0.5 text-[8px] font-black uppercase text-sky tracking-wider mt-1.5">
-                                      <Check className="h-3 w-3" /> Baru / Klik untuk buka & tandai dibaca
-                                    </span>
+                                    <div className="mt-2.5 flex items-center gap-1.5">
+                                      <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-sky tracking-wider bg-sky/15 px-2.5 py-1 rounded-lg border border-sky/30">
+                                        <Check className="h-3 w-3" /> Klik untuk lihat & tandai telah dibaca
+                                      </span>
+                                    </div>
                                   )}
                                 </div>
                               </div>
