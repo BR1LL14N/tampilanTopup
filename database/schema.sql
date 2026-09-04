@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     flash_sale_discount INTEGER,
     flash_sale_stock INTEGER DEFAULT 100,
     flash_sale_sold INTEGER DEFAULT 0,
+    is_manual_price BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

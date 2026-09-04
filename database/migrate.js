@@ -73,8 +73,16 @@ async function runMigration() {
         throw new Error("Berkas schema-mysql.sql tidak ditemukan di folder database!");
       }
       const schemaSql = fs.readFileSync(schemaPath, "utf-8");
-      await connection.query(schemaSql);
-      console.log("✓ Database schema created successfully.");
+      try {
+        await connection.query(schemaSql);
+        console.log("✓ Database schema created successfully.");
+      } catch (schemaErr) {
+        if (schemaErr.code === 'ER_DUP_KEYNAME' || (schemaErr.message && schemaErr.message.includes('Duplicate key name'))) {
+          console.log("✓ Database schema already exists (tables and indexes ready).");
+        } else {
+          console.warn("Schema notice:", schemaErr.message);
+        }
+      }
 
       // Ensure customer_phone column is present
       try {
@@ -89,6 +97,14 @@ async function runMigration() {
         await connection.query("ALTER TABLE products ADD COLUMN provider VARCHAR(50) NOT NULL DEFAULT 'manual';");
         await connection.query("UPDATE products SET provider = 'digiflazz' WHERE provider_sku IS NOT NULL AND provider_sku != '';");
         console.log("✓ Ensured 'provider' column is in products.");
+      } catch (err) {
+        // Already exists
+      }
+
+      // Ensure is_manual_price column is present in products
+      try {
+        await connection.query("ALTER TABLE products ADD COLUMN is_manual_price TINYINT(1) DEFAULT 0;");
+        console.log("✓ Ensured 'is_manual_price' column is in products.");
       } catch (err) {
         // Already exists
       }
@@ -145,6 +161,14 @@ async function runMigration() {
         await client.query("ALTER TABLE public.products ADD COLUMN IF NOT EXISTS provider VARCHAR(50) NOT NULL DEFAULT 'manual';");
         await client.query("UPDATE public.products SET provider = 'digiflazz' WHERE provider_sku IS NOT NULL AND provider_sku != '';");
         console.log("✓ Ensured 'provider' column is in products.");
+      } catch (err) {
+        // Already exists
+      }
+
+      // Ensure is_manual_price column is present in products
+      try {
+        await client.query("ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_manual_price BOOLEAN DEFAULT false;");
+        console.log("✓ Ensured 'is_manual_price' column is in products.");
       } catch (err) {
         // Already exists
       }

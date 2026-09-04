@@ -53,6 +53,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Minus,
+  Lock,
+  Unlock,
 } from "lucide-react"
 
 export default function AdminProductsPage() {
@@ -73,19 +75,27 @@ export default function AdminProductsPage() {
   // Sync States
   const [syncing, setSyncing] = useState(false)
   const [markupPercent, setMarkupPercent] = useState("10")
+  const [forceOverwrite, setForceOverwrite] = useState(false)
+  const [isUnlockingAll, setIsUnlockingAll] = useState(false)
+  const [isUnlockAllDialogOpen, setIsUnlockAllDialogOpen] = useState(false)
   const [syncStatus, setSyncStatus] = useState<string | null>(null)
   const [syncLogs, setSyncLogs] = useState<any[] | null>(null)
   const [rawDigiflazzResponse, setRawDigiflazzResponse] = useState<any | null>(null)
   const [syncModalTab, setSyncModalTab] = useState<"log" | "raw">("log")
-  const [syncLogFilter, setSyncLogFilter] = useState<"all" | "up" | "down" | "same" | "new" | "deactivated">("all")
+  const [syncLogFilter, setSyncLogFilter] = useState<"all" | "up" | "down" | "same" | "new" | "deactivated" | "locked">("all")
   const [copiedJson, setCopiedJson] = useState(false)
   const [isSyncLogOpen, setIsSyncLogOpen] = useState(false)
 
+  const lockedProductsCount = useMemo(() => {
+    return productsList.filter((p: any) => p.is_manual_price === 1 || p.is_manual_price === true).length
+  }, [productsList])
+
   const logStats = useMemo(() => {
-    if (!syncLogs) return { up: 0, down: 0, same: 0, newItems: 0, deactivated: 0 }
-    let up = 0, down = 0, same = 0, newItems = 0, deactivated = 0
+    if (!syncLogs) return { up: 0, down: 0, same: 0, newItems: 0, deactivated: 0, locked: 0 }
+    let up = 0, down = 0, same = 0, newItems = 0, deactivated = 0, locked = 0
     for (const item of syncLogs) {
       if (item.type === "NEW") newItems++
+      else if (item.type === "LOCKED_SKIPPED") locked++
       else if (item.type === "DEACTIVATED" || item.type === "DEACTIVATED_MISSING" || item.type === "SKIPPED_INACTIVE") deactivated++
       else if (item.type === "UPDATE") {
         const diff = item.price_diff !== undefined 
@@ -96,7 +106,7 @@ export default function AdminProductsPage() {
         else same++
       }
     }
-    return { up, down, same, newItems, deactivated }
+    return { up, down, same, newItems, deactivated, locked }
   }, [syncLogs])
 
   const filteredLogs = useMemo(() => {
@@ -104,6 +114,7 @@ export default function AdminProductsPage() {
     if (syncLogFilter === "all") return syncLogs
     return syncLogs.filter((item: any) => {
       if (syncLogFilter === "new") return item.type === "NEW"
+      if (syncLogFilter === "locked") return item.type === "LOCKED_SKIPPED" || item.is_locked
       if (syncLogFilter === "deactivated") return item.type === "DEACTIVATED" || item.type === "DEACTIVATED_MISSING" || item.type === "SKIPPED_INACTIVE"
       if (item.type === "UPDATE") {
         const diff = item.price_diff !== undefined 
@@ -137,6 +148,7 @@ export default function AdminProductsPage() {
     is_flash_sale: false,
     flash_sale_price: 0,
     flash_sale_stock: 100,
+    is_manual_price: false,
   })
 
   // Clip Paths for UI Bevels
@@ -201,18 +213,22 @@ export default function AdminProductsPage() {
     try {
       setSyncing(true)
       setSyncStatus(null)
-      const res = await fetch(`/api/admin/sync/trigger?manual=true&markup=${markupPercent}`, {
+      const res = await fetch(`/api/admin/sync/trigger?manual=true&markup=${markupPercent}&force_overwrite=${forceOverwrite}`, {
         method: "POST"
       })
       const data = await res.json()
       if (data.success) {
         const newAdded = data.productsCreated ?? data.summary?.newAdded ?? 0
         const updated = data.productsUpdated ?? data.summary?.updated ?? 0
+        const lockedSkipped = data.productsLockedSkipped ?? data.summary?.lockedSkipped ?? 0
         const deactivated = data.productsDeactivated ?? data.summary?.deactivated ?? 0
         const skipped = data.skippedProductsCount ?? data.summary?.skipped ?? 0
         let msg = `Berhasil menyinkronkan: ${newAdded} produk baru, ${updated} produk diperbarui.`
+        if (lockedSkipped > 0) {
+          msg += ` (${lockedSkipped} produk harga manual dipertahankan).`
+        }
         if (deactivated > 0) {
-          msg += ` (${deactivated} produk dinonaktifkan otomatis mengikuti Digiflazz).`
+          msg += ` (${deactivated} produk dinonaktifkan otomatis).`
         }
         if (skipped > 0) {
           msg += ` (${skipped} produk non-game dilewati).`
@@ -245,6 +261,89 @@ export default function AdminProductsPage() {
     }
   }
 
+  // Unlock all prices handler
+  const handleUnlockAll = async () => {
+    try {
+      setIsUnlockingAll(true)
+      const res = await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "unlock_all" })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setProductsList(prev => prev.map(p => ({ ...p, is_manual_price: 0 })))
+        setIsUnlockAllDialogOpen(false)
+        setSyncStatus("Semua kunci harga manual berhasil dibuka! Seluruh produk kini akan mengikuti markup sync.")
+      } else {
+        alert(data.error || "Gagal membuka semua kunci")
+      }
+    } catch (e: any) {
+      alert("Error: " + e.message)
+    } finally {
+      setIsUnlockingAll(false)
+    }
+  }
+
+  // Toggle single product price lock
+  const handleToggleLock = async (product: any) => {
+    try {
+      const currentLocked = product.is_manual_price === 1 || product.is_manual_price === true
+      const nextLocked = !currentLocked
+      // Optimistic update
+      setProductsList(prev => prev.map(p => p.id === product.id ? { ...p, is_manual_price: nextLocked ? 1 : 0 } : p))
+
+      const res = await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "toggle_lock",
+          id: product.id,
+          is_manual_price: nextLocked
+        })
+      })
+      const data = await res.json()
+      if (!data.success) {
+        // Revert on error
+        setProductsList(prev => prev.map(p => p.id === product.id ? { ...p, is_manual_price: currentLocked ? 1 : 0 } : p))
+        alert(data.error || "Gagal mengubah status kunci harga")
+      }
+    } catch (e: any) {
+      alert("Error: " + e.message)
+    }
+  }
+
+  // Bulk lock/unlock selected products
+  const handleBulkLock = async (targetLocked: boolean) => {
+    if (selectedProductIds.length === 0) return
+    try {
+      setIsBulkUpdating(true)
+      const res = await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "bulk_lock",
+          ids: selectedProductIds,
+          is_manual_price: targetLocked
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setProductsList(prev =>
+          prev.map(p => selectedProductIds.includes(p.id) ? { ...p, is_manual_price: targetLocked ? 1 : 0 } : p)
+        )
+        setSelectedProductIds([])
+        setSyncStatus(`Berhasil ${targetLocked ? 'mengunci' : 'membuka kunci'} ${data.count} produk terpilih!`)
+      } else {
+        alert(data.error || "Gagal memperbarui status kunci massal")
+      }
+    } catch (e: any) {
+      alert("Error: " + e.message)
+    } finally {
+      setIsBulkUpdating(false)
+    }
+  }
+
   // Quick edit price handler
   const handleSavePrice = async (forceSubmit = false) => {
     if (!editingProduct) return
@@ -266,14 +365,15 @@ export default function AdminProductsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingProduct.id,
-          sell_price: priceNum
+          sell_price: priceNum,
+          is_manual_price: true
         })
       })
       const data = await res.json()
       if (data.error) {
         alert(`Gagal mengupdate harga: ${data.error}`)
       } else {
-        setProductsList(prev => prev.map(p => p.id === editingProduct.id ? { ...p, sell_price: priceNum } : p))
+        setProductsList(prev => prev.map(p => p.id === editingProduct.id ? { ...p, sell_price: priceNum, is_manual_price: 1 } : p))
         setEditingProduct(null)
       }
     } catch (err: any) {
@@ -295,6 +395,7 @@ export default function AdminProductsPage() {
       is_flash_sale: product.is_flash_sale === 1 || product.is_flash_sale === true,
       flash_sale_price: product.flash_sale_price || 0,
       flash_sale_stock: product.flash_sale_stock || 100,
+      is_manual_price: product.is_manual_price === 1 || product.is_manual_price === true,
     })
     setIsFormDialogOpen(true)
   }
@@ -312,6 +413,7 @@ export default function AdminProductsPage() {
       is_flash_sale: false,
       flash_sale_price: 0,
       flash_sale_stock: 100,
+      is_manual_price: false,
     })
     setIsFormDialogOpen(true)
   }
@@ -330,6 +432,7 @@ export default function AdminProductsPage() {
         is_flash_sale: editForm.is_flash_sale ? 1 : 0,
         flash_sale_price: editForm.is_flash_sale ? (Number(editForm.flash_sale_price) || 0) : null,
         flash_sale_stock: editForm.is_flash_sale ? (Number(editForm.flash_sale_stock) || 100) : 100,
+        is_manual_price: editForm.is_manual_price ? 1 : 0,
       }
 
       const method = selectedProduct ? "PUT" : "POST"
@@ -574,18 +677,40 @@ export default function AdminProductsPage() {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 bg-mist backdrop-blur-md px-3 py-1.5 rounded-xl border border-sky/30 shadow-sm">
+                <div className="flex items-center gap-2 bg-mist backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-sky/30 shadow-sm h-10">
                   <span className="text-xs font-semibold text-white/80 whitespace-nowrap">Markup:</span>
                   <Input
                     type="number"
                     value={markupPercent}
                     onChange={(e) => setMarkupPercent(e.target.value)}
-                    className="w-14 h-7 text-center text-xs font-semibold p-1 focus-visible:ring-sky font-mono"
+                    className="w-14 h-7 text-center text-xs font-semibold p-1 focus-visible:ring-sky font-mono bg-black/20 text-white border border-sky/30 rounded-lg"
                     min="0"
                     max="100"
                   />
                   <span className="text-xs font-semibold text-white/80">%</span>
                 </div>
+
+                <label 
+                  className={`flex items-center gap-2 cursor-pointer backdrop-blur-md px-3.5 py-1.5 rounded-xl border transition-all select-none shadow-sm h-10 ${
+                    forceOverwrite 
+                      ? "bg-amber-500/20 border-amber-500/60 text-amber-300" 
+                      : "bg-mist border-sky/30 text-white/80 hover:border-sky/60"
+                  }`}
+                  title="Jika dicentang, sinkronisasi akan menimpa seluruh harga produk termasuk yang harganya dikunci manual"
+                >
+                  <input
+                    type="checkbox"
+                    checked={forceOverwrite}
+                    onChange={(e) => setForceOverwrite(e.target.checked)}
+                    className="rounded border-sky/40 text-amber-500 focus:ring-0 w-4 h-4 accent-amber-500 cursor-pointer"
+                  />
+                  <span className={`text-xs font-bold uppercase tracking-wider whitespace-nowrap flex items-center gap-1.5 ${
+                    forceOverwrite ? "text-amber-300 font-black" : "text-white/80"
+                  }`}>
+                    {forceOverwrite ? <Unlock className="h-3.5 w-3.5 text-amber-400" /> : <Lock className="h-3.5 w-3.5 text-cyan-300" />}
+                    Timpa Kunci
+                  </span>
+                </label>
                 
                 <Button 
                   variant="outline"
@@ -606,13 +731,25 @@ export default function AdminProductsPage() {
                   )}
                 </Button>
 
+                {lockedProductsCount > 0 && (
+                  <Button 
+                    variant="outline"
+                    onClick={() => setIsUnlockAllDialogOpen(true)}
+                    className="gap-2 border-amber-500/40 text-amber-300 hover:bg-amber-500/10 rounded-xl shadow-sm h-10 text-xs font-bold uppercase tracking-wider"
+                    title="Buka semua kunci harga produk yang diedit manual agar mengikuti markup sync"
+                  >
+                    <Unlock className="h-4 w-4 text-amber-400" />
+                    Buka Semua Kunci ({lockedProductsCount})
+                  </Button>
+                )}
+
                 <Button
                   variant="outline"
                   onClick={async () => {
                     setIsSyncLogOpen(true)
                     if (!syncLogs || syncLogs.length === 0) {
                       try {
-                        const res = await fetch(`/api/admin/sync/trigger?manual=true&markup=${markupPercent}`, { method: "POST" })
+                        const res = await fetch(`/api/admin/sync/trigger?manual=true&markup=${markupPercent}&force_overwrite=${forceOverwrite}`, { method: "POST" })
                         const data = await res.json()
                         if (data.log || data.sampleItems) {
                           setSyncLogs(data.log || data.sampleItems || [])
@@ -798,6 +935,28 @@ export default function AdminProductsPage() {
 
                     <Button
                       size="sm"
+                      onClick={() => handleBulkLock(true)}
+                      disabled={isBulkUpdating}
+                      className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider rounded-xl h-8 shadow-sm transition-all"
+                      title="Kunci harga jual produk terpilih agar tidak tertimpa saat sync"
+                    >
+                      <Lock className="h-3.5 w-3.5 mr-1 text-amber-400" />
+                      Kunci Harga ({selectedProductIds.length})
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      onClick={() => handleBulkLock(false)}
+                      disabled={isBulkUpdating}
+                      className="bg-cyan-950/70 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-400/60 text-[10px] font-black uppercase tracking-wider rounded-xl h-8 shadow-sm transition-all"
+                      title="Buka kunci harga jual produk terpilih agar mengikuti markup sync"
+                    >
+                      <Unlock className="h-3.5 w-3.5 mr-1 text-cyan-300" />
+                      Buka Kunci ({selectedProductIds.length})
+                    </Button>
+
+                    <Button
+                      size="sm"
                       variant="ghost"
                       onClick={() => setSelectedProductIds([])}
                       className="text-white/60 hover:text-white text-[10px] font-bold uppercase h-8"
@@ -941,7 +1100,29 @@ export default function AdminProductsPage() {
                           {formatCurrency(product.price)}
                         </TableCell>
                         <TableCell className="font-mono font-bold text-xs text-white">
-                          {formatCurrency(product.sell_price)}
+                          <div className="flex items-center gap-2">
+                            <span>{formatCurrency(product.sell_price)}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleToggleLock(product)}
+                              title={
+                                (product.is_manual_price === 1 || product.is_manual_price === true)
+                                  ? "🔒 Harga Terkunci Manual (Klik untuk membuka kunci agar mengikuti markup sync)"
+                                  : "🔓 Harga Otomatis Markup (Klik untuk mengunci harga manual)"
+                              }
+                              className={`p-1.5 rounded-lg border transition-all duration-150 flex items-center justify-center hover:scale-105 active:scale-95 ${
+                                (product.is_manual_price === 1 || product.is_manual_price === true)
+                                  ? "bg-amber-500/25 text-amber-300 border-amber-400/80 hover:bg-amber-500/40 hover:border-amber-300 hover:text-amber-100 shadow-[0_0_10px_rgba(245,158,11,0.25)]"
+                                  : "bg-cyan-950/70 text-cyan-300 border-cyan-400/60 hover:bg-cyan-500/25 hover:border-cyan-300 hover:text-white shadow-sm"
+                              }`}
+                            >
+                              {(product.is_manual_price === 1 || product.is_manual_price === true) ? (
+                                <Lock className="h-3.5 w-3.5 stroke-[2.2]" />
+                              ) : (
+                                <Unlock className="h-3.5 w-3.5 stroke-[2.2]" />
+                              )}
+                            </button>
+                          </div>
                         </TableCell>
                         <TableCell className={`font-mono font-bold text-xs ${profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                           {profit >= 0 ? '+' : ''}{formatCurrency(profit)}
@@ -981,6 +1162,22 @@ export default function AdminProductsPage() {
                               >
                                 <TrendingUp className="h-3.5 w-3.5 mr-2 text-sky" />
                                 Edit Harga Jual
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleToggleLock(product)}
+                                className="text-xs font-bold uppercase tracking-wider cursor-pointer text-amber-300 focus:bg-amber-500/20 focus:text-amber-300"
+                              >
+                                {(product.is_manual_price === 1 || product.is_manual_price === true) ? (
+                                  <>
+                                    <Unlock className="h-3.5 w-3.5 mr-2 text-amber-400" />
+                                    Buka Kunci Harga
+                                  </>
+                                ) : (
+                                  <>
+                                    <Lock className="h-3.5 w-3.5 mr-2 text-amber-400" />
+                                    Kunci Harga Manual
+                                  </>
+                                )}
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 onClick={() => handleDeleteProduct(product.id)}
@@ -1251,6 +1448,26 @@ export default function AdminProductsPage() {
               )}
             </div>
 
+            {/* Price Lock Section */}
+            <div className="p-3.5 rounded-xl border border-sky/30 bg-mist/50 flex items-center justify-between gap-3">
+              <div>
+                <Label htmlFor="prod-lock" className="text-xs font-black text-white uppercase tracking-wider cursor-pointer flex items-center gap-1.5">
+                  <Lock className="h-3.5 w-3.5 text-amber-400" />
+                  Kunci Harga Jual Manual
+                </Label>
+                <span className="text-[10px] text-white/70 font-medium">
+                  Cegah penimpaan harga jual saat sinkronisasi otomatis dari Digiflazz.
+                </span>
+              </div>
+              <input
+                id="prod-lock"
+                type="checkbox"
+                checked={editForm.is_manual_price}
+                onChange={(e) => setEditForm(prev => ({ ...prev, is_manual_price: e.target.checked }))}
+                className="h-4.5 w-4.5 rounded border-sky/40 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
+              />
+            </div>
+
             <DialogFooter className="pt-2">
               <Button 
                 type="button" 
@@ -1407,6 +1624,19 @@ export default function AdminProductsPage() {
                     ⛔ Nonaktif ({logStats.deactivated})
                   </button>
                 )}
+                {logStats.locked > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSyncLogFilter("locked")}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all border ${
+                      syncLogFilter === "locked"
+                        ? "bg-amber-500 text-slate-950 font-black border-amber-400"
+                        : "bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500/20"
+                    }`}
+                  >
+                    🔒 Terkunci ({logStats.locked})
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -1514,6 +1744,18 @@ export default function AdminProductsPage() {
                             </div>
                           )}
 
+                          {logItem.type === 'LOCKED_SKIPPED' && (
+                            <div className="flex flex-col gap-1">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                <Lock className="h-3 w-3" />
+                                DILEWATI (HARGA TERKUNCI MANUAL)
+                              </span>
+                              <span className="text-[10px] text-white/70 font-mono">
+                                Harga Jual Dipertahankan: Rp {Number(logItem.sell_price).toLocaleString("id-ID")}
+                              </span>
+                            </div>
+                          )}
+
                           {logItem.type === 'DEACTIVATED' && (
                             <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/30">
                               ⛔ DINONAKTIFKAN (OFF DI SUPPLIER)
@@ -1558,6 +1800,41 @@ export default function AdminProductsPage() {
               className="rounded-xl text-[10px] font-bold uppercase tracking-wider border-sky/30 text-sky hover:bg-sky/20"
             >
               Tutup Modal
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Konfirmasi Buka Semua Kunci */}
+      <Dialog open={isUnlockAllDialogOpen} onOpenChange={setIsUnlockAllDialogOpen}>
+        <DialogContent className="sm:max-w-[420px] rounded-2xl border-amber-500/30 bg-[#183644] text-white">
+          <DialogHeader>
+            <DialogTitle className="text-base font-black uppercase tracking-tight text-amber-300 flex items-center gap-2">
+              <Unlock className="h-5 w-5 text-amber-400" />
+              Buka Semua Kunci Harga?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-white/70 pt-2 leading-relaxed">
+              Saat ini terdapat <strong className="text-amber-300 font-mono">{lockedProductsCount} produk</strong> dengan harga terkunci secara manual. 
+              <br /><br />
+              Jika dibuka, semua produk tersebut akan kembali mengikuti rumus markup saat proses sinkronisasi Digiflazz dijalankan berikutnya.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsUnlockAllDialogOpen(false)}
+              className="rounded-xl text-[10px] font-bold uppercase tracking-wider"
+              disabled={isUnlockingAll}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleUnlockAll}
+              disabled={isUnlockingAll}
+              className="rounded-xl text-[10px] uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-slate-950 font-black shadow-lg"
+            >
+              {isUnlockingAll ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Unlock className="h-3.5 w-3.5 mr-1" />}
+              Ya, Buka Semua Kunci
             </Button>
           </DialogFooter>
         </DialogContent>

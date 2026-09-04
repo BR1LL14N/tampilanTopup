@@ -17,6 +17,7 @@ export interface ProductData {
   flash_sale_discount?: number | null;
   flash_sale_stock?: number;
   flash_sale_sold?: number;
+  is_manual_price?: boolean;
 }
 
 export class ProductService {
@@ -85,9 +86,9 @@ export class ProductService {
     const sql = `
       INSERT INTO products (
         id, game_id, provider_sku, name, description, price, sell_price, admin_fee,
-        status, sort_order, is_flash_sale, flash_sale_price, flash_sale_discount, flash_sale_stock, flash_sale_sold
+        status, sort_order, is_flash_sale, flash_sale_price, flash_sale_discount, flash_sale_stock, flash_sale_sold, is_manual_price
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     `;
     await executeQuery(sql, [
       id,
@@ -104,7 +105,8 @@ export class ProductService {
       data.flash_sale_price || null,
       data.flash_sale_discount || null,
       data.flash_sale_stock !== undefined ? data.flash_sale_stock : 100,
-      data.flash_sale_sold || 0
+      data.flash_sale_sold || 0,
+      data.is_manual_price ? true : false
     ]);
     return { id, ...data };
   }
@@ -121,8 +123,9 @@ export class ProductService {
       UPDATE products
       SET game_id = $1, provider_sku = $2, name = $3, description = $4, price = $5, sell_price = $6,
           admin_fee = $7, status = $8, sort_order = $9, is_flash_sale = $10,
-          flash_sale_price = $11, flash_sale_discount = $12, flash_sale_stock = $13, flash_sale_sold = $14
-      WHERE id = $15
+          flash_sale_price = $11, flash_sale_discount = $12, flash_sale_stock = $13, flash_sale_sold = $14,
+          is_manual_price = $15
+      WHERE id = $16
     `;
     await executeQuery(sql, [
       data.game_id !== undefined ? data.game_id : current.game_id,
@@ -139,6 +142,7 @@ export class ProductService {
       data.flash_sale_discount !== undefined ? data.flash_sale_discount : current.flash_sale_discount,
       data.flash_sale_stock !== undefined ? data.flash_sale_stock : current.flash_sale_stock,
       data.flash_sale_sold !== undefined ? data.flash_sale_sold : current.flash_sale_sold,
+      data.is_manual_price !== undefined ? (data.is_manual_price ? true : false) : current.is_manual_price,
       id
     ]);
   }
@@ -156,6 +160,42 @@ export class ProductService {
       const sql = `UPDATE products SET status = $1`;
       await executeQuery(sql, [statusVal]);
     }
+  }
+
+  /**
+   * Unlocks all manual product prices (sets is_manual_price to false).
+   */
+  static async unlockAllPrices(): Promise<number> {
+    const sql = `UPDATE products SET is_manual_price = $1 WHERE is_manual_price = $2`;
+    await executeQuery(sql, [false, true]);
+    return 1;
+  }
+
+  /**
+   * Bulk updates price lock status (is_manual_price) for selected product IDs.
+   */
+  static async bulkUpdatePriceLock(isLocked: boolean, ids?: string[]): Promise<void> {
+    const val = isLocked ? true : false;
+    if (ids && ids.length > 0) {
+      const placeholders = ids.map((_, i) => `$${i + 2}`).join(", ");
+      const sql = `UPDATE products SET is_manual_price = $1 WHERE id IN (${placeholders})`;
+      await executeQuery(sql, [val, ...ids]);
+    } else {
+      const sql = `UPDATE products SET is_manual_price = $1`;
+      await executeQuery(sql, [val]);
+    }
+  }
+
+  /**
+   * Toggles or sets price lock for a single product.
+   */
+  static async togglePriceLock(id: string, isLocked?: boolean): Promise<boolean> {
+    const existing = await executeQuery(`SELECT id, is_manual_price FROM products WHERE id = $1 LIMIT 1`, [id]);
+    if (existing.length === 0) throw new Error("Product not found");
+    const current = !!(existing[0].is_manual_price);
+    const nextVal = isLocked !== undefined ? isLocked : !current;
+    await executeQuery(`UPDATE products SET is_manual_price = $1 WHERE id = $2`, [nextVal, id]);
+    return nextVal;
   }
 
   /**

@@ -257,7 +257,10 @@ async function handleSync(req: NextRequest) {
     let productsCreated = 0;
     let productsUpdated = 0;
     let productsDeactivated = 0;
+    let productsLockedSkipped = 0;
     let gamesCreated = 0;
+
+    const forceOverwrite = searchParams.get("force_overwrite") === "true";
 
     // Dynamic markup from query param (default 8%)
     const markupParam = searchParams.get("markup");
@@ -307,61 +310,114 @@ async function handleSync(req: NextRequest) {
       const sellPrice = Math.ceil(rawSellPrice / 100) * 100;
 
       const existingProduct = await executeQuery(
-        "SELECT id, price, sell_price, status FROM products WHERE provider_sku = $1 LIMIT 1",
+        "SELECT id, price, sell_price, status, is_manual_price FROM products WHERE provider_sku = $1 LIMIT 1",
         [providerSku]
       );
 
       if (existingProduct.length > 0) {
-        // Automatically sync product status with Digiflazz status (0 if OFF/inactive, 1 if ON/active)
+        const pRow = existingProduct[0];
+        const isLocked = !!(pRow.is_manual_price);
+        const shouldKeepPrice = isLocked && !forceOverwrite;
         const targetStatus = isDigiActive ? 1 : 0;
-        await executeQuery(
-          `UPDATE products 
-           SET game_id = $1, name = $2, price = $3, sell_price = $4, status = $5, provider_sku = $6, updated_at = CURRENT_TIMESTAMP 
-           WHERE id = $7`,
-          [gameId, productName, modalPrice, sellPrice, targetStatus, providerSku, existingProduct[0].id]
-        );
+        const oldPrice = Number(pRow.price) || 0;
+        const oldSellPrice = Number(pRow.sell_price) || 0;
+        const priceDiff = modalPrice - oldPrice;
 
-        if (!isDigiActive) {
-          productsDeactivated++;
-          syncedItemsLog.push({
-            sku: providerSku,
-            name: productName,
-            game: gameObj.name,
-            brand,
-            category: item.category,
-            price: modalPrice,
-            sell_price: sellPrice,
-            type: 'DEACTIVATED',
-            reason: 'Dinonaktifkan otomatis (Status OFF dari Digiflazz)'
-          });
+        if (shouldKeepPrice) {
+          // Keep manual sell_price, but update modal price and status from Digiflazz
+          await executeQuery(
+            `UPDATE products 
+             SET game_id = $1, name = $2, price = $3, status = $4, provider_sku = $5, updated_at = CURRENT_TIMESTAMP 
+             WHERE id = $6`,
+            [gameId, productName, modalPrice, targetStatus, providerSku, pRow.id]
+          );
+
+          productsLockedSkipped++;
+
+          if (!isDigiActive) {
+            productsDeactivated++;
+            syncedItemsLog.push({
+              sku: providerSku,
+              name: productName,
+              game: gameObj.name,
+              brand,
+              category: item.category,
+              price: modalPrice,
+              sell_price: oldSellPrice,
+              is_locked: true,
+              type: 'DEACTIVATED',
+              reason: 'Dinonaktifkan otomatis (Status OFF dari Digiflazz, harga manual tetap dipertahankan)'
+            });
+          } else {
+            syncedItemsLog.push({
+              sku: providerSku,
+              name: productName,
+              game: gameObj.name,
+              brand,
+              category: item.category,
+              old_price: oldPrice,
+              new_price: modalPrice,
+              old_sell_price: oldSellPrice,
+              sell_price: oldSellPrice,
+              price_diff: priceDiff,
+              sell_price_diff: 0,
+              is_locked: true,
+              type: 'LOCKED_SKIPPED',
+              reason: 'Harga jual dipertahankan (Kunci Harga Manual aktif)'
+            });
+          }
         } else {
-          productsUpdated++;
-          const oldPrice = Number(existingProduct[0].price) || 0;
-          const oldSellPrice = Number(existingProduct[0].sell_price) || 0;
-          const priceDiff = modalPrice - oldPrice;
-          const sellPriceDiff = sellPrice - oldSellPrice;
+          // If forceOverwrite, reset is_manual_price to 0
+          const resetLock = forceOverwrite && isLocked ? 0 : (pRow.is_manual_price ? 1 : 0);
 
-          syncedItemsLog.push({
-            sku: providerSku,
-            name: productName,
-            game: gameObj.name,
-            brand,
-            category: item.category,
-            old_price: oldPrice,
-            new_price: modalPrice,
-            old_sell_price: oldSellPrice,
-            sell_price: sellPrice,
-            price_diff: priceDiff,
-            sell_price_diff: sellPriceDiff,
-            type: 'UPDATE'
-          });
+          await executeQuery(
+            `UPDATE products 
+             SET game_id = $1, name = $2, price = $3, sell_price = $4, status = $5, provider_sku = $6, is_manual_price = $7, updated_at = CURRENT_TIMESTAMP 
+             WHERE id = $8`,
+            [gameId, productName, modalPrice, sellPrice, targetStatus, providerSku, resetLock, pRow.id]
+          );
+
+          if (!isDigiActive) {
+            productsDeactivated++;
+            syncedItemsLog.push({
+              sku: providerSku,
+              name: productName,
+              game: gameObj.name,
+              brand,
+              category: item.category,
+              price: modalPrice,
+              sell_price: sellPrice,
+              type: 'DEACTIVATED',
+              reason: 'Dinonaktifkan otomatis (Status OFF dari Digiflazz)'
+            });
+          } else {
+            productsUpdated++;
+            const sellPriceDiff = sellPrice - oldSellPrice;
+
+            syncedItemsLog.push({
+              sku: providerSku,
+              name: productName,
+              game: gameObj.name,
+              brand,
+              category: item.category,
+              old_price: oldPrice,
+              new_price: modalPrice,
+              old_sell_price: oldSellPrice,
+              sell_price: sellPrice,
+              price_diff: priceDiff,
+              sell_price_diff: sellPriceDiff,
+              is_locked: false,
+              type: 'UPDATE',
+              reason: forceOverwrite && isLocked ? 'Kunci dibuka paksa & harga diperbarui' : undefined
+            });
+          }
         }
       } else if (isDigiActive) {
         const id = crypto.randomUUID();
         await executeQuery(
-          `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [id, gameId, providerSku, productName, modalPrice, sellPrice, 1, 0]
+          `INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order, is_manual_price) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+          [id, gameId, providerSku, productName, modalPrice, sellPrice, 1, 0, 0]
         );
         productsCreated++;
         syncedItemsLog.push({
@@ -408,6 +464,7 @@ async function handleSync(req: NextRequest) {
       productsCreated,
       productsUpdated,
       productsDeactivated,
+      productsLockedSkipped,
       gamesCreated,
       skippedProductsCount,
       totalDigiflazzCount: allItems.length,
@@ -415,6 +472,7 @@ async function handleSync(req: NextRequest) {
         totalFromDigiflazz: allItems.length,
         newAdded: productsCreated,
         updated: productsUpdated,
+        lockedSkipped: productsLockedSkipped,
         deactivated: productsDeactivated,
         skipped: skippedProductsCount
       },
