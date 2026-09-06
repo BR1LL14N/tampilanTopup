@@ -56,8 +56,7 @@ export default function AdminBannersPage() {
   const [selectedBanner, setSelectedBanner] = useState<any>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [uploadingDesktop, setUploadingDesktop] = useState(false)
-  const [uploadingMobile, setUploadingMobile] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [editForm, setEditForm] = useState({
     title: "",
     image_url: "",
@@ -101,11 +100,10 @@ export default function AdminBannersPage() {
     fetchAdminData()
   }, [router])
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "desktop" | "mobile") => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (type === "desktop") setUploadingDesktop(true)
-    else setUploadingMobile(true)
+    setUploadingImage(true)
 
     try {
       const formData = new FormData()
@@ -118,19 +116,14 @@ export default function AdminBannersPage() {
       })
       const data = await res.json()
       if (data.url) {
-        if (type === "desktop") {
-          setEditForm(prev => ({ ...prev, image_url: data.url }))
-        } else {
-          setEditForm(prev => ({ ...prev, mobile_image_url: data.url }))
-        }
+        setEditForm(prev => ({ ...prev, image_url: data.url }))
       } else {
         alert(data.error || "Gagal mengunggah gambar")
       }
     } catch (err: any) {
       alert(err.message || "Gagal mengunggah gambar")
     } finally {
-      if (type === "desktop") setUploadingDesktop(false)
-      else setUploadingMobile(false)
+      setUploadingImage(false)
     }
   }
 
@@ -314,16 +307,16 @@ export default function AdminBannersPage() {
             </div>
 
             {/* Banners Table */}
-            <Card className="bg-[#183644]/90 border border-sky/30 overflow-hidden shadow-2xl">
-              <CardContent className="p-0">
+            <Card className="bg-mist backdrop-blur-md border border-sky/30 rounded-[20px] overflow-hidden shadow-sky-soft">
+              <CardContent className="p-0 overflow-x-auto">
                 <Table>
-                  <TableHeader className="bg-black/30">
-                    <TableRow className="border-sky/20">
-                      <TableHead className="text-white text-xs font-bold">Gambar Banner</TableHead>
-                      <TableHead className="text-white text-xs font-bold">Judul / Keterangan</TableHead>
-                      <TableHead className="text-white text-xs font-bold">Target Link URL</TableHead>
-                      <TableHead className="text-white text-xs font-bold text-center">Urutan</TableHead>
-                      <TableHead className="text-white text-xs font-bold text-center">Status</TableHead>
+                  <TableHeader>
+                    <TableRow className="border-sky/30 hover:bg-transparent">
+                      <TableHead className="text-white text-xs font-bold w-40">Preview</TableHead>
+                      <TableHead className="text-white text-xs font-bold">Judul Banner</TableHead>
+                      <TableHead className="text-white text-xs font-bold">Target Link</TableHead>
+                      <TableHead className="text-center text-white text-xs font-bold w-20">Urutan</TableHead>
+                      <TableHead className="text-center text-white text-xs font-bold w-24">Status</TableHead>
                       <TableHead className="text-right text-white text-xs font-bold">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -338,36 +331,12 @@ export default function AdminBannersPage() {
                       filteredBanners.map((b) => (
                         <TableRow key={b.id} className="border-sky/20 hover:bg-white/5">
                           <TableCell>
-                            <div className="flex items-center gap-2">
-                              {/* Desktop thumbnail */}
-                              <div className="h-14 w-28 rounded-lg border border-sky/30 overflow-hidden bg-black/40 relative shadow-md shrink-0" title="Banner Desktop">
-                                <img
-                                  src={b.image_url}
-                                  alt={b.title || "Banner Desktop"}
-                                  className="h-full w-full object-cover"
-                                />
-                                <span className="absolute bottom-0 left-0 bg-black/80 text-sky text-[8px] font-black px-1.5 py-0.5 rounded-tr">
-                                  PC
-                                </span>
-                              </div>
-
-                              {/* Mobile thumbnail if available */}
-                              {b.mobile_image_url ? (
-                                <div className="h-14 w-12 rounded-lg border border-emerald-500/40 overflow-hidden bg-black/40 relative shadow-md shrink-0" title="Banner Mobile Khusus">
-                                  <img
-                                    src={b.mobile_image_url}
-                                    alt={b.title || "Banner Mobile"}
-                                    className="h-full w-full object-cover"
-                                  />
-                                  <span className="absolute bottom-0 left-0 bg-emerald-600/90 text-white text-[8px] font-black px-1 py-0.5 rounded-tr">
-                                    HP
-                                  </span>
-                                </div>
-                              ) : (
-                                <div className="h-14 w-12 rounded-lg border border-white/10 bg-black/20 flex flex-col items-center justify-center text-center p-1 shrink-0" title="Menggunakan gambar PC sebagai fallback">
-                                  <span className="text-[8px] text-white/40 font-bold leading-tight">Auto PC</span>
-                                </div>
-                              )}
+                            <div className="h-14 w-32 rounded-lg border border-sky/30 overflow-hidden bg-black/40 relative shadow-md shrink-0" title="Banner Landscape">
+                              <img
+                                src={b.image_url}
+                                alt={b.title || "Banner Landscape"}
+                                className="h-full w-full object-cover"
+                              />
                             </div>
                           </TableCell>
                           <TableCell>
@@ -463,98 +432,47 @@ export default function AdminBannersPage() {
               />
             </div>
 
-            {/* Dua Seksi Upload: Desktop & Mobile */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Seksi Upload Gambar Banner Landscape */}
+            <div className="bg-black/25 border border-sky/30 rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="banner_image" className="text-xs font-black text-sky uppercase flex items-center gap-1.5">
+                  🖼️ Gambar Banner Landscape *
+                </Label>
+                <span className="text-[9px] bg-sky/20 text-sky px-2 py-0.5 rounded-md font-bold uppercase">
+                  Wajib
+                </span>
+              </div>
               
-              {/* 1. Desktop Banner */}
-              <div className="bg-black/25 border border-sky/30 rounded-2xl p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="banner_image" className="text-xs font-black text-sky uppercase flex items-center gap-1.5">
-                    🖥️ Banner Desktop *
-                  </Label>
-                  <span className="text-[9px] bg-sky/20 text-sky px-2 py-0.5 rounded-md font-bold uppercase">
-                    Wajib
-                  </span>
-                </div>
-                
-                <p className="text-[10.5px] text-white/70 font-medium leading-tight">
-                  <strong className="text-white">Rekomendasi:</strong> 1920 x 720 px (Rasio 16:6) atau 1440 x 540 px.
-                </p>
+              <p className="text-[10.5px] text-white/70 font-medium leading-tight">
+                <strong className="text-white">Rekomendasi:</strong> 1920 x 720 px atau 1440 x 540 px (Rasio Landscape ~21:9 atau 16:7). Format ini langsung otomatis pas dan proporsional di PC maupun HP tanpa terpotong.
+              </p>
 
-                <Input
-                  id="banner_image"
-                  required
-                  value={editForm.image_url}
-                  onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
-                  placeholder="URL gambar desktop..."
-                  className="bg-[#102530] border-sky/30 text-white font-semibold placeholder:text-white/40 text-xs"
+              <Input
+                id="banner_image"
+                required
+                value={editForm.image_url}
+                onChange={(e) => setEditForm({ ...editForm, image_url: e.target.value })}
+                placeholder="URL gambar banner..."
+                className="bg-[#102530] border-sky/30 text-white font-semibold placeholder:text-white/40 text-xs"
+              />
+
+              <label className="cursor-pointer w-full bg-sky/20 hover:bg-sky/30 border border-sky/30 text-sky hover:text-white py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all">
+                {uploadingImage ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                {uploadingImage ? "Mengunggah..." : "Upload File Banner"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                  className="hidden"
                 />
+              </label>
 
-                <label className="cursor-pointer w-full bg-sky/20 hover:bg-sky/30 border border-sky/30 text-sky hover:text-white py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all">
-                  {uploadingDesktop ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-                  {uploadingDesktop ? "Mengunggah..." : "Upload File Desktop"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e, "desktop")}
-                    disabled={uploadingDesktop}
-                    className="hidden"
-                  />
-                </label>
-
-                {editForm.image_url && (
-                  <div className="h-24 w-full rounded-xl border border-sky/30 overflow-hidden bg-black/40 relative shadow-inner">
-                    <img src={editForm.image_url} alt="Preview Desktop" className="h-full w-full object-cover" />
-                  </div>
-                )}
-              </div>
-
-              {/* 2. Mobile Banner */}
-              <div className="bg-black/25 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="banner_mobile_image" className="text-xs font-black text-emerald-400 uppercase flex items-center gap-1.5">
-                    📱 Banner Mobile
-                  </Label>
-                  <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md font-bold uppercase">
-                    Opsional
-                  </span>
+              {editForm.image_url && (
+                <div className="h-32 w-full rounded-xl border border-sky/30 overflow-hidden bg-black/40 relative shadow-inner">
+                  <img src={editForm.image_url} alt="Preview Banner" className="h-full w-full object-cover" />
                 </div>
-
-                <p className="text-[10.5px] text-white/70 font-medium leading-tight">
-                  <strong className="text-white">Rekomendasi:</strong> 1080 x 810 px (Rasio 4:3) atau 800 x 600 px.
-                </p>
-
-                <Input
-                  id="banner_mobile_image"
-                  value={editForm.mobile_image_url}
-                  onChange={(e) => setEditForm({ ...editForm, mobile_image_url: e.target.value })}
-                  placeholder="URL gambar mobile (opsional)..."
-                  className="bg-[#102530] border-emerald-500/30 text-white font-semibold placeholder:text-white/40 text-xs"
-                />
-
-                <label className="cursor-pointer w-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-400 hover:text-white py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all">
-                  {uploadingMobile ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-                  {uploadingMobile ? "Mengunggah..." : "Upload File Mobile"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e, "mobile")}
-                    disabled={uploadingMobile}
-                    className="hidden"
-                  />
-                </label>
-
-                {editForm.mobile_image_url ? (
-                  <div className="h-24 w-full rounded-xl border border-emerald-500/30 overflow-hidden bg-black/40 relative shadow-inner">
-                    <img src={editForm.mobile_image_url} alt="Preview Mobile" className="h-full w-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="h-24 w-full rounded-xl border border-dashed border-white/10 bg-black/20 flex flex-col items-center justify-center text-center p-2">
-                    <p className="text-[10px] text-white/40 font-medium">Kosong (Otomatis memakai gambar desktop di HP)</p>
-                  </div>
-                )}
-              </div>
-
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">

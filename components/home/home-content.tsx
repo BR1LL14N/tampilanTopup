@@ -77,11 +77,11 @@ const catalogItems = [
 export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContentProps) {
   const router = useRouter()
   
-  // Map games dynamically from Supabase if present
+  // Map games dynamically from unified DB if present
   const popularGames = dbGames.length > 0
-    ? dbGames.slice(0, 6).map((game) => ({
+    ? dbGames.slice(0, 12).map((game) => ({
         name: game.name,
-        publisher: game.category || "Game",
+        publisher: game.publisher || game.category || "Game",
         image: getGameAsset(game.slug)?.icon || game.image || "/assets/games/mobile-legends/icon.png",
         slug: game.slug,
       }))
@@ -89,44 +89,18 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
 
   const catalogList = dbGames.length > 0
     ? dbGames
-        .filter((game) => {
-          const categoryLower = game.category?.toLowerCase() || "";
-          return !(categoryLower.includes("live") || categoryLower.includes("app") || categoryLower.includes("coin"));
-        })
+        .filter((game) => game.status !== false && game.status !== 0)
         .map((game) => {
           let tab = "all";
-          const nameLower = game.name.toLowerCase();
+          const nameLower = game.name?.toLowerCase() || "";
           const categoryLower = game.category?.toLowerCase() || "";
           const slugLower = game.slug?.toLowerCase() || "";
           
-          const isVoucherBrand = 
-            nameLower.includes("xl") ||
-            nameLower.includes("axis") ||
-            nameLower.includes("telkomsel") ||
-            nameLower.includes("indosat") ||
-            nameLower.includes("smartfren") ||
-            nameLower.includes("tri") ||
-            nameLower.includes("three") ||
-            nameLower.includes("by.u") ||
-            nameLower.includes("pulsa") ||
-            nameLower.includes("kuota") ||
-            nameLower.includes("data") ||
-            slugLower.includes("xl") ||
-            slugLower.includes("axis") ||
-            slugLower.includes("telkomsel") ||
-            slugLower.includes("indosat") ||
-            slugLower.includes("smartfren") ||
-            slugLower.includes("tri") ||
-            slugLower.includes("three");
-
           if (
             categoryLower.includes("voucher") || 
             categoryLower.includes("gift card") ||
-            categoryLower.includes("pulsa") ||
-            categoryLower.includes("data") ||
-            categoryLower.includes("kuota") ||
-            categoryLower.includes("internet") ||
-            isVoucherBrand
+            slugLower.includes("voucher") ||
+            slugLower.includes("steam")
           ) {
             tab = "voucher";
           }
@@ -134,7 +108,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           return {
             title: game.name.toUpperCase(),
             eyebrow: tab === "voucher" ? "VOUCHER" : "TOP UP GAME",
-            publisher: game.category || "Game",
+            publisher: game.publisher || game.category || "Game",
             bg: getGameAsset(game.slug)?.poster || game.image || "/assets/games/mobile-legends/poster.png",
             tab,
             slug: game.slug,
@@ -316,7 +290,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className="hero-carousel mb-10 overflow-hidden relative rounded-[24px] border border-sky/30 shadow-2xl select-none group/carousel transition-all duration-500 hover:border-sky/60 hover:shadow-sky-glow shimmer-hover"
+          className="hero-carousel mb-10 overflow-hidden relative rounded-[16px] sm:rounded-[24px] border border-sky/30 shadow-2xl select-none group/carousel transition-all duration-500 hover:border-sky/60 hover:shadow-sky-glow shimmer-hover"
         >
           <div
             className="carousel-track flex transition-transform duration-500 ease-out"
@@ -326,7 +300,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
               <div
                 key={idx}
                 onClick={() => handleBannerClick(slide.link)}
-                className="carousel-slide relative w-full shrink-0 aspect-[16/10] sm:aspect-auto sm:h-[340px] md:h-[420px] lg:h-[460px] overflow-hidden cursor-pointer group/slide"
+                className="carousel-slide relative w-full shrink-0 aspect-[21/9] sm:aspect-auto sm:h-[340px] md:h-[420px] lg:h-[460px] overflow-hidden cursor-pointer group/slide"
               >
                 <picture className="w-full h-full block">
                   {slide.mobile_bg && (

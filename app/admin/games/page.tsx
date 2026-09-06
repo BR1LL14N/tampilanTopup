@@ -314,24 +314,24 @@ export default function AdminGamesPage() {
             </div>
 
             {/* Games Table */}
-            <Card>
-              <CardContent className="p-0">
-                <Table>
+            <Card className="bg-mist backdrop-blur-md border border-sky/30 rounded-[20px] overflow-hidden shadow-sky-soft">
+              <CardContent className="p-0 overflow-x-auto">
+                <Table className="min-w-[550px]">
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Game</TableHead>
-                      <TableHead>Kategori</TableHead>
-                      <TableHead>Produk</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Aksi</TableHead>
+                    <TableRow className="border-sky/30 hover:bg-transparent">
+                      <TableHead className="text-white text-xs font-bold">Game</TableHead>
+                      <TableHead className="text-white text-xs font-bold">Kategori</TableHead>
+                      <TableHead className="text-white text-xs font-bold">Produk</TableHead>
+                      <TableHead className="text-white text-xs font-bold">Status</TableHead>
+                      <TableHead className="text-right text-white text-xs font-bold">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredGames.map((game) => (
-                      <TableRow key={game.id}>
+                      <TableRow key={game.id} className="border-sky/20 hover:bg-white/5">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-sky/20 shrink-0">
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-sky/20 shrink-0 border border-sky/30">
                               <img
                                 src={game.image}
                                 alt={game.name}
@@ -339,18 +339,17 @@ export default function AdminGamesPage() {
                               />
                             </div>
                             <div>
-                              <p className="font-medium flex items-center gap-1.5">
-                                <span className="text-base">{game.icon}</span>
+                              <p className="font-bold text-white text-sm">
                                 {game.name}
                               </p>
-                              <p className="text-sm text-white/60">
+                              <p className="text-xs text-white/50 font-mono">
                                 /{game.slug}
                               </p>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>{game.category}</TableCell>
-                        <TableCell>{game.products_count}</TableCell>
+                        <TableCell className="text-xs text-white/80 font-medium">{game.category}</TableCell>
+                        <TableCell className="text-xs text-white/80 font-bold">{game.products_count}</TableCell>
                         <TableCell>
                           <span
                             className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
@@ -404,7 +403,7 @@ export default function AdminGamesPage() {
 
       {/* Edit/Add Game Dialog Modal */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md bg-mist backdrop-blur-md border border-sky/30 rounded-[24px] p-6 shadow-sky-medium">
+        <DialogContent className="max-w-md w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto bg-mist backdrop-blur-md border border-sky/30 rounded-[20px] sm:rounded-[24px] p-4 sm:p-6 shadow-sky-medium">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-white uppercase tracking-wide">
               {selectedGame ? "Edit Game" : "Tambah Game Baru"}
@@ -415,7 +414,7 @@ export default function AdminGamesPage() {
           </DialogHeader>
 
           <form onSubmit={handleSaveGame} className="space-y-4 my-2">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="game_name" className="text-xs font-bold text-white/80 uppercase">Nama Game</Label>
                 <Input
@@ -440,7 +439,7 @@ export default function AdminGamesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="game_publisher" className="text-xs font-bold text-white/80 uppercase">Publisher</Label>
                 <Input
@@ -474,29 +473,17 @@ export default function AdminGamesPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="game_icon" className="text-xs font-bold text-white/80 uppercase">Icon Emoji</Label>
-                <Input
-                  id="game_icon"
-                  value={editForm.icon}
-                  onChange={(e) => setEditForm({ ...editForm, icon: e.target.value })}
-                  placeholder="e.g. 🎮 atau 🔥"
-                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="game_sort" className="text-xs font-bold text-white/80 uppercase">Sort Order</Label>
-                <Input
-                  id="game_sort"
-                  type="number"
-                  value={editForm.sort_order === 0 ? "" : editForm.sort_order}
-                  onFocus={(e) => e.target.select()}
-                  onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value === "" ? 0 : parseInt(e.target.value) || 0 })}
-                  placeholder="0"
-                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
-                />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="game_sort" className="text-xs font-bold text-white/80 uppercase">Urutan Tampil (Sort Order)</Label>
+              <Input
+                id="game_sort"
+                type="number"
+                value={editForm.sort_order === 0 ? "" : editForm.sort_order}
+                onFocus={(e) => e.target.select()}
+                onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value === "" ? 0 : parseInt(e.target.value) || 0 })}
+                placeholder="0 (angka terkecil tampil paling depan)"
+                className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
+              />
             </div>
 
             <div className="space-y-2">

@@ -29,6 +29,7 @@ import {
   Image as ImageIcon,
   Wallet,
   ArrowRight,
+  Receipt,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -465,6 +466,19 @@ export function Header({ user }: HeaderProps) {
               {currentUser ? (
                 <>
                   <HeaderNotificationBell />
+                  {currentUser.role === "admin" && (
+                    <Link
+                      href="/admin/games"
+                      className={cn(
+                        "flex items-center gap-1.5 border border-sky/30 bg-sky/15 text-sky hover:bg-sky hover:text-white px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-full transition-all duration-300 shadow-sm",
+                        pathname === "/admin/games" && "bg-sky text-white"
+                      )}
+                      title="Kelola Game"
+                    >
+                      <Gamepad2 className="h-3.5 w-3.5" />
+                      <span>Kelola Game</span>
+                    </Link>
+                  )}
                   <Link href="/dashboard" className="flex items-center gap-1.5 border border-white/15 bg-[#1e2227] text-white hover:text-sky hover:bg-white/15 px-5 py-2 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-300">
                     <User className="h-3.5 w-3.5 text-sky" />
                     {currentUser.name}
@@ -569,6 +583,7 @@ export function Header({ user }: HeaderProps) {
                     )}
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <Gamepad2 className="h-4 w-4 text-sky" />
                     Kelola Game
                   </Link>
                   <Link
@@ -579,6 +594,7 @@ export function Header({ user }: HeaderProps) {
                     )}
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <ImageIcon className="h-4 w-4 text-sky" />
                     Kelola Banner
                   </Link>
                   <Link
@@ -589,6 +605,7 @@ export function Header({ user }: HeaderProps) {
                     )}
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <ShoppingBag className="h-4 w-4 text-sky" />
                     Kelola Produk
                   </Link>
                   <Link
@@ -599,6 +616,7 @@ export function Header({ user }: HeaderProps) {
                     )}
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <Receipt className="h-4 w-4 text-sky" />
                     Transaksi Masuk
                   </Link>
                   <Link
