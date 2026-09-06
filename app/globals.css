@@ -728,17 +728,15 @@
    ============================================= */
 
 .hero-carousel {
-  @apply relative overflow-hidden rounded-[24px];
-  border: 1px solid hsl(207 60% 90%);
-  box-shadow: 0 12px 30px rgba(92, 184, 255, 0.12);
+  @apply relative overflow-hidden rounded-[16px] sm:rounded-[24px];
 }
 
 .carousel-track {
-  @apply flex transition-transform duration-500;
+  @apply flex transition-transform duration-500 h-full;
 }
 
 .carousel-slide {
-  @apply min-h-[420px] bg-cover bg-center flex items-center w-full shrink-0;
+  @apply bg-cover bg-center flex items-center w-full shrink-0 min-h-0 h-full;
 }
 
 .carousel-nav {

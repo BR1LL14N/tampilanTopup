@@ -290,17 +290,17 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className="hero-carousel mb-10 overflow-hidden relative rounded-[16px] sm:rounded-[24px] border border-sky/30 shadow-2xl select-none group/carousel transition-all duration-500 hover:border-sky/60 hover:shadow-sky-glow shimmer-hover"
+          className="hero-carousel mb-6 sm:mb-10 overflow-hidden relative rounded-[16px] sm:rounded-[24px] border border-sky/30 shadow-2xl select-none group/carousel transition-all duration-500 hover:border-sky/60 hover:shadow-sky-glow shimmer-hover w-full aspect-[21/9] sm:aspect-auto sm:h-[340px] md:h-[420px] lg:h-[460px]"
         >
           <div
-            className="carousel-track flex transition-transform duration-500 ease-out"
+            className="carousel-track flex h-full transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${activeSlide * 100}%)` }}
           >
             {activeSlides.map((slide, idx) => (
               <div
                 key={idx}
                 onClick={() => handleBannerClick(slide.link)}
-                className="carousel-slide relative w-full shrink-0 aspect-[21/9] sm:aspect-auto sm:h-[340px] md:h-[420px] lg:h-[460px] overflow-hidden cursor-pointer group/slide"
+                className="carousel-slide relative w-full h-full shrink-0 overflow-hidden cursor-pointer group/slide !min-h-0"
               >
                 <picture className="w-full h-full block">
                   {slide.mobile_bg && (
@@ -337,7 +337,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
           >
             <ChevronRight className="h-6 w-6 text-white stroke-[2.5]" />
           </button>
-          <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2.5">
+          <div className="absolute bottom-2.5 sm:bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2.5">
             {activeSlides.map((_, idx) => (
               <button
                 key={idx}
