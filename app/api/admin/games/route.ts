@@ -24,14 +24,27 @@ export async function GET(req: NextRequest) {
 
     const games = await GameService.getAll();
     
-    // Fetch product counts on the server
+    // Fetch product counts and successful transactions counts on the server
     const gamesWithCount = await Promise.all(
       games.map(async (game: any) => {
-        const rows = await executeQuery(`SELECT COUNT(*) as count FROM products WHERE game_id = $1`, [game.id]);
-        const count = Number(rows[0]?.count ?? rows[0]?.COUNT ?? 0);
+        const rowsProd = await executeQuery(`SELECT COUNT(*) as count FROM products WHERE game_id = $1`, [game.id]);
+        const prodCount = Number(rowsProd[0]?.count ?? rowsProd[0]?.COUNT ?? 0);
+
+        const rowsTx = await executeQuery(
+          `SELECT COUNT(t.id) as count 
+           FROM transactions t 
+           JOIN products p ON t.product_id = p.id 
+           WHERE p.game_id = $1 
+             AND t.payment_status IN ('paid', 'success') 
+             AND t.topup_status = 'success'`,
+          [game.id]
+        );
+        const txCount = Number(rowsTx[0]?.count ?? rowsTx[0]?.COUNT ?? 0);
+
         return {
           ...game,
-          products_count: count
+          products_count: prodCount,
+          success_transactions_count: txCount,
         };
       })
     );

@@ -43,6 +43,7 @@ import {
   Trash2,
   Eye,
   Loader2,
+  Flame,
 } from "lucide-react"
 
 export default function AdminGamesPage() {
@@ -61,11 +62,12 @@ export default function AdminGamesPage() {
     name: "",
     slug: "",
     publisher: "",
-    category: "",
+    category: "Game",
     description: "",
-    icon: "",
+    icon: "🎮",
     image: "",
     status: true,
+    is_popular: false,
     sort_order: 0,
   })
 
@@ -151,6 +153,7 @@ export default function AdminGamesPage() {
       icon: game.icon || "🎮",
       image: game.image || "",
       status: game.status ? true : false,
+      is_popular: Boolean(game.is_popular),
       sort_order: game.sort_order || 0,
     })
     setIsEditDialogOpen(true)
@@ -167,9 +170,29 @@ export default function AdminGamesPage() {
       icon: "🎮",
       image: "",
       status: true,
+      is_popular: false,
       sort_order: 0,
     })
     setIsEditDialogOpen(true)
+  }
+
+  const handleTogglePopular = async (game: any) => {
+    const newStatus = !game.is_popular
+    setGamesList((prev) =>
+      prev.map((g) => (g.id === game.id ? { ...g, is_popular: newStatus } : g))
+    )
+    try {
+      const res = await fetch("/api/admin/games", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: game.id, is_popular: newStatus }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+    } catch (err: any) {
+      alert("Gagal mengubah status populer: " + err.message)
+      fetchAdminData()
+    }
   }
 
   const handleSaveGame = async (e: React.FormEvent) => {
@@ -185,6 +208,7 @@ export default function AdminGamesPage() {
         icon: editForm.icon,
         image: editForm.image || null,
         status: editForm.status,
+        is_popular: editForm.is_popular,
         sort_order: Number(editForm.sort_order) || 0,
       }
 
@@ -321,7 +345,9 @@ export default function AdminGamesPage() {
                     <TableRow className="border-sky/30 hover:bg-transparent">
                       <TableHead className="text-white text-xs font-bold">Game</TableHead>
                       <TableHead className="text-white text-xs font-bold">Kategori</TableHead>
-                      <TableHead className="text-white text-xs font-bold">Produk</TableHead>
+                      <TableHead className="text-white text-xs font-bold text-center">Produk</TableHead>
+                      <TableHead className="text-white text-xs font-bold text-center">Tx Berhasil</TableHead>
+                      <TableHead className="text-white text-xs font-bold text-center">Populer</TableHead>
                       <TableHead className="text-white text-xs font-bold">Status</TableHead>
                       <TableHead className="text-right text-white text-xs font-bold">Aksi</TableHead>
                     </TableRow>
@@ -349,7 +375,34 @@ export default function AdminGamesPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-xs text-white/80 font-medium">{game.category}</TableCell>
-                        <TableCell className="text-xs text-white/80 font-bold">{game.products_count}</TableCell>
+                        <TableCell className="text-xs text-white/80 font-bold text-center">{game.products_count}</TableCell>
+                        <TableCell className="text-center">
+                          <span
+                            className={`inline-flex items-center gap-1 font-mono text-xs px-2.5 py-0.5 rounded-lg border ${
+                              (game.success_transactions_count || 0) > 0
+                                ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-black"
+                                : "bg-white/5 text-white/40 border-white/10"
+                            }`}
+                            title="Total transaksi pembayaran & topup yang berhasil"
+                          >
+                            {game.success_transactions_count || 0} Tx
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <button
+                            type="button"
+                            onClick={() => handleTogglePopular(game)}
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black transition-all cursor-pointer border ${
+                              game.is_popular
+                                ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30 shadow-sm"
+                                : "bg-white/5 text-white/40 border-white/10 hover:bg-white/10 hover:text-white"
+                            }`}
+                            title={game.is_popular ? "Klik untuk mematikan status populer" : "Klik untuk mengaktifkan status populer"}
+                          >
+                            <Flame className={`h-3 w-3 ${game.is_popular ? "text-amber-400 fill-amber-400" : "text-white/40"}`} />
+                            {game.is_popular ? "Populer" : "Biasa"}
+                          </button>
+                        </TableCell>
                         <TableCell>
                           <span
                             className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
@@ -531,17 +584,36 @@ export default function AdminGamesPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-2">
-              <input
-                id="game_status"
-                type="checkbox"
-                checked={editForm.status}
-                onChange={(e) => setEditForm({ ...editForm, status: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300 text-sky focus:ring-sky cursor-pointer"
-              />
-              <Label htmlFor="game_status" className="text-xs font-bold text-white/80 uppercase cursor-pointer select-none">
-                Game Aktif (Tampil di Catalog Web)
-              </Label>
+            <div className="space-y-2 pt-2 border-t border-sky/20">
+              <div className="flex items-center gap-2">
+                <input
+                  id="game_popular"
+                  type="checkbox"
+                  checked={editForm.is_popular}
+                  onChange={(e) => setEditForm({ ...editForm, is_popular: e.target.checked })}
+                  className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                />
+                <Label htmlFor="game_popular" className="text-xs font-bold text-amber-300 uppercase cursor-pointer select-none flex items-center gap-1.5">
+                  <Flame className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+                  Tandai Sebagai Game Populer (Tampil di &ldquo;Populer Sekarang&rdquo;)
+                </Label>
+              </div>
+              <p className="text-[10px] text-white/50 pl-6">
+                Game ini akan dimunculkan di seksi khusus &ldquo;POPULER SEKARANG!&rdquo; pada halaman utama.
+              </p>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  id="game_status"
+                  type="checkbox"
+                  checked={editForm.status}
+                  onChange={(e) => setEditForm({ ...editForm, status: e.target.checked })}
+                  className="h-4 w-4 rounded border-gray-300 text-sky focus:ring-sky cursor-pointer"
+                />
+                <Label htmlFor="game_status" className="text-xs font-bold text-white/80 uppercase cursor-pointer select-none">
+                  Game Aktif (Tampil di Catalog Web)
+                </Label>
+              </div>
             </div>
 
             <DialogFooter className="pt-4 gap-2">

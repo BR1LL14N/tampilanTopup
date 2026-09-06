@@ -109,6 +109,14 @@ async function runMigration() {
         // Already exists
       }
 
+      // Ensure is_popular column is present in games
+      try {
+        await connection.query("ALTER TABLE games ADD COLUMN is_popular TINYINT(1) DEFAULT 0;");
+        console.log("✓ Ensured 'is_popular' column is in games.");
+      } catch (err) {
+        // Already exists
+      }
+
       // 4. Eksekusi Seed Data
       console.log("Running seed-mysql.sql...");
       const seedPath = path.join(__dirname, "seed-mysql.sql");
