@@ -67,12 +67,32 @@ export const gameAssets = {
   "arena-of-valor": {
     icon: "/assets/games/arena-of-valor/icon.png",
     poster: "/assets/games/arena-of-valor/poster.png",
-    banner: "/assets/games/arena-of-valor/banner.png",
+    banner: "/assets/games/arena-of-valor/poster.png",
   },
   aov: {
     icon: "/assets/games/arena-of-valor/icon.png",
     poster: "/assets/games/arena-of-valor/poster.png",
-    banner: "/assets/games/arena-of-valor/banner.png",
+    banner: "/assets/games/arena-of-valor/poster.png",
+  },
+  "magic-chess": {
+    icon: "/assets/games/magic-chess/icon.png",
+    poster: "/assets/games/magic-chess/poster.png",
+    banner: "/assets/games/magic-chess/poster.png",
+  },
+  "magic-chest-go-go": {
+    icon: "/assets/games/magic-chess/icon.png",
+    poster: "/assets/games/magic-chess/poster.png",
+    banner: "/assets/games/magic-chess/poster.png",
+  },
+  "magic-chess-go-go": {
+    icon: "/assets/games/magic-chess/icon.png",
+    poster: "/assets/games/magic-chess/poster.png",
+    banner: "/assets/games/magic-chess/poster.png",
+  },
+  "mc-gogo": {
+    icon: "/assets/games/mc-gogo/icon.png",
+    poster: "/assets/games/mc-gogo/poster.png",
+    banner: "/assets/games/mc-gogo/poster.png",
   },
   "fc-mobile": {
     icon: "/assets/games/fc-mobile/icon.png",
@@ -82,12 +102,12 @@ export const gameAssets = {
   growtopia: {
     icon: "/assets/games/growtopia/icon.png",
     poster: "/assets/games/growtopia/poster.png",
-    banner: "/assets/games/growtopia/banner.png",
+    banner: "/assets/games/growtopia/poster.png",
   },
   "honkai-star-rail": {
     icon: "/assets/games/honkai-star-rail/icon.png",
     poster: "/assets/games/honkai-star-rail/poster.png",
-    banner: "/assets/games/honkai-star-rail/banner.png",
+    banner: "/assets/games/honkai-star-rail/poster.png",
   },
   "zenless-zone-zero": {
     icon: "/assets/games/zenless-zone-zero/icon.png",
@@ -155,6 +175,16 @@ export function slugFromGameName(name?: string | null) {
     tiktok: "tiktok-live",
     "bigo-live": "bigo-live",
     bigo: "bigo-live",
+    "magic-chest-go-go": "magic-chest-go-go",
+    "magic-chess-go-go": "magic-chest-go-go",
+    "magic-chest": "magic-chess",
+    "magic-chess": "magic-chess",
+    "mc-gogo": "mc-gogo",
+    growtopia: "growtopia",
+    "honkai-star-rail": "honkai-star-rail",
+    hsr: "honkai-star-rail",
+    "arena-of-valor": "arena-of-valor",
+    aov: "arena-of-valor",
   };
   return aliases[normalized] || (normalized as GameAssetSlug);
 }

@@ -463,14 +463,23 @@ export default function AdminGamesPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="game_desc" className="text-xs font-bold text-white/80 uppercase">Deskripsi</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="game_desc" className="text-xs font-bold text-white/80 uppercase">
+                  Informasi Game &amp; Panduan Top Up
+                </Label>
+                <span className="text-[10px] font-semibold text-sky">Tab Informasi Game</span>
+              </div>
               <textarea
                 id="game_desc"
+                rows={4}
                 value={editForm.description}
                 onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full min-h-[75px] rounded-xl border border-sky/30 bg-[#183644] text-white font-medium px-3 py-2 text-xs shadow-sm placeholder:text-white/40 focus:outline-none focus:border-sky"
-                placeholder="Deskripsi game..."
+                className="w-full min-h-[95px] rounded-xl border border-sky/30 bg-[#183644] text-white font-medium px-3.5 py-2.5 text-xs shadow-sm placeholder:text-white/40 focus:outline-none focus:border-sky leading-relaxed"
+                placeholder="Tuliskan keterangan game, cara pemesanan, atau info event di sini. Teks ini akan langsung muncul pada tab 'Informasi Game' di halaman pembeli."
               />
+              <p className="text-[10px] text-white/50">
+                Mendukung baris baru (enter). Informasi ini akan ditampilkan rapi kepada pembeli di tab Informasi Game.
+              </p>
             </div>
 
             <div className="space-y-1.5">

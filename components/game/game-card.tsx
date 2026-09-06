@@ -14,7 +14,7 @@ export function GameCard({ game }: GameCardProps) {
       <Card className="group overflow-hidden hover:border-primary/50 transition-all duration-300">
         <div className="relative aspect-[4/3] overflow-hidden">
           <Image
-            src={getGameAsset(game.slug)?.banner || game.image || "/placeholder-game.jpg"}
+            src={game.image || getGameAsset(game.slug)?.banner || "/placeholder-game.jpg"}
             alt={game.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"

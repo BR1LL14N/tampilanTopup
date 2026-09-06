@@ -8,15 +8,24 @@ INSERT INTO users (id, email, password_hash, name, role, phone) VALUES
 ('00000000-0000-0000-0000-000000000002', 'customer@gmail.com', '$2b$10$cwX7wGBVF2IUbQzBpqroJOLwaPCbu8IYEJ2EfRwOXGw9QZcdATu2S', 'Customer User', 'user', '6289876543210')
 ON DUPLICATE KEY UPDATE id=id;
 
--- 2. Seed Games
+-- 2. Seed Games (10 Active Server Games)
 INSERT INTO games (id, name, slug, image, icon, category, description, status, sort_order) VALUES
-('10000000-0000-0000-0000-000000000001', 'Mobile Legends', 'mobile-legends', '/assets/games/mobile-legends/banner.png', '🎮', 'MOBA', 'Top up ML Diamonds termurah dan proses sangat cepat.', 1, 1),
-('10000000-0000-0000-0000-000000000002', 'Free Fire', 'free-fire', '/assets/games/free-fire/banner.png', '🔥', 'FPS', 'Top up FF Diamonds proses instan 24 jam.', 1, 2),
-('10000000-0000-0000-0000-000000000003', 'PUBG Mobile', 'pubg-mobile', '/assets/games/pubg-mobile/banner.png', '🪂', 'Battle Royale', 'Top up PUBG Mobile UC resmi dan terpercaya.', 1, 3),
-('10000000-0000-0000-0000-000000000004', 'Valorant', 'valorant', '/assets/games/valorant/banner.png', '🎯', 'FPS', 'Top up Valorant Points proses otomatis.', 1, 4),
-('10000000-0000-0000-0000-000000000005', 'Genshin Impact', 'genshin-impact', '/assets/games/genshin-impact/banner.png', '✨', 'RPG', 'Genesis Crystal Genshin Impact termurah dengan proses instant.', 1, 5),
-('10000000-0000-0000-0000-000000000006', 'Honor of Kings', 'honor-of-kings', '/assets/games/honor-of-kings/banner.png', '👑', 'MOBA', 'Top up HOK Tokens dengan proses cepat.', 1, 6)
-ON DUPLICATE KEY UPDATE id=id;
+('10000000-0000-0000-0000-000000000001', 'Mobile Legends', 'mobile-legends', '/assets/games/mobile-legends/poster.png', '🎮', 'MOBA', 'Top up ML Diamonds termurah dan proses sangat cepat 24 jam.', 1, 1),
+('10000000-0000-0000-0000-000000000002', 'HONKAI : STAR RAIL', 'honkai-star-rail', '/assets/games/honkai-star-rail/poster.png', '✨', 'Game', 'Top up Oneiric Shard Honkai: Star Rail resmi dan instan.', 1, 2),
+('10000000-0000-0000-0000-000000000003', 'GROWTOPIA', 'growtopia', '/assets/games/growtopia/poster.png', '🌱', 'Game', 'Top up Diamond Lock Growtopia termurah dan aman terpercaya.', 1, 3),
+('10000000-0000-0000-0000-000000000004', 'ARENA OF VALOR', 'arena-of-valor', '/assets/games/arena-of-valor/poster.png', '⚔️', 'Game', 'Top up Voucher Arena of Valor resmi proses cepat.', 1, 4),
+('10000000-0000-0000-0000-000000000005', 'MAGIC CHEST : GO GO', 'magic-chest-go-go', '/assets/games/magic-chess/poster.png', '♟️', 'Moba', 'Top up Magic Chest: Go Go Diamonds resmi proses kilat.', 1, 5),
+('10000000-0000-0000-0000-000000000006', 'Free Fire', 'free-fire', '/assets/games/free-fire/poster.png', '🔥', 'FPS', 'Top up FF Diamonds proses instan 24 jam.', 1, 6),
+('10000000-0000-0000-0000-000000000007', 'PUBG Mobile', 'pubg-mobile', '/assets/games/pubg-mobile/poster.png', '🪂', 'Battle Royale', 'Top up PUBG Mobile UC resmi dan terpercaya.', 1, 7),
+('10000000-0000-0000-0000-000000000008', 'Valorant', 'valorant', '/assets/games/valorant/poster.png', '🎯', 'FPS', 'Top up Valorant Points proses otomatis.', 1, 8),
+('10000000-0000-0000-0000-000000000009', 'Genshin Impact', 'genshin-impact', '/assets/games/genshin-impact/poster.png', '✨', 'RPG', 'Genesis Crystal Genshin Impact termurah dengan proses instant.', 1, 9),
+('10000000-0000-0000-0000-000000000010', 'Honor of Kings', 'honor-of-kings', '/assets/games/honor-of-kings/poster.png', '👑', 'MOBA', 'Top up HOK Tokens dengan proses cepat.', 1, 10)
+ON DUPLICATE KEY UPDATE 
+  name = VALUES(name),
+  image = VALUES(image),
+  category = VALUES(category),
+  sort_order = VALUES(sort_order),
+  description = VALUES(description);
 
 -- 3. Seed Products
 INSERT INTO products (id, game_id, provider_sku, name, price, sell_price, status, sort_order, is_flash_sale, flash_sale_price, flash_sale_discount, flash_sale_stock, flash_sale_sold) VALUES

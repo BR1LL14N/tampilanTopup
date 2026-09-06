@@ -949,9 +949,15 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                     <FileText className="h-5 w-5 text-sky" />
                     Keterangan Game {game.name}
                   </h2>
-                  <p className="mt-4 text-sm font-medium leading-relaxed text-white/90">
-                    {game.description}
-                  </p>
+                  {game.description ? (
+                    <div className="mt-4 text-sm font-medium leading-relaxed text-white/90 whitespace-pre-line bg-black/20 p-4 rounded-xl border border-white/5">
+                      {game.description}
+                    </div>
+                  ) : (
+                    <p className="mt-4 text-sm font-medium leading-relaxed text-white/60 italic">
+                      Belum ada informasi khusus untuk game ini.
+                    </p>
+                  )}
 
                   {/* Panduan Cara Menemukan ID */}
                   <div className="mt-6 bg-black/25 border border-sky/30 rounded-2xl p-5 space-y-3 shadow-inner">

@@ -109,7 +109,7 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             title: game.name.toUpperCase(),
             eyebrow: tab === "voucher" ? "VOUCHER" : "TOP UP GAME",
             publisher: game.publisher || game.category || "Game",
-            bg: getGameAsset(game.slug)?.poster || game.image || "/assets/games/mobile-legends/poster.png",
+            bg: game.image || getGameAsset(game.slug)?.poster || "/assets/games/mobile-legends/poster.png",
             tab,
             slug: game.slug,
           };
