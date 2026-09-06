@@ -44,6 +44,10 @@ import {
   Eye,
   Loader2,
   Flame,
+  Gamepad2,
+  ImageIcon,
+  UploadCloud,
+  X,
 } from "lucide-react"
 
 export default function AdminGamesPage() {
@@ -454,175 +458,232 @@ export default function AdminGamesPage() {
         </main>
       </SidebarContentWrapper>
 
-      {/* Edit/Add Game Dialog Modal */}
+      {/* Edit/Add Game Dialog Modal - Two Column Grouped Layout */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto bg-mist backdrop-blur-md border border-sky/30 rounded-[20px] sm:rounded-[24px] p-4 sm:p-6 shadow-sky-medium">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black text-white uppercase tracking-wide">
-              {selectedGame ? "Edit Game" : "Tambah Game Baru"}
+        <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[92vh] overflow-y-auto bg-mist backdrop-blur-xl border border-sky/40 rounded-[24px] p-5 sm:p-7 shadow-2xl">
+          <DialogHeader className="border-b border-sky/20 pb-3">
+            <DialogTitle className="text-xl font-black text-white uppercase tracking-wide flex items-center gap-2">
+              <Gamepad2 className="h-5 w-5 text-sky" />
+              {selectedGame ? "Edit Parameter Game" : "Tambah Game Baru"}
             </DialogTitle>
             <DialogDescription className="text-xs font-semibold text-white/60 uppercase tracking-wider">
-              {selectedGame ? "Ubah detail parameter game di bawah ini." : "Masukkan data game baru yang ingin ditampilkan."}
+              {selectedGame ? `Mengubah konfigurasi untuk game: ${selectedGame.name}` : "Tambahkan game baru ke dalam sistem katalog dan kelola tampilan."}
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSaveGame} className="space-y-4 my-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="game_name" className="text-xs font-bold text-white/80 uppercase">Nama Game</Label>
-                <Input
-                  id="game_name"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  placeholder="e.g. Free Fire"
-                  required
-                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="game_slug" className="text-xs font-bold text-white/80 uppercase">Slug URL</Label>
-                <Input
-                  id="game_slug"
-                  value={editForm.slug}
-                  onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })}
-                  placeholder="e.g. free-fire"
-                  required
-                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
-                />
-              </div>
-            </div>
+          <form onSubmit={handleSaveGame} className="space-y-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              
+              {/* Kolom Kiri: Informasi Utama & Deskripsi (col-span-7) */}
+              <div className="md:col-span-7 space-y-4">
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-sky border-b border-sky/20 pb-2">
+                  <Gamepad2 className="h-4 w-4" />
+                  <span>Informasi Utama Game</span>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="game_publisher" className="text-xs font-bold text-white/80 uppercase">Publisher</Label>
-                <Input
-                  id="game_publisher"
-                  value={editForm.publisher}
-                  onChange={(e) => setEditForm({ ...editForm, publisher: e.target.value })}
-                  placeholder="e.g. Garena"
-                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="game_category" className="text-xs font-bold text-white/80 uppercase">Kategori</Label>
-                <Input
-                  id="game_category"
-                  value={editForm.category}
-                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-                  placeholder="e.g. Battle Royale, MOBA"
-                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="game_desc" className="text-xs font-bold text-white/80 uppercase">
-                  Informasi Game &amp; Panduan Top Up
-                </Label>
-                <span className="text-[10px] font-semibold text-sky">Tab Informasi Game</span>
-              </div>
-              <textarea
-                id="game_desc"
-                rows={4}
-                value={editForm.description}
-                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                className="w-full min-h-[95px] rounded-xl border border-sky/30 bg-[#183644] text-white font-medium px-3.5 py-2.5 text-xs shadow-sm placeholder:text-white/40 focus:outline-none focus:border-sky leading-relaxed"
-                placeholder="Tuliskan keterangan game, cara pemesanan, atau info event di sini. Teks ini akan langsung muncul pada tab 'Informasi Game' di halaman pembeli."
-              />
-              <p className="text-[10px] text-white/50">
-                Mendukung baris baru (enter). Informasi ini akan ditampilkan rapi kepada pembeli di tab Informasi Game.
-              </p>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="game_sort" className="text-xs font-bold text-white/80 uppercase">Urutan Tampil (Sort Order)</Label>
-              <Input
-                id="game_sort"
-                type="number"
-                value={editForm.sort_order === 0 ? "" : editForm.sort_order}
-                onFocus={(e) => e.target.select()}
-                onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value === "" ? 0 : parseInt(e.target.value) || 0 })}
-                placeholder="0 (angka terkecil tampil paling depan)"
-                className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="game_image" className="text-xs font-bold text-white/80 uppercase block">
-                Image Banner / Poster Game
-              </Label>
-              <div className="space-y-2">
-                <Input
-                  id="game_image"
-                  value={editForm.image}
-                  onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
-                  placeholder="https://... atau /uploads/games/..."
-                  className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
-                />
-                
-                <div className="flex items-center gap-3 pt-1">
-                  <label className="cursor-pointer bg-sky/20 hover:bg-sky/40 border border-sky/30 hover:border-sky/60 text-sky hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all">
-                    {uploadingImage ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
-                    {uploadingImage ? "Mengunggah..." : "Upload File Gambar"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={uploadingImage}
-                      className="hidden"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="game_name" className="text-xs font-bold text-white/90 uppercase">Nama Game</Label>
+                    <Input
+                      id="game_name"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      placeholder="e.g. Free Fire"
+                      required
+                      className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
                     />
-                  </label>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="game_slug" className="text-xs font-bold text-white/90 uppercase">Slug URL</Label>
+                    <Input
+                      id="game_slug"
+                      value={editForm.slug}
+                      onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })}
+                      placeholder="e.g. free-fire"
+                      required
+                      className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
+                    />
+                  </div>
+                </div>
 
-                  {editForm.image && (
-                    <div className="flex items-center gap-2 bg-black/30 p-1.5 pr-3 rounded-xl border border-sky/20">
-                      <img src={editForm.image} alt="Preview" className="h-7 w-10 object-cover rounded" />
-                      <span className="text-[10px] text-white/70 font-mono truncate max-w-[110px]">{editForm.image}</span>
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="game_publisher" className="text-xs font-bold text-white/90 uppercase">Publisher</Label>
+                    <Input
+                      id="game_publisher"
+                      value={editForm.publisher}
+                      onChange={(e) => setEditForm({ ...editForm, publisher: e.target.value })}
+                      placeholder="e.g. Garena / Moonton"
+                      className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="game_category" className="text-xs font-bold text-white/90 uppercase">Kategori</Label>
+                    <Input
+                      id="game_category"
+                      value={editForm.category}
+                      onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                      placeholder="e.g. MOBA / Battle Royale"
+                      className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="game_desc" className="text-xs font-bold text-white/90 uppercase">
+                      Informasi Game &amp; Panduan Top Up
+                    </Label>
+                    <span className="text-[10px] font-bold text-sky bg-sky/15 px-2 py-0.5 rounded border border-sky/30">Tab Informasi Game</span>
+                  </div>
+                  <textarea
+                    id="game_desc"
+                    rows={6}
+                    value={editForm.description}
+                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    className="w-full min-h-[140px] rounded-xl border border-sky/30 bg-[#183644] text-white font-medium px-3.5 py-2.5 text-xs shadow-sm placeholder:text-white/40 focus:outline-none focus:border-sky leading-relaxed"
+                    placeholder="Tuliskan keterangan game, panduan cara transaksi, atau info event di sini. Teks ini akan langsung muncul pada tab 'Informasi Game' di halaman pembeli."
+                  />
+                  <p className="text-[10.5px] text-white/50">
+                    💡 Mendukung enter / baris baru. Pembeli akan melihat format teks ini secara rapi.
+                  </p>
                 </div>
               </div>
+
+              {/* Kolom Kanan: Media Poster & Visibilitas (col-span-5) */}
+              <div className="md:col-span-5 space-y-4">
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-sky border-b border-sky/20 pb-2">
+                  <ImageIcon className="h-4 w-4" />
+                  <span>Poster &amp; Visibilitas</span>
+                </div>
+
+                {/* Poster Live Preview Card */}
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-white/90 uppercase block">Preview Poster Game</Label>
+                  <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden border border-sky/40 bg-black/40 shadow-inner flex items-center justify-center group">
+                    {editForm.image ? (
+                      <>
+                        <img
+                          src={editForm.image}
+                          alt="Poster Preview"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] font-bold text-white">
+                          <span className="bg-black/60 px-2 py-0.5 rounded border border-white/15 truncate max-w-[200px]">
+                            {editForm.image}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setEditForm({ ...editForm, image: "" })}
+                            className="bg-red-500/80 hover:bg-red-500 text-white p-1 rounded-md transition-colors"
+                            title="Hapus gambar"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center p-4">
+                        <ImageIcon className="h-10 w-10 text-white/20 mx-auto mb-2" />
+                        <p className="text-xs font-bold text-white/40 uppercase tracking-wider">Belum Ada Poster Khusus</p>
+                        <p className="text-[10px] text-white/30 mt-0.5">Akan memakai aset bawaan sistem</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Upload & Input URL */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <label className="cursor-pointer flex-1 bg-sky/20 hover:bg-sky/40 border border-sky/40 hover:border-sky/70 text-sky hover:text-white px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm">
+                      {uploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
+                      {uploadingImage ? "Mengunggah..." : "Upload File Poster"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  <Input
+                    value={editForm.image}
+                    onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
+                    placeholder="URL gambar (/uploads/games/... atau https://...)"
+                    className="bg-[#183644] border-sky/30 text-white text-xs font-mono placeholder:text-white/40 focus-visible:ring-sky"
+                  />
+                </div>
+
+                {/* Urutan & Toggles */}
+                <div className="bg-black/20 p-3.5 rounded-2xl border border-sky/20 space-y-3 pt-3">
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="game_sort" className="text-xs font-bold text-white/90 uppercase">Urutan Tampil (Sort Order)</Label>
+                      <span className="text-[10px] text-white/50">Urutan kecil tampil paling depan</span>
+                    </div>
+                    <Input
+                      id="game_sort"
+                      type="number"
+                      value={editForm.sort_order === 0 ? "" : editForm.sort_order}
+                      onFocus={(e) => e.target.select()}
+                      onChange={(e) => setEditForm({ ...editForm, sort_order: e.target.value === "" ? 0 : parseInt(e.target.value) || 0 })}
+                      placeholder="0"
+                      className="bg-[#183644] border-sky/30 text-white font-semibold placeholder:text-white/40 focus-visible:ring-sky"
+                    />
+                  </div>
+
+                  {/* Toggle Populer */}
+                  <div className="flex items-start gap-2.5 pt-1">
+                    <input
+                      id="game_popular"
+                      type="checkbox"
+                      checked={editForm.is_popular}
+                      onChange={(e) => setEditForm({ ...editForm, is_popular: e.target.checked })}
+                      className="h-4 w-4 mt-0.5 rounded border-gray-300 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                    />
+                    <label htmlFor="game_popular" className="cursor-pointer select-none">
+                      <span className="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
+                        <Flame className="h-3.5 w-3.5 text-amber-400 fill-amber-400 animate-pulse" />
+                        Tandai Sebagai Game Populer
+                      </span>
+                      <p className="text-[10px] text-white/50 leading-tight mt-0.5">
+                        Tampil di seksi &ldquo;POPULER SEKARANG!&rdquo; homepage
+                      </p>
+                    </label>
+                  </div>
+
+                  {/* Toggle Aktif */}
+                  <div className="flex items-start gap-2.5 pt-1">
+                    <input
+                      id="game_status"
+                      type="checkbox"
+                      checked={editForm.status}
+                      onChange={(e) => setEditForm({ ...editForm, status: e.target.checked })}
+                      className="h-4 w-4 mt-0.5 rounded border-gray-300 text-sky focus:ring-sky cursor-pointer"
+                    />
+                    <label htmlFor="game_status" className="cursor-pointer select-none">
+                      <span className="text-xs font-black text-white uppercase">
+                        Status Game Aktif
+                      </span>
+                      <p className="text-[10px] text-white/50 leading-tight mt-0.5">
+                        Tampil di katalog dan bisa ditransaksikan pembeli
+                      </p>
+                    </label>
+                  </div>
+                </div>
+
+              </div>
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-sky/20">
-              <div className="flex items-center gap-2">
-                <input
-                  id="game_popular"
-                  type="checkbox"
-                  checked={editForm.is_popular}
-                  onChange={(e) => setEditForm({ ...editForm, is_popular: e.target.checked })}
-                  className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500 cursor-pointer"
-                />
-                <Label htmlFor="game_popular" className="text-xs font-bold text-amber-300 uppercase cursor-pointer select-none flex items-center gap-1.5">
-                  <Flame className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                  Tandai Sebagai Game Populer (Tampil di &ldquo;Populer Sekarang&rdquo;)
-                </Label>
-              </div>
-              <p className="text-[10px] text-white/50 pl-6">
-                Game ini akan dimunculkan di seksi khusus &ldquo;POPULER SEKARANG!&rdquo; pada halaman utama.
-              </p>
-
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  id="game_status"
-                  type="checkbox"
-                  checked={editForm.status}
-                  onChange={(e) => setEditForm({ ...editForm, status: e.target.checked })}
-                  className="h-4 w-4 rounded border-gray-300 text-sky focus:ring-sky cursor-pointer"
-                />
-                <Label htmlFor="game_status" className="text-xs font-bold text-white/80 uppercase cursor-pointer select-none">
-                  Game Aktif (Tampil di Catalog Web)
-                </Label>
-              </div>
-            </div>
-
-            <DialogFooter className="pt-4 gap-2">
-              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <DialogFooter className="pt-4 border-t border-sky/20 gap-2">
+              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="border-white/20 text-white hover:bg-white/10">
                 Batal
               </Button>
-              <Button type="submit" className="bg-sky text-white hover:bg-sky/90" disabled={saving}>
+              <Button type="submit" className="bg-sky text-white hover:bg-sky/90 font-bold px-6 shadow-sky-soft" disabled={saving}>
                 {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Simpan
+                Simpan Perubahan
               </Button>
             </DialogFooter>
           </form>

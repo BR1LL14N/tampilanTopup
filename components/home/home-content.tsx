@@ -16,6 +16,7 @@ import {
   Award,
 } from "lucide-react"
 import { gameAssets, getGameAsset } from "@/lib/assets"
+import { PopularFireCard } from "@/components/home/popular-fire-card"
 
 interface HomeContentProps {
   user?: {
@@ -478,21 +479,16 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
                 <p className="text-xs font-semibold text-white/70 uppercase tracking-wide">Pilihan game paling diminati &amp; sering ditransaksikan.</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {popularGames.map((card, idx) => (
-                <button
+                <PopularFireCard
                   key={idx}
+                  name={card.name}
+                  publisher={card.publisher}
+                  image={card.image}
+                  slug={card.slug}
                   onClick={() => router.push(`/games/${card.slug}`)}
-                  className="w-full flex flex-col sm:flex-row min-h-24 sm:min-h-28 items-center sm:items-center gap-3 sm:gap-5 dark-stripes-teal-pop border border-sky/30 hover:border-diamond/60 p-3 sm:p-4 text-center sm:text-left group shimmer-hover rounded-[16px] sm:rounded-[20px] shadow-lg shadow-black/25 transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="relative h-14 w-14 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl border border-white/15 group-hover:border-diamond/50 transition-colors">
-                    <img className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" src={card.image} alt={card.name} />
-                  </div>
-                  <span className="w-full">
-                    <strong className="block text-[11px] sm:text-lg font-black text-white group-hover:text-diamond transition-colors uppercase tracking-tight leading-tight">{card.name}</strong>
-                    <span className="mt-1 block text-[9px] sm:text-xs font-bold text-white/50 uppercase tracking-wider truncate">{card.publisher}</span>
-                  </span>
-                </button>
+                />
               ))}
             </div>
           </div>
