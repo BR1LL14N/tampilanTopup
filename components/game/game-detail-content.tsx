@@ -669,8 +669,8 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                         </div>
                       </div>
 
-                      {/* Real-time Nickname Verification Action & Result for supported games */}
-                      {["mobile-legends", "free-fire", "pubg-mobile"].includes(game.slug) && (
+                      {/* HIDE SEMENTARA: Real-time Nickname Verification Action & Result for supported games */}
+                      {/* {["mobile-legends", "free-fire", "pubg-mobile"].includes(game.slug) && (
                         <div className="sm:col-span-2 space-y-2 pt-1 pb-1">
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                             <button
@@ -702,7 +702,7 @@ export function GameDetailContent({ game, user }: GameDetailContentProps) {
                             </div>
                           )}
                         </div>
-                      )}
+                      )} */}
 
                       <div className="space-y-2">
                         <span className="block text-xs font-bold uppercase tracking-wider text-white/60">Email (Opsional)</span>
