@@ -17,7 +17,7 @@ function slugify(text: string) {
     .replace(/\-\-+/g, "-");
 }
 
-function isGameProduct(item: any): boolean {
+function isAllowedProduct(item: any): boolean {
   if (!item || !item.brand) return false;
 
   const category = (item.category || "").toLowerCase().trim();
@@ -25,10 +25,22 @@ function isGameProduct(item: any): boolean {
   const productName = (item.product_name || "").toLowerCase().trim();
   const cleanBrand = brand.replace(/[^a-z0-9]/g, "");
 
-  // 1. Explicit Non-Game Brand Exclusions (Pulsa, Operator, PLN, TV, E-Money)
+  // 0. Whitelist: PLN / Token Listrik — selalu diizinkan masuk
+  if (
+    cleanBrand === "pln" ||
+    category === "pln" ||
+    category.includes("token listrik") ||
+    category.includes("listrik") ||
+    productName.includes("token listrik")
+  ) {
+    return true;
+  }
+
+  // 1. Explicit Non-Game Brand Exclusions (Pulsa, Operator, TV, E-Money)
+  //    PLN sudah di-whitelist di atas, tidak perlu diblokir di sini.
   const nonGameBrandList = [
     "telkomsel", "indosat", "xl", "axis", "tri", "three", "smartfren", "byu",
-    "pln", "kvision", "kvisiondangol", "nexparabola", "matrixtv", "indovision", "tv",
+    "kvision", "kvisiondangol", "nexparabola", "matrixtv", "indovision", "tv",
     "gopay", "ovo", "dana", "linkaja", "shopeepay", "maxim", "grab", "gojek", "isaku", "doku"
   ];
 
@@ -37,11 +49,11 @@ function isGameProduct(item: any): boolean {
   }
 
   // 2. Explicit Non-Game Category Keywords
+  //    Catatan: "pln" dan "listrik" tidak diblokir karena sudah di-whitelist di atas.
   if (
     category.includes("pulsa") ||
     category.includes("data") ||
     category.includes("internet") ||
-    category.includes("pln") ||
     category.includes("pasca") ||
     category.includes("e-money") ||
     category.includes("emoney") ||
@@ -53,10 +65,10 @@ function isGameProduct(item: any): boolean {
   }
 
   // 3. Explicit Non-Game Product Name Keywords
+  //    Catatan: "token pln" tidak diblokir karena sudah di-whitelist di atas.
   if (
     productName.includes("pulsa") ||
     productName.includes("paket data") ||
-    productName.includes("token pln") ||
     productName.includes("voucher tv") ||
     productName.includes("paket internet") ||
     productName.includes("kuota")
@@ -172,22 +184,23 @@ async function handleSync(req: NextRequest) {
 
     const allItems = result.data;
     
-    // Filter ALL Digiflazz game items (both active and inactive)
+    // Filter ALL Digiflazz items (game + PLN Token Listrik yang diizinkan, both active and inactive)
     const gameProductsFromDigiflazz = allItems.filter((item: any) => 
-      item && item.brand && item.brand.trim() !== '' && isGameProduct(item)
+      item && item.brand && item.brand.trim() !== '' && isAllowedProduct(item)
     );
 
     const skippedProductsCount = allItems.length - gameProductsFromDigiflazz.length;
 
-    // Clean up non-game operator and utility entries from games and products tables
+    // Clean up non-game operator and utility entries (pulsa, emoney, TV, dll)
+    // Catatan: PLN / Token Listrik TIDAK dihapus karena kini didukung oleh sistem
     try {
       await executeQuery(
         `DELETE FROM products WHERE game_id IN (
-          SELECT id FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'PLN', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
+          SELECT id FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
         )`
       );
       await executeQuery(
-        `DELETE FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'PLN', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
+        `DELETE FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
       );
     } catch (cleanupErr) {
       console.warn("Non-game cleanup warning:", cleanupErr);
