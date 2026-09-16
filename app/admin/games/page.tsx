@@ -42,12 +42,15 @@ import {
   Edit,
   Trash2,
   Eye,
+  EyeOff,
   Loader2,
   Flame,
   Gamepad2,
   ImageIcon,
   UploadCloud,
   X,
+  Globe,
+  Lock,
 } from "lucide-react"
 
 export default function AdminGamesPage() {
@@ -195,6 +198,26 @@ export default function AdminGamesPage() {
       if (data.error) throw new Error(data.error)
     } catch (err: any) {
       alert("Gagal mengubah status populer: " + err.message)
+      fetchAdminData()
+    }
+  }
+
+  // Quick toggle: Publish (status=true) or Draft (status=false) langsung dari tabel
+  const handleToggleStatus = async (game: any) => {
+    const newStatus = !game.status
+    setGamesList((prev) =>
+      prev.map((g) => (g.id === game.id ? { ...g, status: newStatus } : g))
+    )
+    try {
+      const res = await fetch("/api/admin/games", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: game.id, status: newStatus }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+    } catch (err: any) {
+      alert("Gagal mengubah status: " + err.message)
       fetchAdminData()
     }
   }
@@ -408,13 +431,23 @@ export default function AdminGamesPage() {
                           </button>
                         </TableCell>
                         <TableCell>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBgColor(
-                              game.status ? "success" : "failed"
-                            )}`}
+                          <button
+                            type="button"
+                            onClick={() => handleToggleStatus(game)}
+                            title={game.status
+                              ? "Tampil di panel user — Klik untuk sembunyikan (Draft)"
+                              : "Tersembunyi dari user (Draft) — Klik untuk Publish ke panel user"
+                            }
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border cursor-pointer transition-all hover:scale-105 active:scale-95 ${
+                              game.status
+                                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30 shadow-sm"
+                                : "bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25"
+                            }`}
                           >
-                            {game.status ? "Aktif" : "Nonaktif"}
-                          </span>
+                            {game.status
+                              ? <><Globe className="h-3 w-3" /> Published</>
+                              : <><Lock className="h-3 w-3" /> Draft</>}
+                          </button>
                         </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>

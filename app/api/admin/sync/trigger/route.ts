@@ -210,11 +210,48 @@ async function handleSync(req: NextRequest) {
     const dbGames = await executeQuery("SELECT id, name, slug FROM games");
     let gamesList: any[] = [...dbGames];
 
+    let productsCreated = 0;
+    let productsUpdated = 0;
+    let productsDeactivated = 0;
+    let productsLockedSkipped = 0;
+    let gamesCreated = 0;
+
+    // ── Ensure "Voucher Digital" game entry exists ──────────────────────────────
+    // PLN / Token Listrik dan voucher digital lain akan dikelompokkan di sini.
+    // PENTING: status=false agar tidak langsung tampil ke panel user (Draft mode).
+    // Admin bisa publish kapan saja via toggle Status di halaman Kelola Game.
+    let voucherDigitalGame = gamesList.find(g =>
+      g.slug === 'voucher-digital' ||
+      (g.name || '').toLowerCase().replace(/\s+/g, '') === 'voucherdigital'
+    );
+    if (!voucherDigitalGame) {
+      const vdId = crypto.randomUUID();
+      await executeQuery(
+        `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [vdId, 'Voucher Digital', 'voucher-digital', '⚡', 'Voucher Digital',
+         'Token Listrik PLN dan voucher digital lainnya. Proses instan 24 jam.', false, 98]
+      );
+      voucherDigitalGame = { id: vdId, name: 'Voucher Digital', slug: 'voucher-digital' };
+      gamesList.push(voucherDigitalGame);
+      gamesCreated++;
+    }
+
     // Smart Fuzzy Match Digiflazz brand to DB game
     const findGameMatch = (brandInput: string) => {
       if (!brandInput) return undefined;
       const bLower = brandInput.toLowerCase().trim();
       const cleanB = bLower.replace(/[^a-z0-9]/g, '');
+
+      // PLN / Token Listrik → selalu masuk ke grup Voucher Digital
+      if (
+        cleanB === 'pln' ||
+        cleanB.startsWith('pln') ||
+        bLower.includes('token listrik') ||
+        bLower.includes('listrik prepaid')
+      ) {
+        return voucherDigitalGame;
+      }
 
       if (cleanB.includes('mobilelegend') || cleanB.includes('mlbb')) {
         return gamesList.find(g => 
@@ -271,12 +308,6 @@ async function handleSync(req: NextRequest) {
       });
     };
 
-    let productsCreated = 0;
-    let productsUpdated = 0;
-    let productsDeactivated = 0;
-    let productsLockedSkipped = 0;
-    let gamesCreated = 0;
-
     const forceOverwrite = searchParams.get("force_overwrite") === "true";
 
     // Dynamic markup from query param (default 8%)
@@ -302,19 +333,27 @@ async function handleSync(req: NextRequest) {
       let gameObj = findGameMatch(brand);
 
       if (!gameObj && isDigiActive) {
-        let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        if (!slug) slug = 'cat-' + crypto.randomUUID().slice(0, 8);
+        const brandClean = brand.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-        const categoryName = item.category || 'Voucher';
-        const newGameId = crypto.randomUUID();
-        await executeQuery(
-          `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [newGameId, brand, slug, "⚡", categoryName, `Top up ${brand} (${categoryName}) instan 24 jam.`, true, 0]
-        );
-        gameObj = { id: newGameId, name: brand, slug };
-        gamesList.push(gameObj);
-        gamesCreated++;
+        // PLN brand: sudah pasti di-route ke Voucher Digital oleh findGameMatch.
+        // Jika masih tidak ditemukan (edge case), paksa ke voucherDigitalGame.
+        if (brandClean === 'pln' || brandClean.startsWith('pln')) {
+          gameObj = voucherDigitalGame;
+        } else {
+          let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          if (!slug) slug = 'cat-' + crypto.randomUUID().slice(0, 8);
+
+          const categoryName = item.category || 'Voucher';
+          const newGameId = crypto.randomUUID();
+          await executeQuery(
+            `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [newGameId, brand, slug, "⚡", categoryName, `Top up ${brand} (${categoryName}) instan 24 jam.`, true, 0]
+          );
+          gameObj = { id: newGameId, name: brand, slug };
+          gamesList.push(gameObj);
+          gamesCreated++;
+        }
       }
 
       if (!gameObj) continue;
