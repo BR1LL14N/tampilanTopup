@@ -17,7 +17,7 @@ function slugify(text: string) {
     .replace(/\-\-+/g, "-");
 }
 
-function isGameProduct(item: any): boolean {
+function isAllowedProduct(item: any): boolean {
   if (!item || !item.brand) return false;
 
   const category = (item.category || "").toLowerCase().trim();
@@ -25,10 +25,22 @@ function isGameProduct(item: any): boolean {
   const productName = (item.product_name || "").toLowerCase().trim();
   const cleanBrand = brand.replace(/[^a-z0-9]/g, "");
 
-  // 1. Explicit Non-Game Brand Exclusions (Pulsa, Operator, PLN, TV, E-Money)
+  // 0. Whitelist: PLN / Token Listrik — selalu diizinkan masuk
+  if (
+    cleanBrand === "pln" ||
+    category === "pln" ||
+    category.includes("token listrik") ||
+    category.includes("listrik") ||
+    productName.includes("token listrik")
+  ) {
+    return true;
+  }
+
+  // 1. Explicit Non-Game Brand Exclusions (Pulsa, Operator, TV, E-Money)
+  //    PLN sudah di-whitelist di atas, tidak perlu diblokir di sini.
   const nonGameBrandList = [
     "telkomsel", "indosat", "xl", "axis", "tri", "three", "smartfren", "byu",
-    "pln", "kvision", "kvisiondangol", "nexparabola", "matrixtv", "indovision", "tv",
+    "kvision", "kvisiondangol", "nexparabola", "matrixtv", "indovision", "tv",
     "gopay", "ovo", "dana", "linkaja", "shopeepay", "maxim", "grab", "gojek", "isaku", "doku"
   ];
 
@@ -37,11 +49,11 @@ function isGameProduct(item: any): boolean {
   }
 
   // 2. Explicit Non-Game Category Keywords
+  //    Catatan: "pln" dan "listrik" tidak diblokir karena sudah di-whitelist di atas.
   if (
     category.includes("pulsa") ||
     category.includes("data") ||
     category.includes("internet") ||
-    category.includes("pln") ||
     category.includes("pasca") ||
     category.includes("e-money") ||
     category.includes("emoney") ||
@@ -53,10 +65,10 @@ function isGameProduct(item: any): boolean {
   }
 
   // 3. Explicit Non-Game Product Name Keywords
+  //    Catatan: "token pln" tidak diblokir karena sudah di-whitelist di atas.
   if (
     productName.includes("pulsa") ||
     productName.includes("paket data") ||
-    productName.includes("token pln") ||
     productName.includes("voucher tv") ||
     productName.includes("paket internet") ||
     productName.includes("kuota")
@@ -172,22 +184,23 @@ async function handleSync(req: NextRequest) {
 
     const allItems = result.data;
     
-    // Filter ALL Digiflazz game items (both active and inactive)
+    // Filter ALL Digiflazz items (game + PLN Token Listrik yang diizinkan, both active and inactive)
     const gameProductsFromDigiflazz = allItems.filter((item: any) => 
-      item && item.brand && item.brand.trim() !== '' && isGameProduct(item)
+      item && item.brand && item.brand.trim() !== '' && isAllowedProduct(item)
     );
 
     const skippedProductsCount = allItems.length - gameProductsFromDigiflazz.length;
 
-    // Clean up non-game operator and utility entries from games and products tables
+    // Clean up non-game operator and utility entries (pulsa, emoney, TV, dll)
+    // Catatan: PLN / Token Listrik TIDAK dihapus karena kini didukung oleh sistem
     try {
       await executeQuery(
         `DELETE FROM products WHERE game_id IN (
-          SELECT id FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'PLN', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
+          SELECT id FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
         )`
       );
       await executeQuery(
-        `DELETE FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'PLN', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'pln', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
+        `DELETE FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
       );
     } catch (cleanupErr) {
       console.warn("Non-game cleanup warning:", cleanupErr);
@@ -197,11 +210,48 @@ async function handleSync(req: NextRequest) {
     const dbGames = await executeQuery("SELECT id, name, slug FROM games");
     let gamesList: any[] = [...dbGames];
 
+    let productsCreated = 0;
+    let productsUpdated = 0;
+    let productsDeactivated = 0;
+    let productsLockedSkipped = 0;
+    let gamesCreated = 0;
+
+    // ── Ensure "Voucher Digital" game entry exists ──────────────────────────────
+    // PLN / Token Listrik dan voucher digital lain akan dikelompokkan di sini.
+    // PENTING: status=false agar tidak langsung tampil ke panel user (Draft mode).
+    // Admin bisa publish kapan saja via toggle Status di halaman Kelola Game.
+    let voucherDigitalGame = gamesList.find(g =>
+      g.slug === 'voucher-digital' ||
+      (g.name || '').toLowerCase().replace(/\s+/g, '') === 'voucherdigital'
+    );
+    if (!voucherDigitalGame) {
+      const vdId = crypto.randomUUID();
+      await executeQuery(
+        `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [vdId, 'Voucher Digital', 'voucher-digital', '⚡', 'Voucher Digital',
+         'Token Listrik PLN dan voucher digital lainnya. Proses instan 24 jam.', false, 98]
+      );
+      voucherDigitalGame = { id: vdId, name: 'Voucher Digital', slug: 'voucher-digital' };
+      gamesList.push(voucherDigitalGame);
+      gamesCreated++;
+    }
+
     // Smart Fuzzy Match Digiflazz brand to DB game
     const findGameMatch = (brandInput: string) => {
       if (!brandInput) return undefined;
       const bLower = brandInput.toLowerCase().trim();
       const cleanB = bLower.replace(/[^a-z0-9]/g, '');
+
+      // PLN / Token Listrik → selalu masuk ke grup Voucher Digital
+      if (
+        cleanB === 'pln' ||
+        cleanB.startsWith('pln') ||
+        bLower.includes('token listrik') ||
+        bLower.includes('listrik prepaid')
+      ) {
+        return voucherDigitalGame;
+      }
 
       if (cleanB.includes('mobilelegend') || cleanB.includes('mlbb')) {
         return gamesList.find(g => 
@@ -258,12 +308,6 @@ async function handleSync(req: NextRequest) {
       });
     };
 
-    let productsCreated = 0;
-    let productsUpdated = 0;
-    let productsDeactivated = 0;
-    let productsLockedSkipped = 0;
-    let gamesCreated = 0;
-
     const forceOverwrite = searchParams.get("force_overwrite") === "true";
 
     // Dynamic markup from query param (default 8%)
@@ -289,19 +333,27 @@ async function handleSync(req: NextRequest) {
       let gameObj = findGameMatch(brand);
 
       if (!gameObj && isDigiActive) {
-        let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        if (!slug) slug = 'cat-' + crypto.randomUUID().slice(0, 8);
+        const brandClean = brand.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-        const categoryName = item.category || 'Voucher';
-        const newGameId = crypto.randomUUID();
-        await executeQuery(
-          `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [newGameId, brand, slug, "⚡", categoryName, `Top up ${brand} (${categoryName}) instan 24 jam.`, true, 0]
-        );
-        gameObj = { id: newGameId, name: brand, slug };
-        gamesList.push(gameObj);
-        gamesCreated++;
+        // PLN brand: sudah pasti di-route ke Voucher Digital oleh findGameMatch.
+        // Jika masih tidak ditemukan (edge case), paksa ke voucherDigitalGame.
+        if (brandClean === 'pln' || brandClean.startsWith('pln')) {
+          gameObj = voucherDigitalGame;
+        } else {
+          let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          if (!slug) slug = 'cat-' + crypto.randomUUID().slice(0, 8);
+
+          const categoryName = item.category || 'Voucher';
+          const newGameId = crypto.randomUUID();
+          await executeQuery(
+            `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [newGameId, brand, slug, "⚡", categoryName, `Top up ${brand} (${categoryName}) instan 24 jam.`, true, 0]
+          );
+          gameObj = { id: newGameId, name: brand, slug };
+          gamesList.push(gameObj);
+          gamesCreated++;
+        }
       }
 
       if (!gameObj) continue;
