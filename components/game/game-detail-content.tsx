@@ -177,6 +177,60 @@ export const GAME_GUIDES: Record<string, GameGuide> = {
     ],
     formatNotice: "Hanya masukkan Bigo ID resmi akun Anda.",
   },
+  "dana": {
+    idLabel: "Nomor Akun DANA",
+    idPlaceholder: "Contoh: 081234567890",
+    idExample: "081234567890",
+    hasServerId: false,
+    howToFind: [
+      "Buka aplikasi DANA di ponsel Anda.",
+      "Gunakan nomor HP yang terdaftar sebagai akun DANA aktif (format: 08xxxxxxxxxx)."
+    ],
+    formatNotice: "Pastikan nomor akun DANA sudah sesuai sebelum melanjutkan pembayaran. Kesalahan nomor HP di luar tanggung jawab kami.",
+    validate: (id) => {
+      const clean = id.replace(/[^0-9]/g, "");
+      if (clean.length < 10 || clean.length > 14) {
+        return "Nomor HP DANA harus berupa 10-14 digit angka (Contoh: 081234567890)";
+      }
+      return null;
+    }
+  },
+  "top-up-dana": {
+    idLabel: "Nomor Akun DANA",
+    idPlaceholder: "Contoh: 081234567890",
+    idExample: "081234567890",
+    hasServerId: false,
+    howToFind: [
+      "Buka aplikasi DANA di ponsel Anda.",
+      "Gunakan nomor HP yang terdaftar sebagai akun DANA aktif (format: 08xxxxxxxxxx)."
+    ],
+    formatNotice: "Pastikan nomor akun DANA sudah sesuai sebelum melanjutkan pembayaran. Kesalahan nomor HP di luar tanggung jawab kami.",
+    validate: (id) => {
+      const clean = id.replace(/[^0-9]/g, "");
+      if (clean.length < 10 || clean.length > 14) {
+        return "Nomor HP DANA harus berupa 10-14 digit angka (Contoh: 081234567890)";
+      }
+      return null;
+    }
+  },
+  "token-listrik-pln": {
+    idLabel: "Nomor Meter / ID Pelanggan PLN",
+    idPlaceholder: "Contoh: 14123456789 (11-12 digit)",
+    idExample: "14123456789",
+    hasServerId: false,
+    howToFind: [
+      "Lihat 11 digit nomor meter yang tertera pada meteran listrik prabayar Anda.",
+      "Atau lihat 12 digit ID Pelanggan pada struk pembelian token listrik sebelumnya."
+    ],
+    formatNotice: "Pastikan nomor meter atau ID Pelanggan sudah sesuai sebelum melanjutkan pembayaran.",
+    validate: (id) => {
+      const clean = id.replace(/[^0-9]/g, "");
+      if (clean.length < 11 || clean.length > 12) {
+        return "Nomor Meter / ID Pelanggan PLN harus berupa 11 atau 12 digit angka";
+      }
+      return null;
+    }
+  },
 }
 
 export const defaultGameGuide: GameGuide = {
@@ -202,6 +256,8 @@ const gameWallpapers: Record<string, string> = {
   "steam": gameAssets.steam.banner,
   "tiktok": gameAssets.tiktok.banner,
   "bigo": gameAssets.bigo.banner,
+  "dana": "/assets/payments/dana.png",
+  "top-up-dana": "/assets/payments/dana.png",
 }
 const defaultWallpaper = gameAssets["mobile-legends"].banner
 
@@ -217,6 +273,9 @@ const getPublisher = (slug: string) => {
     "steam": "Valve",
     "tiktok": "TikTok",
     "bigo": "BIGO",
+    "dana": "DANA Indonesia",
+    "top-up-dana": "DANA Indonesia",
+    "token-listrik-pln": "PT PLN (Persero)",
   }
   return map[slug] || "Game Publisher"
 }

@@ -105,12 +105,15 @@ export function HomeContent({ user, dbGames = [], flashSales = [] }: HomeContent
             categoryLower === "pln" ||
             categoryLower.includes("pln") ||
             categoryLower.includes("listrik") ||
+            categoryLower.includes("dana") ||
             slugLower.includes("voucher") ||
             slugLower.includes("steam") ||
             slugLower.includes("token-listrik") ||
             slugLower === "pln" ||
+            slugLower.includes("dana") ||
             nameLower.includes("token listrik") ||
-            nameLower.includes("pln")
+            nameLower.includes("pln") ||
+            nameLower.includes("dana")
           ) {
             tab = "voucher";
           }
