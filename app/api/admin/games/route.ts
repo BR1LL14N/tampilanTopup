@@ -11,15 +11,15 @@ export async function GET(req: NextRequest) {
     const { executeQuery } = await import("@/lib/db");
 
     // Auto-purge non-game operator / PPOB entries (pulsa, emoney, TV, dll)
-    // Catatan: PLN / Token Listrik TIDAK ikut dipurge karena kini didukung oleh sistem
+    // Catatan: PLN & DANA TIDAK ikut dipurge karena kini didukung oleh sistem
     try {
       await executeQuery(
         `DELETE FROM products WHERE game_id IN (
-          SELECT id FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
+          SELECT id FROM games WHERE (category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'linkaja', 'shopeepay')) AND slug NOT IN ('dana', 'top-up-dana', 'token-listrik-pln', 'pln')
         )`
       );
       await executeQuery(
-        `DELETE FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
+        `DELETE FROM games WHERE (category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'linkaja', 'shopeepay')) AND slug NOT IN ('dana', 'top-up-dana', 'token-listrik-pln', 'pln')`
       );
     } catch (_) {}
 

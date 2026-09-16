@@ -114,6 +114,16 @@ export const gameAssets = {
     poster: "/assets/games/zenless-zone-zero/poster.png",
     banner: "/assets/games/zenless-zone-zero/banner.png",
   },
+  dana: {
+    icon: "/assets/payments/dana.png",
+    poster: "/assets/payments/dana.png",
+    banner: "/assets/payments/dana.png",
+  },
+  "top-up-dana": {
+    icon: "/assets/payments/dana.png",
+    poster: "/assets/payments/dana.png",
+    banner: "/assets/payments/dana.png",
+  },
 } as const;
 
 export const itemAssets = {
@@ -185,6 +195,9 @@ export function slugFromGameName(name?: string | null) {
     hsr: "honkai-star-rail",
     "arena-of-valor": "arena-of-valor",
     aov: "arena-of-valor",
+    dana: "dana",
+    "top-up-dana": "top-up-dana",
+    "saldo-dana": "dana",
   };
   return aliases[normalized] || (normalized as GameAssetSlug);
 }

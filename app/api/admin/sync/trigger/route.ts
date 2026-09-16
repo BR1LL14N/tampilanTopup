@@ -25,7 +25,7 @@ function isAllowedProduct(item: any): boolean {
   const productName = (item.product_name || "").toLowerCase().trim();
   const cleanBrand = brand.replace(/[^a-z0-9]/g, "");
 
-  // 0. Whitelist: PLN / Token Listrik — selalu diizinkan masuk
+  // 0a. Whitelist: PLN / Token Listrik — selalu diizinkan masuk
   if (
     cleanBrand === "pln" ||
     category === "pln" ||
@@ -36,12 +36,24 @@ function isAllowedProduct(item: any): boolean {
     return true;
   }
 
+  // 0b. Whitelist: DANA — selalu diizinkan masuk (khusus DANA, e-money lain tetap diblokir)
+  if (
+    cleanBrand === "dana" ||
+    brand === "dana" ||
+    cleanBrand.startsWith("dana") ||
+    brand.startsWith("dana ") ||
+    productName.startsWith("dana ") ||
+    productName === "dana"
+  ) {
+    return true;
+  }
+
   // 1. Explicit Non-Game Brand Exclusions (Pulsa, Operator, TV, E-Money)
-  //    PLN sudah di-whitelist di atas, tidak perlu diblokir di sini.
+  //    PLN dan DANA sudah di-whitelist di atas, tidak perlu diblokir di sini.
   const nonGameBrandList = [
     "telkomsel", "indosat", "xl", "axis", "tri", "three", "smartfren", "byu",
     "kvision", "kvisiondangol", "nexparabola", "matrixtv", "indovision", "tv",
-    "gopay", "ovo", "dana", "linkaja", "shopeepay", "maxim", "grab", "gojek", "isaku", "doku"
+    "gopay", "ovo", "linkaja", "shopeepay", "maxim", "grab", "gojek", "isaku", "doku"
   ];
 
   if (nonGameBrandList.some(b => cleanBrand === b || cleanBrand.includes(b))) {
@@ -192,15 +204,15 @@ async function handleSync(req: NextRequest) {
     const skippedProductsCount = allItems.length - gameProductsFromDigiflazz.length;
 
     // Clean up non-game operator and utility entries (pulsa, emoney, TV, dll)
-    // Catatan: PLN / Token Listrik TIDAK dihapus karena kini didukung oleh sistem
+    // Catatan: PLN & DANA TIDAK dihapus karena kini didukung oleh sistem
     try {
       await executeQuery(
         `DELETE FROM products WHERE game_id IN (
-          SELECT id FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')
+          SELECT id FROM games WHERE (category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'linkaja', 'shopeepay')) AND slug NOT IN ('dana', 'top-up-dana', 'token-listrik-pln', 'pln')
         )`
       );
       await executeQuery(
-        `DELETE FROM games WHERE category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'dana', 'linkaja', 'shopeepay')`
+        `DELETE FROM games WHERE (category IN ('Pulsa', 'Masa Aktif', 'Data', 'E-Money', 'TV', 'Pertagas', 'BPJS', 'PBB', 'Pasca') OR slug IN ('telkomsel', 'indosat', 'xl', 'axis', 'tri', 'three', 'smartfren', 'by-u', 'byu', 'k-vision-dan-gol', 'k-vision', 'kvision', 'gopay', 'ovo', 'linkaja', 'shopeepay')) AND slug NOT IN ('dana', 'top-up-dana', 'token-listrik-pln', 'pln')`
       );
     } catch (cleanupErr) {
       console.warn("Non-game cleanup warning:", cleanupErr);
@@ -238,6 +250,27 @@ async function handleSync(req: NextRequest) {
       gamesCreated++;
     }
 
+    // ── Ensure "DANA" game entry khusus DANA (Voucher Digital) ────────────────
+    // Produk DANA dari Digiflazz dikumpulkan di sini secara otomatis.
+    // Menggunakan kategori "Voucher Digital" dan status=false (Draft mode) jika belum ada.
+    let danaGame = gamesList.find(g =>
+      g.slug === 'dana' ||
+      g.slug === 'top-up-dana' ||
+      (g.name || '').toLowerCase().replace(/[^a-z0-9]/g, '') === 'dana'
+    );
+    if (!danaGame) {
+      const danaId = crypto.randomUUID();
+      await executeQuery(
+        `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [danaId, 'DANA', 'dana', '💳', 'Voucher Digital',
+         'Top Up Saldo DANA cepat, murah, dan terpercaya 24 jam non-stop. Masukkan nomor HP akun DANA tujuan.', false, 97]
+      );
+      danaGame = { id: danaId, name: 'DANA', slug: 'dana' };
+      gamesList.push(danaGame);
+      gamesCreated++;
+    }
+
     // Smart Fuzzy Match Digiflazz brand to DB game
     const findGameMatch = (brandInput: string) => {
       if (!brandInput) return undefined;
@@ -253,6 +286,17 @@ async function handleSync(req: NextRequest) {
         bLower.includes('listrik pln')
       ) {
         return plnGame;
+      }
+
+      // DANA → selalu masuk ke game DANA (Voucher Digital)
+      if (
+        cleanB === 'dana' ||
+        cleanB.startsWith('dana') ||
+        bLower.includes('saldo dana') ||
+        bLower.includes('topup dana') ||
+        bLower.includes('top up dana')
+      ) {
+        return danaGame;
       }
 
       if (cleanB.includes('mobilelegend') || cleanB.includes('mlbb')) {
@@ -337,8 +381,8 @@ async function handleSync(req: NextRequest) {
       if (!gameObj && isDigiActive) {
         const brandClean = brand.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-        // PLN brand: sudah pasti di-route ke plnGame oleh findGameMatch.
-        // Jika masih tidak ditemukan (edge case), paksa ke plnGame.
+        // PLN / DANA brand: sudah pasti di-route oleh findGameMatch.
+        // Jika masih tidak ditemukan (edge case), paksa ke dedicated game masing-masing.
         if (
           brandClean === 'pln' ||
           brandClean.startsWith('pln') ||
@@ -346,6 +390,12 @@ async function handleSync(req: NextRequest) {
           brand.toLowerCase().includes('listrik pln')
         ) {
           gameObj = plnGame;
+        } else if (
+          brandClean === 'dana' ||
+          brandClean.startsWith('dana') ||
+          brand.toLowerCase().includes('dana')
+        ) {
+          gameObj = danaGame;
         } else {
           let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
           if (!slug) slug = 'cat-' + crypto.randomUUID().slice(0, 8);
