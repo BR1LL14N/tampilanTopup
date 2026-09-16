@@ -216,24 +216,25 @@ async function handleSync(req: NextRequest) {
     let productsLockedSkipped = 0;
     let gamesCreated = 0;
 
-    // ── Ensure "Voucher Digital" game entry exists ──────────────────────────────
-    // PLN / Token Listrik dan voucher digital lain akan dikelompokkan di sini.
+    // ── Ensure "Token Listrik PLN" game entry khusus PLN ─────────────────────
+    // Semua produk PLN dari Digiflazz dikumpulkan di sini secara otomatis.
     // PENTING: status=false agar tidak langsung tampil ke panel user (Draft mode).
     // Admin bisa publish kapan saja via toggle Status di halaman Kelola Game.
-    let voucherDigitalGame = gamesList.find(g =>
-      g.slug === 'voucher-digital' ||
-      (g.name || '').toLowerCase().replace(/\s+/g, '') === 'voucherdigital'
+    let plnGame = gamesList.find(g =>
+      g.slug === 'token-listrik-pln' ||
+      g.slug === 'pln' ||
+      (g.name || '').toLowerCase().replace(/[^a-z0-9]/g, '') === 'tokenlistrikpln'
     );
-    if (!voucherDigitalGame) {
-      const vdId = crypto.randomUUID();
+    if (!plnGame) {
+      const plnId = crypto.randomUUID();
       await executeQuery(
         `INSERT INTO games (id, name, slug, icon, category, description, status, sort_order)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [vdId, 'Voucher Digital', 'voucher-digital', '⚡', 'Voucher Digital',
-         'Token Listrik PLN dan voucher digital lainnya. Proses instan 24 jam.', false, 98]
+        [plnId, 'Token Listrik PLN', 'token-listrik-pln', '⚡', 'PLN',
+         'Beli Token Listrik PLN Prabayar dengan proses instan 24 jam. Masukkan nomor meter untuk top up.', false, 98]
       );
-      voucherDigitalGame = { id: vdId, name: 'Voucher Digital', slug: 'voucher-digital' };
-      gamesList.push(voucherDigitalGame);
+      plnGame = { id: plnId, name: 'Token Listrik PLN', slug: 'token-listrik-pln' };
+      gamesList.push(plnGame);
       gamesCreated++;
     }
 
@@ -243,14 +244,15 @@ async function handleSync(req: NextRequest) {
       const bLower = brandInput.toLowerCase().trim();
       const cleanB = bLower.replace(/[^a-z0-9]/g, '');
 
-      // PLN / Token Listrik → selalu masuk ke grup Voucher Digital
+      // PLN / Token Listrik → selalu masuk ke game Token Listrik PLN yang dedicated
       if (
         cleanB === 'pln' ||
         cleanB.startsWith('pln') ||
         bLower.includes('token listrik') ||
-        bLower.includes('listrik prepaid')
+        bLower.includes('listrik prepaid') ||
+        bLower.includes('listrik pln')
       ) {
-        return voucherDigitalGame;
+        return plnGame;
       }
 
       if (cleanB.includes('mobilelegend') || cleanB.includes('mlbb')) {
@@ -335,10 +337,15 @@ async function handleSync(req: NextRequest) {
       if (!gameObj && isDigiActive) {
         const brandClean = brand.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-        // PLN brand: sudah pasti di-route ke Voucher Digital oleh findGameMatch.
-        // Jika masih tidak ditemukan (edge case), paksa ke voucherDigitalGame.
-        if (brandClean === 'pln' || brandClean.startsWith('pln')) {
-          gameObj = voucherDigitalGame;
+        // PLN brand: sudah pasti di-route ke plnGame oleh findGameMatch.
+        // Jika masih tidak ditemukan (edge case), paksa ke plnGame.
+        if (
+          brandClean === 'pln' ||
+          brandClean.startsWith('pln') ||
+          brand.toLowerCase().includes('token listrik') ||
+          brand.toLowerCase().includes('listrik pln')
+        ) {
+          gameObj = plnGame;
         } else {
           let slug = brand.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
           if (!slug) slug = 'cat-' + crypto.randomUUID().slice(0, 8);
